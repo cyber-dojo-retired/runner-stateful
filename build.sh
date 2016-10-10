@@ -1,5 +1,4 @@
 #!/bin/sh
-set -e
 
 app_dir=${1}
 docker_engine_version=${2}
