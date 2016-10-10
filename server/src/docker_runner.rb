@@ -1,7 +1,13 @@
 
-module Runner # mix-in
+require_relative './nearest_ancestors'
 
-  module_function
+class DockerRunner
+
+  def initialize(parent)
+    @parent = parent
+  end
+
+  attr_reader :parent
 
   def pulled?(image_name)
     #image_names.include?(image_name)
@@ -14,7 +20,7 @@ module Runner # mix-in
 
   def start(kata_id, avatar_name)
     vol_name = "cyber_dojo_#{kata_id}_#{avatar_name}"
-    # command = "sudo ... docker volume create #{vol_name}"
+    # command = [ sudo, "docker volume create #{vol_name}" ].join(space)
     # shell.exec(command)
   end
 
@@ -59,20 +65,19 @@ module Runner # mix-in
     # 6. Deletegate to docker_runner.sh
     # args = [ cid, max_seconds, quoted(sudo) ].join(space)
     # output, exit_status = shell.cd_exec(my_dir, "./docker_runner.sh #{args}")
+    output = 'stubbed'
 
     # 7. Make sure container is deleted
     # command = "sudo ... docker rm -f #{cid}"
     # shell.exec(command)
 
     # output_or_timed_out(output, exit_status, max_seconds)
-
-    'output'
+    output
   end
 
   private
 
-  #include NearestAncestors
-  #include Runner
+  include NearestAncestors
 
   def image_names
     # [docker images] must be made by a user that has sufficient rights.
@@ -85,11 +90,11 @@ module Runner # mix-in
   end
 
   def disk
-    #nearest_ancestors(:disk)
+    nearest_ancestors(:disk)
   end
 
   def shell
-    #nearest_ancestors(:shell)
+    nearest_ancestors(:shell)
   end
 
   def sudo

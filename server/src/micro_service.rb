@@ -6,31 +6,27 @@ require 'sinatra/base'
 require 'json'
 
 require_relative './externals'
-require_relative './runner'
+require_relative './docker_runner'
 require_relative './string_cleaner'
 
 class MicroService < Sinatra::Base
 
-  # TODO: need to create runner object and pass self as arg
-  # which is held as parent for nearest_ancestors(...)
-
-
   get '/pulled' do
     content_type :json
     request.body.rewind
-    pulled?(image_name)
+    runner.pulled?(image_name)
   end
 
   post '/pull' do
     content_type :json
     request.body.rewind
-    pull(image_name)
+    runner.pull(image_name)
   end
 
   post '/start' do
     content_type :json
     request.body.rewind
-    start(kata_id, avatar_name)
+    runner.start(kata_id, avatar_name)
   end
 
   post '/run' do
@@ -39,15 +35,18 @@ class MicroService < Sinatra::Base
     max_seconds = args['max_seconds']
     delete_filenames = args['delete_filenames']
     changed_files = args['changed_files']
-    output = run(image_name, kata_id, avatar_name, max_seconds, delete_filenames, changed_files)
+    output = runner.run(image_name, kata_id, avatar_name, max_seconds, delete_filenames, changed_files)
     cleaned(output)
   end
 
   private
 
   include Externals
-  include Runner
   include StringCleaner
+
+  def runner
+    DockerRunner.new(self)
+  end
 
   def args
     @args ||= JSON.parse(request.body.read)
