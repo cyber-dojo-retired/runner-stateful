@@ -1,8 +1,8 @@
 #!/bin/sh
 set -e
 
-app_dir=${1:-/app}
-docker_engine_verson=${2:-1.12.1}
+app_dir=${1}
+docker_engine_version=${2}
 
 hash docker 2> /dev/null
 if [ $? != 0 ]; then

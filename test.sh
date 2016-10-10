@@ -11,16 +11,18 @@
 #   Use the test file's hex-id prefix to run *all* the tests in that file
 #   Use the tests individual hex-id to run just that one test
 
-export DOCKER_ENGINE_VERSION=1.12.1
-
 my_dir="$( cd "$( dirname "${0}" )" && pwd )"
-${my_dir}/build.sh /app ${DOCKER_ENGINE_VERSION}
+app_dir=${1:-/app}
+docker_version=$(docker --version | awk '{print $3}' | sed '$s/.$//')
+
+${my_dir}/build.sh /app ${docker_version}
 if [ $? != 0 ]; then
   echo
   echo "./build.sh FAILED"
   exit 1
 fi
 
+export DOCKER_ENGINE_VERSION=${docker_version}
 docker-compose down
 docker-compose up -d
 
