@@ -12,10 +12,10 @@
 #   Use the tests individual hex-id to run just that one test
 
 my_dir="$( cd "$( dirname "${0}" )" && pwd )"
-app_dir=${1:-/app}
+app_dir=/app
 docker_version=$(docker --version | awk '{print $3}' | sed '$s/.$//')
 
-${my_dir}/build.sh /app ${docker_version}
+${my_dir}/build.sh ${app_dir} ${docker_version}
 if [ $? != 0 ]; then
   echo
   echo "./build.sh FAILED"
