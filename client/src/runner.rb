@@ -31,7 +31,7 @@ module Runner # mix-in
       :changed_files => changed_files
     }.to_json
     response = http.request(request)
-    JSON.parse(response.body)
+    response.body
   end
 
 end

@@ -32,8 +32,8 @@ class Demo < Sinatra::Base
           "end"
         ].join("\n")
     }
-    json = run(image_name, kata_id, avatar_name, max_seconds, delete_filenames, changed_files)
-    '<pre>' + JSON.pretty_unparse(json) + '</pre>'
+    output = run(image_name, kata_id, avatar_name, max_seconds, delete_filenames, changed_files)
+    '<pre>' + output + '</pre>'
   end
 
   include Runner
