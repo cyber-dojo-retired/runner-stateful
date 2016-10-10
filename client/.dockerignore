@@ -1,0 +1,10 @@
+#-----Ignore everything
+
+*
+
+-#-----!Except these files
+
+!config.ru
+!Procfile
+!src
+!test

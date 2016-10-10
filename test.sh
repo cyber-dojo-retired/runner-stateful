@@ -11,8 +11,10 @@
 #   Use the test file's hex-id prefix to run *all* the tests in that file
 #   Use the tests individual hex-id to run just that one test
 
+export DOCKER_ENGINE_VERSION=1.12.1
+
 my_dir="$( cd "$( dirname "${0}" )" && pwd )"
-${my_dir}/build.sh
+${my_dir}/build.sh /app ${DOCKER_ENGINE_VERSION}
 if [ $? != 0 ]; then
   echo
   echo "./build.sh FAILED"
