@@ -1,0 +1,10 @@
+Run options: --seed 35305
+
+# Running:
+
+................
+
+Finished in 0.011887s, 1345.9975 runs/s, 2607.8701 assertions/s.
+
+16 runs, 31 assertions, 0 failures, 0 errors, 0 skips
+Coverage report generated for MiniTest to /tmp/coverage. 282 / 290 LOC (97.24%) covered.

@@ -1,0 +1,19 @@
+
+version: '2'
+
+services:
+  runner_client:
+    user: nobody
+    image: cyberdojo/runner_client
+    container_name: runner_client
+    command: [ "foreman", "start", "-d", "/app" ]
+    ports: [ "4558:4558" ]
+    links: [ runner_server ]
+
+  runner_server:
+    user: nobody
+    image: cyberdojo/runner
+    container_name: runner_server
+    command: [ "foreman", "start", "-d", "/app" ]
+    ports: [ "4557:4557" ]
+
