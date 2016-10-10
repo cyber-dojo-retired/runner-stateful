@@ -1,8 +1,5 @@
 #!/bin/sh
 
-app_dir=${1}
-docker_engine_version=${2}
-
 hash docker 2> /dev/null
 if [ $? != 0 ]; then
   echo
@@ -11,6 +8,8 @@ if [ $? != 0 ]; then
 fi
 
 my_dir="$( cd "$( dirname "${0}" )" && pwd )"
+app_dir=${1}
+docker_engine_version=${2}
 
 cd ${my_dir}/base    && ./build-image.sh ${app_dir}
 cd ${my_dir}/client  && ./build-image.sh ${app_dir}
