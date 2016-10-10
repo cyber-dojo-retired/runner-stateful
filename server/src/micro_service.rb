@@ -11,43 +11,35 @@ require_relative './string_cleaner'
 
 class MicroService < Sinatra::Base
 
+  # TODO: need to create runner object and pass self as arg
+  # which is held as parent for nearest_ancestors(...)
+
+
   get '/pulled' do
     content_type :json
     request.body.rewind
-    args = JSON.parse(request.body.read)
-    image_name = args['image_name']
     pulled?(image_name)
   end
 
-  # This is a post not a get
-  get '/pull' do
+  post '/pull' do
     content_type :json
     request.body.rewind
-    args = JSON.parse(request.body.read)
-    image_name = args['image_name']
     pull(image_name)
   end
 
-  # This is a post not a get
-  get '/start' do
+  post '/start' do
     content_type :json
     request.body.rewind
-    args = JSON.parse(request.body.read)
-    id = args['id']
-    avatar = args['avatar']
-    start(id, avatar)
+    start(kata_id, avatar_name)
   end
 
-  # This is a post not a get
-  get '/run' do
+  post '/run' do
     content_type :json
     request.body.rewind
-    image_name = args['image_name']
-    args = JSON.parse(request.body.read)
+    max_seconds = args['max_seconds']
     delete_filenames = args['delete_filenames']
     changed_files = args['changed_files']
-    max_seconds = args['max_seconds']
-    output = run(delete_filenames, changed_files, image_name, max_seconds)
+    output = run(image_name, kata_id, avatar_name, max_seconds, delete_filenames, changed_files)
     cleaned(output)
   end
 
@@ -57,7 +49,21 @@ class MicroService < Sinatra::Base
   include Runner
   include StringCleaner
 
+  def args
+    @args ||= JSON.parse(request.body.read)
+  end
 
+  def image_name
+    args['image_name']
+  end
+
+  def kata_id
+    args['kata_id']
+  end
+
+  def avatar_name
+    args['avatar_name']
+  end
 
 end
 
