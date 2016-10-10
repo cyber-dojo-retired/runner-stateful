@@ -3,6 +3,11 @@
 
 <img src="https://raw.githubusercontent.com/cyber-dojo/nginx/master/images/home_page_logo.png" alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
 
+Infrastructure only.
+
+runner_server still needs docker-in-docker image
+
+runner_server still needs sudo and docker-runner user
 
 ```
 ./demo.sh

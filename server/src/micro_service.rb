@@ -7,11 +7,28 @@ require 'json'
 
 require_relative './externals'
 require_relative './runner'
-require_relative './starter'
 require_relative './string_cleaner'
 
 class MicroService < Sinatra::Base
 
+  get '/pulled' do
+    content_type :json
+    request.body.rewind
+    args = JSON.parse(request.body.read)
+    image_name = args['image_name']
+    pulled?(image_name)
+  end
+
+  # This is a post not a get
+  get '/pull' do
+    content_type :json
+    request.body.rewind
+    args = JSON.parse(request.body.read)
+    image_name = args['image_name']
+    pull(image_name)
+  end
+
+  # This is a post not a get
   get '/start' do
     content_type :json
     request.body.rewind
@@ -21,13 +38,14 @@ class MicroService < Sinatra::Base
     start(id, avatar)
   end
 
+  # This is a post not a get
   get '/run' do
     content_type :json
     request.body.rewind
+    image_name = args['image_name']
     args = JSON.parse(request.body.read)
     delete_filenames = args['delete_filenames']
     changed_files = args['changed_files']
-    image_name = args['image_name']
     max_seconds = args['max_seconds']
     output = run(delete_filenames, changed_files, image_name, max_seconds)
     cleaned(output)
@@ -37,8 +55,9 @@ class MicroService < Sinatra::Base
 
   include Externals
   include Runner
-  include Starter
   include StringCleaner
+
+
 
 end
 

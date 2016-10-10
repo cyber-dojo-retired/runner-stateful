@@ -9,21 +9,12 @@ class Demo < Sinatra::Base
 
     # start
 
-    was_files = {
-      'cyber-dojo.sh': "blah blah",
-      'hiker.c': '#include <hiker.h>',
-      'deleted.txt': 'tweedle-dee',
-      'compacted.eg':
-        [ "def finalize(values)",
-          "",
-          "  values.each do |v|",
-          "    v.finalize",
-          "  end",
-          "",
-          "end"
-        ].join("\n")
-    }
-    now_files = {
+    image_name = 'cyberdojofoundation/gcc_assert'
+    kata_id = 'D4C8A65D61'
+    avatar_name = 'lion'
+    max_seconds = 10
+    delete_filenames = []
+    changed_files = {
       'cyber-dojo.sh': "blah blah blah",
       'hiker.c': '#include "hiker.h"',
       'hiker.h': "#ifndef HIKER_INCLUDED\n#endif",
@@ -41,8 +32,7 @@ class Demo < Sinatra::Base
           "end"
         ].join("\n")
     }
-
-    json = run #(was_files, now_files)
+    json = run(image_name, kata_id, avatar_name, max_seconds, delete_filenames, changed_files)
     '<pre>' + JSON.pretty_unparse(json) + '</pre>'
   end
 
