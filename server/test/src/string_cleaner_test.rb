@@ -3,11 +3,11 @@ require_relative './lib_test_base'
 
 class StringCleanerTest < LibTestBase
 
+  include StringCleaner
+
   def self.hex(suffix)
     '3D9' + suffix
   end
-
-  include StringCleaner
 
   test '7FE',
   'cleaned string is not phased by invalid encodings' do
