@@ -45,11 +45,11 @@ class MockSheller
     raise "cd_exec: no mock for (#{path},#{commands})" if mocks == []
     mock = mocks.shift
     raise "cd_exec: mock is for #{mock['call']}" unless mock['call'] == 'cd_exec'
-    if [path,commands] != [mock['path'],mock['commands']]
+    unless [path,commands] == [mock['path'],mock['commands']]
       complain('cd_exec', "#{mock['path']}, #{mock['commands']}", "#{path}, #{commands}")
     end
     write(mocks)
-    [mock['output'], mock['exit_status']]
+    [ mock['output'], mock['exit_status'] ]
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - -
@@ -59,11 +59,11 @@ class MockSheller
     raise "exec: no mock for (#{commands})" if mocks == []
     mock = mocks.shift
     raise "exec: mock is for #{mock['call']}" unless mock['call'] == 'exec'
-    if commands != mock['commands']
+    unless commands == mock['commands']
       complain('exec', "#{mock['commands']}", "#{commands}")
     end
     write(mocks)
-    [mock['output'], mock['exit_status']]
+    return [ mock['output'], mock['exit_status'] ]
   end
 
   private

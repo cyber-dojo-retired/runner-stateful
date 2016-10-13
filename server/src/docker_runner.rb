@@ -20,7 +20,7 @@ class DockerRunner
 
   def start(kata_id, avatar_name)
     vol_name = "cyber_dojo_#{kata_id}_#{avatar_name}"
-    command = [ sudo, "docker volume create #{vol_name}" ].join(space)
+    command = [ sudo, 'docker', 'volume', 'create', vol_name ].join(space)
     _output,_exit_status = shell.exec(command)
   end
 
@@ -29,52 +29,43 @@ class DockerRunner
     vol_name = "cyber_dojo_#{kata_id}_#{avatar_name}"
 
     # 2. Mount the volume into container made from image
-    #   --detach       ; get the CID
-    #   --interactive  ; we exec later NEEDED????
-    # For security...
-    #   --net=none
-    #   --pids-limit (prevent fork bombs)
-    #   --security-opt=no-new-privileges
-    #   --user=nobody
-    #
-    # command= "sudo ... docker create
-    #             --interactive
-    #             --net=none
-    #             --pids-limit=64
-    #             --security-opt=no-new-privileges
-    #             --user=root
-    #             --volume=#{vol_name}:/sandbox
-    #             #{image_name} sh"
-    #
-    # cid = shell.exec(command)
+    command = [
+      "#{sudo} docker create",
+      '--detach',                          # get the CID
+      '--interactive',                     # exec later
+      '--net=none',                        # security
+      '--pids-limit=64',                   # security (fork bombs)
+      '--security-opt=no-new-privileges',  # security
+      '--user=root',                       # ?????? NECESSARY
+      "--volume=#{vol_name}:/sandbox",
+      "#{image_name} sh"
+    ].join(space)
+    cid, _es = shell.exec(command)
 
     # 3. Start the container
-    #
-    # sudo ... docker start #{cid}
+    command = [ sudo, 'docker', 'start', cid ].join(space)
+    # shell.exec(command)
 
     # 4. Delete deleted_filenames from /sandbox in container
     # The F#-NUnit cyber-dojo.sh names the /sandbox folder
     # So SANDBOX has to be /sandbox for backward compatibility.
     # F#-NUnit is the only cyber-dojo.sh that names /sandbox.
-    #
-    # delete_filenames.each do |filename|
-    #   command = "sudo ... docker exec #{cid} sh -c 'rm /sandbox/#{filename}"
-    #   shell.exec(command)
-    # end
+    delete_filenames.each do |filename|
+      command = "#{sudo} docker exec #{cid} sh -c 'rm /sandbox/#{filename}"
+      # shell.exec(command)
+    end
 
     # 5. Copy changed_files into /sandbox
-    #
-    # Dir.mktmpdir('differ') do |tmp_dir|
-    #   changed_files.each do |filename, content|
-    #     disk[tmp_dir].write(filename, content)
-    #   end
-    #   command = "sudo ... docker cp #{tmp_dir}/ #{cid}:/sandbox"
-    #   shell.exec(command)
-    # end
+    Dir.mktmpdir('differ') do |tmp_dir|
+      changed_files.each do |filename, content|
+        disk[tmp_dir].write(filename, content)
+      end
+      command = "#{sudo} docker cp #{tmp_dir}/ #{cid}:/sandbox"
+      # shell.exec(command)
+    end
 
     # 6. Ensure changed files are owned by nobody
-    #
-    # command="docker exec #{cid} sh -c 'chown -R nobody:nobody /sandbox'"
+    command = "docker exec #{cid} sh -c 'chown -R nobody /sandbox'"
     # shell.exec(command)
 
     # 7. Ensure user nobody has a home.
@@ -87,24 +78,20 @@ class DockerRunner
     # Of course, the usermod runs if you are not using C#-NUnit too.
     # In particular usermod is _not_ installed in a default Alpine linux.
     # It's in the shadow package.
-    #
-    # command = "docker exec #{cid} sh -c 'usermod --home /sandbox nobody 2> /dev/null'"
+    command = "#{sudo} docker exec #{cid} sh -c 'usermod --home /sandbox nobody 2> /dev/null'"
     # shell.exec(command)
 
     # 8. Deletegate to docker_runner.sh
-    #
-    # args = [ cid, max_seconds, quoted(sudo) ].join(space)
-    # output, exit_status = shell.cd_exec(my_dir, "./docker_runner.sh #{args}")
+    args = [ cid, max_seconds, quoted(sudo) ].join(space)
+    output, exit_status = shell.cd_exec(my_dir, "./docker_runner.sh #{args}")
     output = 'stubbed'
 
     # 9. Make sure container is deleted
     # TODO: do this in ensure block for exception safety
-    #
-    # command = "sudo ... docker rm -f #{cid}"
+    command = "#{sudo} docker rm -f #{cid}"
     # shell.exec(command)
 
-    # output_or_timed_out(output, exit_status, max_seconds)
-    output
+    output_or_timed_out(output, exit_status, max_seconds)
   end
 
   private
