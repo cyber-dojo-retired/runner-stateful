@@ -15,60 +15,84 @@ class DockerRunner
   end
 
   def pull(image_name)
-    command = [ sudo, 'docker', 'pull', image_name ].join(space).strip
-    shell.exec(command)
+    sudo_exec("docker pull #{image_name}")
   end
 
   def start(kata_id, avatar_name)
-    vol_name = "cyber_dojo_#{kata_id}_#{avatar_name}"
-    command = [ sudo, 'docker', 'volume', 'create', vol_name ].join(space)
-    shell.exec(command)
+    name = "cyber_dojo_#{kata_id}_#{avatar_name}"
+    sudo_exec("docker volume create #{name}")
   end
 
   def run(image_name, kata_id, avatar_name, max_seconds, delete_filenames, changed_files)
-    # 1. Assume volume exists from previous /start
     vol_name = "cyber_dojo_#{kata_id}_#{avatar_name}"
+    cid = create_container_with_volume_mounted_as_sandbox(vol_name, image_name)
+    start_the_container(cid)
+    delete_deleted_files_from_sandbox(cid, delete_filenames)
+    copy_changed_files_into_sandbox(cid, changed_files)
+    ensure_user_nobody_owns_changed_files(cid)
+    ensure_user_nobody_has_HOME(cid)
+    output, exit_status = runner_sh(cid, max_seconds)
+    output_or_timed_out(output, exit_status, max_seconds)
+  end
 
-    # 2. Mount the volume into container made from image to /sandbox
+  private
+
+  include NearestAncestors
+  include Runner
+
+  def create_container_with_volume_mounted_as_sandbox(vol_name, image_name)
+    # Assume volume exists from previous /start
     # F#-NUnit cyber-dojo.sh actually names the /sandbox folder
     command = [
-      "#{sudo} docker create",
-      '--detach',                          # get the CID
-      '--interactive',                     # exec later NECESSARY?
+      'docker create',
+      '--detach',                          # get the cid
+      '--interactive',                     # exec later ?NECESSARY?
       '--net=none',                        # security
       '--pids-limit=64',                   # security (fork bombs)
       '--security-opt=no-new-privileges',  # security
-      '--user=root',                       # NECESSARY?
+      '--user=root',                       # ?NECESSARY?
       "--volume=#{vol_name}:/sandbox",
       "#{image_name} sh"
-    ].join(space)
-    o, es = shell.exec(command)
+    ].join(space = ' ')
+    o, es = sudo_exec(command)
     cid = o.strip
+  end
 
-    # 3. Start the container
-    command = [ sudo, 'docker', 'start', cid ].join(space)
-    o, es = shell.exec(command)
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    # 4. Delete deleted_filenames from /sandbox
-    delete_filenames.each do |filename|
-      command = "#{sudo} docker exec #{cid} sh -c 'rm /sandbox/#{filename}"
-      o, es = shell.exec(command)
+  def start_the_container(cid)
+    o, es = sudo_exec("docker start #{cid}")
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def delete_deleted_files_from_sandbox(cid, filenames)
+    filenames.each do |filename|
+      o, es = sudo_exec("docker exec #{cid} sh -c 'rm /sandbox/#{filename}")
     end
+  end
 
-    # 5. Copy changed_files into /sandbox
-    Dir.mktmpdir('differ') do |tmp_dir|
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def copy_changed_files_into_sandbox(cid, changed_files)
+    Dir.mktmpdir('runner') do |tmp_dir|
       changed_files.each do |filename, content|
         disk[tmp_dir].write(filename, content)
       end
-      command = "#{sudo} docker cp #{tmp_dir}/ #{cid}:/sandbox"
-      o, es = shell.exec(command)
+      o, es = sudo_exec("docker cp #{tmp_dir}/ #{cid}:/sandbox")
     end
+  end
 
-    # 6. Ensure changed files are owned by nobody
-    command = "docker exec #{cid} sh -c 'chown -R nobody /sandbox'"
-    o, es = shell.exec(command)
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    # 7. Ensure user nobody has a home.
+  def ensure_user_nobody_owns_changed_files(cid)
+    o, es = sudo_exec("docker exec #{cid} sh -c 'chown -R nobody /sandbox'")
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def ensure_user_nobody_has_HOME(cid)
+    # TODO: execute this command only for C#-NUnit image_name???
     # The existing C#-NUnit image picks up HOME from the *current* user.
     # By default, nobody's entry in /etc/passwd is
     #       nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin
@@ -78,32 +102,21 @@ class DockerRunner
     # Of course, the usermod runs if you are not using C#-NUnit too.
     # In particular usermod is _not_ installed in a default Alpine linux.
     # It's in the shadow package.
-    #
-    # TODO: execute this command only for C#-NUnit image_name???
-    #
-    command = "#{sudo} docker exec #{cid} sh -c 'usermod --home /sandbox nobody 2> /dev/null'"
-    o, es = shell.exec(command)
-
-    # 8. Deletegate to docker_runner.sh
-    args = [ cid, max_seconds, quoted(sudo) ].join(space)
-    output, exit_status = shell.cd_exec(my_dir, "./docker_runner.sh #{args}")
-
-    # 9. Make sure container is deleted
-    # TODO: do this in ensure block for exception safety
-    command = "#{sudo} docker rm -f #{cid}"
-    shell.exec(command)
-
-    output_or_timed_out(output, exit_status, max_seconds)
+    command = "docker exec #{cid} sh -c 'usermod --home /sandbox nobody 2> /dev/null'"
+    o, es = sudo_exec(command)
   end
 
-  private
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  include NearestAncestors
-  include Runner
+  def runner_sh(cid, max_seconds)
+    my_dir = "#{File.dirname(__FILE__)}"
+    shell.cd_exec(my_dir, "./docker_runner.sh #{cid} #{max_seconds} #{quoted(sudo)}")
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def image_names
-    command = [sudo, 'docker', 'images'].join(space).strip
-    output, _ = shell.exec(command)
+    output, _ = sudo_exec('docker images')
     # This will (harmlessly) get all cyberdojofoundation image names too.
     lines = output.split("\n").select { |line| line.start_with?('cyberdojo') }
     lines.collect { |line| line.split[0] }
@@ -122,12 +135,12 @@ class DockerRunner
     'sudo -u docker-runner sudo'
   end
 
-  def quoted(s)
-    "'" + s + "'"
+  def sudo_exec(command)
+    shell.exec(sudo + ' ' + command)
   end
 
-  def space
-    ' '
+  def quoted(s)
+    "'" + s + "'"
   end
 
 end
