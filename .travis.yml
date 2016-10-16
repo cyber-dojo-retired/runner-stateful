@@ -26,4 +26,4 @@ before_install:
     - docker images
 
 script:
-    - cd ${TRAVIS_BUILD_DIR} && ./test.sh
+    - ./test.sh
