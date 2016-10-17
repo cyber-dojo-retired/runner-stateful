@@ -1,7 +1,6 @@
 sudo: required
-
-services:
-  - docker
+services: docker
+language: generic
 
 env:
     global:
