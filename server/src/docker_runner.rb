@@ -68,6 +68,7 @@ class DockerRunner
 
   def delete_deleted_files_from_sandbox(cid, filenames)
     filenames.each do |filename|
+      # TODO: what if filename has a quote in it?
       o, es = sudo_exec("docker exec #{cid} sh -c 'rm /sandbox/#{filename}")
     end
   end
@@ -77,8 +78,10 @@ class DockerRunner
   def copy_changed_files_into_sandbox(cid, changed_files)
     Dir.mktmpdir('runner') do |tmp_dir|
       changed_files.each do |filename, content|
+        # TODO: what if filename has a quote in it?
         disk[tmp_dir].write(filename, content)
       end
+      # TODO: I'm assuming [cp] preserves the executable attribute
       o, es = sudo_exec("docker cp #{tmp_dir}/ #{cid}:/sandbox")
     end
   end

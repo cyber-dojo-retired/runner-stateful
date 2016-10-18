@@ -1,11 +1,17 @@
 #!/bin/sh
 
-# A runner that executes /sandbox/cyber-dojo.sh inside a prepared docker
-# container and kills it if it does not complete in 10 seconds.
+# Executes /sandbox/cyber-dojo.sh inside a prepared docker container
+# and kills it if it does not complete in 10 seconds.
 
 cid=$1         # Container ready to run /sandbox/cyber-dojo.sh
 max_secs=$2    # How long cyber-dojo.sh has to complete, in seconds, eg 10
 sudo=$3        # sudo incantation for docker commands
+
+timed_out_and_killed=137 # (128=timed-out) + (9=killed
+
+remove_container() {
+  ${sudo} docker rm --force ${cid} &> /dev/null
+}
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # 1. After max_seconds, remove the container
@@ -44,15 +50,13 @@ output=$(${sudo} docker exec \
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 pkill -P ${sleep_docker_rm_pid}
-if [ "$?" != "0" ]; then
-  # Failed to kill the sleep-docker-rm process
-  # Assume [docker rm ${cid}] happened
-  ${sudo} docker rm --force ${cid} &> /dev/null # belt and braces
-  exit 137 # (128=timed-out) + (9=killed)
+if [ "$?" != "0" ]; then # Failed to kill the sleep-docker-rm process
+  remove_container # belt and braces
+  exit ${timed_out_and_killed}
 fi
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# 5. Check the container is still running (belt and braces)
+# 5. Check the container is still running
 #    We're aiming for
 #      - the background 10-second kill process is dead
 #      - the test-run container is still alive
@@ -60,19 +64,15 @@ fi
 
 running=$(${sudo} docker inspect --format="{{ .State.Running }}" ${cid})
 if [ "${running}" != "true" ]; then
-  exit 137 # (128=timed-out) + (9=killed)
+  remove_container # belt and braces
+  exit ${timed_out_and_killed}
 fi
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # 6. We're not using the exit status of the container
-#   Instead
-#     - echo the output so it can be red/amber/green regex'd (see 5)
-#     - remove the container
-#     - exit 0
+#   Instead echo the output so it can be red/amber/green regex'd (see 3)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 echo "${output}"
-
-${sudo} docker rm --force ${cid} &> /dev/null
-
+remove_container
 exit 0
