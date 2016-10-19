@@ -23,6 +23,15 @@ class SudoDockerTest < LibTestBase
 
   attr_reader :stdoutFile, :stderrFile
 
+  test '111',
+  'show info' do
+    p `whoami`
+    p `cat /etc/group`
+    p `ls -al /var/run/docker.sock`
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   test 'B4C',
   'sudoless docker command fails with exit_status non-zero' do
     # NB: sudoless [docker images]...
@@ -91,6 +100,10 @@ class SudoDockerTest < LibTestBase
     # $ if you [$ cd /usr/bin && ls -al docker*]
     # -rwxr-xr-x 1 root root 15673856 Oct 11 17:05 docker
     #
+    # - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # Also they pass on Travis CI setup
+    # but fail on manually built Ubuntu 14.04.5 LTS server
+    # Can I just use docker user/group?
     # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   private
