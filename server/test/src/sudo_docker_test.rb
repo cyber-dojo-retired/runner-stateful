@@ -25,9 +25,21 @@ class SudoDockerTest < LibTestBase
 
   test '111',
   'show info' do
+    p `lsb_release -a`
     p `whoami`
-    p `cat /etc/group`
     p `ls -al /var/run/docker.sock`
+    p `cat /etc/group`
+    #
+    # On manually built Ubuntu 14.04 server
+    # whoami=cyber-dojo
+    # ls -al=srw-rw---- 1 root ping 0 Oct 19 10:17 /var/run/docker.sock
+    # /etc/group -> ping=999
+    # On host that ran the test
+    # /etc/group -> docker=999
+    # And if I shell into cyberdojo/runner:1.12.2 as cyber-dojo user
+    # I can ping so that seems to be it.
+    #
+    # Yet I get the same thing on Travis CI
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
