@@ -25,14 +25,22 @@ class SudoDockerTest < LibTestBase
 
   test 'B4C',
   'sudoless docker command fails with exit_status non-zero' do
+    # NB: sudoless [docker images]...
+    # o) locally on a Mac using Docker-Toolbox it _can_ be run, and this test fails
+    # o) on a proper Travis CI Linux box it can't be run, and this test passes
     command = "docker images >#{stdoutFile} 2>#{stderrFile}"
     output, exit_status = shell.exec([command])
     refute_equal success, exit_status, '[docker image] can be run without sudo'
     assert `cat #{stderrFile}`.start_with? 'Cannot connect to the Docker daemon'
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   test '279',
   'sudo docker command succeeds and exits zero' do
+    # NB: sudo [docker images]...
+    # o) locally on a Mac using Docker-Toolbox this test is no good (see above)
+    # o) on a proper Travis CI Linux box this test is currently failing...
     command = "#{sudo} docker images >#{stdoutFile} 2>#{stderrFile}"
     output, exit_status = shell.exec([command])
     assert_equal success, exit_status

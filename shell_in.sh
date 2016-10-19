@@ -2,7 +2,7 @@
 
 docker run \
   --rm \
-  --user=nobody \
+  --user=cyber-dojo \
   --interactive \
   --tty \
   --volume=/var/run/docker.sock:/var/run/docker.sock \
