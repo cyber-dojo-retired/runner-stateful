@@ -6,7 +6,7 @@ require_relative './snake_caser'
 # see test/external_helper.rb
 
 def env_name(suffix)
-  'DIFFER_CLASS_' + suffix.upcase
+  'RUNNER_CLASS_' + suffix.upcase
 end
 
 def env_map

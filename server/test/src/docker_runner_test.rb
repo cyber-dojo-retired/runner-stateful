@@ -10,12 +10,12 @@ class DockerRunnerTest < LibTestBase
 
   def setup
     super
-    ENV[env_name('shell')]  = 'MockSheller'
+    ENV[env_name('shell')] = 'MockSheller'
   end
 
   def teardown
-    shell.teardown
-    super
+    super # do first. If teardown fails ensure other tests see original ENV
+    shell.teardown if shell.class.name == 'MockSheller'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -29,7 +29,7 @@ class DockerRunnerTest < LibTestBase
     no_gcc_assert = [
       "REPOSITORY                                 TAG                 IMAGE ID            CREATED             SIZE",
       "cyberdojofoundation/java_cucumber          latest              06aa46aad63d        6 weeks ago         881.7 MB",
-      "cyberdojo/runner                           1.12.1              a531a83580c9        18 minutes ago      56.05 MB"
+      "cyberdojo/runner                           1.12.2              a531a83580c9        18 minutes ago      56.05 MB"
     ].join("\n")
     shell.mock_exec([command], no_gcc_assert, success)
     refute runner.pulled?(image_name)
@@ -44,7 +44,7 @@ class DockerRunnerTest < LibTestBase
     has_gcc_assert = [
       "REPOSITORY                                 TAG                 IMAGE ID            CREATED             SIZE",
       "cyberdojofoundation/java_cucumber          latest              06aa46aad63d        6 weeks ago         881.7 MB",
-      "cyberdojo/runner                           1.12.1              a531a83580c9        18 minutes ago      56.05 MB",
+      "cyberdojo/runner                           1.12.2              a531a83580c9        18 minutes ago      56.05 MB",
       "cyberdojofoundation/gcc_assert             latest              da213d286ec5        4 months ago        99.16 MB"
     ].join("\n")
     shell.mock_exec([command], has_gcc_assert, success)
@@ -72,10 +72,10 @@ class DockerRunnerTest < LibTestBase
 
   test 'F2E',
   'start(kata_id,avatar_name) issues shell(docker create volume) command' do
-    kata_id = '77CC5D7F80'
+    kata_id = test_id + '42'
     avatar_name = 'lion'
     volume_name =  [ 'cyber_dojo', kata_id, avatar_name ].join('_')
-    command = [ sudo, 'docker', 'volume', 'create', volume_name ].join(space)
+    command = [ sudo, 'docker volume create --name', volume_name ].join(space)
     info = 'sdsdsd'
     shell.mock_exec([command], info, success)
     output, exit_status = runner.start(kata_id, avatar_name)
@@ -83,12 +83,22 @@ class DockerRunnerTest < LibTestBase
     assert_equal success, exit_status
   end
 
-  #start creates a docker-volume
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test 'DBC',
+  'start creates a docker-volume' do
+    live_shelling
+    kata_id = test_id + '42'
+    avatar_name = 'lion'
+    runner.start(kata_id, avatar_name)
+    output, exit_status = shell.exec([sudo + ' docker volume ls'])
+    assert_equal success, exit_status
+    assert output.include? 'cyber_dojo_' + kata_id + '_' + avatar_name
+  end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
   # run
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
 
 
 
@@ -113,6 +123,11 @@ class DockerRunnerTest < LibTestBase
 
   def space
     ' '
+  end
+
+  def live_shelling
+    ENV[env_name('shell')] = 'ExternalSheller'
+    ENV[env_name('log')] = 'SpyLogger'
   end
 
 end

@@ -29,7 +29,7 @@ class MockShellerTest < LibTestBase
 
   test '4A5',
   'teardown does not raise when no mocks are setup and no calls are made' do
-    assert_equal 'A6E4A5', ENV['DIFFER_TEST_ID']
+    assert_equal 'A6E4A5', ENV['RUNNER_TEST_ID']
     shell.teardown
   end
 

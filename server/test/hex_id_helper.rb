@@ -20,6 +20,10 @@
 
 module TestHexIdHelper # mix-in
 
+  def test_id
+    ENV['RUNNER_TEST_ID']
+  end
+
   def self.included(base)
     base.extend(ClassMethods)
   end
@@ -52,7 +56,7 @@ module TestHexIdHelper # mix-in
         name = lines.join(' ')
         # make test's hex id available inside test method
         block_with_test_id = lambda {
-          ENV['DIFFER_TEST_ID'] = id
+          ENV['RUNNER_TEST_ID'] = id
           self.instance_eval &block
         }
         define_method("test_'#{id}',\n #{name}\n".to_sym, &block_with_test_id)

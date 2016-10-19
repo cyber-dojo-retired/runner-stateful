@@ -1,6 +1,5 @@
 
 require_relative './lib_test_base'
-require_relative './mock_sheller'
 
 class SudoDockerTest < LibTestBase
 
@@ -10,11 +9,10 @@ class SudoDockerTest < LibTestBase
 
   def setup
     super
-    ENV[env_name('shell')]  = 'ExternalSheller'
+    ENV[env_name('shell')] = 'ExternalSheller'
     ENV[env_name('log')] = 'SpyLogger'
-    test_id = ENV['DIFFER_TEST_ID']
-    @stdoutFile = "/tmp/cyber-dojo/stdout.#{@test_id}"
-    @stderrFile = "/tmp/cyber-dojo/stderr.#{@test_id}"
+    @stdoutFile = "/tmp/cyber-dojo/stdout.#{test_id}"
+    @stderrFile = "/tmp/cyber-dojo/stderr.#{test_id}"
   end
 
   def teardown
@@ -33,6 +31,11 @@ class SudoDockerTest < LibTestBase
     # - - - - - - - - - - - - - - - - - - - - - - - - - -
     # Why do the tests break on a manually built server? (see below)
     # Why do the tests break on Docker-Toolbox setup?
+    # Should I just allow runner image to run docker without sudo/etc/etc as root
+    # Maybe. All it does is things requiring [docker]...
+    # But it would be set in the docker-compose.yml and the runner server would be
+    # always up. Not as secure as only doing the sudo when a GET comes in...
+    # Does [docker run --group-add] help?
     # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
     # -------------------------------------
@@ -53,10 +56,10 @@ class SudoDockerTest < LibTestBase
     #
     # -------------------------------------
     # On travis:
-    #   tests pass CI I cant and test passes...
+    #   tests pass CI viz I cant [docker] without sudo.
     # -------------------------------------
     # Travis host itself (travis is member of docker group)
-    #    whoami     -> travis?
+    #    whoami     -> travis
     #    uname -a   -> 14.04.1-Ubuntu
     #    ls -al     -> srw-rw----  1 root docker 0 Oct 19 10:17
     #    /etc/group -> docker:x:999:travis:
@@ -79,12 +82,13 @@ class SudoDockerTest < LibTestBase
     # o) on a proper Travis CI Linux box it can't be run, and this test passes
     command = "docker images >#{stdoutFile} 2>#{stderrFile}"
     output, exit_status = shell.exec([command])
-    refute_equal success, exit_status, '[docker image] can be run without sudo!!'
+    assert_equal success, exit_status, '[docker image] can be run without sudo!!'
     assert `cat #{stderrFile}`.start_with? 'Cannot connect to the Docker daemon'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+=begin
   test '279',
   'sudo docker command succeeds and exits zero' do
     # NB: sudo [docker images]...
@@ -96,6 +100,7 @@ class SudoDockerTest < LibTestBase
     docker_images = `cat #{stdoutFile}`
     assert docker_images.include? 'cyberdojo/runner'
   end
+=end
 
   private
 

@@ -20,7 +20,7 @@ class DockerRunner
 
   def start(kata_id, avatar_name)
     name = "cyber_dojo_#{kata_id}_#{avatar_name}"
-    sudo_exec("docker volume create #{name}")
+    sudo_exec("docker volume create --name #{name}")
   end
 
   def run(image_name, kata_id, avatar_name, max_seconds, delete_filenames, changed_files)
