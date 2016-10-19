@@ -8,13 +8,11 @@ class DockerRunnerTest < LibTestBase
     '9D9' + suffix
   end
 
-  def setup
-    super
+  def external_setup
     ENV[env_name('shell')] = 'MockSheller'
   end
 
-  def teardown
-    super # do first. If teardown fails ensure other tests see original ENV
+  def external_teardown
     shell.teardown if shell.class.name == 'MockSheller'
   end
 
@@ -87,13 +85,15 @@ class DockerRunnerTest < LibTestBase
 
   test 'DBC',
   'start creates a docker-volume' do
-    live_shelling
     kata_id = test_id + '42'
     avatar_name = 'lion'
+    live_shelling
     runner.start(kata_id, avatar_name)
     output, exit_status = shell.exec([sudo + ' docker volume ls'])
     assert_equal success, exit_status
-    assert output.include? 'cyber_dojo_' + kata_id + '_' + avatar_name
+    volume_name = 'cyber_dojo_' + kata_id + '_' + avatar_name
+    assert output.include? volume_name
+    shell.exec([sudo + " docker volume rm #{volume_name}" ])
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -

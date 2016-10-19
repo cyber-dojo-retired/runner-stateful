@@ -7,16 +7,11 @@ class SudoDockerTest < LibTestBase
     '1BF' + suffix
   end
 
-  def setup
-    super
+  def external_setup
     ENV[env_name('shell')] = 'ExternalSheller'
     ENV[env_name('log')] = 'SpyLogger'
     @stdoutFile = "/tmp/cyber-dojo/stdout.#{test_id}"
     @stderrFile = "/tmp/cyber-dojo/stderr.#{test_id}"
-  end
-
-  def teardown
-    super
   end
 
   attr_reader :stdoutFile, :stderrFile

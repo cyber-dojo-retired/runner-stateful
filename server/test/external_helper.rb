@@ -4,16 +4,29 @@ module TestExternalHelper # mix-in
   module_function
 
   def setup
-    raise 'setup() already called' unless @setup_called.nil?
-    @setup_called = true
+    @test_id = ENV['RUNNER_TEST_ID']
     @config = {}
     env_map.keys.each { |key| @config[key] = ENV[key] }
+    external_setup
   end
 
+  def external_setup
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - -
+
   def teardown
-    fail 'teardown() NOT executed because setup() not yet called' if @setup_called.nil?
     env_map.keys.each { |key| ENV[key] = @config[key] }
-    @setup_called = nil
+    external_teardown
+  end
+
+  def external_teardown
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - -
+
+  def test_id
+    @test_id
   end
 
 end

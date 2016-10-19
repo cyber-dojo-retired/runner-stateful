@@ -20,10 +20,6 @@
 
 module TestHexIdHelper # mix-in
 
-  def test_id
-    ENV['RUNNER_TEST_ID']
-  end
-
   def self.included(base)
     base.extend(ClassMethods)
   end
