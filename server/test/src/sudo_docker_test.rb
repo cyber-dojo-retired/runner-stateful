@@ -25,7 +25,7 @@ class SudoDockerTest < LibTestBase
 
   test '111',
   'show info' do
-    p `lsb_release -a`
+    p `uname -a`
     p `whoami`
     p `ls -al /var/run/docker.sock`
     p `cat /etc/group`
