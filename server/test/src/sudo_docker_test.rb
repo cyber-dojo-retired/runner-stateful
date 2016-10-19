@@ -31,15 +31,28 @@ class SudoDockerTest < LibTestBase
     p `cat /etc/group`
     #
     # On manually built Ubuntu 14.04 server
-    # whoami=cyber-dojo
-    # ls -al=srw-rw---- 1 root ping 0 Oct 19 10:17 /var/run/docker.sock
+    # uname -a   -> Ubuntu 14.04
+    # whoami     -> cyber-dojo
+    # ls -al     -> srw-rw---- 1 root ping 0 Oct 19 10:17 /var/run/docker.sock
     # /etc/group -> ping=999
     # On host that ran the test
     # /etc/group -> docker=999
-    # And if I shell into cyberdojo/runner:1.12.2 as cyber-dojo user
-    # I can ping so that seems to be it.
+    # docker-compose --version -> 1.8.0 f3628c7
+    # B4C fails. I can run [docker images] from inside runner as cyber-dojo user without sudo
     #
-    # Yet I get the same thing on Travis CI
+    # On travis CI I cant and test passes...
+    # uname -a   -> 14.04.1-Ubuntu
+    # whoami     -> cyber-dojo
+    # ls -al     -> srw-rw---- 1 root ping 0 Oct 19 10:17 /var/run/docker.sock
+    # /etc/group -> ping=999
+    #
+    # Difference must be on the host.
+    # On manually built.
+    # cat /etc/group
+    #    docker=999
+    # ls -al /var/run/docker.sock
+    #    srw-rw----  1 root     docker        0 Oct 19 10:17 docker.sock
+    #
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
