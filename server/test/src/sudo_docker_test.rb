@@ -29,30 +29,45 @@ class SudoDockerTest < LibTestBase
     p `whoami`
     p `ls -al /var/run/docker.sock`
     p `cat /etc/group`
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - -
+    # Why do the tests break on a manually built server? (see below)
+    # Why do the tests break on Docker-Toolbox setup?
+    # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+    # -------------------------------------
+    # On manually built server (Google cloud, after installing docker)
+    #    B4C test fails. I can run [docker images] _without_ sudoing
+    # -------------------------------------
+    # On host itself
+    #    whoami     -> jrbjagger
+    #    uname -a   -> 14.04.1-Ubuntu
+    #    ls -al     -> srw-rw---- 1 root docker 0 Oct 19 10:17 /var/run/docker.sock
+    #    /etc/group -> docker:x:999:
     #
-    # On manually built Ubuntu 14.04 server
-    # uname -a   -> Ubuntu 14.04
-    # whoami     -> cyber-dojo
-    # ls -al     -> srw-rw---- 1 root ping 0 Oct 19 10:17 /var/run/docker.sock
-    # /etc/group -> ping=999
-    # On host that ran the test
-    # /etc/group -> docker=999
-    # docker-compose --version -> 1.8.0 f3628c7
-    # B4C fails. I can run [docker images] from inside runner as cyber-dojo user without sudo
+    # From test inside container
+    #    whoami     -> cyber-dojo
+    #    uname -a   -> 14.04.1-Ubuntu
+    #    ls -al     -> srw-rw---- 1 root ping 0 Oct 19 10:17 /var/run/docker.sock
+    #    /etc/group -> ping:x:999:
     #
-    # On travis CI I cant and test passes...
-    # uname -a   -> 14.04.1-Ubuntu
-    # whoami     -> cyber-dojo
-    # ls -al     -> srw-rw---- 1 root ping 0 Oct 19 10:17 /var/run/docker.sock
-    # /etc/group -> ping=999
+    # -------------------------------------
+    # On travis:
+    #   tests pass CI I cant and test passes...
+    # -------------------------------------
+    # Travis host itself (travis is member of docker group)
+    #    whoami     -> travis?
+    #    uname -a   -> 14.04.1-Ubuntu
+    #    ls -al     -> srw-rw----  1 root docker 0 Oct 19 10:17
+    #    /etc/group -> docker:x:999:travis:
     #
-    # Difference must be on the host.
-    # On manually built.
-    # cat /etc/group
-    #    docker=999
-    # ls -al /var/run/docker.sock
-    #    srw-rw----  1 root     docker        0 Oct 19 10:17 docker.sock
-    #
+    # From test running inside container
+    #    whoami     -> cyber-dojo
+    #    uname -a   -> 14.04.1-Ubuntu
+    #    ls -al     -> srw-rw----  1 root ping 0 Oct 19 10:17
+    #    /etc/group -> ping:x:999:
+    # -------------------------------------
+
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -81,55 +96,6 @@ class SudoDockerTest < LibTestBase
     docker_images = `cat #{stdoutFile}`
     assert docker_images.include? 'cyberdojo/runner'
   end
-
-    # - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # Why do the above tests break on Docker-Toolbox setup?
-    # Get them working on both?
-    # Detect if on Docker-Toolbox and don't run?
-    # - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # On Ubuntu 14.04 host, after installing docker,
-    # if you [$ cat /etc/group] you see
-    #    docker:x:999:
-    # if you [$ cd /var/run && ls -al] you see
-    #    srw-rw----  1 root     docker        0 Oct 19 10:17 docker.sock
-    #
-    # On Mac with Docker-Toolbox
-    # $ docker-machine ssh default
-    # $ whoami
-    # $ docker run --rm -i --tty --volume=/var/run/docker.sock:/var/run/docker.sock \
-    #     cyberdojo/runner:1.12.2 sh
-    # $ cd /var/run
-    # $ ls -al
-    # srw-rw----    1 root     users            0 Oct 14 19:33 docker.sock
-    # $ cat /etc/group
-    # users:x:100:games
-    #
-    #
-    #
-    # Inside the runner:1.12.2 container on Mac with Docker-Toolbox
-    # if you [$ cat /etc/group] you see
-    #    ping:x:999:
-    # if you [$ cd /var/run && ls -al] you see
-    #    srw-rw----  1 root     ping          0 Oct 19 10:17 docker.sock
-    #
-    # So owner:rw-
-    #    group:rw-
-    #    everyone:---
-    #
-    # - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # On Ubuntu 14.04 host, after installing docker,
-    # if you [$ cd /usr/bin && ls -al docker*] you see
-    # -rwxr-xr-x 1 root root 15096408 Oct 11 18:19 docker
-    #
-    # Inside the runner:1.12.2 container
-    # $ if you [$ cd /usr/bin && ls -al docker*]
-    # -rwxr-xr-x 1 root root 15673856 Oct 11 17:05 docker
-    #
-    # - - - - - - - - - - - - - - - - - - - - - - - - - -
-    # Also they pass on Travis CI setup
-    # but fail on manually built Ubuntu 14.04.5 LTS server
-    # Can I just use docker user/group?
-    # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   private
 

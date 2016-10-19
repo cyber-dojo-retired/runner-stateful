@@ -13,6 +13,7 @@ before_install:
     - uname -a
     - cat /etc/group
     - ls -al /var/run/docker.sock
+    - whoami
 
 script:
     - ./build_and_test.sh
