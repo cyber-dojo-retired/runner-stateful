@@ -31,6 +31,7 @@ class SudoDockerTest < LibTestBase
     command = "docker images >#{stdoutFile} 2>#{stderrFile}"
     output, exit_status = shell.exec([command])
     p "B4C stdout---------"
+    p `whoami`
     p `cat #{stdoutFile}`
     p "B4C stderr---------"
     p `cat #{stderrFile}`
@@ -50,13 +51,14 @@ class SudoDockerTest < LibTestBase
     command = "#{sudo} docker images >#{stdoutFile} 2>#{stderrFile}"
     output, exit_status = shell.exec([command])
     p "279 stdout---------"
+    p `whoami`
     p `cat #{stdoutFile}`
     p "279 stderr---------"
     p `cat #{stderrFile}`
     p "---------"
     assert_equal success, exit_status
     docker_images = `cat #{stdoutFile}`
-    assert docker_images.include? 'cyberdojo/differ'
+    assert docker_images.include? 'cyberdojo/runner'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -87,12 +89,11 @@ class SudoDockerTest < LibTestBase
   #
   # On Ubuntu 14.04 host, after installing docker,
   # if you [$ cd /usr/bin && ls -al docker*] you see
-
+  # -rwxr-xr-x 1 root root 15096408 Oct 11 18:19 docker
   #
   # Inside the runner:1.12.2 container
-  # $ cd /usr/bin
-  # $ ls -al docker*
-  # -rwxr-xr-x    1 root     root      15673856 Oct 11 17:05 docker
+  # $ if you [$ cd /usr/bin && ls -al docker*]
+  # -rwxr-xr-x 1 root root 15673856 Oct 11 17:05 docker
   #
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
