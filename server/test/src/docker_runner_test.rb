@@ -63,7 +63,7 @@ class DockerRunnerTest < LibTestBase
     shell.mock_exec([command], info, success)
     output, exit_status = runner.pull(image_name)
     assert_equal info, output
-    assert_equal exit_status, success
+    assert_equal success, exit_status
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -80,12 +80,16 @@ class DockerRunnerTest < LibTestBase
     shell.mock_exec([command], info, success)
     output, exit_status = runner.start(kata_id, avatar_name)
     assert_equal info, output
-    assert_equal exit_status, success
+    assert_equal success, exit_status
   end
+
+  #start creates a docker-volume
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
   # run
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+
 
 
 

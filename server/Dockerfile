@@ -34,4 +34,4 @@ RUN  echo "${GETS_DOCKER_SUDO}  ALL=NOPASSWD: ${DOCKER_BINARY} *"       >>  ${SU
 
 ARG app_dir
 COPY . ${app_dir}
-EXPOSE PORT
+EXPOSE 4557

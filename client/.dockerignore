@@ -2,9 +2,13 @@
 
 *
 
--#-----!Except these files
+-#-----!Except these dirs
 
-!config.ru
-!Procfile
 !src
 !test
+
+-#-----!Except these files
+
+!Gemfile
+!config.ru
+!Procfile

@@ -4,6 +4,13 @@
 # [docker exec ... cd test && ./run.sh ${*}] fails
 # I want the [docker cp] command to extract the coverage info
 
+hash docker 2> /dev/null
+if [ $? != 0 ]; then
+  echo
+  echo "docker is not installed"
+  exit 1
+fi
+
 # Use 1: ./test.sh
 #   Load and run all tests.
 # Use 2: ./test.sh 347
@@ -12,12 +19,16 @@
 #   Use the tests individual hex-id to run just that one test
 
 my_dir="$( cd "$( dirname "${0}" )" && pwd )"
+
 app_dir=/app
 docker_version=$(docker --version | awk '{print $3}' | sed '$s/.$//')
 client_port=4558
 server_port=4557
 
-${my_dir}/build.sh ${app_dir} ${docker_version} ${client_port} ${server_port}
+${my_dir}/base/build-image.sh ${app_dir}
+${my_dir}/client/build-image.sh ${app_dir} ${client_port}
+${my_dir}/server/build-image.sh ${app_dir} ${docker_version} ${server_port}
+
 if [ $? != 0 ]; then
   echo
   echo "./build.sh FAILED"
@@ -30,25 +41,27 @@ export SERVER_PORT=${server_port}
 docker-compose down
 docker-compose up -d
 
-#docker ps -a
-
+# - - - - - - - - - - - - - - - - - - - - - - - - - -
+# server
 server_cid=`docker ps --all --quiet --filter "name=runner_server"`
-docker exec ${server_cid} sh -c "cat Gemfile.lock"
+#docker exec ${server_cid} sh -c "cat Gemfile.lock"
 docker exec ${server_cid} sh -c "cd test && ./run.sh ${*}"
 server_exit_status=$?
 docker cp ${server_cid}:/tmp/coverage ${my_dir}/server
 echo "Coverage report copied to ${my_dir}/server/coverage"
 cat ${my_dir}/server/coverage/done.txt
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - -
+# client
 client_cid=`docker ps --all --quiet --filter "name=runner_client"`
 docker exec ${client_cid} sh -c "cd test && ./run.sh ${*}"
 client_exit_status=$?
 docker cp ${client_cid}:/tmp/coverage ${my_dir}/client
-
 # Client Coverage is broken. Simplecov is not seeing the *_test.rb files
 #echo "Coverage report copied to ${my_dir}/client/coverage"
 #cat ${my_dir}/client/coverage/done.txt
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - -
 echo
 echo "server_cid = ${server_cid}"
 echo "client_cid = ${client_cid}"
