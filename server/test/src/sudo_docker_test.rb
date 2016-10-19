@@ -35,6 +35,27 @@ class SudoDockerTest < LibTestBase
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # On an Ubuntu 14.04 host, after installing docker,
+  # if you [cat /etc/group] you see
+  #    docker:x:999:
+  # Do all installs install docker with the same group-id?
+  #
+  # if you [cd /var/run && ls -al] you see
+  #    srw-rw----  1 root     docker        0 Oct 19 10:17 docker.sock
+  #
+  # Inside the runner:1.12.2 image
+  # if you [cat /etc/group] you see
+  #    ping:x:999:
+  # if you [cd /var/run && ls -al] you see
+  #    srw-rw----  1 root     ping          0 Oct 19 10:17 docker.sock
+  #
+  # So owner:rw-
+  #    group:rw-
+  #    everyone:---
+  #
+  # and the group is what is making it work.
+  # This is why both tests are failing.
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '279',
   'sudo docker command succeeds and exits zero' do

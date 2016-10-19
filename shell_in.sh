@@ -1,8 +1,10 @@
 #!/bin/sh
 
+user=${1:-cyber-dojo}
+
 docker run \
   --rm \
-  --user=cyber-dojo \
+  --user=${user} \
   --interactive \
   --tty \
   --volume=/var/run/docker.sock:/var/run/docker.sock \
