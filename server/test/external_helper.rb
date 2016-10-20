@@ -4,7 +4,6 @@ module TestExternalHelper # mix-in
   module_function
 
   def setup
-    @test_id = ENV['RUNNER_TEST_ID']
     @config = {}
     env_map.keys.each { |key| @config[key] = ENV[key] }
     external_setup
@@ -26,7 +25,7 @@ module TestExternalHelper # mix-in
   # - - - - - - - - - - - - - - - - - - - - -
 
   def test_id
-    @test_id
+    ENV['RUNNER_TEST_ID']
   end
 
 end
