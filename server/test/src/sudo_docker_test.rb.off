@@ -83,7 +83,6 @@ class SudoDockerTest < LibTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-=begin
   test '279',
   'sudo docker command succeeds and exits zero' do
     # NB: sudo [docker images]...
@@ -95,7 +94,6 @@ class SudoDockerTest < LibTestBase
     docker_images = `cat #{stdoutFile}`
     assert docker_images.include? 'cyberdojo/runner'
   end
-=end
 
   private
 

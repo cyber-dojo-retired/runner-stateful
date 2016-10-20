@@ -5,7 +5,7 @@ require_relative './mock_sheller'
 class DockerRunnerTest < LibTestBase
 
   def self.hex(suffix)
-    '9D9' + suffix
+    '9D930' + suffix
   end
 
   def external_setup
@@ -70,7 +70,7 @@ class DockerRunnerTest < LibTestBase
 
   test 'F2E',
   'start(kata_id,avatar_name) issues shell(docker create volume) command' do
-    kata_id = test_id + '42'
+    kata_id = test_id
     avatar_name = 'lion'
     volume_name =  [ 'cyber_dojo', kata_id, avatar_name ].join('_')
     command = [ sudo, 'docker volume create --name', volume_name ].join(space)
@@ -85,7 +85,7 @@ class DockerRunnerTest < LibTestBase
 
   test 'DBC',
   'start creates a docker-volume' do
-    kata_id = test_id + '42'
+    kata_id = test_id
     avatar_name = 'lion'
     live_shelling
     runner.start(kata_id, avatar_name)

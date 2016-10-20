@@ -62,16 +62,23 @@ docker cp ${client_cid}:/tmp/coverage ${my_dir}/client
 #cat ${my_dir}/client/coverage/done.txt
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - -
-echo
-echo "server_cid = ${server_cid}"
-echo "client_cid = ${client_cid}"
-echo
-echo "server_exit_status = ${server_exit_status}"
-echo "client_exit_status = ${client_exit_status}"
+
+show_cids() {
+  echo
+  echo "server: cid = ${server_cid}, exit_status = ${server_exit_status}"
+  echo "client: cid = ${client_cid}, exit_status = ${client_exit_status}"
+  echo
+}
 
 if [ ${client_exit_status} != 0 ]; then
+  show_cids
   exit 1
 fi
 if [ ${server_exit_status} != 0 ]; then
+  show_cids
   exit 1
 fi
+
+echo
+echo "All passed. Removing runner containers..."
+docker-compose down 2>/dev/null

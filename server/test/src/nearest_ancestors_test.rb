@@ -1,3 +1,4 @@
+require_relative './lib_test_base'
 
 class DummyDisk
   def initialize(who); @who = who; end
@@ -34,8 +35,6 @@ class Ellie
 end
 
 # - - - - - - - - - - - - - - - - - - - - - - - -
-
-require_relative './lib_test_base'
 
 class TestNearestAncestors < LibTestBase
 
