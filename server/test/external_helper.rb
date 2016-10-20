@@ -25,7 +25,7 @@ module TestExternalHelper # mix-in
   # - - - - - - - - - - - - - - - - - - - - -
 
   def test_id
-    ENV['RUNNER_TEST_ID']
+    ENV['TEST_ID']
   end
 
 end

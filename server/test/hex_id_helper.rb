@@ -32,8 +32,10 @@ module TestHexIdHelper # mix-in
     def test(id, *lines, &block)
       fail 'missing hex()' unless self.respond_to?(:hex)
       id = hex(id)
-      # check hex-id is well-formed
       diagnostic = "'#{id}',#{lines.join}"
+      fail "duplicate hex_ID: #{diagnostic}" if @@seen_ids.include?(id)
+      @@seen_ids << id
+      # check hex-id is well-formed
       hex_chars = '0123456789ABCDEF'
       is_hex_id      = id.chars.all? { |ch|   hex_chars.include? ch }
       has_empty_line = lines.any?    { |line| line.strip == ''      }
@@ -44,13 +46,11 @@ module TestHexIdHelper # mix-in
       fail "space line: #{diagnostic}" if has_space_line
       # if no hex-id supplied, or test method matches any supplied hex-id
       # then define a mini_test method using the hex-id
-      no_args = @@args == []
+      run_all = @@args == []
       any_arg_is_part_of_id = @@args.any?{ |arg| id.include?(arg) }
-      if no_args || any_arg_is_part_of_id
-        fail "duplicate hex_ID: #{diagnostic}" if @@seen_ids.include?(id)
-        @@seen_ids << id
+      if run_all || any_arg_is_part_of_id
         block_with_test_id = lambda {
-          ENV['RUNNER_TEST_ID'] = id # hex id is available inside test
+          ENV['TEST_ID'] = id # make available inside test
           self.instance_eval &block
         }
         name = lines.join(' ')

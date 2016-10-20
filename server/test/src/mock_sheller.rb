@@ -2,7 +2,7 @@
 class MockSheller
 
   def initialize(_parent)
-    test_id =  ENV['RUNNER_TEST_ID']
+    test_id =  ENV['TEST_ID']
     @filename = Dir.tmpdir + '/cyber-dojo-' + test_id + '_mock_host_shell.json'
     write([]) unless File.file?(@filename)
   end
