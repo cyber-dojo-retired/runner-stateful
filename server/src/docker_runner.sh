@@ -20,8 +20,8 @@ remove_container() {
 #    See top of Dockerfile
 # o) The parentheses puts the commands into a child process.
 # o) The trailing & backgrounds it.
-# o) Piping stdout and stderr of both sub-commands (&>) to dev/null ensures
-#    that normal shell output [Terminated] from the pkill (6) is suppressed.
+# o) Pipe stdout and stderr of both sub-commands (&>) to dev/null so normal
+#    shell output [Terminated] from the pkill (3) is suppressed from output.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 (sleep ${max_secs} &> /dev/null && docker rm --force ${cid} &> /dev/null) &
@@ -72,6 +72,6 @@ fi
 #   Instead echo the output so it can be red/amber/green regex'd (see 3)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-echo "${output}"
 remove_container
+echo "${output}"
 exit 0
