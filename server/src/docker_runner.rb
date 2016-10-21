@@ -114,8 +114,7 @@ class DockerRunner
     # Of course, the usermod runs if you are not using C#-NUnit too.
     # In particular usermod is _not_ installed in a default Alpine linux.
     # It's in the shadow package.
-    command = "docker exec #{cid} sh -c 'usermod --home /sandbox nobody 2> /dev/null'"
-    exec(command)
+    exec("docker exec #{cid} sh -c 'usermod --home /sandbox nobody 2> /dev/null'")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -123,20 +122,20 @@ class DockerRunner
   def runner_sh(cid, max_seconds)
     my_dir = "#{File.dirname(__FILE__)}"
     output, exit_status = shell.cd_exec(my_dir, "./docker_runner.sh #{cid} #{max_seconds}")
-    assert_ok(output, exit_status)
+    assert_success(output, exit_status)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def exec(command)
     output, exit_status = shell.exec(command)
-    assert_ok(output, exit_status)
+    assert_success(output, exit_status)
     return [output, exit_status]
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_ok(output, exit_status)
+  def assert_success(output, exit_status)
     fail "exit_status(#{exit_status}):#{output}" unless exit_status == success
   end
 
