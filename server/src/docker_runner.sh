@@ -5,12 +5,11 @@
 
 cid=$1         # Container ready to run /sandbox/cyber-dojo.sh
 max_secs=$2    # How long cyber-dojo.sh has to complete, in seconds, eg 10
-sudo=$3        # sudo incantation for docker commands
 
 timed_out_and_killed=137 # (128=timed-out) + (9=killed
 
 remove_container() {
-  ${sudo} docker rm --force ${cid} &> /dev/null
+  docker rm --force ${cid} &> /dev/null
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -25,7 +24,7 @@ remove_container() {
 #    that normal shell output [Terminated] from the pkill (6) is suppressed.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-(sleep ${max_secs} &> /dev/null && ${sudo} docker rm --force ${cid} &> /dev/null) &
+(sleep ${max_secs} &> /dev/null && docker rm --force ${cid} &> /dev/null) &
 sleep_docker_rm_pid=$!
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -36,7 +35,7 @@ sleep_docker_rm_pid=$!
 #   - cyber-dojo.sh is editable (suppose it ended [exit 137])
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-output=$(${sudo} docker exec \
+output=$(docker exec \
                --user=nobody \
                --interactive \
                ${cid} \
@@ -62,7 +61,7 @@ fi
 #      - the test-run container is still alive
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-running=$(${sudo} docker inspect --format="{{ .State.Running }}" ${cid})
+running=$(docker inspect --format="{{ .State.Running }}" ${cid})
 if [ "${running}" != "true" ]; then
   remove_container # belt and braces
   exit ${timed_out_and_killed}

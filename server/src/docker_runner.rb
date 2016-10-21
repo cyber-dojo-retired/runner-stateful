@@ -15,12 +15,12 @@ class DockerRunner
   end
 
   def pull(image_name)
-    sudo_exec("docker pull #{image_name}")
+    shell.exec("docker pull #{image_name}")
   end
 
   def start(kata_id, avatar_name)
     name = "cyber_dojo_#{kata_id}_#{avatar_name}"
-    sudo_exec("docker volume create --name #{name}")
+    shell.exec("docker volume create --name #{name}")
   end
 
   def run(image_name, kata_id, avatar_name, max_seconds, delete_filenames, changed_files)
@@ -54,14 +54,14 @@ class DockerRunner
       "--volume=#{vol_name}:/sandbox",
       "#{image_name} sh"
     ].join(space = ' ')
-    o, es = sudo_exec(command)
+    o, es = shell.exec(command)
     cid = o.strip
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def start_the_container(cid)
-    o, es = sudo_exec("docker start #{cid}")
+    o, es = shell.exec("docker start #{cid}")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -69,7 +69,7 @@ class DockerRunner
   def delete_deleted_files_from_sandbox(cid, filenames)
     filenames.each do |filename|
       # TODO: what if filename has a quote in it?
-      o, es = sudo_exec("docker exec #{cid} sh -c 'rm /sandbox/#{filename}")
+      o, es = shell.exec("docker exec #{cid} sh -c 'rm /sandbox/#{filename}")
     end
   end
 
@@ -82,14 +82,14 @@ class DockerRunner
         disk[tmp_dir].write(filename, content)
       end
       # TODO: I'm assuming [cp] preserves the executable attribute
-      o, es = sudo_exec("docker cp #{tmp_dir}/ #{cid}:/sandbox")
+      o, es = shell.exec("docker cp #{tmp_dir}/ #{cid}:/sandbox")
     end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def ensure_user_nobody_owns_changed_files(cid)
-    o, es = sudo_exec("docker exec #{cid} sh -c 'chown -R nobody /sandbox'")
+    o, es = shell.exec("docker exec #{cid} sh -c 'chown -R nobody /sandbox'")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -106,20 +106,20 @@ class DockerRunner
     # In particular usermod is _not_ installed in a default Alpine linux.
     # It's in the shadow package.
     command = "docker exec #{cid} sh -c 'usermod --home /sandbox nobody 2> /dev/null'"
-    o, es = sudo_exec(command)
+    o, es = shell.exec(command)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def runner_sh(cid, max_seconds)
     my_dir = "#{File.dirname(__FILE__)}"
-    shell.cd_exec(my_dir, "./docker_runner.sh #{cid} #{max_seconds} #{quoted(sudo)}")
+    shell.cd_exec(my_dir, "./docker_runner.sh #{cid} #{max_seconds}")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def image_names
-    output, _ = sudo_exec('docker images')
+    output, _ = shell.exec('docker images')
     # This will (harmlessly) get all cyberdojofoundation image names too.
     lines = output.split("\n").select { |line| line.start_with?('cyberdojo') }
     lines.collect { |line| line.split[0] }
@@ -131,19 +131,6 @@ class DockerRunner
 
   def shell
     nearest_ancestors(:shell)
-  end
-
-  def sudo
-    # See sudo comments in Dockerfile
-    'sudo -u docker-runner sudo'
-  end
-
-  def sudo_exec(command)
-    shell.exec(sudo + ' ' + command)
-  end
-
-  def quoted(s)
-    "'" + s + "'"
   end
 
 end

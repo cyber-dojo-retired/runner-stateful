@@ -23,7 +23,7 @@ class DockerRunnerTest < LibTestBase
   test 'B71',
   'pulled?(image_name) is false when image_name has not yet been pulled' do
     image_name = 'cyberdojofoundation/gcc_assert'
-    command = [ sudo, 'docker', 'images' ].join(space)
+    command = [ 'docker', 'images' ].join(space)
     no_gcc_assert = [
       "REPOSITORY                                 TAG                 IMAGE ID            CREATED             SIZE",
       "cyberdojofoundation/java_cucumber          latest              06aa46aad63d        6 weeks ago         881.7 MB",
@@ -38,7 +38,7 @@ class DockerRunnerTest < LibTestBase
   test '94E',
   'pulled?(image) is true when image_name has already been pulled' do
     image_name = 'cyberdojofoundation/gcc_assert'
-    command = [ sudo, 'docker', 'images' ].join(space)
+    command = [ 'docker', 'images' ].join(space)
     has_gcc_assert = [
       "REPOSITORY                                 TAG                 IMAGE ID            CREATED             SIZE",
       "cyberdojofoundation/java_cucumber          latest              06aa46aad63d        6 weeks ago         881.7 MB",
@@ -56,7 +56,7 @@ class DockerRunnerTest < LibTestBase
   test 'DA5',
   'pull(image_name) issues shell(docker pull) command' do
     image_name = 'cyberdojofoundation/gcc_assert'
-    command = [ sudo, 'docker', 'pull', image_name ].join(space)
+    command = [ 'docker', 'pull', image_name ].join(space)
     info = 'sdsdsd'
     shell.mock_exec([command], info, success)
     output, exit_status = runner.pull(image_name)
@@ -73,7 +73,7 @@ class DockerRunnerTest < LibTestBase
     kata_id = test_id
     avatar_name = 'lion'
     volume_name =  [ 'cyber_dojo', kata_id, avatar_name ].join('_')
-    command = [ sudo, 'docker volume create --name', volume_name ].join(space)
+    command = [ 'docker volume create --name', volume_name ].join(space)
     info = 'sdsdsd'
     shell.mock_exec([command], info, success)
     output, exit_status = runner.start(kata_id, avatar_name)
@@ -89,11 +89,11 @@ class DockerRunnerTest < LibTestBase
     avatar_name = 'lion'
     live_shelling
     runner.start(kata_id, avatar_name)
-    output, exit_status = shell.exec([sudo + ' docker volume ls'])
+    output, exit_status = shell.exec([' docker volume ls'])
     assert_equal success, exit_status
     volume_name = 'cyber_dojo_' + kata_id + '_' + avatar_name
     assert output.include? volume_name
-    shell.exec([sudo + " docker volume rm #{volume_name}" ])
+    shell.exec(["docker volume rm #{volume_name}" ])
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -115,10 +115,6 @@ class DockerRunnerTest < LibTestBase
 
   def success
     0
-  end
-
-  def sudo
-    'sudo -u docker-runner sudo'
   end
 
   def space
