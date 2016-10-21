@@ -15,12 +15,12 @@ class DockerRunner
   end
 
   def pull(image_name)
-    shell.exec("docker pull #{image_name}")
+    exec("docker pull #{image_name}")
   end
 
   def start(kata_id, avatar_name)
     name = "cyber_dojo_#{kata_id}_#{avatar_name}"
-    shell.exec("docker volume create --name #{name}")
+    exec("docker volume create --name #{name}")
   end
 
   def run(image_name, kata_id, avatar_name, max_seconds, delete_filenames, changed_files)
@@ -40,6 +40,15 @@ class DockerRunner
   include NearestAncestors
   include Runner
 
+  def image_names
+    output, _ = exec('docker images')
+    # This will (harmlessly) get all cyberdojofoundation image names too.
+    lines = output.split("\n").select { |line| line.start_with?('cyberdojo') }
+    lines.collect { |line| line.split[0] }
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   def create_container_with_volume_mounted_as_sandbox(vol_name, image_name)
     # Assume volume exists from previous /start
     # F#-NUnit cyber-dojo.sh actually names the /sandbox folder
@@ -54,14 +63,14 @@ class DockerRunner
       "--volume=#{vol_name}:/sandbox",
       "#{image_name} sh"
     ].join(space = ' ')
-    o, es = shell.exec(command)
-    cid = o.strip
+    output, _ = exec(command)
+    cid = output.strip
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def start_the_container(cid)
-    o, es = shell.exec("docker start #{cid}")
+    exec("docker start #{cid}")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -69,7 +78,7 @@ class DockerRunner
   def delete_deleted_files_from_sandbox(cid, filenames)
     filenames.each do |filename|
       # TODO: what if filename has a quote in it?
-      o, es = shell.exec("docker exec #{cid} sh -c 'rm /sandbox/#{filename}")
+      exec("docker exec #{cid} sh -c 'rm /sandbox/#{filename}")
     end
   end
 
@@ -82,14 +91,14 @@ class DockerRunner
         disk[tmp_dir].write(filename, content)
       end
       # TODO: I'm assuming [cp] preserves the executable attribute
-      o, es = shell.exec("docker cp #{tmp_dir}/ #{cid}:/sandbox")
+      exec("docker cp #{tmp_dir}/ #{cid}:/sandbox")
     end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def ensure_user_nobody_owns_changed_files(cid)
-    o, es = shell.exec("docker exec #{cid} sh -c 'chown -R nobody /sandbox'")
+    exec("docker exec #{cid} sh -c 'chown -R nobody /sandbox'")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -106,31 +115,37 @@ class DockerRunner
     # In particular usermod is _not_ installed in a default Alpine linux.
     # It's in the shadow package.
     command = "docker exec #{cid} sh -c 'usermod --home /sandbox nobody 2> /dev/null'"
-    o, es = shell.exec(command)
+    exec(command)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def runner_sh(cid, max_seconds)
     my_dir = "#{File.dirname(__FILE__)}"
-    shell.cd_exec(my_dir, "./docker_runner.sh #{cid} #{max_seconds}")
+    output, exit_status = shell.cd_exec(my_dir, "./docker_runner.sh #{cid} #{max_seconds}")
+    assert_ok(output, exit_status)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def image_names
-    output, _ = shell.exec('docker images')
-    # This will (harmlessly) get all cyberdojofoundation image names too.
-    lines = output.split("\n").select { |line| line.start_with?('cyberdojo') }
-    lines.collect { |line| line.split[0] }
+  def exec(command)
+    output, exit_status = shell.exec(command)
+    assert_ok(output, exit_status)
+    return [output, exit_status]
   end
 
-  def disk
-    nearest_ancestors(:disk)
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def assert_ok(output, exit_status)
+    fail "exit_status(#{exit_status}):#{output}" unless exit_status == success
   end
 
-  def shell
-    nearest_ancestors(:shell)
-  end
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def disk; nearest_ancestors(:disk); end
+
+  def shell; nearest_ancestors(:shell); end
+
+  def success; 0; end
 
 end
