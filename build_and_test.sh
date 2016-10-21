@@ -11,12 +11,7 @@ if [ $? != 0 ]; then
   exit 1
 fi
 
-# Use 1: ./test.sh
-#   Load and run all tests.
-# Use 2: ./test.sh 347
-#   Load all tests and run those whose hex-id includes 347
-#   Use the test file's hex-id prefix to run *all* the tests in that file
-#   Use the tests individual hex-id to run just that one test
+# - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 my_dir="$( cd "$( dirname "${0}" )" && pwd )"
 
@@ -35,9 +30,10 @@ if [ $? != 0 ]; then
   exit 1
 fi
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 export DOCKER_ENGINE_VERSION=${docker_version}
-export CLIENT_PORT=${client_port}
-export SERVER_PORT=${server_port}
+
 docker-compose down
 docker-compose up -d
 
@@ -70,6 +66,8 @@ show_cids() {
   echo
 }
 
+# - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 if [ ${client_exit_status} != 0 ]; then
   show_cids
   exit 1
@@ -78,6 +76,8 @@ if [ ${server_exit_status} != 0 ]; then
   show_cids
   exit 1
 fi
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 echo
 echo "All passed. Removing runner containers..."
