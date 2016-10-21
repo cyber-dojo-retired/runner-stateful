@@ -5,9 +5,6 @@
 
 Work in progress.
 
-runner_server still needs docker-in-docker image, sudo, docker-runner user etc.
-
-
 ```
 ./demo.sh
 ```
@@ -19,7 +16,7 @@ on port 4557. If the runner-client's IP address is 192.168.99.100 then put
 192.168.99.100:4558 into your browser to see the output.
 
 ```
-./test.sh
+./build_and_test.sh
 ```
 
 Rebuilds the images and runs the tests inside the runner server/client containers
