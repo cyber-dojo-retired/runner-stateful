@@ -136,7 +136,7 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_success(output, exit_status)
-    fail "exit_status(#{exit_status}):#{output}" unless exit_status == success
+    fail "exited(#{exit_status}):#{output}:" unless exit_status == success
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
