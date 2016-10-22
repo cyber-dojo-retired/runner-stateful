@@ -16,6 +16,7 @@ before_install:
     - whoami
 
 script:
+    - docker pull cyberdojofoundation/gcc_assert
     - ./build_and_test.sh
 
 after_success:

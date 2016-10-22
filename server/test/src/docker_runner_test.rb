@@ -99,12 +99,17 @@ class DockerRunnerTest < LibTestBase
       '#include "hiker.h"',
       'int answer(void) { return 6 * 9; }'
     ].join("\n")
-    expected = [
+    expected_lines = [
       "Assertion failed: answer() == 42 (hiker.tests.c: life_the_universe_and_everything: 7)",
       "make: *** [makefile:14: test.output] Aborted"
-    ].join("\n") + "\n"
+    ]
     actual = runner_run(hiker_c)
-    assert_equal expected, actual
+    expected_lines.each { |line| assert actual.include? line }
+    # Odd...locally (Mac Docker-Toolbox, default VM)
+    # the last line is
+    #   make: *** [makefile:14: test.output] Aborted
+    # on travis the last line is
+    #   make: *** [makefile:14: test.output] Aborted (core dumped)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
