@@ -6,11 +6,11 @@ max_secs=$2    # How long cyber-dojo.sh has to complete, in seconds, eg 10
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Executes /sandbox/cyber-dojo.sh inside a docker container (${cid})
 # prepared by docker_runner.rb
-#
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # If it completes within max_seconds
 #   - the container is removed
 #   - it prints the output of cyber-dojo.sh's execution
-#   - it's exit status is zero (succeess)
+#   - it's exit status is 0 (success)
 #
 # If it fails to complete within max_seconds
 #   - the container is removed
@@ -28,7 +28,7 @@ timed_out_and_killed=137 # (128=timed-out) + (9=killed)
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # 1. After max_seconds, remove the container
-# o) Doing [docker stop ${CID}] is not enough to stop a container
+# o) Doing [docker stop ${CID}] is not enough to quickly stop a container
 #    that is printing in an infinite loop (for example).
 # o) Any zombie processes this backgrounded process creates are reaped by tini.
 #    See top of Dockerfile
@@ -43,8 +43,8 @@ sleep_docker_rm_pid=$!
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # 2. Run cyber-dojo.sh
-# Don't use the exit-status of cyber-dojo.sh
-# Using it to determine red/amber/green status is unreliable
+# Don't use the exit-status of cyber-dojo.sh to determine
+# the red/amber/green status. It's unreliable...
 #   - not all test frameworks set their exit-status properly
 #   - cyber-dojo.sh is editable (suppose it ended [exit 137])
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -57,7 +57,7 @@ output=$(docker exec \
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # 3. If the sleep-docker-rm process (1) is still alive race to
-#    kill it before it does [docker rm ${cid}]
+# kill it before it does [docker rm ${cid}]
 #      pkill   => kill processes
 #      -P PID  => whose parent pid is PID
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -65,14 +65,14 @@ output=$(docker exec \
 pkill -P ${sleep_docker_rm_pid} &> /dev/null
 if [ "$?" != "0" ]; then
   # Failed to kill the sleep-docker-rm process.
-  # Assume it ran to completion and it removed the container
-  # which is what caused the [docker exec] to exit.
+  # Assuming it ran to completion and removed the container
+  # and that is what caused the [docker exec] to exit.
   exit ${timed_out_and_killed}
 fi
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # 4. We're not using the exit status of the container (see 2)
-#   Instead echo the output so it can be red/amber/green regex'd
+# Instead echo the output so it can be red/amber/green regex'd
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 echo "${output}"
