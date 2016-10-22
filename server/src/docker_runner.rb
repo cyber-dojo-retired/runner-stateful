@@ -32,6 +32,15 @@ class DockerRunner
     ensure_user_nobody_owns_changed_files(cid)
     ensure_user_nobody_has_HOME(cid)
     output, exit_status = runner_sh(cid, max_seconds)
+    #timed_out_and_killed = 137
+    if exit_status == success
+      #p "runner.run() exited with success"
+      #p "about to [docker rm --force #{cid}]"
+      rm_output, rm_exit_status = exec("docker rm --force #{cid} 2>&1")
+      #p "[docker rm]exit_status=:#{rm_exit_status}:"
+      #p "[docker rm]output=:#{rm_output}:"
+      #TODO: if this failed LOG it
+    end
     output_or_timed_out(output, exit_status, max_seconds)
   end
 

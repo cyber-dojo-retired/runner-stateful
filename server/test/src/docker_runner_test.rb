@@ -172,9 +172,9 @@ class DockerRunnerTest < LibTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 =begin
-  This is failing with the following output...
-    Error response from daemon: No such exec instance
-     '712f562e1d346830441155af998339340cc20665ce38da47b14a90a2f2df7533' found in daemon
+  #This is failing with the following output...
+  #  Error response from daemon: No such exec instance
+  #   '712f562e1d346830441155af998339340cc20665ce38da47b14a90a2f2df7533' found in daemon
 
   test '307',
   'run gcc:assert with printing infinite loop is killed and outputs diagostic' do
@@ -190,6 +190,7 @@ class DockerRunnerTest < LibTestBase
       "Is the server very busy?",
       "Please try again."
     ].join("\n")
+
     actual = runner_run(hiker_c, 3)
     assert_equal expected, actual
   end
@@ -243,8 +244,23 @@ class DockerRunnerTest < LibTestBase
       max_seconds,
       delete_filenames = [],
       changed_files)
-    exec("docker volume rm #{volume_name}")
-    output
+
+    # if the test was an infinite-loop test
+    # then docker_runner.sh did a [docker rm --force CID] in a child process
+    # This creates a timing issue and you seem to need
+    # to wait until the container is actually dead
+    10.times do
+      #p "about to [docker volume rm #{volume_name}]"
+      vrm_output, vrm_exit_status = exec("docker volume rm #{volume_name} 2>&1")
+      return output if vrm_exit_status == 0
+      #p "[docker volume rm]exit_status=:#{vrm_exit_status}:"
+      #p "[docker volume rm]output=:#{vrm_output}:"
+    end
+
+    # You'll probably never get to this line which means
+    # test coverage is slightly less than 100%
+    fail "UNABLE to do [docker volume rm #{volume_name}] after 10 attempts"
+    #output
   end
 
 end

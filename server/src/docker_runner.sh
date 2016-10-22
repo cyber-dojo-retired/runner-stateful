@@ -8,12 +8,12 @@ max_secs=$2    # How long cyber-dojo.sh has to complete, in seconds, eg 10
 # prepared by docker_runner.rb
 #
 # If it completes within max_seconds
-#   - the container is removed
+#   - the container is removed???????
 #   - it prints the output of cyber-dojo.sh's execution
 #   - it's exit status is zero (succeess)
 #
 # If it fails to complete within max_seconds
-#   - the container is removed
+#   - the container is removed??????
 #   - it prints no output
 #   - it's exit status is 137
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -21,12 +21,22 @@ max_secs=$2    # How long cyber-dojo.sh has to complete, in seconds, eg 10
 success=0
 timed_out_and_killed=137 # (128=timed-out) + (9=killed)
 
-exit_with_status()
-{
-  local status=$1
-  docker rm --force ${cid} &> /dev/null
-  exit ${status}
-}
+#remove_container()
+#{
+#  running=$(docker inspect --format="{{ .State.Running }}" ${cid} &> /dev/null)
+#  #echo "running=${running}"
+#  if [ "${running}" == "true" ]; then
+#    docker rm --force ${cid} &> /dev/null
+#  fi
+#}
+
+#exit_with_status()
+#{
+#  local status=$1
+#  #remove_container
+#  docker rm --force ${cid} &> /dev/null
+#  exit ${status}
+#}
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # 1. After max_seconds, remove the container
@@ -64,9 +74,12 @@ output=$(docker exec \
 #      -P PID  => whose parent pid is PID
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-pkill -P ${sleep_docker_rm_pid}
-if [ "$?" != "0" ]; then # Failed to kill the sleep-docker-rm process
-  exit_with_status ${timed_out_and_killed}
+pkill -P ${sleep_docker_rm_pid} &> /dev/null
+if [ "$?" != "0" ]; then
+  # Failed to kill the sleep-docker-rm process.
+  # Assume it ran to completion and it removed the container
+  # which is what caused the [docker exec] to exit.
+  exit ${timed_out_and_killed}
 fi
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -76,10 +89,10 @@ fi
 #      - the test-run container is still alive
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-running=$(docker inspect --format="{{ .State.Running }}" ${cid})
-if [ "${running}" != "true" ]; then
-  exit_with_status ${timed_out_and_killed}
-fi
+#running=$(docker inspect --format="{{ .State.Running }}" ${cid} &> /dev/null)
+#if [ "${running}" != "true" ]; then
+#  exit_with_status ${timed_out_and_killed}
+#fi
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # 5. We're not using the exit status of the container
@@ -87,4 +100,5 @@ fi
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 echo "${output}"
-exit_with_status ${success}
+#docker rm --force ${cid} &> /dev/null
+exit ${success}
