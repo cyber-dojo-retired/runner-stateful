@@ -97,7 +97,7 @@ table =
     [ 'failures',               failure_count,      '==',   0 ],
     [ 'errors',                 error_count,        '==',   0 ],
     [ 'skips',                  skip_count,         '==',   0 ],
-    [ 'assertions/s',           assertions_per_sec, '>=',   5 ],
+    [ 'assertions/s',           assertions_per_sec, '>=',   1 ],
     [ 'duration(test)[s]',      test_duration,      '<=',  25 ],
     [ 'coverage(src)[%]',       src_coverage,       '>=',  95 ],
     [ 'coverage(test)[%]',      test_coverage,      '>=',  99 ], # See end of docker_runner_test.rb

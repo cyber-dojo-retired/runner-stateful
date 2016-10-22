@@ -249,6 +249,9 @@ class DockerRunnerTest < LibTestBase
       delete_filenames = [],
       changed_files)
 
+    _,exit_status = exec("docker inspect --format='{{ .State.Running }}' ${cid} 2> /dev/null")
+    assert_equal does_not_exist=1, exit_status
+
     # if the test was an infinite-loop test
     # then docker_runner.sh did a [docker rm --force CID] in a child process
     # This creates a timing issue and you seem to need
