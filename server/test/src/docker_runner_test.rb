@@ -152,6 +152,51 @@ class DockerRunnerTest < LibTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  test 'C9A',
+  'run gcc:assert with empty infinite loop is killed and outputs diagostic' do
+    @kata_id = test_id
+    hiker_c = [
+      '#include "hiker.h"',
+      'int answer(void) { for(;;); return 6 * 7; }'
+    ].join("\n")
+    expected = [
+      "Unable to complete the tests in 3 seconds.",
+      "Is there an accidental infinite loop?",
+      "Is the server very busy?",
+      "Please try again."
+    ].join("\n")
+    actual = runner_run(hiker_c, 3)
+    assert_equal expected, actual
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+=begin
+  This is failing with the following output...
+    Error response from daemon: No such exec instance
+     '712f562e1d346830441155af998339340cc20665ce38da47b14a90a2f2df7533' found in daemon
+
+  test '307',
+  'run gcc:assert with printing infinite loop is killed and outputs diagostic' do
+    @kata_id = test_id
+    hiker_c = [
+      '#include "hiker.h"',
+      '#include <stdio.h>',
+      'int answer(void) { for(;;) printf("...."); return 6 * 7; }'
+    ].join("\n")
+    expected = [
+      "Unable to complete the tests in 3 seconds.",
+      "Is there an accidental infinite loop?",
+      "Is the server very busy?",
+      "Please try again."
+    ].join("\n")
+    actual = runner_run(hiker_c, 3)
+    assert_equal expected, actual
+  end
+=end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   private
 
   include Externals
@@ -185,10 +230,10 @@ class DockerRunnerTest < LibTestBase
     IO.read("/app/test/src/start_files/#{filename}")
   end
 
-  def runner_run(hiker_c)
-    @avatar_name = 'lion'
+  def runner_run(hiker_c, max_seconds = 10)
+    avatar_name = 'lion'
     live_shelling
-    runner.start(@kata_id, @avatar_name)
+    runner.start(@kata_id, avatar_name)
     changed_files = {
       'hiker.c' => hiker_c,
       'hiker.h' => read('hiker.h'),
@@ -199,8 +244,8 @@ class DockerRunnerTest < LibTestBase
     output = runner.run(
       image_name = 'cyberdojofoundation/gcc_assert',
       @kata_id,
-      @avatar_name,
-      max_seconds = 10,
+      avatar_name,
+      max_seconds,
       delete_filenames = [],
       changed_files)
     exec("docker volume rm #{volume_name}")

@@ -15,12 +15,12 @@ class DockerRunner
   end
 
   def pull(image_name)
-    exec("docker pull #{image_name}")
+    assert_exec("docker pull #{image_name}")
   end
 
   def start(kata_id, avatar_name)
     name = "cyber_dojo_#{kata_id}_#{avatar_name}"
-    exec("docker volume create --name #{name}")
+    assert_exec("docker volume create --name #{name}")
   end
 
   def run(image_name, kata_id, avatar_name, max_seconds, delete_filenames, changed_files)
@@ -41,7 +41,7 @@ class DockerRunner
   include Runner
 
   def image_names
-    output, _ = exec('docker images')
+    output, _ = assert_exec('docker images')
     # This will (harmlessly) get all cyberdojofoundation image names too.
     lines = output.split("\n").select { |line| line.start_with?('cyberdojo') }
     lines.collect { |line| line.split[0] }
@@ -63,7 +63,7 @@ class DockerRunner
       "--volume=#{vol_name}:/sandbox",
       "#{image_name} sh"
     ].join(space = ' ')
-    output, _ = exec(command)
+    output, _ = assert_exec(command)
     cid = output.strip
   end
 
@@ -71,7 +71,7 @@ class DockerRunner
 
   def delete_deleted_files_from_sandbox(cid, filenames)
     filenames.each do |filename|
-      exec("docker exec #{cid} sh -c 'rm /sandbox/#{filename}")
+      assert_exec("docker exec #{cid} sh -c 'rm /sandbox/#{filename}")
     end
   end
 
@@ -82,16 +82,16 @@ class DockerRunner
       changed_files.each do |filename, content|
         pathed_filename = tmp_dir + '/' + filename
         disk.write(pathed_filename, content)
-        exec("chmod +x #{pathed_filename}") if pathed_filename.end_with?('.sh')
+        assert_exec("chmod +x #{pathed_filename}") if pathed_filename.end_with?('.sh')
       end
-      exec("docker cp #{tmp_dir}/. #{cid}:/sandbox")
+      assert_exec("docker cp #{tmp_dir}/. #{cid}:/sandbox")
     end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def ensure_user_nobody_owns_changed_files(cid)
-    exec("docker exec #{cid} sh -c 'chown -R nobody /sandbox'")
+    assert_exec("docker exec #{cid} sh -c 'chown -R nobody /sandbox'")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -107,7 +107,7 @@ class DockerRunner
     # Of course, the usermod runs if you are not using C#-NUnit too.
     # In particular usermod is _not_ installed in a default Alpine linux.
     # It's in the shadow package.
-    exec("docker exec #{cid} sh -c 'usermod --home /sandbox nobody 2> /dev/null'")
+    assert_exec("docker exec #{cid} sh -c 'usermod --home /sandbox nobody 2> /dev/null'")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -116,7 +116,14 @@ class DockerRunner
     #comment [docker rm -f cid] in docker_runner.sh if you want to shell into cid
     #p cid
     output, exit_status = exec("/app/src/docker_runner.sh #{cid} #{max_seconds}")
-    assert_success(output, exit_status)
+    return [output, exit_status]
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def assert_exec(command)
+    output, exit_status = exec(command)
+    fail "exited(#{exit_status}):#{output}:" unless exit_status == success
     return [output, exit_status]
   end
 
@@ -124,14 +131,7 @@ class DockerRunner
 
   def exec(command)
     output, exit_status = shell.exec(command)
-    assert_success(output, exit_status)
     return [output, exit_status]
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def assert_success(output, exit_status)
-    fail "exited(#{exit_status}):#{output}:" unless exit_status == success
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
