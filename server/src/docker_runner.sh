@@ -76,5 +76,5 @@ fi
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 echo "${output}"
-#docker rm --force ${cid} &> /dev/null
+docker rm --force ${cid} &> /dev/null
 exit ${success}
