@@ -100,9 +100,9 @@ class DockerRunnerTest < LibTestBase
     runner.start(@kata_id, @avatar_name)
 
     changed_files = {
-      'hiker.cpp' => read('hiker.cpp'),
-      'hiker.hpp' => read('hiker.hpp'),
-      'hiker.tests.cpp' => read('hiker.tests.cpp'),
+      'hiker.c' => read('hiker.c'),
+      'hiker.h' => read('hiker.h'),
+      'hiker.tests.c' => read('hiker.tests.c'),
       'cyber-dojo.sh' => read('cyber-dojo.sh'),
       'makefile' => read('makefile')
     }
@@ -115,16 +115,7 @@ class DockerRunnerTest < LibTestBase
       delete_filenames = [],
       changed_files)
 
-    # This creates a container with the files in it.
-    # If I docker exec into this container and run cyber-dojo.sh
-    # I get output (fix g++ not being seen later)
-    #    make: g++: Command not found
-    #    make: *** [makefile:20: hiker.compiled_hpp] Error 127
-    # This output is not being seen
-    # All I get here is output=nil
-
-    p output
-
+    assert output.start_with? 'Assertion failed:'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
