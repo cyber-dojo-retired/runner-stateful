@@ -37,9 +37,9 @@ module TestHexIdHelper # mix-in
       @@seen_ids << id
       # check hex-id is well-formed
       hex_chars = '0123456789ABCDEF'
-      is_hex_id      = id.chars.all? { |ch|   hex_chars.include? ch }
-      has_empty_line = lines.any?    { |line| line.strip == ''      }
-      has_space_line = lines.any?    { |line| line.strip != line    }
+      is_hex_id      = id.chars.all? { |ch| hex_chars.include? ch }
+      has_empty_line = lines.any?    { |line| line.strip == ''    }
+      has_space_line = lines.any?    { |line| line.strip != line  }
       fail  "no hex-ID: #{diagnostic}" if id == ''
       fail "bad hex-ID: #{diagnostic}" unless is_hex_id
       fail "empty line: #{diagnostic}" if has_empty_line
@@ -51,25 +51,13 @@ module TestHexIdHelper # mix-in
       if run_all || any_arg_is_part_of_id
         block_with_test_id = lambda {
           ENV['TEST_ID'] = id # make available inside test
+          puts ">>>>>> #{id} <<<<<<" if any_arg_is_part_of_id
           self.instance_eval &block
         }
         name = lines.join(' ')
         define_method("test_'#{id}',\n #{name}\n".to_sym, &block_with_test_id)
       end
     end
-
-    # complain about any unfound hex-id args
-    ObjectSpace.define_finalizer(self, proc {
-      unseen_arg = lambda { |arg| @@seen_ids.none? { |id| id.include?(arg) } }
-      unseen_args = @@args.find_all { |arg| unseen_arg.call(arg) }
-      if unseen_args != []
-        message = 'the following test id arguments were *not* found'
-        bar = 'X' * message.length
-        lines = [ '', bar, message, "#{unseen_args}", bar, '' ]
-        # can't raise in a finalizer
-        lines.each { |line| STDERR.puts line }
-      end
-    })
 
   end
 
