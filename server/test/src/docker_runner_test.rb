@@ -171,11 +171,6 @@ class DockerRunnerTest < LibTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-#=begin
-  #This is failing with the following output...
-  #  Error response from daemon: No such exec instance
-  #   '712f562e1d346830441155af998339340cc20665ce38da47b14a90a2f2df7533' found in daemon
-
   test '307',
   'run gcc:assert with printing infinite loop is killed and outputs diagostic' do
     @kata_id = test_id
@@ -194,7 +189,6 @@ class DockerRunnerTest < LibTestBase
     actual = runner_run(hiker_c, 3)
     assert_equal expected, actual
   end
-#=end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
