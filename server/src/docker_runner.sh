@@ -8,19 +8,19 @@ max_secs=$2    # How long cyber-dojo.sh has to complete, in seconds, eg 10
 # prepared by docker_runner.rb
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # If it completes within max_seconds
-#   - the container is removed
-#   - it prints the output of cyber-dojo.sh's execution
-#   - it's exit status is 0 (success)
+#   o) the container is removed
+#   o) it prints the output of cyber-dojo.sh's execution
+#   o) it's exit status is 0 (success)
 #
 # If it fails to complete within max_seconds
-#   - the container is removed
-#   - it prints no output
-#   - it's exit status is 137
+#   o) the container is removed
+#   o) it prints no output
+#   o) it's exit status is 137
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# There are two places that do this
+# There are two places that run this command...
 #   docker rm --force ${cid} &> /dev/null
 # I've tried putting that into a method to remove duplication
-# and it causes tests to fail!? I have no idea why.
+# and it causes tests to fail. I have no idea why!
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 success=0
@@ -28,14 +28,15 @@ timed_out_and_killed=137 # (128=timed-out) + (9=killed)
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # 1. After max_seconds, remove the container
-# o) Doing [docker stop ${CID}] is not enough to quickly stop a container
-#    that is printing in an infinite loop (for example).
-# o) Any zombie processes this backgrounded process creates are reaped by tini.
-#    See top of Dockerfile
-# o) The parentheses puts the commands into a child process.
-# o) The trailing & backgrounds it.
-# o) Pipe stdout and stderr (&>) of both sub-commands to dev/null so normal
-#    shell output [Terminated] from the pkill (3) is suppressed from output.
+#
+#   o) Doing [docker stop ${CID}] is not enough to quickly stop a container
+#      that is printing in an infinite loop (for example).
+#   o) Any zombie processes this backgrounded process creates are reaped by tini.
+#      See top of cyberdojo/runner's Dockerfile
+#   o) The parentheses puts the commands into a child process.
+#   o) The trailing & backgrounds it.
+#   o) Pipe stdout and stderr (&>) of both sub-commands to dev/null so normal
+#      shell output [Terminated] from the pkill (3) is suppressed from output.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 (sleep ${max_secs} &> /dev/null && docker rm --force ${cid} &> /dev/null) &
@@ -45,8 +46,9 @@ sleep_docker_rm_pid=$!
 # 2. Run cyber-dojo.sh
 # Don't use the exit-status of cyber-dojo.sh to determine
 # the red/amber/green status. It's unreliable...
-#   - not all test frameworks set their exit-status properly
-#   - cyber-dojo.sh is editable (suppose it ended [exit 137])
+#
+#   o) not all test frameworks set their exit-status properly
+#   o) cyber-dojo.sh is editable (suppose it ended [exit 137])
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 output=$(docker exec \
@@ -58,8 +60,9 @@ output=$(docker exec \
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # 3. If the sleep-docker-rm process (1) is still alive race to
 # kill it before it does [docker rm ${cid}]
-#      pkill   => kill processes
-#      -P PID  => whose parent pid is PID
+#
+#   o) pkill   => kill processes
+#   o) -P PID  => whose parent pid is PID
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 pkill -P ${sleep_docker_rm_pid} &> /dev/null

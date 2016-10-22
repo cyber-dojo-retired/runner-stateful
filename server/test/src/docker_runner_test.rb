@@ -202,6 +202,10 @@ class DockerRunnerTest < LibTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  # Test that deletes some files
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   private
 
   include Externals
