@@ -32,6 +32,14 @@ class DockerRunner
     ensure_user_nobody_owns_changed_files(cid)
     ensure_user_nobody_has_HOME(cid)
     output, exit_status = runner_sh(cid, max_seconds)
+
+    #p "------"
+    #p exit_status
+    #p output
+    #p output.nil?
+    #p "------"
+    output = 'FAKED ITS REALLY nil'
+
     output_or_timed_out(output, exit_status, max_seconds)
   end
 
@@ -54,7 +62,7 @@ class DockerRunner
     # F#-NUnit cyber-dojo.sh actually names the /sandbox folder
     command = [
       'docker create',
-      '--detach',                          # get the cid
+      #'--detach',                          # get the cid
       '--interactive',                     # exec later ?NECESSARY?
       '--net=none',                        # security
       '--pids-limit=64',                   # security (fork bombs)
@@ -85,13 +93,15 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def copy_changed_files_into_sandbox(cid, changed_files)
+    # TODO: what if a filename has a quote in it?
     Dir.mktmpdir('runner') do |tmp_dir|
       changed_files.each do |filename, content|
-        # TODO: what if filename has a quote in it?
-        disk[tmp_dir].write(filename, content)
+        pathed_filename = tmp_dir + '/' + filename
+        disk.write(pathed_filename, content)
+        exec("chmod +x #{pathed_filename}") if pathed_filename.end_with?('.sh')
       end
       # TODO: I'm assuming [cp] preserves the executable attribute
-      exec("docker cp #{tmp_dir}/ #{cid}:/sandbox")
+      exec("docker cp #{tmp_dir}/. #{cid}:/sandbox")
     end
   end
 
@@ -120,8 +130,9 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def runner_sh(cid, max_seconds)
-    my_dir = "#{File.dirname(__FILE__)}"
-    output, exit_status = shell.cd_exec(my_dir, "./docker_runner.sh #{cid} #{max_seconds}")
+    #comment [docker rm -f cid] in docker_runner.sh if you want to shell into cid
+    #p cid
+    output, exit_status = exec("/app/src/docker_runner.sh #{cid} #{max_seconds}")
     assert_success(output, exit_status)
   end
 

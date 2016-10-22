@@ -92,8 +92,40 @@ class DockerRunnerTest < LibTestBase
   # run
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  test 'BB3',
+  'run with red traffic light' do
+    @kata_id = test_id
+    @avatar_name = 'lion'
+    live_shelling
+    runner.start(@kata_id, @avatar_name)
 
+    changed_files = {
+      'hiker.cpp' => read('hiker.cpp'),
+      'hiker.hpp' => read('hiker.hpp'),
+      'hiker.tests.cpp' => read('hiker.tests.cpp'),
+      'cyber-dojo.sh' => read('cyber-dojo.sh'),
+      'makefile' => read('makefile')
+    }
 
+    output = runner.run(
+      image_name = 'cyberdojofoundation/gcc_assert',
+      @kata_id,
+      @avatar_name,
+      max_seconds = 10,
+      delete_filenames = [],
+      changed_files)
+
+    # This creates a container with the files in it.
+    # If I docker exec into this container and run cyber-dojo.sh
+    # I get output (fix g++ not being seen later)
+    #    make: g++: Command not found
+    #    make: *** [makefile:20: hiker.compiled_hpp] Error 127
+    # This output is not being seen
+    # All I get here is output=nil
+
+    p output
+
+  end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -124,6 +156,10 @@ class DockerRunnerTest < LibTestBase
 
   def assert_success(output, exit_status)
     fail "exited(#{exit_status}):#{output}:" unless exit_status == success
+  end
+
+  def read(filename)
+    IO.read("/app/test/src/start_files/#{filename}")
   end
 
 end

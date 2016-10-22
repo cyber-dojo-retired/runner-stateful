@@ -1,5 +1,7 @@
 #!/bin/sh
 
+echo HELLO
+
 # Executes /sandbox/cyber-dojo.sh inside a prepared docker container
 # and kills it if it does not complete in 10 seconds.
 

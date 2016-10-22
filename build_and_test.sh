@@ -80,5 +80,5 @@ fi
 # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 echo
-echo "All passed. Removing runner containers..."
+echo "All passed. Removing runner_client and runner_server containers..."
 docker-compose down 2>/dev/null
