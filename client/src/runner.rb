@@ -13,9 +13,22 @@ module Runner # mix-in
     # TODO post
   end
 
+  # - - - - - - - - - - - - - - - - - - - -
+
   def start(kata_id, avatar_name)
-    # TODO post
+    uri = URI.parse('http://runner_server:4557/start')
+    http = Net::HTTP.new(uri.host, uri.port)
+    request = Net::HTTP::Post.new(uri.request_uri)
+    request.content_type = 'application/json'
+    request.body = {
+      :kata_id => kata_id,
+      :avatar_name => avatar_name
+    }.to_json
+    response = http.request(request)
+    response.body
   end
+
+  # - - - - - - - - - - - - - - - - - - - -
 
   def run(image_name, kata_id, avatar_name, max_seconds, delete_filenames, changed_files)
     uri = URI.parse('http://runner_server:4557/run')
