@@ -124,7 +124,7 @@ class DockerRunnerTest < LibTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '13D',
-  'run gcc:assert with failing test outputs assert diagnostic' do
+  'run gcc:assert with syntax error outputs gcc diagnostic' do
     @kata_id = test_id
     hiker_c = [
       '#include "hiker.h"',
