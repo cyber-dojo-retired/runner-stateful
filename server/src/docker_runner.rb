@@ -26,21 +26,14 @@ class DockerRunner
   def run(image_name, kata_id, avatar_name, max_seconds, delete_filenames, changed_files)
     # TODO: what if filename has a quote in it?
     vol_name = "cyber_dojo_#{kata_id}_#{avatar_name}"
+    # docker_runner.rb creates the container but docker_runner.sh removes it.
+    # This is because that is how docker_runner.sh does the timeout.
     cid = create_container_with_volume_mounted_as_sandbox(vol_name, image_name)
     delete_deleted_files_from_sandbox(cid, delete_filenames)
     copy_changed_files_into_sandbox(cid, changed_files)
     ensure_user_nobody_owns_changed_files(cid)
     ensure_user_nobody_has_HOME(cid)
     output, exit_status = runner_sh(cid, max_seconds)
-    #timed_out_and_killed = 137
-    if exit_status == success
-      #p "runner.run() exited with success"
-      #p "about to [docker rm --force #{cid}]"
-      rm_output, rm_exit_status = exec("docker rm --force #{cid} 2>&1")
-      #p "[docker rm]exit_status=:#{rm_exit_status}:"
-      #p "[docker rm]output=:#{rm_output}:"
-      #TODO: if this failed LOG it
-    end
     output_or_timed_out(output, exit_status, max_seconds)
   end
 

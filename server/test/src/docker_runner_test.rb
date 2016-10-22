@@ -260,7 +260,6 @@ class DockerRunnerTest < LibTestBase
     # You'll probably never get to this line which means
     # test coverage is slightly less than 100%
     fail "UNABLE to do [docker volume rm #{volume_name}] after 10 attempts"
-    #output
   end
 
 end

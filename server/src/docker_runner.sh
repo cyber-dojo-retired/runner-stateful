@@ -8,35 +8,23 @@ max_secs=$2    # How long cyber-dojo.sh has to complete, in seconds, eg 10
 # prepared by docker_runner.rb
 #
 # If it completes within max_seconds
-#   - the container is removed???????
+#   - the container is removed
 #   - it prints the output of cyber-dojo.sh's execution
 #   - it's exit status is zero (succeess)
 #
 # If it fails to complete within max_seconds
-#   - the container is removed??????
+#   - the container is removed
 #   - it prints no output
 #   - it's exit status is 137
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# There are two places that do this
+#   docker rm --force ${cid} &> /dev/null
+# I've tried putting that into a method to remove duplication
+# and it causes tests to fail!? I have no idea why.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 success=0
 timed_out_and_killed=137 # (128=timed-out) + (9=killed)
-
-#remove_container()
-#{
-#  running=$(docker inspect --format="{{ .State.Running }}" ${cid} &> /dev/null)
-#  #echo "running=${running}"
-#  if [ "${running}" == "true" ]; then
-#    docker rm --force ${cid} &> /dev/null
-#  fi
-#}
-
-#exit_with_status()
-#{
-#  local status=$1
-#  #remove_container
-#  docker rm --force ${cid} &> /dev/null
-#  exit ${status}
-#}
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # 1. After max_seconds, remove the container
@@ -83,22 +71,10 @@ if [ "$?" != "0" ]; then
 fi
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# 4. Check the container is still running
-#    We're aiming for
-#      - the background 10-second kill process is dead (3)
-#      - the test-run container is still alive
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-#running=$(docker inspect --format="{{ .State.Running }}" ${cid} &> /dev/null)
-#if [ "${running}" != "true" ]; then
-#  exit_with_status ${timed_out_and_killed}
-#fi
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# 5. We're not using the exit status of the container
-#   Instead echo the output so it can be red/amber/green regex'd (see 3)
+# 4. We're not using the exit status of the container (see 2)
+#   Instead echo the output so it can be red/amber/green regex'd
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 echo "${output}"
-#docker rm --force ${cid} &> /dev/null
+docker rm --force ${cid} &> /dev/null
 exit ${success}
