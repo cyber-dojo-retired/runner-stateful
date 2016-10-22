@@ -3,8 +3,8 @@ require_relative './lib_test_base'
 
 class ExternalsTest < LibTestBase
 
-  def self.hex(suffix)
-    '7A9' + suffix
+  def self.hex
+    '7A9'
   end
 
   include Externals

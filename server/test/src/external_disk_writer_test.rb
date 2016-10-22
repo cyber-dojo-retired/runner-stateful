@@ -3,8 +3,8 @@ require_relative './lib_test_base'
 
 class ExternalDiskWriterTest < LibTestBase
 
-  def self.hex(suffix)
-    'FDF' + suffix
+  def self.hex
+    'FDF'
   end
 
   class App; include Externals; end

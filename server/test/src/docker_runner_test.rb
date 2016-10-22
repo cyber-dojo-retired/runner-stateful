@@ -4,8 +4,8 @@ require_relative './mock_sheller'
 
 class DockerRunnerTest < LibTestBase
 
-  def self.hex(suffix)
-    '9D930' + suffix
+  def self.hex
+    '9D930'
   end
 
   def external_setup

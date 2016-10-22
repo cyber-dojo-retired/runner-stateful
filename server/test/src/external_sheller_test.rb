@@ -5,8 +5,8 @@ require_relative './spy_logger'
 
 class ExternalShellerTest < LibTestBase
 
-  def self.hex(suffix)
-    'C89' + suffix
+  def self.hex
+    'C89'
   end
 
   class App; include Externals; end

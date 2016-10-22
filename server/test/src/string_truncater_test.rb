@@ -5,8 +5,8 @@ class StringTruncaterTest < LibTestBase
 
   include StringTruncater
 
-  def self.hex(suffix)
-    '767' + suffix
+  def self.hex
+    '767'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - -

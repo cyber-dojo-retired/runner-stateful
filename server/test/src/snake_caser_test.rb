@@ -3,8 +3,8 @@ require_relative './lib_test_base'
 
 class SnakeCaserTest < LibTestBase
 
-  def self.hex(suffix)
-    '59B' + suffix
+  def self.hex
+    '59B'
   end
 
   test 'A70',

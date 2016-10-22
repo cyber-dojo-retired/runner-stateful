@@ -4,8 +4,8 @@ require_relative './lib_test_base'
 
 class MockShellerTest < LibTestBase
 
-  def self.hex(suffix)
-    'A6E' + suffix
+  def self.hex
+    'A6E'
   end
 
   # - - - - - - - - - - - - - - -

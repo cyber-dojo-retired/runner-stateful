@@ -5,8 +5,8 @@ class StringCleanerTest < LibTestBase
 
   include StringCleaner
 
-  def self.hex(suffix)
-    '3D9' + suffix
+  def self.hex
+    '3D9'
   end
 
   test '7FE',

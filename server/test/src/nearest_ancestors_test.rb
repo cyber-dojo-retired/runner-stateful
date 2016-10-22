@@ -38,8 +38,8 @@ end
 
 class TestNearestAncestors < LibTestBase
 
-  def self.hex(suffix)
-    '9D4' + suffix
+  def self.hex
+    '9D4'
   end
 
   def setup

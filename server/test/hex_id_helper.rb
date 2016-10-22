@@ -29,9 +29,9 @@ module TestHexIdHelper # mix-in
     @@args = (ARGV.sort.uniq - ['--']).map(&:upcase)  # eg 2DD6F3 eg 2dd
     @@seen_ids = []
 
-    def test(id, *lines, &block)
+    def test(tid, *lines, &block)
       fail 'missing hex()' unless self.respond_to?(:hex)
-      id = hex(id)
+      id = hex + tid
       diagnostic = "'#{id}',#{lines.join}"
       fail "duplicate hex_ID: #{diagnostic}" if @@seen_ids.include?(id)
       @@seen_ids << id
@@ -44,8 +44,8 @@ module TestHexIdHelper # mix-in
       fail "bad hex-ID: #{diagnostic}" unless is_hex_id
       fail "empty line: #{diagnostic}" if has_empty_line
       fail "space line: #{diagnostic}" if has_space_line
-      # if no hex-id supplied, or test method matches any supplied hex-id
-      # then define a mini_test method using the hex-id
+      # if no hex-id supplied, or test method matches any
+      # supplied hex-id then define a mini_test method
       run_all = @@args == []
       any_arg_is_part_of_id = @@args.any?{ |arg| id.include?(arg) }
       if run_all || any_arg_is_part_of_id

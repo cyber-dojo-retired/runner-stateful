@@ -6,8 +6,8 @@ require 'net/http'
 
 class RunnerAppTest < LibTestBase
 
-  def self.hex(suffix)
-    '201' + suffix
+  def self.hex
+    '201'
   end
 
   test '348',

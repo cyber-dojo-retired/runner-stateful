@@ -3,8 +3,8 @@ require_relative './lib_test_base'
 
 class ExternalStdoutLoggerTest < LibTestBase
 
-  def self.hex(suffix)
-    '1B6' + suffix
+  def self.hex
+    '1B6'
   end
 
   test '962',
