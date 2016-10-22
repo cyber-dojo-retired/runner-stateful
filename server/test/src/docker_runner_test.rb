@@ -171,7 +171,7 @@ class DockerRunnerTest < LibTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-=begin
+#=begin
   #This is failing with the following output...
   #  Error response from daemon: No such exec instance
   #   '712f562e1d346830441155af998339340cc20665ce38da47b14a90a2f2df7533' found in daemon
@@ -194,7 +194,7 @@ class DockerRunnerTest < LibTestBase
     actual = runner_run(hiker_c, 3)
     assert_equal expected, actual
   end
-=end
+#=end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -249,7 +249,7 @@ class DockerRunnerTest < LibTestBase
     # then docker_runner.sh did a [docker rm --force CID] in a child process
     # This creates a timing issue and you seem to need
     # to wait until the container is actually dead
-    10.times do
+    100.times do
       #p "about to [docker volume rm #{volume_name}]"
       vrm_output, vrm_exit_status = exec("docker volume rm #{volume_name} 2>&1")
       return output if vrm_exit_status == 0
@@ -259,7 +259,7 @@ class DockerRunnerTest < LibTestBase
 
     # You'll probably never get to this line which means
     # test coverage is slightly less than 100%
-    fail "UNABLE to do [docker volume rm #{volume_name}] after 10 attempts"
+    fail "UNABLE to do [docker volume rm #{volume_name}] after 100 attempts!"
   end
 
 end

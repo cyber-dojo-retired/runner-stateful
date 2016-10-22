@@ -34,6 +34,14 @@ class DockerRunner
     ensure_user_nobody_owns_changed_files(cid)
     ensure_user_nobody_has_HOME(cid)
     output, exit_status = runner_sh(cid, max_seconds)
+    if exit_status == success
+      #p "runner.run() exited with success"
+      #p "about to [docker rm --force #{cid}]"
+      rm_output, rm_exit_status = exec("docker rm --force #{cid} 2>&1")
+      #p "[docker rm]exit_status=:#{rm_exit_status}:"
+      #p "[docker rm]output=:#{rm_output}:"
+      #TODO: if this failed LOG it
+    end
     output_or_timed_out(output, exit_status, max_seconds)
   end
 
@@ -115,9 +123,15 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def runner_sh(cid, max_seconds)
-    #comment [docker rm -f cid] in docker_runner.sh if you want to shell into cid
     #p cid
-    output, exit_status = exec("/app/src/docker_runner.sh #{cid} #{max_seconds}")
+    #comment [docker rm -f cid] in docker_runner.sh if you want to shell into cid
+
+    # docker_runner.sh does a [docker rm] in a child process which sometimes result
+    # in a race-condition causing this exec to issue a diagnostic to stderr, eg
+    #   Error response from daemon: No such exec instance
+    #          'cfc1ce94ec97f86ad0a73c6f.....' found in daemon
+    # I pipe stderr to /dev/null so this does not appear in test output
+    output, exit_status = exec("/app/src/docker_runner.sh #{cid} #{max_seconds} 2> /dev/null")
     return [output, exit_status]
   end
 
