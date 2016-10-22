@@ -207,8 +207,6 @@ class DockerRunnerTest < LibTestBase
 
   def space; ' '; end
 
-  def volume_name; 'cyber_dojo_' + @kata_id + '_' + @avatar_name; end
-
   def any; 'sdsdsd'; end
 
   def live_shelling
@@ -218,22 +216,19 @@ class DockerRunnerTest < LibTestBase
 
   def exec(command)
     output, exit_success = shell.exec(command)
-    assert_success(output, exit_success)
     return [output, exit_success]
-  end
-
-  def assert_success(output, exit_status)
-    fail "exited(#{exit_status}):#{output}:" unless exit_status == success
   end
 
   def read(filename)
     IO.read("/app/test/src/start_files/#{filename}")
   end
 
+  def volume_name; 'cyber_dojo_' + @kata_id + '_' + @avatar_name; end
+
   def runner_run(hiker_c, max_seconds = 10)
-    avatar_name = 'lion'
+    @avatar_name = 'lion'
     live_shelling
-    runner.start(@kata_id, avatar_name)
+    runner.start(@kata_id, @avatar_name)
     changed_files = {
       'hiker.c' => hiker_c,
       'hiker.h' => read('hiker.h'),
@@ -244,7 +239,7 @@ class DockerRunnerTest < LibTestBase
     output = runner.run(
       image_name = 'cyberdojofoundation/gcc_assert',
       @kata_id,
-      avatar_name,
+      @avatar_name,
       max_seconds,
       delete_filenames = [],
       changed_files)
