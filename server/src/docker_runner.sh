@@ -1,15 +1,31 @@
 #!/bin/sh
 
-# Executes /sandbox/cyber-dojo.sh inside a prepared docker container
-# and kills it if it does not complete in 10 seconds.
-
 cid=$1         # Container ready to run /sandbox/cyber-dojo.sh
 max_secs=$2    # How long cyber-dojo.sh has to complete, in seconds, eg 10
 
-timed_out_and_killed=137 # (128=timed-out) + (9=killed
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Executes /sandbox/cyber-dojo.sh inside a docker container (${cid})
+# prepared by docker_runner.rb
+#
+# If it completes within max_seconds
+#   - the container is removed
+#   - it prints the output of cyber-dojo.sh's execution
+#   - it's exit status is zero (succeess)
+#
+# If it fails to complete within max_seconds
+#   - the container is removed
+#   - it prints no output
+#   - it's exit status is 137
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-remove_container() {
+success=0
+timed_out_and_killed=137 # (128=timed-out) + (9=killed)
+
+exit_with_status()
+{
+  local status=$1
   docker rm --force ${cid} &> /dev/null
+  exit ${status}
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -20,7 +36,7 @@ remove_container() {
 #    See top of Dockerfile
 # o) The parentheses puts the commands into a child process.
 # o) The trailing & backgrounds it.
-# o) Pipe stdout and stderr of both sub-commands (&>) to dev/null so normal
+# o) Pipe stdout and stderr (&>) of both sub-commands to dev/null so normal
 #    shell output [Terminated] from the pkill (3) is suppressed from output.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -44,34 +60,31 @@ output=$(docker exec \
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # 3. If the sleep-docker-rm process (1) is still alive race to
 #    kill it before it does [docker rm ${cid}]
-#      pkill   == kill processes
-#      -P PID  == whose parent pid is PID
+#      pkill   => kill processes
+#      -P PID  => whose parent pid is PID
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 pkill -P ${sleep_docker_rm_pid}
 if [ "$?" != "0" ]; then # Failed to kill the sleep-docker-rm process
-  remove_container # belt and braces
-  exit ${timed_out_and_killed}
+  exit_with_status ${timed_out_and_killed}
 fi
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# 5. Check the container is still running
+# 4. Check the container is still running
 #    We're aiming for
-#      - the background 10-second kill process is dead
+#      - the background 10-second kill process is dead (3)
 #      - the test-run container is still alive
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 running=$(docker inspect --format="{{ .State.Running }}" ${cid})
 if [ "${running}" != "true" ]; then
-  remove_container # belt and braces
-  exit ${timed_out_and_killed}
+  exit_with_status ${timed_out_and_killed}
 fi
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# 6. We're not using the exit status of the container
+# 5. We're not using the exit status of the container
 #   Instead echo the output so it can be red/amber/green regex'd (see 3)
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-remove_container
 echo "${output}"
-exit 0
+exit_with_status ${success}
