@@ -93,7 +93,9 @@ class DockerRunnerTest < LibTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'BB3',
-  'run gcc:assert with failing test outputs assert diagnostic' do
+  'when run(test-code) fails' +
+  'the container is killed and' +
+  'the assert diagnostic is returned' do
     @kata_id = test_id
     hiker_c = [
       '#include "hiker.h"',
@@ -115,7 +117,9 @@ class DockerRunnerTest < LibTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'CDE',
-  'run gcc:assert with passing test outputs all-tests-passed key-string' do
+  'when run(test-code) passes' +
+  'the container is killed and' +
+  'the all-tests-passed string is returned' do
     @kata_id = test_id
     hiker_c = [
       '#include "hiker.h"',
@@ -129,7 +133,9 @@ class DockerRunnerTest < LibTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '13D',
-  'run gcc:assert with syntax error outputs gcc diagnostic' do
+  'when run(test-code) has syntax-error' +
+  'the container is killed and' +
+  'the gcc diagnosticis returned' do
     @kata_id = test_id
     hiker_c = [
       '#include "hiker.h"',
@@ -153,7 +159,9 @@ class DockerRunnerTest < LibTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'C9A',
-  'run gcc:assert with empty infinite loop is killed and outputs diagostic' do
+  'when run(test-code) is empty-infinite-loop' +
+  'the container is killed and' +
+  'a timeout-diagostic is returned' do
     @kata_id = test_id
     hiker_c = [
       '#include "hiker.h"',
@@ -172,7 +180,9 @@ class DockerRunnerTest < LibTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '307',
-  'run gcc:assert with printing infinite loop is killed and outputs diagostic' do
+  'when run(test-code) is printing-infinite-loop' +
+  'the container is killed and' +
+  'a timeout-diagostic is returned' do
     @kata_id = test_id
     hiker_c = [
       '#include "hiker.h"',
