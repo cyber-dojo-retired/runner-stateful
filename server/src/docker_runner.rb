@@ -24,22 +24,14 @@ class DockerRunner
   end
 
   def run(image_name, kata_id, avatar_name, max_seconds, delete_filenames, changed_files)
+    # TODO: what if filename has a quote in it?
     vol_name = "cyber_dojo_#{kata_id}_#{avatar_name}"
     cid = create_container_with_volume_mounted_as_sandbox(vol_name, image_name)
-    start_the_container(cid)
     delete_deleted_files_from_sandbox(cid, delete_filenames)
     copy_changed_files_into_sandbox(cid, changed_files)
     ensure_user_nobody_owns_changed_files(cid)
     ensure_user_nobody_has_HOME(cid)
     output, exit_status = runner_sh(cid, max_seconds)
-
-    #p "------"
-    #p exit_status
-    #p output
-    #p output.nil?
-    #p "------"
-    output = 'FAKED ITS REALLY nil'
-
     output_or_timed_out(output, exit_status, max_seconds)
   end
 
@@ -61,13 +53,13 @@ class DockerRunner
     # Assume volume exists from previous /start
     # F#-NUnit cyber-dojo.sh actually names the /sandbox folder
     command = [
-      'docker create',
-      #'--detach',                          # get the cid
+      'docker run',
+      '--detach',                          # get the cid
       '--interactive',                     # exec later ?NECESSARY?
       '--net=none',                        # security
       '--pids-limit=64',                   # security (fork bombs)
       '--security-opt=no-new-privileges',  # security
-      '--user=root',                       # ?NECESSARY?
+      '--user=root',                       # TODO: NECESSARY?
       "--volume=#{vol_name}:/sandbox",
       "#{image_name} sh"
     ].join(space = ' ')
@@ -77,15 +69,8 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def start_the_container(cid)
-    exec("docker start #{cid}")
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   def delete_deleted_files_from_sandbox(cid, filenames)
     filenames.each do |filename|
-      # TODO: what if filename has a quote in it?
       exec("docker exec #{cid} sh -c 'rm /sandbox/#{filename}")
     end
   end
@@ -93,14 +78,12 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def copy_changed_files_into_sandbox(cid, changed_files)
-    # TODO: what if a filename has a quote in it?
     Dir.mktmpdir('runner') do |tmp_dir|
       changed_files.each do |filename, content|
         pathed_filename = tmp_dir + '/' + filename
         disk.write(pathed_filename, content)
         exec("chmod +x #{pathed_filename}") if pathed_filename.end_with?('.sh')
       end
-      # TODO: I'm assuming [cp] preserves the executable attribute
       exec("docker cp #{tmp_dir}/. #{cid}:/sandbox")
     end
   end
@@ -134,6 +117,7 @@ class DockerRunner
     #p cid
     output, exit_status = exec("/app/src/docker_runner.sh #{cid} #{max_seconds}")
     assert_success(output, exit_status)
+    return [output, exit_status]
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
