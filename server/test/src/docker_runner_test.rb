@@ -93,29 +93,56 @@ class DockerRunnerTest < LibTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'BB3',
-  'run with red traffic light' do
+  'run gcc:assert with failing test outputs assert diagnostic' do
     @kata_id = test_id
-    @avatar_name = 'lion'
-    live_shelling
-    runner.start(@kata_id, @avatar_name)
+    hiker_c = [
+      '#include "hiker.h"',
+      'int answer(void) { return 6 * 9; }'
+    ].join("\n")
+    expected = [
+      "Assertion failed: answer() == 42 (hiker.tests.c: life_the_universe_and_everything: 7)",
+      "make: *** [makefile:14: test.output] Aborted"
+    ].join("\n") + "\n"
+    actual = runner_run(hiker_c)
+    assert_equal expected, actual
+  end
 
-    changed_files = {
-      'hiker.c' => read('hiker.c'),
-      'hiker.h' => read('hiker.h'),
-      'hiker.tests.c' => read('hiker.tests.c'),
-      'cyber-dojo.sh' => read('cyber-dojo.sh'),
-      'makefile' => read('makefile')
-    }
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-    output = runner.run(
-      image_name = 'cyberdojofoundation/gcc_assert',
-      @kata_id,
-      @avatar_name,
-      max_seconds = 10,
-      delete_filenames = [],
-      changed_files)
+  test 'CDE',
+  'run gcc:assert with passing test outputs all-tests-passed key-string' do
+    @kata_id = test_id
+    hiker_c = [
+      '#include "hiker.h"',
+      'int answer(void) { return 6 * 7; }'
+    ].join("\n")
+    expected = "All tests passed\n"
+    actual = runner_run(hiker_c)
+    assert_equal expected, actual
+  end
 
-    assert output.start_with? 'Assertion failed:'
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test '13D',
+  'run gcc:assert with failing test outputs assert diagnostic' do
+    @kata_id = test_id
+    hiker_c = [
+      '#include "hiker.h"',
+      'int answer(void) { return 6 * 9sss; }'
+    ].join("\n")
+    expected = [
+      "hiker.c: In function 'answer':",
+      "hiker.c:2:31: error: invalid suffix \"sss\" on integer constant",
+      " int answer(void) { return 6 * 9sss; }",
+      "                               ^",
+      "hiker.c:2:1: error: control reaches end of non-void function [-Werror=return-type]",
+      " int answer(void) { return 6 * 9sss; }",
+      " ^",
+      "cc1: all warnings being treated as errors",
+      "make: *** [makefile:17: test] Error 1"
+    ].join("\n") + "\n"
+    actual = runner_run(hiker_c)
+    assert_equal expected, actual
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -151,6 +178,28 @@ class DockerRunnerTest < LibTestBase
 
   def read(filename)
     IO.read("/app/test/src/start_files/#{filename}")
+  end
+
+  def runner_run(hiker_c)
+    @avatar_name = 'lion'
+    live_shelling
+    runner.start(@kata_id, @avatar_name)
+    changed_files = {
+      'hiker.c' => hiker_c,
+      'hiker.h' => read('hiker.h'),
+      'hiker.tests.c' => read('hiker.tests.c'),
+      'cyber-dojo.sh' => read('cyber-dojo.sh'),
+      'makefile' => read('makefile')
+    }
+    output = runner.run(
+      image_name = 'cyberdojofoundation/gcc_assert',
+      @kata_id,
+      @avatar_name,
+      max_seconds = 10,
+      delete_filenames = [],
+      changed_files)
+    exec("docker volume rm #{volume_name}")
+    output
   end
 
 end
