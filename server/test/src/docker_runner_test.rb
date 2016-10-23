@@ -26,29 +26,27 @@ class DockerRunnerTest < LibTestBase
 
   test 'B71',
   'pulled?(image_name) is false when image_name has not yet been pulled' do
-    image_name = 'cyberdojofoundation/gcc_assert'
     no_gcc_assert = [
       "REPOSITORY                                 TAG                 IMAGE ID            CREATED             SIZE",
       "cyberdojofoundation/java_cucumber          latest              06aa46aad63d        6 weeks ago         881.7 MB",
       "cyberdojo/runner                           1.12.2              a531a83580c9        18 minutes ago      56.05 MB"
     ].join("\n")
     shell.mock_exec(['docker images'], no_gcc_assert, success)
-    refute runner.pulled?(image_name)
+    refute runner.pulled?(gcc_assert_image_name)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '94E',
   'pulled?(image) is true when image_name has already been pulled' do
-    image_name = 'cyberdojofoundation/gcc_assert'
     has_gcc_assert = [
       "REPOSITORY                                 TAG                 IMAGE ID            CREATED             SIZE",
       "cyberdojofoundation/java_cucumber          latest              06aa46aad63d        6 weeks ago         881.7 MB",
       "cyberdojo/runner                           1.12.2              a531a83580c9        18 minutes ago      56.05 MB",
-      "#{image_name}                              latest              da213d286ec5        4 months ago        99.16 MB"
+      "#{gcc_assert_image_name}                   latest              da213d286ec5        4 months ago        99.16 MB"
     ].join("\n")
     shell.mock_exec(['docker images'], has_gcc_assert, success)
-    assert runner.pulled?(image_name)
+    assert runner.pulled?(gcc_assert_image_name)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -57,9 +55,8 @@ class DockerRunnerTest < LibTestBase
 
   test 'DA5',
   'pull(image_name) issues shell(docker pull) command' do
-    image_name = 'cyberdojofoundation/gcc_assert'
-    shell.mock_exec(["docker pull #{image_name}"], any, success)
-    output, exit_status = runner.pull(image_name)
+    shell.mock_exec(["docker pull #{gcc_assert_image_name}"], any, success)
+    output, exit_status = runner.pull(gcc_assert_image_name)
     assert_equal any, output
     assert_equal success, exit_status
   end
@@ -206,12 +203,13 @@ class DockerRunnerTest < LibTestBase
   include Externals
 
   def runner; DockerRunner.new(self); end
-
   def success; 0; end
-
   def space; ' '; end
-
   def any; 'sdsdsd'; end
+  def gcc_assert_image_name; 'cyberdojofoundation/gcc_assert'; end
+  def kata_id; test_id; end
+  def avatar_name; 'lion'; end
+  def volume_name; 'cyber_dojo_' + kata_id + '_' + avatar_name; end
 
   def live_shelling
     ENV[env_name('shell')] = 'ExternalSheller'
@@ -227,10 +225,6 @@ class DockerRunnerTest < LibTestBase
     IO.read("/app/test/src/start_files/#{filename}")
   end
 
-  def kata_id; test_id; end
-  def avatar_name; 'lion'; end
-  def volume_name; 'cyber_dojo_' + kata_id + '_' + avatar_name; end
-
   def runner_run(hiker_c, max_seconds = 10)
     live_shelling
     output, exit_status = runner.start(kata_id, avatar_name)
@@ -244,7 +238,7 @@ class DockerRunnerTest < LibTestBase
       'makefile'      => read('makefile')
     }
     output = runner.run(
-      image_name = 'cyberdojofoundation/gcc_assert',
+      gcc_assert_image_name,
       kata_id,
       avatar_name,
       max_seconds,
