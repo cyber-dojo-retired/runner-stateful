@@ -1,6 +1,7 @@
 #!/bin/bash ../test_wrapper.sh
 
 require_relative './lib_test_base'
+require_relative './mock_sheller'
 
 class MockShellerTest < LibTestBase
 

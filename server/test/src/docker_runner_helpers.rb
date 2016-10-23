@@ -1,5 +1,6 @@
 
 require_relative './null_logger'
+require 'json'
 
 module DockerRunnerHelpers # mix-in
 
@@ -32,14 +33,13 @@ module DockerRunnerHelpers # mix-in
       changed_files)
   end
 
-  def starting_files
-    {
-      'hiker.c'       => read('hiker.c'),
-      'hiker.h'       => read('hiker.h'),
-      'hiker.tests.c' => read('hiker.tests.c'),
-      'cyber-dojo.sh' => read('cyber-dojo.sh'),
-      'makefile'      => read('makefile')
-    }
+  def starting_files(dir = 'gcc_assert')
+    dir = "/app/test/src/language_start_files/#{dir}"
+    json = JSON.parse(IO.read("#{dir}/filenames.json"))
+    json['filenames'].collect { |filename| }
+    Hash[json['filenames'].collect { |filename|
+      [filename, IO.read("#{dir}/#{filename}")]
+    }]
   end
 
   def remove_volume(name)
@@ -59,10 +59,6 @@ module DockerRunnerHelpers # mix-in
   def exec(command)
     output, exit_success = shell.exec(command)
     return [output, exit_success]
-  end
-
-  def read(filename)
-    IO.read("/app/test/src/start_files/#{filename}")
   end
 
   def runner; DockerRunner.new(self); end
