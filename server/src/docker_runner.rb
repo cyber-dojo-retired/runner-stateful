@@ -71,7 +71,7 @@ class DockerRunner
 
   def delete_deleted_files_from_sandbox(cid, filenames)
     filenames.each do |filename|
-      assert_exec("docker exec #{cid} sh -c 'rm /sandbox/#{filename}")
+      assert_exec("docker exec #{cid} sh -c 'rm /sandbox/#{filename}'")
     end
   end
 
@@ -91,7 +91,7 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def ensure_user_nobody_owns_changed_files(cid)
-    assert_exec("docker exec #{cid} sh -c 'chown -R nobody /sandbox'")
+    assert_exec("docker exec #{cid} sh -c 'chown -R nobody:nobody /sandbox'")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

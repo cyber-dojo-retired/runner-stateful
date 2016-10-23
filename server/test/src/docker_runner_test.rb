@@ -202,39 +202,28 @@ class DockerRunnerTest < LibTestBase
       "Is the server very busy?",
       "Please try again."
     ].join("\n")
-
-    actual = runner_run(files, [], 2)
+    actual = runner_run(files, delete_filenames = [], max_seconds = 2)
     assert_equal expected, actual
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  # Test that deletes some files
-  # 1. do run 1 on existing files. Add ls -al to end of cyber-dojo.sh
-  #    grab output1
-  # 2. do run 2 with new name for test file.
-  #    Send old test-file name as deleted
-  #    Send new test-file as only changed_file
-  #    grab output2
-  # 3. verify
-  #    old name does not appear in output2
-  #    date-time stamps of hiker.hpp and hiker.cpp are unchanged
-
-=begin
   test '385',
-  'deleted files get deleted and unchanged files dont get resaved' do
+  'deleted files get deleted' do
     live_shelling
     runner_start
-    hiker_c = [
-      '#include "hiker.h"',
-      'int answer(void) { return 6 * 7; }'
-    ].join("\n")
+    files = starting_files
+    files['cyber-dojo.sh'] = 'ls'
     expected = "All tests passed\n"
-    actual_1 = runner_run(hiker_c)
-    assert_equal expected, actual_1
+    ls_output = runner_run(files)
+    before_filenames = ls_output.split
+    ls_output = runner_run({}, [ 'makefile' ])
+    after_filenames = ls_output.split
+    deleted_filenames = before_filenames - after_filenames
+    assert_equal [ 'makefile'], deleted_filenames
   end
-=end
 
+  # unchanged files dont get resaved
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
