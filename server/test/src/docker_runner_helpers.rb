@@ -7,7 +7,8 @@ module DockerRunnerHelpers # mix-in
   module_function
 
   def external_setup
-    # TODO?: expose container's cid and ensure [docker rm #{cid}] happens in external_teardown
+    # TODO?: expose container's cid and ensure [docker rm #{cid}]
+    # happens in external_teardown
     assert_equal 'ExternalSheller', shell.class.name
     ENV[env_name('log')] = 'NullLogger'
     @rm_volume = ''
@@ -63,7 +64,6 @@ module DockerRunnerHelpers # mix-in
 
   def runner; DockerRunner.new(self); end
   def success; 0; end
-  #def gcc_assert_image_name; 'cyberdojofoundation/gcc_assert'; end
   def kata_id; test_id; end
   def avatar_name; 'lion'; end
   def volume_name; 'cyber_dojo_' + kata_id + '_' + avatar_name; end

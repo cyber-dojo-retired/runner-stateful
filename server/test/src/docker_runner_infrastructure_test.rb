@@ -16,7 +16,6 @@ class DockerRunnerInfrastructureTest < LibTestBase
     output, exit_status = exec('docker volume ls')
     assert_equal success, exit_status
     assert output.include? volume_name
-    exec("docker volume rm #{volume_name}")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
