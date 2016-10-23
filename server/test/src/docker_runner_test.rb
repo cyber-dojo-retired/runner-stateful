@@ -1,11 +1,12 @@
 
 require_relative './lib_test_base'
 require_relative './mock_sheller'
+require_relative './null_logger'
 
 class DockerRunnerTest < LibTestBase
 
   # TODO: if these tests fail they leave behind docker containers
-  # and docker volumes. Remove them.
+  # and docker volumes. Remove container then volume in teardown.
 
   def self.hex
     '9D930'
@@ -223,7 +224,7 @@ class DockerRunnerTest < LibTestBase
 
   def live_shelling
     ENV[env_name('shell')] = 'ExternalSheller'
-    ENV[env_name('log')] = 'SpyLogger'
+    ENV[env_name('log'  )] = 'NullLogger'
   end
 
   def exec(command)
@@ -240,7 +241,9 @@ class DockerRunnerTest < LibTestBase
   def runner_run(hiker_c, max_seconds = 10)
     @avatar_name = 'lion'
     live_shelling
-    runner.start(@kata_id, @avatar_name)
+    output, exit_status = runner.start(@kata_id, @avatar_name)
+    assert_equal success, exit_status
+    cid = output.strip
     changed_files = {
       'hiker.c'       => hiker_c,
       'hiker.h'       => read('hiker.h'),
@@ -256,7 +259,7 @@ class DockerRunnerTest < LibTestBase
       delete_filenames = [],
       changed_files)
 
-    _, exit_status = exec("docker inspect --format='{{ .State.Running }}' ${cid} 2> /dev/null")
+    _, exit_status = exec("docker inspect --format='{{ .State.Running }}' #{cid} 2> /dev/null")
     assert_equal does_not_exist=1, exit_status
 
     # docker_runner.sh does [docker rm --force ${cid}] in a child process.
