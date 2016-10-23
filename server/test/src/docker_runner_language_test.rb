@@ -36,9 +36,12 @@ class DockerRunnerLanguageTest < LibTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  # test '182',
-  # '(C#-NUnit) which needs to pick up HOME from the _current_ user' do
-  # end
+  test '182',
+  '(C#-NUnit) which needs to pick up HOME from the current user' do
+    runner_start
+    output = runner_run(language_files('csharp_nunit'), [], 10)
+    assert output.include?('Tests run: 1, Errors: 0, Failures: 0, Inconclusive: 0')
+  end
 
   private
 
