@@ -15,7 +15,7 @@ class DockerRunnerTimeoutTest < LibTestBase
   'the container is killed and',
   'a timeout-diagostic is returned' do
     runner_start
-    files = starting_files
+    files = language_files('gcc_assert')
     files['hiker.c'] = [
       '#include "hiker.h"',
       'int answer(void) { for(;;); return 6 * 7; }'
@@ -37,7 +37,7 @@ class DockerRunnerTimeoutTest < LibTestBase
   'the container is killed and',
   'a timeout-diagostic is returned' do
     runner_start
-    files = starting_files
+    files = language_files('gcc_assert')
     files['hiker.c'] = [
       '#include "hiker.h"',
       '#include <stdio.h>',

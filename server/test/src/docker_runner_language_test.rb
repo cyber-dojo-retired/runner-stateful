@@ -12,10 +12,8 @@ class DockerRunnerLanguageTest < LibTestBase
   test 'CDE',
   'Ubuntu-based image [C(gcc),assert]' do
     runner_start
-    expected = "All tests passed\n"
-    files = starting_files('gcc_assert')
-    actual = runner_run(files)
-    assert_equal expected, actual
+    actual = runner_run(language_files('gcc_assert'))
+    assert_equal "All tests passed\n", actual
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -23,16 +21,22 @@ class DockerRunnerLanguageTest < LibTestBase
   test '5F0',
   'Alpine-based [Ruby,MiniTest]' do
     runner_start
-    expected = "All tests passed\n"
-    files = starting_files('ruby_mini_test')
-    output = runner_run(files)
+    output = runner_run(language_files('ruby_mini_test'))
     assert output.include?('1 runs, 1 assertions, 0 failures, 0 errors, 0 skips')
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  # test
-  # (F#,NUnit) which explicitly names /sandbox in cyber-dojo.sh
+=begin
+  test '99B',
+  '(F#,NUnit) which explicitly names /sandbox in cyber-dojo.sh' do
+    runner_start
+    files = language_files('fsharp_nunit')
+    output = runner_run(files)
+    #expected = "All tests passed\n"
+    #assert output.include?('1 runs, 1 assertions, 0 failures, 0 errors, 0 skips')
+  end
+=end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 

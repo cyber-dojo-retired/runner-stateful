@@ -23,7 +23,7 @@ module DockerRunnerHelpers # mix-in
     @rm_volume = output.strip
   end
 
-  def starting_files(dir = 'gcc_assert')
+  def language_files(dir)
     dir = "/app/test/src/language_start_files/#{dir}"
     json = JSON.parse(IO.read("#{dir}/manifest.json"))
     @image_name = json['image_name']

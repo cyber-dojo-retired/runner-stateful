@@ -24,7 +24,7 @@ class DockerRunnerInfrastructureTest < LibTestBase
   test '385',
   'deleted files get deleted' do
     runner_start
-    files = starting_files
+    files = language_files('gcc_assert')
     files['cyber-dojo.sh'] = 'ls'
     ls_output = runner_run(files)
     before_filenames = ls_output.split
@@ -39,11 +39,9 @@ class DockerRunnerInfrastructureTest < LibTestBase
   test '4E8',
   'unchanged files dont get resaved' do
     runner_start
-    files = starting_files
+    files = language_files('gcc_assert')
     files['cyber-dojo.sh'] = 'ls -el'
     ls_output = runner_run(files)
-    #puts ls_output
-    #IN PROGRESS
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
