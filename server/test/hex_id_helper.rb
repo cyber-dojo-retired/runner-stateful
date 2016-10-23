@@ -54,7 +54,7 @@ module TestHexIdHelper # mix-in
           puts ">>>>>> #{id} <<<<<<" if any_arg_is_part_of_id
           self.instance_eval &block
         }
-        name = lines.join(' ')
+        name = lines.join(space = ' ')
         define_method("test_'#{id}',\n #{name}\n".to_sym, &block_with_test_id)
       end
     end

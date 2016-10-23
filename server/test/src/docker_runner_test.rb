@@ -93,8 +93,8 @@ class DockerRunnerTest < LibTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'BB3',
-  'when run(test-code) fails' +
-  'the container is killed and' +
+  'when run(test-code) fails',
+  'the container is killed and',
   'the assert diagnostic is returned' do
     hiker_c = [
       '#include "hiker.h"',
@@ -116,8 +116,8 @@ class DockerRunnerTest < LibTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'CDE',
-  'when run(test-code) passes' +
-  'the container is killed and' +
+  'when run(test-code) passes',
+  'the container is killed and',
   'the all-tests-passed string is returned' do
     hiker_c = [
       '#include "hiker.h"',
@@ -131,8 +131,8 @@ class DockerRunnerTest < LibTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '13D',
-  'when run(test-code) has syntax-error' +
-  'the container is killed and' +
+  'when run(test-code) has syntax-error',
+  'the container is killed and',
   'the gcc diagnosticis returned' do
     hiker_c = [
       '#include "hiker.h"',
@@ -156,8 +156,8 @@ class DockerRunnerTest < LibTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'C9A',
-  'when run(test-code) is empty-infinite-loop' +
-  'the container is killed and' +
+  'when run(test-code) is empty-infinite-loop',
+  'the container is killed and',
   'a timeout-diagostic is returned' do
     hiker_c = [
       '#include "hiker.h"',
@@ -176,8 +176,8 @@ class DockerRunnerTest < LibTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '307',
-  'when run(test-code) is printing-infinite-loop' +
-  'the container is killed and' +
+  'when run(test-code) is printing-infinite-loop',
+  'the container is killed and',
   'a timeout-diagostic is returned' do
     hiker_c = [
       '#include "hiker.h"',
