@@ -17,6 +17,7 @@ before_install:
 
 script:
     - docker pull cyberdojofoundation/gcc_assert
+    - docker pull cyberdojofoundation/ruby_mini_test
     - ./build_and_test.sh
 
 after_success:

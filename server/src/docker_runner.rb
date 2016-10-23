@@ -52,7 +52,6 @@ class DockerRunner
 
   def create_container_with_volume_mounted_as_sandbox(vol_name, image_name)
     # Assume volume exists from previous /start
-    # (F#,NUnit) cyber-dojo.sh actually names the /sandbox folder
     args = [
       '--detach',                          # get the cid
       '--interactive',                     # later execs
@@ -96,7 +95,6 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def ensure_user_nobody_has_HOME(cid)
-    # TODO: execute this command only for C#-NUnit image_name???
     # The existing C#-NUnit image picks up HOME from the _current_ user.
     # By default, nobody's entry in /etc/passwd is
     #       nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin
@@ -106,8 +104,8 @@ class DockerRunner
     # Of course, the usermod runs if you are not using C#-NUnit too.
     # In particular usermod is _not_ installed in a default Alpine linux.
     # It's in the shadow package.
-    assert_exec("docker exec #{cid} sh -c 'usermod --home /sandbox nobody 2> /dev/null'")
-    # TODO: make this non-asserting
+    # Consequently this is not assert_exec(...)
+    exec("docker exec #{cid} sh -c 'usermod --home /sandbox nobody 2> /dev/null'")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -1,0 +1,8 @@
+{
+  "filenames": [
+    "cyber-dojo.sh",
+    "hiker.rb",
+    "test_hiker.rb"
+  ],
+  "image_name": "cyberdojofoundation/ruby_mini_test"
+}

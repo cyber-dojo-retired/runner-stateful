@@ -13,17 +13,21 @@ class DockerRunnerLanguageTest < LibTestBase
   'Ubuntu-based image [C(gcc),assert]' do
     runner_start
     expected = "All tests passed\n"
-    files = starting_files
+    files = starting_files('gcc_assert')
     actual = runner_run(files)
     assert_equal expected, actual
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  #test '5F0',
-  #'Alpine-based [Ruby,MiniTest]' do
-  #
-  #end
+  test '5F0',
+  'Alpine-based [Ruby,MiniTest]' do
+    runner_start
+    expected = "All tests passed\n"
+    files = starting_files('ruby_mini_test')
+    output = runner_run(files)
+    assert output.include?('1 runs, 1 assertions, 0 failures, 0 errors, 0 skips')
+  end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
