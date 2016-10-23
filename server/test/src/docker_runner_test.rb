@@ -100,15 +100,11 @@ class DockerRunnerTest < LibTestBase
   'the assert diagnostic is returned' do
     live_shelling
     runner_start
-    hiker_c = [
-      '#include "hiker.h"',
-      'int answer(void) { return 6 * 9; }'
-    ].join("\n")
     expected_lines = [
       "Assertion failed: answer() == 42 (hiker.tests.c: life_the_universe_and_everything: 7)",
       "make: *** [makefile:14: test.output] Aborted"
     ]
-    actual = runner_run(hiker_c)
+    actual = runner_run(starting_files)
     expected_lines.each { |line| assert actual.include? line }
     # Odd...locally (Mac Docker-Toolbox, default VM)
     # the last line is
@@ -125,12 +121,13 @@ class DockerRunnerTest < LibTestBase
   'the all-tests-passed string is returned' do
     live_shelling
     runner_start
-    hiker_c = [
+    expected = "All tests passed\n"
+    files = starting_files
+    files['hiker.c'] = [
       '#include "hiker.h"',
       'int answer(void) { return 6 * 7; }'
     ].join("\n")
-    expected = "All tests passed\n"
-    actual = runner_run(hiker_c)
+    actual = runner_run(files)
     assert_equal expected, actual
   end
 
@@ -142,7 +139,8 @@ class DockerRunnerTest < LibTestBase
   'the gcc diagnosticis returned' do
     live_shelling
     runner_start
-    hiker_c = [
+    files = starting_files
+    files['hiker.c'] = [
       '#include "hiker.h"',
       'int answer(void) { return 6 * 9sss; }'
     ].join("\n")
@@ -157,7 +155,7 @@ class DockerRunnerTest < LibTestBase
       "cc1: all warnings being treated as errors",
       "make: *** [makefile:17: test] Error 1"
     ].join("\n") + "\n"
-    actual = runner_run(hiker_c)
+    actual = runner_run(files)
     assert_equal expected, actual
   end
 
@@ -169,17 +167,18 @@ class DockerRunnerTest < LibTestBase
   'a timeout-diagostic is returned' do
     live_shelling
     runner_start
-    hiker_c = [
+    files = starting_files
+    files['hiker.c'] = [
       '#include "hiker.h"',
       'int answer(void) { for(;;); return 6 * 7; }'
     ].join("\n")
     expected = [
-      "Unable to complete the tests in 3 seconds.",
+      "Unable to complete the tests in 2 seconds.",
       "Is there an accidental infinite loop?",
       "Is the server very busy?",
       "Please try again."
     ].join("\n")
-    actual = runner_run(hiker_c, 3)
+    actual = runner_run(files, [], 2)
     assert_equal expected, actual
   end
 
@@ -191,25 +190,51 @@ class DockerRunnerTest < LibTestBase
   'a timeout-diagostic is returned' do
     live_shelling
     runner_start
-    hiker_c = [
+    files = starting_files
+    files['hiker.c'] = [
       '#include "hiker.h"',
       '#include <stdio.h>',
       'int answer(void) { for(;;) printf("...."); return 6 * 7; }'
     ].join("\n")
     expected = [
-      "Unable to complete the tests in 3 seconds.",
+      "Unable to complete the tests in 2 seconds.",
       "Is there an accidental infinite loop?",
       "Is the server very busy?",
       "Please try again."
     ].join("\n")
 
-    actual = runner_run(hiker_c, 3)
+    actual = runner_run(files, [], 2)
     assert_equal expected, actual
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   # Test that deletes some files
+  # 1. do run 1 on existing files. Add ls -al to end of cyber-dojo.sh
+  #    grab output1
+  # 2. do run 2 with new name for test file.
+  #    Send old test-file name as deleted
+  #    Send new test-file as only changed_file
+  #    grab output2
+  # 3. verify
+  #    old name does not appear in output2
+  #    date-time stamps of hiker.hpp and hiker.cpp are unchanged
+
+=begin
+  test '385',
+  'deleted files get deleted and unchanged files dont get resaved' do
+    live_shelling
+    runner_start
+    hiker_c = [
+      '#include "hiker.h"',
+      'int answer(void) { return 6 * 7; }'
+    ].join("\n")
+    expected = "All tests passed\n"
+    actual_1 = runner_run(hiker_c)
+    assert_equal expected, actual_1
+  end
+=end
+
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -225,21 +250,26 @@ class DockerRunnerTest < LibTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def runner_run(hiker_c, max_seconds = 10)
-    changed_files = {
-      'hiker.c'       => hiker_c,
-      'hiker.h'       => read('hiker.h'),
-      'hiker.tests.c' => read('hiker.tests.c'),
-      'cyber-dojo.sh' => read('cyber-dojo.sh'),
-      'makefile'      => read('makefile')
-    }
+  def runner_run(changed_files, delete_filenames = [], max_seconds = 3)
     output = runner.run(
       gcc_assert_image_name,
       kata_id,
       avatar_name,
       max_seconds,
-      delete_filenames = [],
+      delete_filenames,
       changed_files)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def starting_files
+    {
+      'hiker.c'       => read('hiker.c'),
+      'hiker.h'       => read('hiker.h'),
+      'hiker.tests.c' => read('hiker.tests.c'),
+      'cyber-dojo.sh' => read('cyber-dojo.sh'),
+      'makefile'      => read('makefile')
+    }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
