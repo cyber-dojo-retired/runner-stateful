@@ -1,16 +1,11 @@
 
 require_relative './lib_test_base'
-require_relative './null_logger'
+require_relative './docker_runner_helpers'
 
 class DockerRunnerPullingTest < LibTestBase
 
   def self.hex
     'CFC'
-  end
-
-  def external_setup
-    assert_equal 'ExternalSheller', shell.class.name
-    ENV[env_name('log')] = 'NullLogger'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -43,14 +38,7 @@ class DockerRunnerPullingTest < LibTestBase
 
   private
 
-  include Externals
-
-  def runner; DockerRunner.new(self); end
-
-  #pulled?
-  #pull
-
-  def success; 0; end
+  include DockerRunnerHelpers
 
 end
 
