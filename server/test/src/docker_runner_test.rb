@@ -4,6 +4,9 @@ require_relative './mock_sheller'
 
 class DockerRunnerTest < LibTestBase
 
+  # TODO: if these tests fail they leave behind docker containers
+  # and docker volumes. Remove them.
+
   def self.hex
     '9D930'
   end
@@ -256,10 +259,10 @@ class DockerRunnerTest < LibTestBase
     _, exit_status = exec("docker inspect --format='{{ .State.Running }}' ${cid} 2> /dev/null")
     assert_equal does_not_exist=1, exit_status
 
-    # if the test was an infinite-loop test
-    # then docker_runner.sh did a [docker rm --force CID] in a child process
-    # This creates a timing issue and you seem to need
-    # to wait until the container is actually dead
+    # docker_runner.sh does [docker rm --force ${cid}] in a child process.
+    # This has a race condition so you need to wait
+    # until the container (which has the volume mounted)
+    # is 'actually' removed before you can remove the volume.
     100.times do
       #p "about to [docker volume rm #{volume_name}]"
       vrm_output, vrm_exit_status = exec("docker volume rm #{volume_name} 2>&1")
@@ -268,9 +271,8 @@ class DockerRunnerTest < LibTestBase
       #p "[docker volume rm]output=:#{vrm_output}:"
     end
 
-    # return 100 (Fixnum, not string) causing test failures
-    # To keep test coverage at 100% I'm not doing this
-    #    fail "UNABLE to do [docker volume rm #{volume_name}] after 100 attempts!"
+    # getting to here will return 100 (Fixnum, not string) causing test failures.
+    # To keep test coverage at 100% I'm not putting a statement here.
   end
 
 end
