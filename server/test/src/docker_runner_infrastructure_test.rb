@@ -21,7 +21,7 @@ class DockerRunnerInfrastructureTest < LibTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '385',
-  'deleted files get deleted' do
+  'deleted files get deleted and all previous files still exist' do
     runner_start
     files = language_files('gcc_assert')
     files['cyber-dojo.sh'] = 'ls'
@@ -35,11 +35,27 @@ class DockerRunnerInfrastructureTest < LibTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  test '232',
+  'new files get added and all previous files still exist' do
+    runner_start
+    files = language_files('gcc_assert')
+    files['cyber-dojo.sh'] = 'ls'
+    ls_output = runner_run(files)
+    before_filenames = ls_output.split
+    files = { 'newfile.txt' => 'hello world' }
+    ls_output = runner_run(files)
+    after_filenames = ls_output.split
+    new_filenames = after_filenames - before_filenames
+    assert_equal [ 'newfile.txt' ], new_filenames
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   test '4E8',
   'unchanged files dont get resaved' do
     runner_start
     files = language_files('gcc_assert')
-    files['cyber-dojo.sh'] = 'ls -el | tail -n +2'
+    files['cyber-dojo.sh'] = 'ls -el'
     before_ls = runner_run(files)
     after_ls = runner_run({})
     assert_equal before_ls, after_ls
@@ -47,11 +63,8 @@ class DockerRunnerInfrastructureTest < LibTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  # test added files get added
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  # test changed files get resaved
+  # test '9A7'
+  # 'changed files get resaved' do
   # lines like this
   # -rwxr-xr-x 1 nobody root 19 Sun Oct 23 19:15:35 2016 cyber-dojo.sh
   # 0          1 2      3    4  5   6   7  8        9    10
@@ -62,6 +75,7 @@ class DockerRunnerInfrastructureTest < LibTestBase
   #p "owner:#{info[2]}"
   #p "group:#{info[3]}"
   #p "name:#{info[10]}"
+  # end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
