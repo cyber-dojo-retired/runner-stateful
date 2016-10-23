@@ -17,8 +17,8 @@ my_dir="$( cd "$( dirname "${0}" )" && pwd )"
 
 app_dir=/app
 docker_version=$(docker --version | awk '{print $3}' | sed '$s/.$//')
-server_port=${4:-4557}
-client_port=${3:-4558}
+server_port=4557
+client_port=4558
 
 ${my_dir}/base/build-image.sh ${app_dir}
 ${my_dir}/server/build-image.sh ${app_dir} ${docker_version} ${server_port}

@@ -45,8 +45,7 @@ class DockerRunner
 
   def image_names
     output, _ = assert_exec('docker images')
-    lines = output.split("\n").select { |line| line.start_with?('cyberdojofoundation/') }
-    lines.collect { |line| line.split[0] }
+    output.split("\n").collect { |line| line.split[0] }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

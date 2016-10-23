@@ -12,77 +12,21 @@ class DockerRunnerTest < LibTestBase
   end
 
   def external_setup
-    ENV[env_name('shell')] = 'MockSheller'
+    assert_equal 'ExternalSheller', shell.class.name
+    ENV[env_name('log')] = 'NullLogger'
     @rm_volume = ''
   end
 
   def external_teardown
-    if shell.class.name == 'ExternalSheller'
-      remove_volume(@rm_volume) unless @rm_volume == ''
-    end
-    if shell.class.name == 'MockSheller'
-      shell.teardown
-    end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # pulled?
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test 'B71',
-  'pulled?(image_name) is false when image_name has not yet been pulled' do
-    no_gcc_assert = [
-      "REPOSITORY                         TAG     IMAGE ID      CREATED         SIZE",
-      "cyberdojofoundation/java_cucumber  latest  06aa46aad63d  6 weeks ago     881.7 MB",
-      "cyberdojo/runner                   1.12.2  a531a83580c9  18 minutes ago  56.05 MB"
-    ].join("\n")
-    shell.mock_exec(['docker images'], no_gcc_assert, success)
-    refute runner.pulled?(gcc_assert_image_name)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test '94E',
-  'pulled?(image) is true when image_name has already been pulled' do
-    has_gcc_assert = [
-      "REPOSITORY                          TAG      IMAGE ID      CREATED         SIZE",
-      "cyberdojofoundation/java_cucumber   latest   06aa46aad63d  6 weeks ago     881.7 MB",
-      "cyberdojo/runner                    1.12.2   a531a83580c9  18 minutes ago  56.05 MB",
-      "#{gcc_assert_image_name}            latest   da213d286ec5  4 months ago    99.16 MB"
-    ].join("\n")
-    shell.mock_exec(['docker images'], has_gcc_assert, success)
-    assert runner.pulled?(gcc_assert_image_name)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # pull
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test 'DA5',
-  'pull(image_name) issues shell(docker pull) command' do
-    shell.mock_exec(["docker pull #{gcc_assert_image_name}"], any, success)
-    output, exit_status = runner.pull(gcc_assert_image_name)
-    assert_equal any, output
-    assert_equal success, exit_status
+    remove_volume(@rm_volume) unless @rm_volume == ''
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
   # start
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test 'F2E',
-  'start(kata_id,avatar_name) issues shell(docker create volume) command' do
-    shell.mock_exec(["docker volume create --name #{volume_name}"], any, success)
-    output, exit_status = runner.start(kata_id, avatar_name)
-    assert_equal any, output
-    assert_equal success, exit_status
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   test 'DBC',
   'start creates a docker-volume' do
-    live_shelling
     runner.start(kata_id, avatar_name)
     output, exit_status = exec('docker volume ls')
     assert_equal success, exit_status
@@ -98,7 +42,6 @@ class DockerRunnerTest < LibTestBase
   'when run(test-code) fails',
   'the container is killed and',
   'the assert diagnostic is returned' do
-    live_shelling
     runner_start
     expected_lines = [
       "Assertion failed: answer() == 42 (hiker.tests.c: life_the_universe_and_everything: 7)",
@@ -119,7 +62,6 @@ class DockerRunnerTest < LibTestBase
   'when run(test-code) passes',
   'the container is killed and',
   'the all-tests-passed string is returned' do
-    live_shelling
     runner_start
     expected = "All tests passed\n"
     files = starting_files
@@ -137,7 +79,6 @@ class DockerRunnerTest < LibTestBase
   'when run(test-code) has syntax-error',
   'the container is killed and',
   'the gcc diagnosticis returned' do
-    live_shelling
     runner_start
     files = starting_files
     files['hiker.c'] = [
@@ -165,7 +106,6 @@ class DockerRunnerTest < LibTestBase
   'when run(test-code) is empty-infinite-loop',
   'the container is killed and',
   'a timeout-diagostic is returned' do
-    live_shelling
     runner_start
     files = starting_files
     files['hiker.c'] = [
@@ -188,7 +128,6 @@ class DockerRunnerTest < LibTestBase
   'when run(test-code) is printing-infinite-loop',
   'the container is killed and',
   'a timeout-diagostic is returned' do
-    live_shelling
     runner_start
     files = starting_files
     files['hiker.c'] = [
@@ -210,11 +149,9 @@ class DockerRunnerTest < LibTestBase
 
   test '385',
   'deleted files get deleted' do
-    live_shelling
     runner_start
     files = starting_files
     files['cyber-dojo.sh'] = 'ls'
-    expected = "All tests passed\n"
     ls_output = runner_run(files)
     before_filenames = ls_output.split
     ls_output = runner_run({}, [ 'makefile' ])
@@ -223,7 +160,22 @@ class DockerRunnerTest < LibTestBase
     assert_equal [ 'makefile'], deleted_filenames
   end
 
-  # unchanged files dont get resaved
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test '4E8',
+  'unchanged files dont get resaved' do
+    runner_start
+    files = starting_files
+    files['cyber-dojo.sh'] = 'ls -el'
+    ls_output = runner_run(files)
+    #puts ls_output
+    #IN PROGRESS
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  # test added files get added
+  # test changed files get resaved
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -279,11 +231,6 @@ class DockerRunnerTest < LibTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def live_shelling
-    ENV[env_name('shell')] = 'ExternalSheller'
-    ENV[env_name('log'  )] = 'NullLogger'
-  end
-
   def exec(command)
     output, exit_success = shell.exec(command)
     return [output, exit_success]
@@ -295,10 +242,10 @@ class DockerRunnerTest < LibTestBase
 
   def runner; DockerRunner.new(self); end
   def success; 0; end
-  def any; 'sdsdsd'; end
   def gcc_assert_image_name; 'cyberdojofoundation/gcc_assert'; end
   def kata_id; test_id; end
   def avatar_name; 'lion'; end
   def volume_name; 'cyber_dojo_' + kata_id + '_' + avatar_name; end
 
 end
+
