@@ -39,9 +39,10 @@ class DockerRunnerInfrastructureTest < LibTestBase
   'unchanged files dont get resaved' do
     runner_start
     files = language_files('gcc_assert')
-    files['cyber-dojo.sh'] = 'ls -el'
-    ls_output = runner_run(files)
-    # UNFINISHED...
+    files['cyber-dojo.sh'] = 'ls -el | tail -n +2'
+    before_ls = runner_run(files)
+    after_ls = runner_run({})
+    assert_equal before_ls, after_ls
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -51,6 +52,16 @@ class DockerRunnerInfrastructureTest < LibTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   # test changed files get resaved
+  # lines like this
+  # -rwxr-xr-x 1 nobody root 19 Sun Oct 23 19:15:35 2016 cyber-dojo.sh
+  # 0          1 2      3    4  5   6   7  8        9    10
+  #before = ls_output.split("\n")
+  #info = lines[0].split
+  #p "permissions:#{info[0]}"
+  #p "???#{info[1]}"
+  #p "owner:#{info[2]}"
+  #p "group:#{info[3]}"
+  #p "name:#{info[10]}"
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
