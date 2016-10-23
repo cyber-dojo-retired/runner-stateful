@@ -3,12 +3,12 @@ require_relative './lib_test_base'
 require_relative './mock_sheller'
 require_relative './null_logger'
 
-class DockerRunnerTest < LibTestBase
+class DockerRunnerInfrastructureTest < LibTestBase
 
   # TODO: expose container's cid and ensure [docker rm #{cid}] happens in external_teardown
 
   def self.hex
-    '9D930'
+    '4D87A'
   end
 
   def external_setup
@@ -23,67 +23,51 @@ class DockerRunnerTest < LibTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test 'BB3',
-  'when run(test-code) fails',
-  'the container is killed and',
-  'the assert diagnostic is returned' do
-    runner_start
-    expected_lines = [
-      "Assertion failed: answer() == 42 (hiker.tests.c: life_the_universe_and_everything: 7)",
-      "make: *** [makefile:14: test.output] Aborted"
-    ]
-    actual = runner_run(starting_files)
-    expected_lines.each { |line| assert actual.include? line }
-    # Odd...locally (Mac Docker-Toolbox, default VM)
-    # the last line is
-    #   make: *** [makefile:14: test.output] Aborted
-    # on travis the last line is
-    #   make: *** [makefile:14: test.output] Aborted (core dumped)
+  test 'DBC',
+  'start creates a docker-volume' do
+    runner.start(kata_id, avatar_name)
+    output, exit_status = exec('docker volume ls')
+    assert_equal success, exit_status
+    assert output.include? volume_name
+    exec("docker volume rm #{volume_name}")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test 'CDE',
-  'when run(test-code) passes',
-  'the container is killed and',
-  'the all-tests-passed string is returned' do
+  test '385',
+  'deleted files get deleted' do
     runner_start
-    expected = "All tests passed\n"
     files = starting_files
-    files['hiker.c'] = [
-      '#include "hiker.h"',
-      'int answer(void) { return 6 * 7; }'
-    ].join("\n")
-    actual = runner_run(files)
-    assert_equal expected, actual
+    files['cyber-dojo.sh'] = 'ls'
+    ls_output = runner_run(files)
+    before_filenames = ls_output.split
+    ls_output = runner_run({}, [ 'makefile' ])
+    after_filenames = ls_output.split
+    deleted_filenames = before_filenames - after_filenames
+    assert_equal [ 'makefile'], deleted_filenames
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '13D',
-  'when run(test-code) has syntax-error',
-  'the container is killed and',
-  'the gcc diagnosticis returned' do
+  test '4E8',
+  'unchanged files dont get resaved' do
     runner_start
     files = starting_files
-    files['hiker.c'] = [
-      '#include "hiker.h"',
-      'int answer(void) { return 6 * 9sss; }'
-    ].join("\n")
-    expected = [
-      "hiker.c: In function 'answer':",
-      "hiker.c:2:31: error: invalid suffix \"sss\" on integer constant",
-      " int answer(void) { return 6 * 9sss; }",
-      "                               ^",
-      "hiker.c:2:1: error: control reaches end of non-void function [-Werror=return-type]",
-      " int answer(void) { return 6 * 9sss; }",
-      " ^",
-      "cc1: all warnings being treated as errors",
-      "make: *** [makefile:17: test] Error 1"
-    ].join("\n") + "\n"
-    actual = runner_run(files)
-    assert_equal expected, actual
+    files['cyber-dojo.sh'] = 'ls -el'
+    ls_output = runner_run(files)
+    #puts ls_output
+    #IN PROGRESS
   end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  # test added files get added
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  # test changed files get resaved
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   private
 
