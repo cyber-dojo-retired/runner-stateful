@@ -5,8 +5,7 @@ require_relative './null_logger'
 
 class DockerRunnerTest < LibTestBase
 
-  # TODO: if these tests fail they leave behind docker containers
-  # and docker volumes. Remove container then volume in teardown.
+  # TODO: expose container's cid and ensure [docker rm #{cid}] happens in external_teardown
 
   def self.hex
     '9D930'
@@ -14,10 +13,16 @@ class DockerRunnerTest < LibTestBase
 
   def external_setup
     ENV[env_name('shell')] = 'MockSheller'
+    @rm_volume = ''
   end
 
   def external_teardown
-    shell.teardown if shell.class.name == 'MockSheller'
+    if shell.class.name == 'ExternalSheller'
+      remove_volume(@rm_volume) unless @rm_volume == ''
+    end
+    if shell.class.name == 'MockSheller'
+      shell.teardown
+    end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -27,9 +32,9 @@ class DockerRunnerTest < LibTestBase
   test 'B71',
   'pulled?(image_name) is false when image_name has not yet been pulled' do
     no_gcc_assert = [
-      "REPOSITORY                                 TAG                 IMAGE ID            CREATED             SIZE",
-      "cyberdojofoundation/java_cucumber          latest              06aa46aad63d        6 weeks ago         881.7 MB",
-      "cyberdojo/runner                           1.12.2              a531a83580c9        18 minutes ago      56.05 MB"
+      "REPOSITORY                         TAG     IMAGE ID      CREATED         SIZE",
+      "cyberdojofoundation/java_cucumber  latest  06aa46aad63d  6 weeks ago     881.7 MB",
+      "cyberdojo/runner                   1.12.2  a531a83580c9  18 minutes ago  56.05 MB"
     ].join("\n")
     shell.mock_exec(['docker images'], no_gcc_assert, success)
     refute runner.pulled?(gcc_assert_image_name)
@@ -40,10 +45,10 @@ class DockerRunnerTest < LibTestBase
   test '94E',
   'pulled?(image) is true when image_name has already been pulled' do
     has_gcc_assert = [
-      "REPOSITORY                                 TAG                 IMAGE ID            CREATED             SIZE",
-      "cyberdojofoundation/java_cucumber          latest              06aa46aad63d        6 weeks ago         881.7 MB",
-      "cyberdojo/runner                           1.12.2              a531a83580c9        18 minutes ago      56.05 MB",
-      "#{gcc_assert_image_name}                   latest              da213d286ec5        4 months ago        99.16 MB"
+      "REPOSITORY                          TAG      IMAGE ID      CREATED         SIZE",
+      "cyberdojofoundation/java_cucumber   latest   06aa46aad63d  6 weeks ago     881.7 MB",
+      "cyberdojo/runner                    1.12.2   a531a83580c9  18 minutes ago  56.05 MB",
+      "#{gcc_assert_image_name}            latest   da213d286ec5  4 months ago    99.16 MB"
     ].join("\n")
     shell.mock_exec(['docker images'], has_gcc_assert, success)
     assert runner.pulled?(gcc_assert_image_name)
@@ -93,6 +98,8 @@ class DockerRunnerTest < LibTestBase
   'when run(test-code) fails',
   'the container is killed and',
   'the assert diagnostic is returned' do
+    live_shelling
+    runner_start
     hiker_c = [
       '#include "hiker.h"',
       'int answer(void) { return 6 * 9; }'
@@ -116,6 +123,8 @@ class DockerRunnerTest < LibTestBase
   'when run(test-code) passes',
   'the container is killed and',
   'the all-tests-passed string is returned' do
+    live_shelling
+    runner_start
     hiker_c = [
       '#include "hiker.h"',
       'int answer(void) { return 6 * 7; }'
@@ -131,6 +140,8 @@ class DockerRunnerTest < LibTestBase
   'when run(test-code) has syntax-error',
   'the container is killed and',
   'the gcc diagnosticis returned' do
+    live_shelling
+    runner_start
     hiker_c = [
       '#include "hiker.h"',
       'int answer(void) { return 6 * 9sss; }'
@@ -156,6 +167,8 @@ class DockerRunnerTest < LibTestBase
   'when run(test-code) is empty-infinite-loop',
   'the container is killed and',
   'a timeout-diagostic is returned' do
+    live_shelling
+    runner_start
     hiker_c = [
       '#include "hiker.h"',
       'int answer(void) { for(;;); return 6 * 7; }'
@@ -176,6 +189,8 @@ class DockerRunnerTest < LibTestBase
   'when run(test-code) is printing-infinite-loop',
   'the container is killed and',
   'a timeout-diagostic is returned' do
+    live_shelling
+    runner_start
     hiker_c = [
       '#include "hiker.h"',
       '#include <stdio.h>',
@@ -202,14 +217,48 @@ class DockerRunnerTest < LibTestBase
 
   include Externals
 
-  def runner; DockerRunner.new(self); end
-  def success; 0; end
-  def space; ' '; end
-  def any; 'sdsdsd'; end
-  def gcc_assert_image_name; 'cyberdojofoundation/gcc_assert'; end
-  def kata_id; test_id; end
-  def avatar_name; 'lion'; end
-  def volume_name; 'cyber_dojo_' + kata_id + '_' + avatar_name; end
+  def runner_start
+    output, exit_status = runner.start(kata_id, avatar_name)
+    assert_equal success, exit_status
+    @rm_volume = output
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def runner_run(hiker_c, max_seconds = 10)
+    changed_files = {
+      'hiker.c'       => hiker_c,
+      'hiker.h'       => read('hiker.h'),
+      'hiker.tests.c' => read('hiker.tests.c'),
+      'cyber-dojo.sh' => read('cyber-dojo.sh'),
+      'makefile'      => read('makefile')
+    }
+    output = runner.run(
+      gcc_assert_image_name,
+      kata_id,
+      avatar_name,
+      max_seconds,
+      delete_filenames = [],
+      changed_files)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def remove_volume(name)
+    # docker_runner.sh does [docker rm --force ${cid}] in a child process.
+    # This has a race condition so you need to wait
+    # until the container (which has the volume mounted)
+    # is 'actually' removed before you can remove the volume.
+    100.times do
+      #p "about to [docker volume rm #{name}]"
+      output, exit_status = exec("docker volume rm #{name} 2>&1")
+      break if exit_status == success
+      #p "[docker volume rm]exit_status=:#{exit_status}:"
+      #p "[docker volume rm]output=:#{output}:"
+    end
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def live_shelling
     ENV[env_name('shell')] = 'ExternalSheller'
@@ -225,43 +274,12 @@ class DockerRunnerTest < LibTestBase
     IO.read("/app/test/src/start_files/#{filename}")
   end
 
-  def runner_run(hiker_c, max_seconds = 10)
-    live_shelling
-    output, exit_status = runner.start(kata_id, avatar_name)
-    assert_equal success, exit_status
-    cid = output.strip
-    changed_files = {
-      'hiker.c'       => hiker_c,
-      'hiker.h'       => read('hiker.h'),
-      'hiker.tests.c' => read('hiker.tests.c'),
-      'cyber-dojo.sh' => read('cyber-dojo.sh'),
-      'makefile'      => read('makefile')
-    }
-    output = runner.run(
-      gcc_assert_image_name,
-      kata_id,
-      avatar_name,
-      max_seconds,
-      delete_filenames = [],
-      changed_files)
-
-    _, exit_status = exec("docker inspect --format='{{ .State.Running }}' #{cid} 2> /dev/null")
-    assert_equal does_not_exist=1, exit_status
-
-    # docker_runner.sh does [docker rm --force ${cid}] in a child process.
-    # This has a race condition so you need to wait
-    # until the container (which has the volume mounted)
-    # is 'actually' removed before you can remove the volume.
-    100.times do
-      #p "about to [docker volume rm #{volume_name}]"
-      vrm_output, vrm_exit_status = exec("docker volume rm #{volume_name} 2>&1")
-      return output if vrm_exit_status == 0
-      #p "[docker volume rm]exit_status=:#{vrm_exit_status}:"
-      #p "[docker volume rm]output=:#{vrm_output}:"
-    end
-
-    # getting to here will return 100 (Fixnum, not string) causing test failures.
-    # To keep test coverage at 100% I'm not putting a statement here.
-  end
+  def runner; DockerRunner.new(self); end
+  def success; 0; end
+  def any; 'sdsdsd'; end
+  def gcc_assert_image_name; 'cyberdojofoundation/gcc_assert'; end
+  def kata_id; test_id; end
+  def avatar_name; 'lion'; end
+  def volume_name; 'cyber_dojo_' + kata_id + '_' + avatar_name; end
 
 end
