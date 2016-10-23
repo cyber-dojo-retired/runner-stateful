@@ -26,7 +26,7 @@ class DockerRunnerTimeoutTest < LibTestBase
       "Is the server very busy?",
       "Please try again."
     ].join("\n")
-    actual = runner_run(files, [], 2)
+    actual = runner_run(files, max_seconds = 2)
     assert_equal expected, actual
   end
 
@@ -49,7 +49,7 @@ class DockerRunnerTimeoutTest < LibTestBase
       "Is the server very busy?",
       "Please try again."
     ].join("\n")
-    actual = runner_run(files, delete_filenames = [], max_seconds = 2)
+    actual = runner_run(files, max_seconds = 2)
     assert_equal expected, actual
   end
 

@@ -32,7 +32,7 @@ module DockerRunnerHelpers # mix-in
     }]
   end
 
-  def runner_run(changed_files, delete_filenames = [], max_seconds = 3)
+  def runner_run(changed_files, max_seconds = 10, delete_filenames = [])
     output = runner.run(
       @image_name,
       kata_id,

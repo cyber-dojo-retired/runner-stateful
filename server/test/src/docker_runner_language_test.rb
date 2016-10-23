@@ -30,7 +30,7 @@ class DockerRunnerLanguageTest < LibTestBase
   test '99B',
   '(F#,NUnit) which explicitly names /sandbox in cyber-dojo.sh' do
     runner_start
-    output = runner_run(language_files('fsharp_nunit'), [], 10)
+    output = runner_run(language_files('fsharp_nunit'))
     assert output.include?('Tests run: 1, Errors: 0, Failures: 0, Inconclusive: 0')
   end
 
@@ -39,7 +39,7 @@ class DockerRunnerLanguageTest < LibTestBase
   test '182',
   '(C#-NUnit) which needs to pick up HOME from the current user' do
     runner_start
-    output = runner_run(language_files('csharp_nunit'), [], 10)
+    output = runner_run(language_files('csharp_nunit'))
     assert output.include?('Tests run: 1, Errors: 0, Failures: 0, Inconclusive: 0')
   end
 

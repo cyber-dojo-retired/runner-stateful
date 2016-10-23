@@ -28,10 +28,10 @@ class DockerRunnerInfrastructureTest < LibTestBase
     files['cyber-dojo.sh'] = 'ls'
     ls_output = runner_run(files)
     before_filenames = ls_output.split
-    ls_output = runner_run({}, [ 'makefile' ])
+    ls_output = runner_run({}, max_seconds = 10, [ 'makefile' ])
     after_filenames = ls_output.split
     deleted_filenames = before_filenames - after_filenames
-    assert_equal [ 'makefile'], deleted_filenames
+    assert_equal [ 'makefile' ], deleted_filenames
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -42,6 +42,7 @@ class DockerRunnerInfrastructureTest < LibTestBase
     files = language_files('gcc_assert')
     files['cyber-dojo.sh'] = 'ls -el'
     ls_output = runner_run(files)
+    # UNFINISHED...
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
