@@ -2,13 +2,15 @@
 require_relative './null_logger'
 require 'json'
 
+# TODO?
+# expose container's cid and ensure [docker rm #{cid}]
+# happens in external_teardown
+
 module DockerRunnerHelpers # mix-in
 
   module_function
 
   def external_setup
-    # TODO?: expose container's cid and ensure [docker rm #{cid}]
-    # happens in external_teardown
     assert_equal 'ExternalSheller', shell.class.name
     ENV[env_name('log')] = 'NullLogger'
     @rm_volume = ''
@@ -49,11 +51,8 @@ module DockerRunnerHelpers # mix-in
     # until the container (which has the volume mounted)
     # is 'actually' removed before you can remove the volume.
     100.times do
-      #p "about to [docker volume rm #{name}]"
       output, exit_status = exec("docker volume rm #{name} 2>&1")
       break if exit_status == success
-      #p "[docker volume rm]exit_status=:#{exit_status}:"
-      #p "[docker volume rm]output=:#{output}:"
     end
   end
 
@@ -65,7 +64,7 @@ module DockerRunnerHelpers # mix-in
   def runner; DockerRunner.new(self); end
   def success; 0; end
   def kata_id; test_id; end
-  def avatar_name; 'lion'; end
+  def avatar_name; 'salmon'; end
   def volume_name; 'cyber_dojo_' + kata_id + '_' + avatar_name; end
 
   include Externals # for shell
