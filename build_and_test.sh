@@ -17,12 +17,12 @@ my_dir="$( cd "$( dirname "${0}" )" && pwd )"
 
 app_dir=/app
 docker_version=$(docker --version | awk '{print $3}' | sed '$s/.$//')
-client_port=${3:-4558}
 server_port=${4:-4557}
+client_port=${3:-4558}
 
 ${my_dir}/base/build-image.sh ${app_dir}
-${my_dir}/client/build-image.sh ${app_dir} ${client_port}
 ${my_dir}/server/build-image.sh ${app_dir} ${docker_version} ${server_port}
+${my_dir}/client/build-image.sh ${app_dir} ${client_port}
 
 if [ $? != 0 ]; then
   echo
@@ -31,6 +31,10 @@ if [ $? != 0 ]; then
 fi
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+cat ${my_dir}/docker-compose.yml.PORT |
+  sed "s/CLIENT_PORT/${client_port}/g" |
+  sed "s/SERVER_PORT/${server_port}/g" > ${my_dir}/docker-compose.yml
 
 export DOCKER_ENGINE_VERSION=${docker_version}
 

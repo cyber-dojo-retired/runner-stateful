@@ -1,0 +1,20 @@
+
+version: '2'
+
+services:
+  runner_client:
+    user: nobody
+    image: cyberdojo/runner_client
+    container_name: runner_client
+    command: [ "foreman", "start", "-d", "/app" ]
+    ports: [ "CLIENT_PORT:CLIENT_PORT" ]
+
+  runner_server:
+    user: root
+    image: cyberdojo/runner:${DOCKER_ENGINE_VERSION}
+    container_name: runner_server
+    command: [ "foreman", "start", "-d", "/app" ]
+    ports: [ "SERVER_PORT:SERVER_PORT" ]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
