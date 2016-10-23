@@ -1,0 +1,8 @@
+{
+  "filenames": [
+    "cyber-dojo.sh",
+    "Hiker.fs",
+    "HikerTest.fs"
+  ],
+  "image_name": "cyberdojofoundation/fsharp_nunit"
+}

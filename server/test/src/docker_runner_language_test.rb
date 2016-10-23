@@ -27,21 +27,18 @@ class DockerRunnerLanguageTest < LibTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-=begin
   test '99B',
   '(F#,NUnit) which explicitly names /sandbox in cyber-dojo.sh' do
     runner_start
-    files = language_files('fsharp_nunit')
-    output = runner_run(files)
-    #expected = "All tests passed\n"
-    #assert output.include?('1 runs, 1 assertions, 0 failures, 0 errors, 0 skips')
+    output = runner_run(language_files('fsharp_nunit'), [], 10)
+    assert output.include?('Tests run: 1, Errors: 0, Failures: 0, Inconclusive: 0')
   end
-=end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  # test
-  # (C#-NUnit) which needs to pick up HOME from the _current_ user
+  # test '182',
+  # '(C#-NUnit) which needs to pick up HOME from the _current_ user' do
+  # end
 
   private
 

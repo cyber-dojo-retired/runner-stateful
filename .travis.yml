@@ -18,6 +18,7 @@ before_install:
 script:
     - docker pull cyberdojofoundation/gcc_assert
     - docker pull cyberdojofoundation/ruby_mini_test
+    - docker pull cyberdojofoundation/fsharp_nunit
     - ./build_and_test.sh
 
 after_success:

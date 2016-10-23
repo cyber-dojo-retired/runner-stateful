@@ -89,7 +89,9 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def ensure_user_nobody_owns_changed_files(cid)
-    assert_exec("docker exec #{cid} sh -c 'chown -R nobody:nobody /sandbox'")
+    # The nobody user exists on Ubuntu and Alpine images
+    # The nobody group doesn't. So not doing nobody:nobody
+    assert_exec("docker exec #{cid} sh -c 'chown -R nobody /sandbox'")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
