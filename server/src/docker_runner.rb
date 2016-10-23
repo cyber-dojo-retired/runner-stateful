@@ -23,7 +23,7 @@ class DockerRunner
   def start(kata_id, avatar_name)
     volume_name = "cyber_dojo_#{kata_id}_#{avatar_name}"
     output, exit_status = assert_exec("docker volume create --name #{volume_name}")
-    return [output.strip, exit_status]
+    return [output, exit_status]
   end
 
   def run(image_name, kata_id, avatar_name, max_seconds, delete_filenames, changed_files)

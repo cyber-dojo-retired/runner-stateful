@@ -220,7 +220,7 @@ class DockerRunnerTest < LibTestBase
   def runner_start
     output, exit_status = runner.start(kata_id, avatar_name)
     assert_equal success, exit_status
-    @rm_volume = output
+    @rm_volume = output.strip
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
