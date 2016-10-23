@@ -5,5 +5,6 @@
     "hiker.h",
     "hiker.tests.c",
     "makefile"
-  ]
+  ],
+  "image_name": "cyberdojofoundation/gcc_assert"
 }

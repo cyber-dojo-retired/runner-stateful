@@ -107,6 +107,7 @@ class DockerRunner
     # In particular usermod is _not_ installed in a default Alpine linux.
     # It's in the shadow package.
     assert_exec("docker exec #{cid} sh -c 'usermod --home /sandbox nobody 2> /dev/null'")
+    # TODO: make this non-asserting
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

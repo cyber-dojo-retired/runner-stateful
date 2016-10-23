@@ -23,23 +23,23 @@ module DockerRunnerHelpers # mix-in
     @rm_volume = output.strip
   end
 
+  def starting_files(dir = 'gcc_assert')
+    dir = "/app/test/src/language_start_files/#{dir}"
+    json = JSON.parse(IO.read("#{dir}/manifest.json"))
+    @image_name = json['image_name']
+    Hash[json['filenames'].collect { |filename|
+      [filename, IO.read("#{dir}/#{filename}")]
+    }]
+  end
+
   def runner_run(changed_files, delete_filenames = [], max_seconds = 3)
     output = runner.run(
-      gcc_assert_image_name,
+      @image_name,
       kata_id,
       avatar_name,
       max_seconds,
       delete_filenames,
       changed_files)
-  end
-
-  def starting_files(dir = 'gcc_assert')
-    dir = "/app/test/src/language_start_files/#{dir}"
-    json = JSON.parse(IO.read("#{dir}/filenames.json"))
-    json['filenames'].collect { |filename| }
-    Hash[json['filenames'].collect { |filename|
-      [filename, IO.read("#{dir}/#{filename}")]
-    }]
   end
 
   def remove_volume(name)
@@ -63,7 +63,7 @@ module DockerRunnerHelpers # mix-in
 
   def runner; DockerRunner.new(self); end
   def success; 0; end
-  def gcc_assert_image_name; 'cyberdojofoundation/gcc_assert'; end
+  #def gcc_assert_image_name; 'cyberdojofoundation/gcc_assert'; end
   def kata_id; test_id; end
   def avatar_name; 'lion'; end
   def volume_name; 'cyber_dojo_' + kata_id + '_' + avatar_name; end
