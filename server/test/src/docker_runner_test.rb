@@ -70,10 +70,8 @@ class DockerRunnerTest < LibTestBase
 
   test 'F2E',
   'start(kata_id,avatar_name) issues shell(docker create volume) command' do
-    @kata_id = test_id
-    @avatar_name = 'lion'
     shell.mock_exec(["docker volume create --name #{volume_name}"], any, success)
-    output, exit_status = runner.start(@kata_id, @avatar_name)
+    output, exit_status = runner.start(kata_id, avatar_name)
     assert_equal any, output
     assert_equal success, exit_status
   end
@@ -82,10 +80,8 @@ class DockerRunnerTest < LibTestBase
 
   test 'DBC',
   'start creates a docker-volume' do
-    @kata_id = test_id
-    @avatar_name = 'lion'
     live_shelling
-    runner.start(@kata_id, @avatar_name)
+    runner.start(kata_id, avatar_name)
     output, exit_status = exec('docker volume ls')
     assert_equal success, exit_status
     assert output.include? volume_name
@@ -100,7 +96,6 @@ class DockerRunnerTest < LibTestBase
   'when run(test-code) fails' +
   'the container is killed and' +
   'the assert diagnostic is returned' do
-    @kata_id = test_id
     hiker_c = [
       '#include "hiker.h"',
       'int answer(void) { return 6 * 9; }'
@@ -124,7 +119,6 @@ class DockerRunnerTest < LibTestBase
   'when run(test-code) passes' +
   'the container is killed and' +
   'the all-tests-passed string is returned' do
-    @kata_id = test_id
     hiker_c = [
       '#include "hiker.h"',
       'int answer(void) { return 6 * 7; }'
@@ -140,7 +134,6 @@ class DockerRunnerTest < LibTestBase
   'when run(test-code) has syntax-error' +
   'the container is killed and' +
   'the gcc diagnosticis returned' do
-    @kata_id = test_id
     hiker_c = [
       '#include "hiker.h"',
       'int answer(void) { return 6 * 9sss; }'
@@ -166,7 +159,6 @@ class DockerRunnerTest < LibTestBase
   'when run(test-code) is empty-infinite-loop' +
   'the container is killed and' +
   'a timeout-diagostic is returned' do
-    @kata_id = test_id
     hiker_c = [
       '#include "hiker.h"',
       'int answer(void) { for(;;); return 6 * 7; }'
@@ -187,7 +179,6 @@ class DockerRunnerTest < LibTestBase
   'when run(test-code) is printing-infinite-loop' +
   'the container is killed and' +
   'a timeout-diagostic is returned' do
-    @kata_id = test_id
     hiker_c = [
       '#include "hiker.h"',
       '#include <stdio.h>',
@@ -236,12 +227,13 @@ class DockerRunnerTest < LibTestBase
     IO.read("/app/test/src/start_files/#{filename}")
   end
 
-  def volume_name; 'cyber_dojo_' + @kata_id + '_' + @avatar_name; end
+  def kata_id; test_id; end
+  def avatar_name; 'lion'; end
+  def volume_name; 'cyber_dojo_' + kata_id + '_' + avatar_name; end
 
   def runner_run(hiker_c, max_seconds = 10)
-    @avatar_name = 'lion'
     live_shelling
-    output, exit_status = runner.start(@kata_id, @avatar_name)
+    output, exit_status = runner.start(kata_id, avatar_name)
     assert_equal success, exit_status
     cid = output.strip
     changed_files = {
@@ -253,8 +245,8 @@ class DockerRunnerTest < LibTestBase
     }
     output = runner.run(
       image_name = 'cyberdojofoundation/gcc_assert',
-      @kata_id,
-      @avatar_name,
+      kata_id,
+      avatar_name,
       max_seconds,
       delete_filenames = [],
       changed_files)
