@@ -239,11 +239,11 @@ class DockerRunnerTest < LibTestBase
     live_shelling
     runner.start(@kata_id, @avatar_name)
     changed_files = {
-      'hiker.c' => hiker_c,
-      'hiker.h' => read('hiker.h'),
+      'hiker.c'       => hiker_c,
+      'hiker.h'       => read('hiker.h'),
       'hiker.tests.c' => read('hiker.tests.c'),
       'cyber-dojo.sh' => read('cyber-dojo.sh'),
-      'makefile' => read('makefile')
+      'makefile'      => read('makefile')
     }
     output = runner.run(
       image_name = 'cyberdojofoundation/gcc_assert',
@@ -253,7 +253,7 @@ class DockerRunnerTest < LibTestBase
       delete_filenames = [],
       changed_files)
 
-    _,exit_status = exec("docker inspect --format='{{ .State.Running }}' ${cid} 2> /dev/null")
+    _, exit_status = exec("docker inspect --format='{{ .State.Running }}' ${cid} 2> /dev/null")
     assert_equal does_not_exist=1, exit_status
 
     # if the test was an infinite-loop test
