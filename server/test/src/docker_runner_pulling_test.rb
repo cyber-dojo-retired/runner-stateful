@@ -47,6 +47,9 @@ class DockerRunnerPullingTest < LibTestBase
 
   def runner; DockerRunner.new(self); end
 
+  #pulled?
+  #pull
+
   def success; 0; end
 
 end
