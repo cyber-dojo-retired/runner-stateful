@@ -14,10 +14,6 @@ class DockerRunnerLanguageTest < LibTestBase
     runner_start
     expected = "All tests passed\n"
     files = starting_files
-    files['hiker.c'] = [
-      '#include "hiker.h"',
-      'int answer(void) { return 6 * 7; }'
-    ].join("\n")
     actual = runner_run(files)
     assert_equal expected, actual
   end
