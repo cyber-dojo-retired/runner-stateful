@@ -21,18 +21,14 @@ class MicroService < Sinatra::Base
   end
 
   post '/start' do
-    content_type :json
-    output, status = runner.start(kata_id, avatar_name)
-    { status:status, output:output }.to_json
+    jasoned *runner.start(kata_id, avatar_name)
   end
 
   post '/run' do
-    content_type :json
     max_seconds = args['max_seconds']
     delete_filenames = args['delete_filenames']
     changed_files = args['changed_files']
-    output, status = runner.run(image_name, kata_id, avatar_name, max_seconds, delete_filenames, changed_files)
-    { exit:status, output:output }.to_json
+    jasoned *runner.run(image_name, kata_id, avatar_name, max_seconds, delete_filenames, changed_files)
   end
 
   private
@@ -55,6 +51,11 @@ class MicroService < Sinatra::Base
   def image_name;  args['image_name' ]; end
   def kata_id;     args['kata_id'    ]; end
   def avatar_name; args['avatar_name']; end
+
+  def jasoned(output, status)
+    content_type :json
+    { status:status, output:output }.to_json
+  end
 
 end
 
