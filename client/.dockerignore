@@ -2,12 +2,12 @@
 
 *
 
--#-----!Except these dirs
+#-----!Except these dirs
 
 !src
 !test
 
--#-----!Except these files
+#-----!Except these files
 
 !Gemfile
 !config.ru
