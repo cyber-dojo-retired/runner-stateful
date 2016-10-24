@@ -43,10 +43,9 @@ module DockerRunnerHelpers # mix-in
   def runner_run(changed_files, max_seconds = 10, delete_filenames = [])
     refute_nil @image_name
     @cid = runner.create_container(@image_name, kata_id, avatar_name)
-    runner.delete_deleted_files_from_sandbox(@cid, delete_filenames)
-    runner.copy_changed_files_into_sandbox(@cid, changed_files)
-    runner.ensure_user_nobody_owns_changed_files(@cid)
-    runner.ensure_user_nobody_has_HOME(@cid)
+    runner.deleted_files(@cid, delete_filenames)
+    runner.changed_files(@cid, changed_files)
+    runner.setup_home(@cid)
     runner.run(@cid, max_seconds)
   end
 

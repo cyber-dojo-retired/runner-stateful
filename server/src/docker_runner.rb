@@ -43,7 +43,7 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def delete_deleted_files_from_sandbox(cid, filenames)
+  def deleted_files(cid, filenames)
     filenames.each do |filename|
       assert_exec("docker exec #{cid} sh -c 'rm /sandbox/#{filename}'")
     end
@@ -51,7 +51,8 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def copy_changed_files_into_sandbox(cid, changed_files)
+  def changed_files(cid, changed_files)
+    # copy changed files into sandbox
     Dir.mktmpdir('runner') do |tmp_dir|
       changed_files.each do |filename, content|
         pathed_filename = tmp_dir + '/' + filename
@@ -60,18 +61,14 @@ class DockerRunner
       end
       assert_exec("docker cp #{tmp_dir}/. #{cid}:/sandbox")
     end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def ensure_user_nobody_owns_changed_files(cid)
-    # Ubuntu and Alpine images have nobody and nogroup
+    # ensure nobody:nogroup owns changed files
+    # Ubuntu and Alpine images both have nobody and nogroup
     assert_exec("docker exec #{cid} sh -c 'chown -R nobody:nogroup /sandbox'")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def ensure_user_nobody_has_HOME(cid)
+  def setup_home(cid)
     # The existing C#-NUnit image picks up HOME from the _current_ user.
     # The nobody user quite probably does not have a home dir.
     # I usermod to solve this. The C#-NUnit docker image is built
