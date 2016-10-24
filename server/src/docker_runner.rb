@@ -1,6 +1,7 @@
 
 require_relative './nearest_ancestors'
-require_relative './runner'
+require_relative './string_cleaner'
+require_relative './string_truncater'
 
 # TODO: what if filename has a quote in it?
 
@@ -39,9 +40,6 @@ class DockerRunner
   end
 
   private
-
-  include NearestAncestors
-  include Runner
 
   def image_names
     output, _ = assert_exec('docker images')
@@ -98,22 +96,21 @@ class DockerRunner
 
   def ensure_user_nobody_has_HOME(cid)
     # The existing C#-NUnit image picks up HOME from the _current_ user.
-    # By default, nobody's entry in /etc/passwd is
-    #       nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin
-    # and nobody does not have a home dir.
+    # The nobody user quite probably does not have a home dir.
     # I usermod to solve this. The C#-NUnit docker image is built
     # from an Ubuntu base which has usermod.
-    # Of course, the usermod runs if you are not using C#-NUnit too.
-    # In particular usermod is _not_ installed in a default Alpine linux.
+    # Of course, the usermod runs if you are not using C#-NUnit.
+    # And usermod is _not_ installed in Alpine linux.
     # It's in the shadow package.
-    # Consequently this is not assert_exec(...)
+    # Consequently the next statement is not assert_exec(...)
     exec("docker exec #{cid} sh -c 'usermod --home /sandbox nobody 2> /dev/null'")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def runner_sh(cid, max_seconds)
-    # docker_runner.sh does a [docker rm] in a child process (for the timeout).
+    # docker_runner.sh does a [docker rm CID] in a child process
+    # (for the max_seconds timeout).
     # This has a race-condition and can issue a diagnostic to stderr, eg
     #   Error response from daemon: No such exec instance
     #          'cfc1ce94ec97f86ad0a73c6f.....' found in daemon
@@ -143,10 +140,28 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def disk; nearest_ancestors(:disk); end
+  def output_or_timed_out(output, exit_status, max_seconds)
+    exit_status != timed_out ? truncated(cleaned(output)) : did_not_complete(max_seconds)
+  end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def did_not_complete(max_seconds)
+    "Unable to complete the tests in #{max_seconds} seconds.\n" +
+    "Is there an accidental infinite loop?\n" +
+    "Is the server very busy?\n" +
+    "Please try again."
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def disk;  nearest_ancestors(:disk);  end
   def shell; nearest_ancestors(:shell); end
-
   def success; 0; end
+  def timed_out; (timeout = 128) + (kill = 9); end
+
+  include NearestAncestors
+  include StringCleaner
+  include StringTruncater
 
 end
