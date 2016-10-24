@@ -23,7 +23,7 @@ module DockerRunnerHelpers # mix-in
   def runner_start
     output, status = runner.start(kata_id, avatar_name)
     assert_equal success, status
-    @rm_volume = output
+    @rm_volume = output.strip
     [ output, status ]
   end
 
@@ -38,14 +38,8 @@ module DockerRunnerHelpers # mix-in
 
   def runner_run(changed_files, max_seconds = 10, delete_filenames = [])
     refute_nil @image_name
-    #output =
-    runner.run(
-      @image_name,
-      kata_id,
-      avatar_name,
-      max_seconds,
-      delete_filenames,
-      changed_files)
+    @cid = runner.create_container(@image_name, kata_id, avatar_name)
+    runner.run(@cid, max_seconds, delete_filenames, changed_files)
   end
 
   def remove_volume(name)
@@ -53,10 +47,25 @@ module DockerRunnerHelpers # mix-in
     # This has a race condition so you need to wait
     # until the container (which has the volume mounted)
     # is 'actually' removed before you can remove the volume.
-    100.times do
-      output, status = exec("docker volume rm #{name} 2>&1")
-      break if status == success
+    unless @cid.nil?
+      10.times do
+        break if container_dead?
+        sleep(1)
+      end
     end
+    _output, status = exec("docker volume rm #{name} 2>&1")
+    assert_equal success, status
+    #puts "remove_volume output:#{output}:"
+    #puts "remove_volume status:#{status}:"
+  end
+
+  def container_dead?
+    refute_nil @cid
+    command = "docker inspect --format='{{ .State.Running }}' #{@cid} 2> /dev/null"
+    _output, status = exec(command)
+    #p "inspect output:#{output}:"
+    #p "inspect status:#{status}:"
+    status == 1
   end
 
   def runner; DockerRunner.new(self); end

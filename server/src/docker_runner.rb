@@ -24,10 +24,13 @@ class DockerRunner
     exec("docker volume create --name #{volume_name}")
   end
 
-  def run(image_name, kata_id, avatar_name, max_seconds, delete_filenames, changed_files)
+  def create_container(image_name, kata_id, avatar_name)
     # This creates the container but docker_runner.sh removes it.
     volume_name = "cyber_dojo_#{kata_id}_#{avatar_name}"
     cid = create_container_with_volume_mounted_as_sandbox(volume_name, image_name)
+  end
+
+  def run(cid, max_seconds, delete_filenames, changed_files)
     delete_deleted_files_from_sandbox(cid, delete_filenames)
     copy_changed_files_into_sandbox(cid, changed_files)
     ensure_user_nobody_owns_changed_files(cid)

@@ -23,7 +23,8 @@ class MicroService < Sinatra::Base
   end
 
   post '/run' do
-    jasoned *runner.run(image_name, kata_id, avatar_name, max_seconds, delete_filenames, changed_files)
+    cid = runner.create_container(image_name, kata_id, avatar_name)
+    jasoned *runner.run(cid, max_seconds, delete_filenames, changed_files)
   end
 
   private
