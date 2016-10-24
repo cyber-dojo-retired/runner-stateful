@@ -74,11 +74,9 @@ class DockerRunner
     # The nobody user quite probably does not have a home dir.
     # I usermod to solve this. The C#-NUnit docker image is built
     # from an Ubuntu base which has usermod.
-    # Of course, the usermod runs if you are not using C#-NUnit.
-    # And usermod is _not_ installed in Alpine linux.
-    # It's in the shadow package.
-    # Consequently the next statement is not assert_exec(...)
-    exec("docker exec #{cid} sh -c 'usermod --home /sandbox nobody 2> /dev/null'")
+    if image_name == 'cyberdojofoundation/csharp_nunit'
+      assert_exec("docker exec #{cid} sh -c 'usermod --home /sandbox nobody 2> /dev/null'")
+    end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
