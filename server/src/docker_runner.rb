@@ -1,8 +1,6 @@
 
 require_relative './nearest_ancestors'
 
-# TODO: what if filename has a quote in it?
-
 class DockerRunner
 
   def initialize(parent)
@@ -105,7 +103,6 @@ class DockerRunner
   def assert_exec(command)
     output, status = exec(command)
     fail "exited(#{status}):#{output}:" unless status == success
-    # TODO?: log too
     [output, status]
   end
 

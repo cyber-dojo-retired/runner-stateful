@@ -13,10 +13,8 @@ class DockerRunnerLanguageTest < LibTestBase
   '[C(gcc),assert] (an Ubuntu-based image) runs and has',
   'the user nobody and',
   'the group nogroup' do
-    runner_start
-    output, status = runner_run(language_files('gcc_assert'))
-    assert_equal success, status
-    assert_equal "All tests passed\n", output
+    @expected = "All tests passed\n"
+    assert_runs 'gcc_assert'
     assert user_nobody_exists?
     assert group_nogroup_exists?
   end
@@ -27,10 +25,8 @@ class DockerRunnerLanguageTest < LibTestBase
   '[Ruby,MiniTest] (an Alpine-based image) runs and has',
   'the user nobody and',
   'the group nogroup' do
-    runner_start
-    output, status = runner_run(language_files('ruby_mini_test'))
-    assert_equal success, status
-    assert output.include?('1 runs, 1 assertions, 0 failures, 0 errors, 0 skips')
+    @expected = '1 runs, 1 assertions, 0 failures, 0 errors, 0 skips'
+    assert_runs 'ruby_mini_test'
     assert user_nobody_exists?
     assert group_nogroup_exists?
   end
@@ -39,23 +35,26 @@ class DockerRunnerLanguageTest < LibTestBase
 
   test '99B',
   '[F#,NUnit] runs (it explicitly names /sandbox in cyber-dojo.sh)' do
-    runner_start
-    output, status = runner_run(language_files('fsharp_nunit'))
-    assert_equal success, status
-    assert output.include?('Tests run: 1, Errors: 0, Failures: 0, Inconclusive: 0')
+    @expected = 'Tests run: 1, Errors: 0, Failures: 0, Inconclusive: 0'
+    assert_runs 'fsharp_nunit'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '182',
   '[C#-NUnit] runs (it needs to pick up HOME from the current user)' do
-    runner_start
-    output, status = runner_run(language_files('csharp_nunit'))
-    assert_equal success, status
-    assert output.include?('Tests run: 1, Errors: 0, Failures: 0, Inconclusive: 0')
+    @expected = 'Tests run: 1, Errors: 0, Failures: 0, Inconclusive: 0'
+    assert_runs 'csharp_nunit'
   end
 
   private
+
+  def assert_runs(dir)
+    runner_start
+    output, status = runner_run(language_files(dir))
+    assert_equal success, status
+    assert output.include?(@expected), output
+  end
 
   def user_nobody_exists?
     user, status = runner_run({'cyber-dojo.sh' => 'getent passwd nobody'})

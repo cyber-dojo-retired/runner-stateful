@@ -1,0 +1,8 @@
+
+o) what if filename has a quote in it?
+
+o) log assert_exec() fail in docker_runner.rb
+
+o) massage micro_service returned strings.
+   - add length truncation
+   - clean them
