@@ -2,7 +2,6 @@
 require_relative './nearest_ancestors'
 
 # TODO: what if filename has a quote in it?
-# TODO: pass image_name to setup_home()
 
 class DockerRunner
 
@@ -89,7 +88,7 @@ class DockerRunner
     #          'cfc1ce94ec97f86ad0a73c6f.....' found in daemon
     # Tests show the container _is_ removed.
     # The race makes it awkard for tests to remove the volume.
-    # See the end of server/test/src/docker_runner_test.rb
+    # (see the external_teardown in server/test/src/docker_runner_helpers.rb)
     # I pipe stderr to /dev/null so the diagnostic does not appear in test output.
     exec("/app/src/docker_runner.sh #{cid} #{max_seconds} 2> /dev/null")
   end
@@ -106,7 +105,7 @@ class DockerRunner
   def assert_exec(command)
     output, status = exec(command)
     fail "exited(#{status}):#{output}:" unless status == success
-    # TODO: log too
+    # TODO?: log too
     [output, status]
   end
 
