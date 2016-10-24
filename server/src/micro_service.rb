@@ -53,17 +53,9 @@ class MicroService < Sinatra::Base
     JSON.parse(request.body.read)
   end
 
-  def image_name
-    args['image_name']
-  end
-
-  def kata_id
-    args['kata_id']
-  end
-
-  def avatar_name
-    args['avatar_name']
-  end
+  def image_name;  args['image_name' ]; end
+  def kata_id;     args['kata_id'    ]; end
+  def avatar_name; args['avatar_name']; end
 
 end
 

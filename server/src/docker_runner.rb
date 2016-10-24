@@ -140,12 +140,16 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def output_or_timed_out(output, exit_status, max_seconds)
-    exit_status != timed_out ? truncated(cleaned(output)) : did_not_complete(max_seconds)
+    if exit_status != timed_out
+      truncated(cleaned(output))
+    else
+      did_not_complete_in(max_seconds)
+    end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def did_not_complete(max_seconds)
+  def did_not_complete_in(max_seconds)
     "Unable to complete the tests in #{max_seconds} seconds.\n" +
     "Is there an accidental infinite loop?\n" +
     "Is the server very busy?\n" +
