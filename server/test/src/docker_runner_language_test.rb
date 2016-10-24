@@ -12,8 +12,8 @@ class DockerRunnerLanguageTest < LibTestBase
   test 'CDE',
   'Ubuntu-based image [C(gcc),assert]' do
     runner_start
-    actual = runner_run(language_files('gcc_assert'))
-    assert_equal "All tests passed\n", actual
+    output = runner_run(language_files('gcc_assert'))
+    assert_equal "All tests passed\n", output
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
