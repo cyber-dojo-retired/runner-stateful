@@ -27,7 +27,6 @@ class DockerRunner
   def create_container(image_name, kata_id, avatar_name)
     # This creates the container but docker_runner.sh removes it.
     volume_name = "cyber_dojo_#{kata_id}_#{avatar_name}"
-    #cid = create_container_with_volume_mounted_as_sandbox(volume_name, image_name)
     # Assume volume exists from previous /start
     args = [
       '--detach',                          # get the cid
@@ -40,14 +39,6 @@ class DockerRunner
     ].join(space = ' ')
     output, _ = assert_exec("docker run #{args} #{image_name} sh")
     cid = output.strip
-  end
-
-  def run(cid, max_seconds, delete_filenames, changed_files)
-    delete_deleted_files_from_sandbox(cid, delete_filenames)
-    copy_changed_files_into_sandbox(cid, changed_files)
-    ensure_user_nobody_owns_changed_files(cid)
-    ensure_user_nobody_has_HOME(cid)
-    runner_sh(cid, max_seconds)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -94,7 +85,7 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def runner_sh(cid, max_seconds)
+  def run(cid, max_seconds)
     # docker_runner.sh does a [docker rm CID] in a child process
     # (for the max_seconds timeout).
     # This has a race-condition and can issue a diagnostic to stderr, eg

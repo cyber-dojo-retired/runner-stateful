@@ -24,7 +24,11 @@ class MicroService < Sinatra::Base
 
   post '/run' do
     cid = runner.create_container(image_name, kata_id, avatar_name)
-    jasoned *runner.run(cid, max_seconds, delete_filenames, changed_files)
+    runner.delete_deleted_files_from_sandbox(cid, delete_filenames)
+    runner.copy_changed_files_into_sandbox(cid, changed_files)
+    runner.ensure_user_nobody_owns_changed_files(cid)
+    runner.ensure_user_nobody_has_HOME(cid)
+    jasoned* runner.run(cid, max_seconds)
   end
 
   private
