@@ -35,12 +35,12 @@ def get_index_stats(flat, name)
   \s*<b>#{number}<\/b> files in total.
   \s*<b>(#{number})<\/b> relevant lines./m
   r = html.match(pattern)
-  h = {}
-  h[:coverage]      = f2(r[1])
-  h[:hits_per_line] = f2(r[2])
-  h[:line_count]    = r[3].to_i
-  h[:name] = name
-  h
+  {
+    :coverage      => f2(r[1]),
+    :hits_per_line => f2(r[2]),
+    :line_count    => r[3].to_i,
+    :name          => name
+  }
 end
 
 # - - - - - - - - - - - - - - - - - - - - - - -
