@@ -71,7 +71,11 @@ class DockerRunner
     # The nobody user quite probably does not have a home dir.
     # I usermod to solve this. The C#-NUnit docker image is built
     # from an Ubuntu base which has usermod.
-    if image_name == 'cyberdojofoundation/csharp_nunit'
+    need_home = [
+      'cyberdojofoundation/csharp_nunit',
+      'cyberdojofoundation/fsharp_nunit'
+    ]
+    if need_home.include?(image_name)
       assert_exec("docker exec #{cid} sh -c 'usermod --home /sandbox nobody 2> /dev/null'")
     end
   end

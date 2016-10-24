@@ -47,7 +47,7 @@ class DockerRunnerLanguageTest < LibTestBase
     assert_runs 'csharp_nunit'
   end
 
-  private
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_runs(dir)
     runner_start
@@ -56,11 +56,15 @@ class DockerRunnerLanguageTest < LibTestBase
     assert output.include?(@expected), output
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   def user_nobody_exists?
     user, status = runner_run({'cyber-dojo.sh' => 'getent passwd nobody'})
     assert_equal success, status
     user.start_with?('nobody')
   end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def group_nogroup_exists?
     group, status = runner_run({'cyber-dojo.sh' => 'getent group nogroup'})
