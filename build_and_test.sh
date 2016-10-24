@@ -44,11 +44,6 @@ docker-compose up -d
 # server
 server_cid=`docker ps --all --quiet --filter "name=runner_server"`
 #docker exec ${server_cid} sh -c "cat Gemfile.lock"
-
-docker exec ${server_cid} sh -c "pwd && ls -al"
-echo "EXITING EARLY"
-exit
-
 docker exec ${server_cid} sh -c "cd test && ./run.sh ${*}"
 server_exit_status=$?
 docker cp ${server_cid}:/tmp/coverage ${my_dir}/server
