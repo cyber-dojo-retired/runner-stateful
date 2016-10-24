@@ -27,27 +27,7 @@ class DockerRunner
   def create_container(image_name, kata_id, avatar_name)
     # This creates the container but docker_runner.sh removes it.
     volume_name = "cyber_dojo_#{kata_id}_#{avatar_name}"
-    cid = create_container_with_volume_mounted_as_sandbox(volume_name, image_name)
-  end
-
-  def run(cid, max_seconds, delete_filenames, changed_files)
-    delete_deleted_files_from_sandbox(cid, delete_filenames)
-    copy_changed_files_into_sandbox(cid, changed_files)
-    ensure_user_nobody_owns_changed_files(cid)
-    ensure_user_nobody_has_HOME(cid)
-    runner_sh(cid, max_seconds)
-  end
-
-  private
-
-  def image_names
-    output, _ = assert_exec('docker images')
-    output.split("\n").collect { |line| line.split[0] }
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def create_container_with_volume_mounted_as_sandbox(vol_name, image_name)
+    #cid = create_container_with_volume_mounted_as_sandbox(volume_name, image_name)
     # Assume volume exists from previous /start
     args = [
       '--detach',                          # get the cid
@@ -56,10 +36,18 @@ class DockerRunner
       '--pids-limit=64',                   # security - no fork bombs
       '--security-opt=no-new-privileges',  # security - no escalation
       '--user=root',
-      "--volume=#{vol_name}:/sandbox"
+      "--volume=#{volume_name}:/sandbox"
     ].join(space = ' ')
     output, _ = assert_exec("docker run #{args} #{image_name} sh")
     cid = output.strip
+  end
+
+  def run(cid, max_seconds, delete_filenames, changed_files)
+    delete_deleted_files_from_sandbox(cid, delete_filenames)
+    copy_changed_files_into_sandbox(cid, changed_files)
+    ensure_user_nobody_owns_changed_files(cid)
+    ensure_user_nobody_has_HOME(cid)
+    runner_sh(cid, max_seconds)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -117,6 +105,13 @@ class DockerRunner
     # See the end of server/test/src/docker_runner_test.rb
     # I pipe stderr to /dev/null so the diagnostic does not appear in test output.
     exec("/app/src/docker_runner.sh #{cid} #{max_seconds} 2> /dev/null")
+  end
+
+  private
+
+  def image_names
+    output, _ = assert_exec('docker images')
+    output.split("\n").collect { |line| line.split[0] }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

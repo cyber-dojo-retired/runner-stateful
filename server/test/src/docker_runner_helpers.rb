@@ -39,6 +39,7 @@ module DockerRunnerHelpers # mix-in
   def runner_run(changed_files, max_seconds = 10, delete_filenames = [])
     refute_nil @image_name
     @cid = runner.create_container(@image_name, kata_id, avatar_name)
+    #...
     runner.run(@cid, max_seconds, delete_filenames, changed_files)
   end
 

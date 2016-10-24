@@ -12,6 +12,7 @@ class DockerRunnerInfrastructureTest < LibTestBase
 
   test 'DBC',
   'start creates a docker-volume and returns its name' do
+    # assert volume_name does not exist
     vol_name, status = runner_start
     assert_equal success, status
     assert_equal volume_name, vol_name.strip
@@ -19,6 +20,7 @@ class DockerRunnerInfrastructureTest < LibTestBase
     output, status = exec('docker volume ls')
     assert_equal success, status
     assert output.include? volume_name
+    # create a container to simplfy remove_volume
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
