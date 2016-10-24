@@ -40,12 +40,12 @@ module DockerRunnerHelpers # mix-in
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def runner_run(changed_files, max_seconds = 10, delete_filenames = [])
+  def runner_run(changed_files, max_seconds = 10, deleted_filenames = [])
     refute_nil @image_name
     @cid = runner.create_container(@image_name, kata_id, avatar_name)
-    runner.deleted_files(@cid, delete_filenames)
+    runner.deleted_files(@cid, deleted_filenames)
     runner.changed_files(@cid, changed_files)
-    runner.setup_home(@cid)
+    runner.setup_home(@cid, @image_named)
     runner.run(@cid, max_seconds)
   end
 

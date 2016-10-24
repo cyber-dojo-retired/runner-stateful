@@ -24,9 +24,9 @@ class MicroService < Sinatra::Base
 
   post '/run' do
     cid = runner.create_container(image_name, kata_id, avatar_name)
-    runner.deleted_files(cid, delete_filenames)
+    runner.deleted_files(cid, deleted_filenames)
     runner.changed_files(cid, changed_files)
-    runner.setup_home(cid)
+    runner.setup_home(cid, image_name)
     jasoned *runner.run(cid, max_seconds)
   end
 
@@ -42,12 +42,12 @@ class MicroService < Sinatra::Base
     JSON.parse(request.body.read)
   end
 
-  def image_name;       args['image_name' ];      end
-  def kata_id;          args['kata_id'    ];      end
-  def avatar_name;      args['avatar_name'];      end
-  def max_seconds;      args['max_seconds'];      end
-  def delete_filenames; args['delete_filenames']; end
-  def changed_files;    args['changed_files'];    end
+  def image_name;        args['image_name' ];      end
+  def kata_id;           args['kata_id'    ];      end
+  def avatar_name;       args['avatar_name'];      end
+  def max_seconds;       args['max_seconds'];      end
+  def deleted_filenames; args['deleted_filenames']; end
+  def changed_files;     args['changed_files'];    end
 
   def jasoned(output, status)
     content_type :json

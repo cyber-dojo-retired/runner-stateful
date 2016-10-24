@@ -2,6 +2,7 @@
 require_relative './nearest_ancestors'
 
 # TODO: what if filename has a quote in it?
+# TODO: pass image_name to setup_home()
 
 class DockerRunner
 
@@ -51,10 +52,10 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def changed_files(cid, changed_files)
+  def changed_files(cid, files)
     # copy changed files into sandbox
     Dir.mktmpdir('runner') do |tmp_dir|
-      changed_files.each do |filename, content|
+      files.each do |filename, content|
         pathed_filename = tmp_dir + '/' + filename
         disk.write(pathed_filename, content)
         assert_exec("chmod +x #{pathed_filename}") if pathed_filename.end_with?('.sh')
@@ -68,7 +69,7 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def setup_home(cid)
+  def setup_home(cid, image_name)
     # The existing C#-NUnit image picks up HOME from the _current_ user.
     # The nobody user quite probably does not have a home dir.
     # I usermod to solve this. The C#-NUnit docker image is built

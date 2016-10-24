@@ -17,12 +17,12 @@ module Runner # mix-in
     post(:start, { kata_id:kata_id, avatar_name:avatar_name })
   end
 
-  def run(image_name, kata_id, avatar_name, max_seconds, delete_filenames, changed_files)
+  def run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
     post(:run, { image_name:image_name,
                     kata_id:kata_id,
                 avatar_name:avatar_name,
                 max_seconds:max_seconds,
-           delete_filenames:delete_filenames,
+          deleted_filenames:deleted_filenames,
               changed_files:changed_files})
   end
 
