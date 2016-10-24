@@ -11,7 +11,7 @@ services:
 
   runner_server:
     user: root
-    image: cyberdojo/runner:${DOCKER_ENGINE_VERSION}
+    image: cyberdojo/runner:DOCKER_ENGINE_VERSION
     command: [ "foreman", "start", "-d", "/app" ]
     ports: [ "SERVER_PORT:SERVER_PORT" ]
     volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
