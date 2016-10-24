@@ -14,7 +14,7 @@ class DockerRunnerInfrastructureTest < LibTestBase
   'start creates a docker-volume and returns its name' do
     vol_name, status = runner_start
     assert_equal success, status
-    assert_equal volume_name, vol_name
+    assert_equal volume_name, vol_name.strip
 
     output, status = exec('docker volume ls')
     assert_equal success, status

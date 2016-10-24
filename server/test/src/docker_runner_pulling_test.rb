@@ -12,7 +12,8 @@ class DockerRunnerPullingTest < LibTestBase
 
   test 'A71',
   'pulled?(image_name) is false when image_name has not yet been pulled' do
-    refute runner.pulled?('thisdoes/not_exist')
+    _output, status = runner.pulled?('thisdoes/not_exist')
+    refute status
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -20,7 +21,8 @@ class DockerRunnerPullingTest < LibTestBase
   test 'A4E',
   'pulled?(image_name) is true when image_name has already been pulled' do
     # use image-name of runner itself
-    assert runner.pulled?('cyberdojo/runner')
+    _output, status = runner.pulled?('cyberdojo/runner')
+    assert status
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -29,9 +31,14 @@ class DockerRunnerPullingTest < LibTestBase
   'after pull(image_name) pulled(image_name) is true' do
     # something small not used in cyber-dojo
     image_name = 'busybox'
-    refute runner.pulled?(image_name)
+    _output, status = runner.pulled?(image_name)
+    refute status
+
     runner.pull(image_name)
-    assert runner.pulled?(image_name)
+
+    _output, status = runner.pulled?(image_name)
+    assert status
+
     output, status = shell.exec("docker rmi #{image_name}")
     fail "exited(#{status}):#{output}:" unless status == success
   end

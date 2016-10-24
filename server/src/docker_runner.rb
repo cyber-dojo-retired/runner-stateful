@@ -12,17 +12,16 @@ class DockerRunner
   attr_reader :parent
 
   def pulled?(image_name)
-    image_names.include?(image_name)
+    ['', image_names.include?(image_name)]
   end
 
   def pull(image_name)
-    assert_exec("docker pull #{image_name}")
+    exec("docker pull #{image_name}")
   end
 
   def start(kata_id, avatar_name)
     volume_name = "cyber_dojo_#{kata_id}_#{avatar_name}"
-    output, status = assert_exec("docker volume create --name #{volume_name}")
-    [output.strip, status]
+    exec("docker volume create --name #{volume_name}")
   end
 
   def run(image_name, kata_id, avatar_name, max_seconds, delete_filenames, changed_files)

@@ -11,13 +11,11 @@ require_relative './docker_runner'
 class MicroService < Sinatra::Base
 
   get '/pulled' do
-    content_type :json
-    runner.pulled?(image_name)
+    jasoned *runner.pulled?(image_name)
   end
 
   post '/pull' do
-    content_type :json
-    runner.pull(image_name)
+    jasoned *runner.pull(image_name)
   end
 
   post '/start' do
@@ -25,9 +23,6 @@ class MicroService < Sinatra::Base
   end
 
   post '/run' do
-    max_seconds = args['max_seconds']
-    delete_filenames = args['delete_filenames']
-    changed_files = args['changed_files']
     jasoned *runner.run(image_name, kata_id, avatar_name, max_seconds, delete_filenames, changed_files)
   end
 
@@ -35,26 +30,24 @@ class MicroService < Sinatra::Base
 
   include Externals
 
-  def runner
-    DockerRunner.new(self)
-  end
-
-  def args
-    @args ||= request_body_args
-  end
+  def runner; DockerRunner.new(self); end
+  def args; @args ||= request_body_args; end
 
   def request_body_args
     request.body.rewind
     JSON.parse(request.body.read)
   end
 
-  def image_name;  args['image_name' ]; end
-  def kata_id;     args['kata_id'    ]; end
-  def avatar_name; args['avatar_name']; end
+  def image_name;       args['image_name' ];      end
+  def kata_id;          args['kata_id'    ];      end
+  def avatar_name;      args['avatar_name'];      end
+  def max_seconds;      args['max_seconds'];      end
+  def delete_filenames; args['delete_filenames']; end
+  def changed_files;    args['changed_files'];    end
 
   def jasoned(output, status)
     content_type :json
-    { status:status, output:output }.to_json
+    { status:status, output:output.strip }.to_json
   end
 
 end

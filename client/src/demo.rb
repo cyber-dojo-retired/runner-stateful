@@ -21,6 +21,10 @@ class Demo < Sinatra::Base
       'makefile'      => read('makefile')
     }
     html = ''
+    json = pulled?(image_name)
+    html += "<pre>/pulled?->#{JSON.unparse(json)}</pre>"
+    json = pull(image_name)
+    html += "<pre>/pull->#{JSON.unparse(json)}</pre>"
     json = start(kata_id, avatar_name)
     html += "<pre>/start->#{JSON.unparse(json)}</pre>"
     json = run(image_name, kata_id, avatar_name, max_seconds, delete_filenames, changed_files)
