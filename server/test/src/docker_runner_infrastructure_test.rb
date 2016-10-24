@@ -11,16 +11,15 @@ class DockerRunnerInfrastructureTest < LibTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'DBC',
-  'start creates a docker-volume and returns its name' do
-    # assert volume_name does not exist
-    vol_name, status = runner_start
-    assert_equal success, status
-    assert_equal volume_name, vol_name.strip
+  'before start volume does not exist,',
+  'after start it does' do
+    refute volume_exists?
 
-    output, status = exec('docker volume ls')
+    output, status = runner_start
     assert_equal success, status
-    assert output.include? volume_name
-    # create a container to simplfy remove_volume
+    assert_equal volume_name, output.strip
+
+    assert volume_exists?
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -74,6 +73,7 @@ class DockerRunnerInfrastructureTest < LibTestBase
     files['cyber-dojo.sh'] = 'ls -el'
     before_ls, status = runner_run(files)
     assert_equal success, status
+
     after_ls, status = runner_run({})
     assert_equal success, status
 
