@@ -53,9 +53,8 @@ module DockerRunnerHelpers # mix-in
 
   def wait_till_container_dead
     # docker_runner.sh does [docker rm --force ${cid}] in a child process.
-    # This has a race condition so you need to wait
-    # until the container (which has the volume mounted)
-    # is 'actually' removed before you can remove the volume.
+    # This has a race so you need to wait for the container (which has the
+    # volume mounted) to be removed before you can remove the volume.
     if test_creates_container?
       10.times do
         break if container_dead?
@@ -69,8 +68,6 @@ module DockerRunnerHelpers # mix-in
   def remove_volume
     assert @rm_volume != ''
     _output, status = exec("docker volume rm #{@rm_volume} 2>&1")
-    #puts "remove_volume output:#{output}:"
-    #puts "remove_volume status:#{status}:"
     assert_equal success, status
   end
 
@@ -86,8 +83,6 @@ module DockerRunnerHelpers # mix-in
     refute_nil @cid
     command = "docker inspect --format='{{ .State.Running }}' #{@cid} 2> /dev/null"
     _output, status = exec(command)
-    #p "inspect output:#{output}:"
-    #p "inspect status:#{status}:"
     status == 1
   end
 
@@ -104,12 +99,11 @@ module DockerRunnerHelpers # mix-in
   def runner; DockerRunner.new(self); end
   def success; 0; end
   def timed_out_and_killed; (timeout = 128) + (kill = 9); end
+  def volume_name; 'cyber_dojo_' + kata_id + '_' + avatar_name; end
   def kata_id; test_id; end
   def avatar_name; 'salmon'; end
-  def volume_name; 'cyber_dojo_' + kata_id + '_' + avatar_name; end
 
   include Externals # for shell
   def exec(command); shell.exec(command); end
 
 end
-

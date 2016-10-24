@@ -12,7 +12,7 @@ class DockerRunner
   attr_reader :parent
 
   def pulled?(image_name)
-    ['', image_names.include?(image_name)]
+    [ '', image_names.include?(image_name) ]
   end
 
   def pull(image_name)
