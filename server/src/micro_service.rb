@@ -7,7 +7,7 @@ require 'json'
 
 require_relative './externals'
 require_relative './docker_runner'
-require_relative './string_cleaner'
+#require_relative './string_cleaner'
 
 class MicroService < Sinatra::Base
 
@@ -23,7 +23,8 @@ class MicroService < Sinatra::Base
 
   post '/start' do
     content_type :json
-    runner.start(kata_id, avatar_name)
+    output, status = runner.start(kata_id, avatar_name)
+    { status:status, output:output }.to_json
   end
 
   post '/run' do
@@ -31,14 +32,14 @@ class MicroService < Sinatra::Base
     max_seconds = args['max_seconds']
     delete_filenames = args['delete_filenames']
     changed_files = args['changed_files']
-    output = runner.run(image_name, kata_id, avatar_name, max_seconds, delete_filenames, changed_files)
-    cleaned(output)
+    output, status = runner.run(image_name, kata_id, avatar_name, max_seconds, delete_filenames, changed_files)
+    { exit:status, output:output }.to_json
   end
 
   private
 
   include Externals
-  include StringCleaner
+  #include StringCleaner
 
   def runner
     DockerRunner.new(self)

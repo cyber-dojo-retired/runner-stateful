@@ -1,7 +1,5 @@
 
 require_relative './nearest_ancestors'
-require_relative './string_cleaner'
-require_relative './string_truncater'
 
 # TODO: what if filename has a quote in it?
 
@@ -23,8 +21,8 @@ class DockerRunner
 
   def start(kata_id, avatar_name)
     volume_name = "cyber_dojo_#{kata_id}_#{avatar_name}"
-    output, exit_status = assert_exec("docker volume create --name #{volume_name}")
-    return [output, exit_status]
+    output, status = assert_exec("docker volume create --name #{volume_name}")
+    [output.strip, status]
   end
 
   def run(image_name, kata_id, avatar_name, max_seconds, delete_filenames, changed_files)
@@ -35,8 +33,7 @@ class DockerRunner
     copy_changed_files_into_sandbox(cid, changed_files)
     ensure_user_nobody_owns_changed_files(cid)
     ensure_user_nobody_has_HOME(cid)
-    output, exit_status = runner_sh(cid, max_seconds)
-    output_or_timed_out(output, exit_status, max_seconds)
+    runner_sh(cid, max_seconds)
   end
 
   private
@@ -117,54 +114,30 @@ class DockerRunner
     # The race makes it awkard for tests to remove the volume.
     # See the end of server/test/src/docker_runner_test.rb
     # I pipe stderr to /dev/null so the diagnostic does not appear in test output.
-    output, exit_status = exec("/app/src/docker_runner.sh #{cid} #{max_seconds} 2> /dev/null")
-    return [output, exit_status]
+    exec("/app/src/docker_runner.sh #{cid} #{max_seconds} 2> /dev/null")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_exec(command)
-    output, exit_status = exec(command)
-    fail "exited(#{exit_status}):#{output}:" unless exit_status == success
+    output, status = exec(command)
+    fail "exited(#{status}):#{output}:" unless status == success
     # TODO: log too
-    return [output, exit_status]
+    [output, status]
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def exec(command)
-    output, exit_status = shell.exec(command)
-    return [output, exit_status]
+    shell.exec(command)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def output_or_timed_out(output, exit_status, max_seconds)
-    if exit_status != timed_out
-      truncated(cleaned(output))
-    else
-      did_not_complete_in(max_seconds)
-    end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def did_not_complete_in(max_seconds)
-    "Unable to complete the tests in #{max_seconds} seconds.\n" +
-    "Is there an accidental infinite loop?\n" +
-    "Is the server very busy?\n" +
-    "Please try again."
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def disk;  nearest_ancestors(:disk);  end
-  def shell; nearest_ancestors(:shell); end
-  def success; 0; end
-  def timed_out; (timeout = 128) + (kill = 9); end
 
   include NearestAncestors
-  include StringCleaner
-  include StringTruncater
+  def disk;  nearest_ancestors(:disk);  end
+  def shell; nearest_ancestors(:shell); end
+
+  def success; 0; end
 
 end

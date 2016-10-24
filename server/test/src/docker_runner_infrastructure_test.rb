@@ -11,10 +11,13 @@ class DockerRunnerInfrastructureTest < LibTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'DBC',
-  'start creates a docker-volume' do
-    runner_start
-    output, exit_status = exec('docker volume ls')
-    assert_equal success, exit_status
+  'start creates a docker-volume and returns its name' do
+    vol_name, status = runner_start
+    assert_equal success, status
+    assert_equal volume_name, vol_name
+
+    output, status = exec('docker volume ls')
+    assert_equal success, status
     assert output.include? volume_name
   end
 
@@ -23,13 +26,18 @@ class DockerRunnerInfrastructureTest < LibTestBase
   test '385',
   'deleted files are removed and all previous files still exist' do
     runner_start
+
     files = language_files('gcc_assert')
     files['cyber-dojo.sh'] = 'ls'
-    ls_output = runner_run(files)
+    ls_output, status = runner_run(files)
+    assert_equal success, status
     before_filenames = ls_output.split
-    ls_output = runner_run({}, max_seconds = 10, [ 'makefile' ])
+
+    ls_output, status = runner_run({}, max_seconds = 10, [ 'makefile' ])
+    assert_equal success, status
     after_filenames = ls_output.split
     deleted_filenames = before_filenames - after_filenames
+
     assert_equal [ 'makefile' ], deleted_filenames
   end
 
@@ -38,13 +46,18 @@ class DockerRunnerInfrastructureTest < LibTestBase
   test '232',
   'new files are added and all previous files still exist' do
     runner_start
+
     files = language_files('gcc_assert')
     files['cyber-dojo.sh'] = 'ls'
-    ls_output = runner_run(files)
+    ls_output, status = runner_run(files)
+    assert_equal success, status
     before_filenames = ls_output.split
+
     files = { 'newfile.txt' => 'hello world' }
-    ls_output = runner_run(files)
+    ls_output, status = runner_run(files)
+    assert_equal success, status
     after_filenames = ls_output.split
+
     new_filenames = after_filenames - before_filenames
     assert_equal [ 'newfile.txt' ], new_filenames
   end
@@ -54,10 +67,14 @@ class DockerRunnerInfrastructureTest < LibTestBase
   test '4E8',
   "unchanged files still exist and don't get touched at all" do
     runner_start
+
     files = language_files('gcc_assert')
     files['cyber-dojo.sh'] = 'ls -el'
-    before_ls = runner_run(files)
-    after_ls = runner_run({})
+    before_ls, status = runner_run(files)
+    assert_equal success, status
+    after_ls, status = runner_run({})
+    assert_equal success, status
+
     assert_equal before_ls, after_ls
   end
 
@@ -66,18 +83,23 @@ class DockerRunnerInfrastructureTest < LibTestBase
   test '9A7',
   'a changed file is resaved and its size and time-stamp updates' do
     runner_start
+
     files = language_files('gcc_assert')
     files['cyber-dojo.sh'] = 'ls -el | tail -n +2'
-    ls_output = runner_run(files)
+    ls_output, status = runner_run(files)
+    assert_equal success, status
     # each line looks like this...
     # -rwxr-xr-x 1 nobody root 19 Sun Oct 23 19:15:35 2016 cyber-dojo.sh
     before = parse(ls_output)
     assert_equal 5, before.size
+
     sleep 2
+
     hiker_h = files['hiker.h']
     extra = '//hello'
     files = { 'hiker.h' => hiker_h + extra }
-    ls_output = runner_run(files)
+    ls_output, status = runner_run(files)
+    assert_equal success, status
     after = parse(ls_output)
 
     assert_equal before.keys, after.keys

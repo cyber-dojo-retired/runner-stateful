@@ -21,9 +21,10 @@ module DockerRunnerHelpers # mix-in
   end
 
   def runner_start
-    output, exit_status = runner.start(kata_id, avatar_name)
-    assert_equal success, exit_status
-    @rm_volume = output.strip
+    output, status = runner.start(kata_id, avatar_name)
+    assert_equal success, status
+    @rm_volume = output
+    [ output, status ]
   end
 
   def language_files(language_dir)
@@ -37,7 +38,8 @@ module DockerRunnerHelpers # mix-in
 
   def runner_run(changed_files, max_seconds = 10, delete_filenames = [])
     refute_nil @image_name
-    output = runner.run(
+    #output =
+    runner.run(
       @image_name,
       kata_id,
       avatar_name,
@@ -52,23 +54,20 @@ module DockerRunnerHelpers # mix-in
     # until the container (which has the volume mounted)
     # is 'actually' removed before you can remove the volume.
     100.times do
-      output, exit_status = exec("docker volume rm #{name} 2>&1")
-      break if exit_status == success
+      output, status = exec("docker volume rm #{name} 2>&1")
+      break if status == success
     end
-  end
-
-  def exec(command)
-    output, exit_success = shell.exec(command)
-    return [output, exit_success]
   end
 
   def runner; DockerRunner.new(self); end
   def success; 0; end
+  def timed_out_and_killed; (timeout = 128) + (kill = 9); end
   def kata_id; test_id; end
   def avatar_name; 'salmon'; end
   def volume_name; 'cyber_dojo_' + kata_id + '_' + avatar_name; end
 
   include Externals # for shell
+  def exec(command); shell.exec(command); end
 
 end
 

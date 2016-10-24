@@ -32,8 +32,8 @@ class DockerRunnerPullingTest < LibTestBase
     refute runner.pulled?(image_name)
     runner.pull(image_name)
     assert runner.pulled?(image_name)
-    output, exit_status = shell.exec("docker rmi #{image_name}")
-    fail "exited(#{exit_status}):#{output}:" unless exit_status == success
+    output, status = shell.exec("docker rmi #{image_name}")
+    fail "exited(#{status}):#{output}:" unless status == success
   end
 
   private

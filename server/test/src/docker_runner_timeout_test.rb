@@ -20,14 +20,9 @@ class DockerRunnerTimeoutTest < LibTestBase
       '#include "hiker.h"',
       'int answer(void) { for(;;); return 6 * 7; }'
     ].join("\n")
-    expected = [
-      "Unable to complete the tests in 2 seconds.",
-      "Is there an accidental infinite loop?",
-      "Is the server very busy?",
-      "Please try again."
-    ].join("\n")
-    actual = runner_run(files, max_seconds = 2)
-    assert_equal expected, actual
+    output, status = runner_run(files, max_seconds = 2)
+    assert_equal '', output
+    assert_equal timed_out_and_killed, status
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -43,14 +38,9 @@ class DockerRunnerTimeoutTest < LibTestBase
       '#include <stdio.h>',
       'int answer(void) { for(;;) printf("...."); return 6 * 7; }'
     ].join("\n")
-    expected = [
-      "Unable to complete the tests in 2 seconds.",
-      "Is there an accidental infinite loop?",
-      "Is the server very busy?",
-      "Please try again."
-    ].join("\n")
-    actual = runner_run(files, max_seconds = 2)
-    assert_equal expected, actual
+    output, status = runner_run(files, max_seconds = 2)
+    assert_equal '', output
+    assert_equal timed_out_and_killed, status
   end
 
   private

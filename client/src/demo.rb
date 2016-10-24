@@ -20,10 +20,11 @@ class Demo < Sinatra::Base
       'cyber-dojo.sh' => read('cyber-dojo.sh'),
       'makefile'      => read('makefile')
     }
-    start(kata_id, avatar_name)
-    output = run(image_name, kata_id, avatar_name, max_seconds, delete_filenames, changed_files)
-
-    '<pre>' + output + '</pre>'
+    html = ''
+    json = start(kata_id, avatar_name)
+    html += "<pre>/start->#{JSON.unparse(json)}</pre>"
+    json = run(image_name, kata_id, avatar_name, max_seconds, delete_filenames, changed_files)
+    html += "<pre>/run->#{JSON.unparse(json)}</pre>"
   end
 
   include Runner
