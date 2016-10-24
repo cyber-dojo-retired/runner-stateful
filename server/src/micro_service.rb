@@ -7,7 +7,6 @@ require 'json'
 
 require_relative './externals'
 require_relative './docker_runner'
-#require_relative './string_cleaner'
 
 class MicroService < Sinatra::Base
 
@@ -39,7 +38,6 @@ class MicroService < Sinatra::Base
   private
 
   include Externals
-  #include StringCleaner
 
   def runner
     DockerRunner.new(self)

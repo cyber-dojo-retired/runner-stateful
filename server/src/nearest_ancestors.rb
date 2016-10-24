@@ -29,4 +29,4 @@ end
 #
 #     HostGit   -> shell -> HostShell
 #     HostShell -> log   -> HostLog
-#
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
