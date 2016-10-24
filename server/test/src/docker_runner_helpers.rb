@@ -26,8 +26,8 @@ module DockerRunnerHelpers # mix-in
     @rm_volume = output.strip
   end
 
-  def language_files(dir)
-    dir = "/app/test/src/language_start_files/#{dir}"
+  def language_files(language_dir)
+    dir = "/app/test/src/language_start_files/#{language_dir}"
     json = JSON.parse(IO.read("#{dir}/manifest.json"))
     @image_name = json['image_name']
     Hash[json['filenames'].collect { |filename|
@@ -36,6 +36,7 @@ module DockerRunnerHelpers # mix-in
   end
 
   def runner_run(changed_files, max_seconds = 10, delete_filenames = [])
+    refute_nil @image_name
     output = runner.run(
       @image_name,
       kata_id,
