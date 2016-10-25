@@ -14,6 +14,7 @@ module DockerRunnerHelpers # mix-in
   end
 
   def external_teardown
+    # See comments for runner.run(cid, max_seconds)
     wait_till_container_dead
     remove_volume
   end
@@ -45,7 +46,7 @@ module DockerRunnerHelpers # mix-in
     @cid = runner.create_container(@image_name, kata_id, avatar_name)
     runner.deleted_files(@cid, deleted_filenames)
     runner.changed_files(@cid, changed_files)
-    runner.setup_home(@cid, @image_name)
+    runner.setup_home(@cid)
     runner.run(@cid, max_seconds)
   end
 

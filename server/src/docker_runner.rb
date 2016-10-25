@@ -66,18 +66,16 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def setup_home(cid, image_name)
-    # The existing C#-NUnit image picks up HOME from the _current_ user.
-    # The nobody user quite probably does not have a home dir.
-    # I usermod to solve this. The C#-NUnit docker image is built
-    # from an Ubuntu base which has usermod.
-    need_home = [
-      'cyberdojofoundation/csharp_nunit',
-      'cyberdojofoundation/fsharp_nunit'
-    ]
-    if need_home.include?(image_name)
-      assert_exec("docker exec #{cid} sh -c 'usermod --home /sandbox nobody 2> /dev/null'")
-    end
+  def setup_home(cid)
+    # Some languages need the current user to have a home.
+    # They are all Ubuntu image based, eg C#-NUnit, F#-NUnit.
+    # The nobody user does not have a home dir in Ubuntu.
+    # I usermod to solve this. Rather than switch on the image_name
+    # or probe to determine if the image is Ubuntu based, I always
+    # run usermod and it does nothing on Alpine based images
+    # (which does not have usermod, its in the shadow package).
+    # Consequently the next statement is not assert_exec(...)
+    exec("docker exec #{cid} sh -c 'usermod --home /sandbox nobody 2> /dev/null'")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -85,12 +83,10 @@ class DockerRunner
   def run(cid, max_seconds)
     # docker_runner.sh does a [docker rm CID] in a child process
     # (for the max_seconds timeout).
-    # This has a race-condition and can issue a diagnostic to stderr, eg
+    # This has a race-condition and can issue a diagnostic to stderr,
     #   Error response from daemon: No such exec instance
     #          'cfc1ce94ec97f86ad0a73c6f.....' found in daemon
     # Tests show the container _is_ removed.
-    # The race makes it awkard for tests to remove the volume.
-    # (see the external_teardown in server/test/src/docker_runner_helpers.rb)
     # I pipe stderr to /dev/null so the diagnostic does not appear in test output.
     exec("/app/src/docker_runner.sh #{cid} #{max_seconds} 2> /dev/null")
   end
