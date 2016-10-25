@@ -14,11 +14,8 @@ class DockerRunnerInfrastructureTest < LibTestBase
   'before new_avatar its volume does not exist,',
   'after new_avatar it does' do
     refute volume_exists?
-
-    output, status = new_avatar
+    _, status = new_avatar
     assert_equal success, status
-    assert_equal volume_name, output.strip
-
     assert volume_exists?
   end
 

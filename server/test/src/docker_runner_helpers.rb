@@ -10,7 +10,6 @@ module DockerRunnerHelpers # mix-in
     ENV[env_name('log')] = 'NullLogger'
     assert_equal 'NullLogger', log.class.name
     assert_equal 'ExternalSheller', shell.class.name
-    @rm_volume = ''
   end
 
   def external_teardown
@@ -22,10 +21,7 @@ module DockerRunnerHelpers # mix-in
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def new_avatar
-    output, status = runner.new_avatar(kata_id, avatar_name)
-    assert_equal success, status
-    @rm_volume = output.strip
-    [output, status]
+    runner.new_avatar(kata_id, avatar_name)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -58,9 +54,10 @@ module DockerRunnerHelpers # mix-in
     # This has a race so you need to wait for the container (which has the
     # volume mounted) to be removed before you can remove the volume.
     unless test_does_not_create_container?
-      10.times do
+      20.times do
+        # do the sleep first to ensure test coverage is 100%
+        sleep(1.0 / 10.0)
         break if container_dead?
-        sleep(1)
       end
     end
   end
@@ -68,8 +65,7 @@ module DockerRunnerHelpers # mix-in
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def remove_volume
-    assert @rm_volume != ''
-    assert_exec("docker volume rm #{@rm_volume} 2>&1")
+    assert_exec("docker volume rm #{volume_name} 2>&1")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
