@@ -1,14 +1,36 @@
 
+o) new test: newly created container has empty /sandbox owned by USER
+
+o) massage micro_service returned strings.
+   - add length truncation
+   - clean them
+
 o) add cpu/memory/swap limits
    See comments at https://github.com/cyber-dojo/commander/blob/master/docker-compose.yml
    See https://github.com/docker/docker/pull/9437
    for suggestion that limits might be uid/gid based.
    Should I use cyber-dojo user and not nobody:nogroup ?
-   That would seem sensible.
+   What if the image does not have cyber-dojo user?
+   I guess I can just use its integer id, 19661
 
-o) massage micro_service returned strings.
-   - add length truncation
-   - clean them
+   From [docker run --help]
+   --blkio-weight value          Block IO (relative weight), between 10 and 1000
+   --blkio-weight-device value   Block IO weight (relative device weight) (default []
+   --cpu-period int              Limit CPU CFS (Completely Fair Scheduler) period
+   --cpu-quota int               Limit CPU CFS (Completely Fair Scheduler) quota
+   -c, --cpu-shares int
+   --device-read-bps value       Limit read rate (bytes per second) from a device (default [])
+   --device-read-iops value      Limit read rate (IO per second) from a device (default [])
+   --device-write-bps value      Limit write rate (bytes per second) to a device (default [])
+   --device-write-iops value     Limit write rate (IO per second) to a device (default [])
+   --isolation string            Container isolation technology
+   --kernel-memory string        Kernel memory limit
+   -m, --memory string               Memory limit
+   --memory-reservation string   Memory soft limit
+   --memory-swap string          Swap limit equal to memory plus swap: '-1' to enable unlimited swap
+   --memory-swappiness int       Tune container memory swappiness (0 to 100) (default -1)
+   --pids-limit int              Tune container pids limit (set -1 for unlimited)
+   --ulimit value                Ulimit options (default [])
 
 o) should new_avatar be dropped?
    I'm guessing [docker volume create jj] is idempotent
