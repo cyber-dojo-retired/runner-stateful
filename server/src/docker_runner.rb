@@ -37,6 +37,8 @@ class DockerRunner
     ].join(space = ' ')
     output, _ = assert_exec("docker run #{args} #{image_name} sh")
     cid = output.strip
+    assert_exec("docker exec #{cid} sh -c 'chown #{user}:#{group} #{sandbox}'")
+    cid
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -67,7 +69,7 @@ class DockerRunner
     # ensure nobody:nogroup owns changed files.
     # Ubuntu and Alpine images both have nobody and nogroup
     files.keys.each do |filename|
-      assert_exec("docker exec #{cid} sh -c 'chown -R #{user}:#{group} #{sandbox}/#{filename}'")
+      assert_exec("docker exec #{cid} sh -c 'chown #{user}:#{group} #{sandbox}/#{filename}'")
     end
   end
 
