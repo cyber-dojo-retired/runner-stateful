@@ -109,15 +109,15 @@ class DockerRunnerInfrastructureTest < LibTestBase
       was = before[filename]
       now = after[filename]
       same = lambda { |name| assert_equal was[name], now[name] }
-      same.call('permissions')
-      same.call('user')
-      same.call('group')
+      same.call(:permissions)
+      same.call(:user)
+      same.call(:group)
       if filename == 'hiker.h'
-        refute_equal now['time-stamp'], was['time-stamp']
-        assert_equal now['size'], was['size'] + extra.size
+        refute_equal now[:time_stamp], was[:time_stamp]
+        assert_equal now[:size], was[:size] + extra.size
       else
-        same.call('time-stamp')
-        same.call('size')
+        same.call(:time_stamp)
+        same.call(:size)
       end
     end
   end
@@ -136,11 +136,11 @@ class DockerRunnerInfrastructureTest < LibTestBase
       info = line.split
       filename = info[10]
       [filename, {
-        'permissions' => info[0],
-        'user'        => info[2],
-        'group'       => info[3],
-        'size'        => info[4].to_i,
-        'time-stamp'  => info[8],
+        permissions: info[0],
+               user: info[2],
+              group: info[3],
+               size: info[4].to_i,
+         time_stamp: info[8],
       }]
     }]
   end

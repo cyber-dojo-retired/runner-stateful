@@ -59,17 +59,17 @@ class DockerRunnerLanguageTest < LibTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def user_nobody_exists?
-    user, status = execute({'cyber-dojo.sh' => 'getent passwd nobody'})
+    output, status = execute({ 'cyber-dojo.sh' => 'getent passwd nobody' })
     assert_equal success, status
-    user.start_with?('nobody')
+    output.start_with?('nobody')
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def group_nogroup_exists?
-    group, status = execute({'cyber-dojo.sh' => 'getent group nogroup'})
+    output, status = execute({ 'cyber-dojo.sh' => 'getent group nogroup' })
     assert_equal success, status
-    group.start_with?('nogroup')
+    output.start_with?('nogroup')
   end
 
   include DockerRunnerHelpers
