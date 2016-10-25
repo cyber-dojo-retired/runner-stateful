@@ -6,3 +6,5 @@ o) log assert_exec() fail in docker_runner.rb
 o) massage micro_service returned strings.
    - add length truncation
    - clean them
+
+o) make pulled? return the matching image-name lines.
