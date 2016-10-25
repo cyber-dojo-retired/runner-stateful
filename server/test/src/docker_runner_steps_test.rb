@@ -46,18 +46,15 @@ class DockerRunnerStepsTest < LibTestBase
   test '385',
   'deleted files are removed and all previous files still exist' do
     new_avatar
-
-    files = language_files('gcc_assert')
     files['cyber-dojo.sh'] = 'ls'
-    ls_output, status = execute(files)
-    assert_equal success, status
+
+    ls_output, _ = assert_execute(files)
     before_filenames = ls_output.split
 
-    ls_output, status = execute({}, max_seconds = 10, [ 'makefile' ])
-    assert_equal success, status
+    ls_output, _ = assert_execute({}, max_seconds = 10, [ 'makefile' ])
     after_filenames = ls_output.split
-    deleted_filenames = before_filenames - after_filenames
 
+    deleted_filenames = before_filenames - after_filenames
     assert_equal [ 'makefile' ], deleted_filenames
   end
 
@@ -67,15 +64,12 @@ class DockerRunnerStepsTest < LibTestBase
   'new files are added and all previous files still exist' do
     new_avatar
 
-    files = language_files('gcc_assert')
     files['cyber-dojo.sh'] = 'ls'
-    ls_output, status = execute(files)
-    assert_equal success, status
+    ls_output, _ = assert_execute(files)
     before_filenames = ls_output.split
 
     files = { 'newfile.txt' => 'hello world' }
-    ls_output, status = execute(files)
-    assert_equal success, status
+    ls_output, _ = assert_execute(files)
     after_filenames = ls_output.split
 
     new_filenames = after_filenames - before_filenames
@@ -87,16 +81,13 @@ class DockerRunnerStepsTest < LibTestBase
   test '4E8',
   "unchanged files still exist and don't get touched at all" do
     new_avatar
-
-    files = language_files('gcc_assert')
     files['cyber-dojo.sh'] = 'ls -el'
-    before_ls, status = execute(files)
-    assert_equal success, status
 
-    after_ls, status = execute({})
-    assert_equal success, status
+    before_ls, _ = assert_execute(files)
+    after_ls, _ = assert_execute({})
 
     assert_equal before_ls, after_ls
+    assert_equal 6, before_ls.split("\n").size
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -105,10 +96,8 @@ class DockerRunnerStepsTest < LibTestBase
   'a changed file is resaved and its size and time-stamp updates' do
     new_avatar
 
-    files = language_files('gcc_assert')
     files['cyber-dojo.sh'] = 'ls -el | tail -n +2'
-    ls_output, status = execute(files)
-    assert_equal success, status
+    ls_output, _ = assert_execute(files)
     # each line looks like this...
     # -rwxr-xr-x 1 nobody root 19 Sun Oct 23 19:15:35 2016 cyber-dojo.sh
     before = ls_parse(ls_output)
@@ -119,8 +108,7 @@ class DockerRunnerStepsTest < LibTestBase
     hiker_h = files['hiker.h']
     extra = '//hello'
     files = { 'hiker.h' => hiker_h + extra }
-    ls_output, status = execute(files)
-    assert_equal success, status
+    ls_output, _ = assert_execute(files)
     after = ls_parse(ls_output)
 
     assert_equal before.keys, after.keys

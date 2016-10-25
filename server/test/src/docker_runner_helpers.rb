@@ -39,13 +39,15 @@ module DockerRunnerHelpers # mix-in
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def language_files(language_dir)
-    dir = "/app/test/src/language_start_files/#{language_dir}"
-    json = JSON.parse(IO.read("#{dir}/manifest.json"))
-    @image_name = json['image_name']
-    Hash[json['filenames'].collect { |filename|
-      [filename, IO.read("#{dir}/#{filename}")]
-    }]
+  def files(language_dir = 'gcc_assert')
+    @files ||= load_files(language_dir)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def create_container
+    refute_nil @image_name
+    @cid = runner.create_container(@image_name, kata_id, avatar_name)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -60,16 +62,17 @@ module DockerRunnerHelpers # mix-in
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def create_container
-    refute_nil @image_name
-    @cid = runner.create_container(@image_name, kata_id, avatar_name)
+  def load_files(language_dir)
+    dir = "/app/test/src/language_start_files/#{language_dir}"
+    json = JSON.parse(IO.read("#{dir}/manifest.json"))
+    @image_name = json['image_name']
+    Hash[json['filenames'].collect { |filename|
+      [filename, IO.read("#{dir}/#{filename}")]
+    }]
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # deleted_files
-  # changed_files
-  # setup_home
 
   def volume_exists?
     output, _ = assert_exec('docker volume ls')
@@ -116,6 +119,12 @@ module DockerRunnerHelpers # mix-in
 
   def assert_exec(command)
     output, status = exec(command)
+    assert_equal success, status
+    [output, status]
+  end
+
+  def assert_execute(*args)
+    output, status = execute(*args)
     assert_equal success, status
     [output, status]
   end

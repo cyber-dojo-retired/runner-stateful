@@ -51,24 +51,21 @@ class DockerRunnerLanguageTest < LibTestBase
 
   def assert_runs(dir)
     new_avatar
-    output, status = execute(language_files(dir))
-    assert_equal success, status
+    output, _ = assert_execute(files(dir))
     assert output.include?(@expected), output
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def user_nobody_exists?
-    output, status = execute({ 'cyber-dojo.sh' => 'getent passwd nobody' })
-    assert_equal success, status
+    output, _ = assert_execute({ 'cyber-dojo.sh' => 'getent passwd nobody' })
     output.start_with?('nobody')
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def group_nogroup_exists?
-    output, status = execute({ 'cyber-dojo.sh' => 'getent group nogroup' })
-    assert_equal success, status
+    output, _ = assert_execute({ 'cyber-dojo.sh' => 'getent group nogroup' })
     output.start_with?('nogroup')
   end
 
