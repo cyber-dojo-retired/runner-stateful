@@ -1,8 +1,45 @@
 
-o) what if filename has a quote in it?
-
-o) log assert_exec() fail in docker_runner.rb
+o) add cpu/memory/swap limits
+   See comments at https://github.com/cyber-dojo/commander/blob/master/docker-compose.yml
+   See https://github.com/docker/docker/pull/9437
+   for suggestion that limits might be uid/gid based.
+   Should I use cyber-dojo user and not nobody:nogroup ?
+   That would seem sensible.
 
 o) massage micro_service returned strings.
    - add length truncation
    - clean them
+
+o) should new_avatar be dropped?
+   I'm guessing [docker volume create jj] is idempotent
+   Yes. Currenty. https://github.com/docker/docker/issues/16068
+
+o) what if filename has a quote in it?
+
+o) log assert_exec() fail in docker_runner.rb
+
+-------------------------------------------------
+documentation
+
+o) pulled?
+     { status:true,  output:unspecified }   pulled already
+     { status:false, output:unspecified }   not pulled already
+     { status:error, output:msg }           something went wrong
+
+o) pull
+     { status:true,  output:unspecified }   pull succeeded
+     { status:false, output:msg }           pull failed
+
+o) new_avatar
+     { status:true,  output:unspecified }   succeeded
+     { status:false, output:msg }           failed
+
+o) run
+     { status:true,   output:output }       succeeded
+     { status:false,  output:'' }           timed-out-and-killed
+     { status:error,  output:msg }          something went wrong
+
+-------------------------------------------------
+
+o) Note that [./cyber-dojo update]
+   does not update the language images. Should it?
