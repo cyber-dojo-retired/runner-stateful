@@ -13,7 +13,7 @@ module DockerRunnerHelpers # mix-in
   end
 
   def external_teardown
-    remove_container unless @cid.nil?
+    wait_till_container_dead unless @cid.nil?
     remove_volume    unless @volume.nil?
   end
 
@@ -81,7 +81,7 @@ module DockerRunnerHelpers # mix-in
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def remove_container
+  def wait_till_container_dead
     # docker_runner.sh does [docker rm --force ${cid}] in a child process.
     # This has a race so you need to wait for the container (which has the
     # volume mounted) to be removed before you can remove the volume.

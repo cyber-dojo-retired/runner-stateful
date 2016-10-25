@@ -73,6 +73,8 @@ class DockerRunnerStepsTest < LibTestBase
     after_filenames = ls_output.split
 
     new_filenames = after_filenames - before_filenames
+    assert_equal 5, before_filenames.size
+    assert_equal 6, after_filenames.size
     assert_equal [ 'newfile.txt' ], new_filenames
   end
 
