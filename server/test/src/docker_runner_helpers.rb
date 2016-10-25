@@ -21,7 +21,7 @@ module DockerRunnerHelpers # mix-in
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def runner_new_avatar
+  def new_avatar
     output, status = runner.new_avatar(kata_id, avatar_name)
     assert_equal success, status
     @rm_volume = output.strip
@@ -41,7 +41,8 @@ module DockerRunnerHelpers # mix-in
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def runner_run(changed_files, max_seconds = 10, deleted_filenames = [])
+  def execute(changed_files, max_seconds = 10, deleted_filenames = [])
+    # Don't call this run (MiniTest uses that method name)
     refute_nil @image_name
     @cid = runner.create_container(@image_name, kata_id, avatar_name)
     runner.deleted_files(@cid, deleted_filenames)
