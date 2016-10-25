@@ -13,9 +13,8 @@ module DockerRunnerHelpers # mix-in
   end
 
   def external_teardown
-    # See comments for runner.run(cid, max_seconds)
-    wait_till_container_is_dead
-    remove_volume
+    remove_container unless @cid.nil?
+    remove_volume    unless @volume.nil?
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -33,7 +32,9 @@ module DockerRunnerHelpers # mix-in
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def new_avatar
-    runner.new_avatar(kata_id, avatar_name)
+    output, status = runner.new_avatar(kata_id, avatar_name)
+    @volume = volume_name
+    [output, status]
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -51,12 +52,11 @@ module DockerRunnerHelpers # mix-in
 
   def execute(changed_files, max_seconds = 10, deleted_filenames = [])
     # Don't call this run (MiniTest uses that method name)
-    refute_nil @image_name
-    @cid = runner.create_container(@image_name, kata_id, avatar_name)
-    runner.deleted_files(@cid, deleted_filenames)
-    runner.changed_files(@cid, changed_files)
-    runner.setup_home(@cid)
-    runner.run(@cid, max_seconds)
+    cid = create_container
+    runner.deleted_files(cid, deleted_filenames)
+    runner.changed_files(cid, changed_files)
+    runner.setup_home(cid)
+    runner.run(cid, max_seconds)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -67,37 +67,26 @@ module DockerRunnerHelpers # mix-in
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # deleted_files
+  # changed_files
+  # setup_home
 
-  def wait_till_container_is_dead
+  def volume_exists?
+    output, _ = assert_exec('docker volume ls')
+    output.include? volume_name
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def remove_container
     # docker_runner.sh does [docker rm --force ${cid}] in a child process.
     # This has a race so you need to wait for the container (which has the
     # volume mounted) to be removed before you can remove the volume.
-    if test_creates_container?
-      20.times do
-        # do the sleep first to ensure test coverage is 100%
-        sleep(1.0 / 10.0)
-        break if container_dead?
-      end
+    20.times do
+      # do the sleep first to keep test coverage at 100%
+      sleep(1.0 / 10.0)
+      break if container_dead?
     end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def remove_volume
-    if test_creates_volume?
-      assert_exec("docker volume rm #{volume_name} 2>&1")
-    end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def test_creates_volume?
-    !test_id.start_with?('CFC') # not pull test
-  end
-
-  def test_creates_container?
-    test_id != '4D87ADBC' &&    # not new_avatar test
-    !test_id.start_with?('CFC') # not pull test
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -112,9 +101,8 @@ module DockerRunnerHelpers # mix-in
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def volume_exists?
-    output, _ = assert_exec('docker volume ls')
-    output.include? volume_name
+  def remove_volume
+    assert_exec("docker volume rm #{volume_name} 2>&1")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -126,13 +114,14 @@ module DockerRunnerHelpers # mix-in
   def kata_id; test_id; end
   def avatar_name; 'salmon'; end
 
-  include Externals # for shell
-  def exec(command); shell.exec(command); end
-
   def assert_exec(command)
     output, status = exec(command)
     assert_equal success, status
     [output, status]
   end
+
+  def exec(command); shell.exec(command); end
+
+  include Externals # for shell
 
 end
