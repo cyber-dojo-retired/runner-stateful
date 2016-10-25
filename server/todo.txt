@@ -1,9 +1,16 @@
 
-o) new test: newly created container has empty /sandbox owned by USER
-
 o) massage micro_service returned strings.
    - clean them
    - truncate them
+
+o) should new_avatar be dropped?
+   I'm guessing [docker volume create jj] is idempotent
+   Yes. Currenty. https://github.com/docker/docker/issues/16068
+   Alternative is making the volume auto-create on 'first' use.
+   This fits well with the idea of some kind of reaper/pruner
+   periodically deleting old-volumes.
+   Suggests there is an api to remove a volume.
+   Would be good for testing too.
 
 o) add cpu/memory/swap limits
    See comments at https://github.com/cyber-dojo/commander/blob/master/docker-compose.yml
@@ -31,10 +38,6 @@ o) add cpu/memory/swap limits
    --memory-swappiness int       Tune container memory swappiness (0 to 100) (default -1)
    --pids-limit int              Tune container pids limit (set -1 for unlimited)
    --ulimit value                Ulimit options (default [])
-
-o) should new_avatar be dropped?
-   I'm guessing [docker volume create jj] is idempotent
-   Yes. Currenty. https://github.com/docker/docker/issues/16068
 
 o) what if filename has a quote in it?
 
