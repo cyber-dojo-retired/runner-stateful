@@ -14,7 +14,7 @@ module DockerRunnerHelpers # mix-in
 
   def external_teardown
     wait_till_container_dead unless @cid.nil?
-    remove_volume    unless @volume.nil?
+    remove_volume unless @volume.nil?
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
