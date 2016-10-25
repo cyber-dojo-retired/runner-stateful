@@ -24,11 +24,13 @@ class DockerRunnerInfrastructureTest < LibTestBase
   test '0C9',
   'newly created container has empty /sandbox owned by nobody:nogroup' do
     new_avatar
-    @image_name = 'cyberdojofoundation/gcc_assert'
-    #language_files('ruby_mini_test') # HACK: prime @image_name
+    @image_name = 'cyberdojofoundation/ruby_mini_test'
     cid = create_container
     begin
-      assert_exec("docker exec #{cid} sh -c '[ -d #{sandbox} ]'")
+      _, status = exec("docker exec #{cid} sh -c '[ -d #{sandbox} ]'")
+      assert_equal 0, status, "#{sandbox} does not exist"
+      _, status = exec("docker exec #{cid} sh -c '[ \"$(ls -A #{sandbox})\" ]'")
+      assert_equal 1, status, "#{sandbox} is not empty"
       output, _ = assert_exec("docker exec #{cid} sh -c 'stat -c \"%U\" #{sandbox}'")
       assert_equal 'nobody', (user_name = output.strip)
       output, _ = assert_exec("docker exec #{cid} sh -c 'stat -c \"%G\" #{sandbox}'")
