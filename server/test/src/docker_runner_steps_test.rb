@@ -2,7 +2,7 @@
 require_relative './lib_test_base'
 require_relative './docker_runner_helpers'
 
-class DockerRunnerInfrastructureTest < LibTestBase
+class DockerRunnerStepsTest < LibTestBase
 
   def self.hex
     '4D87A'

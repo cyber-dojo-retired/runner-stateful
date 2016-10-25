@@ -20,6 +20,18 @@ module DockerRunnerHelpers # mix-in
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  def pulled?(image_name)
+    runner.pulled?(image_name)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def pull(image_name)
+    runner.pull(image_name)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   def new_avatar
     runner.new_avatar(kata_id, avatar_name)
   end
@@ -60,7 +72,7 @@ module DockerRunnerHelpers # mix-in
     # docker_runner.sh does [docker rm --force ${cid}] in a child process.
     # This has a race so you need to wait for the container (which has the
     # volume mounted) to be removed before you can remove the volume.
-    unless test_does_not_create_container?
+    if test_creates_container?
       20.times do
         # do the sleep first to ensure test coverage is 100%
         sleep(1.0 / 10.0)
@@ -72,13 +84,20 @@ module DockerRunnerHelpers # mix-in
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def remove_volume
-    assert_exec("docker volume rm #{volume_name} 2>&1")
+    if test_creates_volume?
+      assert_exec("docker volume rm #{volume_name} 2>&1")
+    end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def test_does_not_create_container?
-    test_id == '4D87ADBC'
+  def test_creates_volume?
+    !test_id.start_with?('CFC') # not pull test
+  end
+
+  def test_creates_container?
+    test_id != '4D87ADBC' &&    # not new_avatar test
+    !test_id.start_with?('CFC') # not pull test
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
