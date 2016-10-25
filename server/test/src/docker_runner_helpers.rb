@@ -49,6 +49,13 @@ module DockerRunnerHelpers # mix-in
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  def create_container
+    refute_nil @image_name
+    @cid = runner.create_container(@image_name, kata_id, avatar_name)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   def wait_till_container_is_dead
     # docker_runner.sh does [docker rm --force ${cid}] in a child process.
     # This has a race so you need to wait for the container (which has the

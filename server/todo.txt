@@ -2,8 +2,8 @@
 o) new test: newly created container has empty /sandbox owned by USER
 
 o) massage micro_service returned strings.
-   - add length truncation
    - clean them
+   - truncate them
 
 o) add cpu/memory/swap limits
    See comments at https://github.com/cyber-dojo/commander/blob/master/docker-compose.yml

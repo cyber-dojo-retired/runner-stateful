@@ -21,6 +21,26 @@ class DockerRunnerInfrastructureTest < LibTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  test '0C9',
+  'newly created container has empty /sandbox owned by nobody:nogroup' do
+    new_avatar
+    @image_name = 'cyberdojofoundation/gcc_assert'
+    #language_files('ruby_mini_test') # HACK: prime @image_name
+    cid = create_container
+    begin
+      assert_exec("docker exec #{cid} sh -c '[ -d #{sandbox} ]'")
+      output, _ = assert_exec("docker exec #{cid} sh -c 'stat -c \"%U\" #{sandbox}'")
+      assert_equal 'nobody', (user_name = output.strip)
+      output, _ = assert_exec("docker exec #{cid} sh -c 'stat -c \"%G\" #{sandbox}'")
+      assert_equal 'nogroup', (group_name = output.strip)
+    ensure
+      # not calling runner.run so have to delete container
+      assert_exec("docker rm --force #{cid}")
+    end
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   test '385',
   'deleted files are removed and all previous files still exist' do
     new_avatar
@@ -142,5 +162,6 @@ class DockerRunnerInfrastructureTest < LibTestBase
     }]
   end
 
-end
+  def sandbox; '/sandbox'; end
 
+end
