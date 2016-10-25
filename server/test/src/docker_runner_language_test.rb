@@ -50,7 +50,7 @@ class DockerRunnerLanguageTest < LibTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_runs(dir)
-    runner_start
+    runner_new_avatar
     output, status = runner_run(language_files(dir))
     assert_equal success, status
     assert output.include?(@expected), output

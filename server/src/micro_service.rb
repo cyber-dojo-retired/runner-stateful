@@ -18,8 +18,8 @@ class MicroService < Sinatra::Base
     jasoned *runner.pull(image_name)
   end
 
-  post '/start' do
-    jasoned *runner.start(kata_id, avatar_name)
+  post '/new_avatar' do
+    jasoned *runner.new_avatar(kata_id, avatar_name)
   end
 
   post '/run' do

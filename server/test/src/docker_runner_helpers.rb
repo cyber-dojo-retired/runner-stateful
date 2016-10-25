@@ -21,8 +21,8 @@ module DockerRunnerHelpers # mix-in
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def runner_start
-    output, status = runner.start(kata_id, avatar_name)
+  def runner_new_avatar
+    output, status = runner.new_avatar(kata_id, avatar_name)
     assert_equal success, status
     @rm_volume = output.strip
     [output, status]

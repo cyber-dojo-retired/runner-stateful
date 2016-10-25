@@ -17,15 +17,13 @@ class DockerRunner
     exec("docker pull #{image_name}")
   end
 
-  def start(kata_id, avatar_name)
-    volume_name = "cyber_dojo_#{kata_id}_#{avatar_name}"
-    exec("docker volume create --name #{volume_name}")
+  def new_avatar(kata_id, avatar_name)
+    exec("docker volume create --name #{volume_name(kata_id, avatar_name)}")
   end
 
   def create_container(image_name, kata_id, avatar_name)
     # This creates the container but docker_runner.sh removes it.
-    volume_name = "cyber_dojo_#{kata_id}_#{avatar_name}"
-    # Assume volume exists from previous /start
+    # Mounts new_avatar's volume in /sandbox
     args = [
       '--detach',                          # get the cid
       '--interactive',                     # later execs
@@ -33,10 +31,11 @@ class DockerRunner
       '--pids-limit=64',                   # security - no fork bombs
       '--security-opt=no-new-privileges',  # security - no escalation
       '--user=root',
-      "--volume=#{volume_name}:/sandbox"
+      "--volume=#{volume_name(kata_id, avatar_name)}:/sandbox"
     ].join(space = ' ')
     output, _ = assert_exec("docker run #{args} #{image_name} sh")
     cid = output.strip
+    # Change ownership of /sandbox
     assert_exec("docker exec #{cid} sh -c 'chown #{user}:#{group} #{sandbox}'")
     cid
   end
@@ -116,6 +115,12 @@ class DockerRunner
     output, status = exec(command)
     fail "exited(#{status}):#{output}:" unless status == success
     [output, status]
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def volume_name(kata_id, avatar_name)
+    "cyber_dojo_#{kata_id}_#{avatar_name}"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

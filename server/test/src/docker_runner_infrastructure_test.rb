@@ -11,11 +11,11 @@ class DockerRunnerInfrastructureTest < LibTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'DBC',
-  'before start volume does not exist,',
-  'after start it does' do
+  'before new_avatar its volume does not exist,',
+  'after new_avatar it does' do
     refute volume_exists?
 
-    output, status = runner_start
+    output, status = runner_new_avatar
     assert_equal success, status
     assert_equal volume_name, output.strip
 
@@ -26,7 +26,7 @@ class DockerRunnerInfrastructureTest < LibTestBase
 
   test '385',
   'deleted files are removed and all previous files still exist' do
-    runner_start
+    runner_new_avatar
 
     files = language_files('gcc_assert')
     files['cyber-dojo.sh'] = 'ls'
@@ -46,7 +46,7 @@ class DockerRunnerInfrastructureTest < LibTestBase
 
   test '232',
   'new files are added and all previous files still exist' do
-    runner_start
+    runner_new_avatar
 
     files = language_files('gcc_assert')
     files['cyber-dojo.sh'] = 'ls'
@@ -67,7 +67,7 @@ class DockerRunnerInfrastructureTest < LibTestBase
 
   test '4E8',
   "unchanged files still exist and don't get touched at all" do
-    runner_start
+    runner_new_avatar
 
     files = language_files('gcc_assert')
     files['cyber-dojo.sh'] = 'ls -el'
@@ -84,7 +84,7 @@ class DockerRunnerInfrastructureTest < LibTestBase
 
   test '9A7',
   'a changed file is resaved and its size and time-stamp updates' do
-    runner_start
+    runner_new_avatar
 
     files = language_files('gcc_assert')
     files['cyber-dojo.sh'] = 'ls -el | tail -n +2'

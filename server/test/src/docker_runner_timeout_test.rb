@@ -14,7 +14,7 @@ class DockerRunnerTimeoutTest < LibTestBase
   'when run(test-code) is empty-infinite-loop',
   'the container is killed and',
   'a timeout-diagostic is returned' do
-    runner_start
+    runner_new_avatar
     files = language_files('gcc_assert')
     files['hiker.c'] = [
       '#include "hiker.h"',
@@ -31,7 +31,7 @@ class DockerRunnerTimeoutTest < LibTestBase
   'when run(test-code) is printing-infinite-loop',
   'the container is killed and',
   'a timeout-diagostic is returned' do
-    runner_start
+    runner_new_avatar
     files = language_files('gcc_assert')
     files['hiker.c'] = [
       '#include "hiker.h"',

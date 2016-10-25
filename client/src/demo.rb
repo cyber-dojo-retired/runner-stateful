@@ -25,8 +25,8 @@ class Demo < Sinatra::Base
     html += "<pre>/pulled?->#{unparse(json)}</pre>"
     json = pull(image_name)
     html += "<pre>/pull->#{unparse(json)}</pre>"
-    json = start(kata_id, avatar_name)
-    html += "<pre>/start->#{unparse(json)}</pre>"
+    json = new_avatar(kata_id, avatar_name)
+    html += "<pre>/new_avatar->#{unparse(json)}</pre>"
     json = run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
     html += "<pre>/run->#{unparse(json)}</pre>"
   end
