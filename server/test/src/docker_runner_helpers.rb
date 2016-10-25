@@ -15,7 +15,7 @@ module DockerRunnerHelpers # mix-in
 
   def external_teardown
     # See comments for runner.run(cid, max_seconds)
-    wait_till_container_dead
+    wait_till_container_is_dead
     remove_volume
   end
 
@@ -25,7 +25,7 @@ module DockerRunnerHelpers # mix-in
     output, status = runner.start(kata_id, avatar_name)
     assert_equal success, status
     @rm_volume = output.strip
-    [ output, status ]
+    [output, status]
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -52,11 +52,11 @@ module DockerRunnerHelpers # mix-in
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def wait_till_container_dead
+  def wait_till_container_is_dead
     # docker_runner.sh does [docker rm --force ${cid}] in a child process.
     # This has a race so you need to wait for the container (which has the
     # volume mounted) to be removed before you can remove the volume.
-    if test_creates_container?
+    unless test_does_not_create_container?
       10.times do
         break if container_dead?
         sleep(1)
@@ -68,14 +68,13 @@ module DockerRunnerHelpers # mix-in
 
   def remove_volume
     assert @rm_volume != ''
-    _output, status = exec("docker volume rm #{@rm_volume} 2>&1")
-    assert_equal success, status
+    assert_exec("docker volume rm #{@rm_volume} 2>&1")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def test_creates_container?
-    test_id != '4D87ADBC'
+  def test_does_not_create_container?
+    test_id == '4D87ADBC'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -83,15 +82,15 @@ module DockerRunnerHelpers # mix-in
   def container_dead?
     refute_nil @cid
     command = "docker inspect --format='{{ .State.Running }}' #{@cid} 2> /dev/null"
-    _output, status = exec(command)
+    _, status = exec(command)
+    # https://gist.github.com/ekristen/11254304
     status == 1
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def volume_exists?
-    output, status = exec('docker volume ls')
-    assert_equal success, status
+    output, _ = assert_exec('docker volume ls')
     output.include? volume_name
   end
 
@@ -106,5 +105,11 @@ module DockerRunnerHelpers # mix-in
 
   include Externals # for shell
   def exec(command); shell.exec(command); end
+
+  def assert_exec(command)
+    output, status = exec(command)
+    assert_equal success, status
+    [output, status]
+  end
 
 end

@@ -10,7 +10,7 @@ class DockerRunner
   attr_reader :parent
 
   def pulled?(image_name)
-    [ '', image_names.include?(image_name) ]
+    ['', image_names.include?(image_name)]
   end
 
   def pull(image_name)
@@ -42,26 +42,33 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def deleted_files(cid, filenames)
+    # filenames have been deleted in the browser
+    # so delete them from the container.
     filenames.each do |filename|
-      assert_exec("docker exec #{cid} sh -c 'rm /sandbox/#{filename}'")
+      assert_exec("docker exec #{cid} sh -c 'rm #{sandbox}/#{filename}'")
     end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def changed_files(cid, files)
-    # copy changed files into sandbox
+    # files have been created or changed in the browser
+    # so create or change them in the container.
     Dir.mktmpdir('runner') do |tmp_dir|
       files.each do |filename, content|
-        pathed_filename = tmp_dir + '/' + filename
-        disk.write(pathed_filename, content)
-        assert_exec("chmod +x #{pathed_filename}") if pathed_filename.end_with?('.sh')
+        host_filename = tmp_dir + '/' + filename
+        disk.write(host_filename, content)
+        assert_exec("chmod +x #{host_filename}") if filename.end_with?('.sh')
       end
-      assert_exec("docker cp #{tmp_dir}/. #{cid}:/sandbox")
+      # The dot in this command is very important.
+      # See https://docs.docker.com/engine/reference/commandline/cp/
+      assert_exec("docker cp #{tmp_dir}/. #{cid}:#{sandbox}")
     end
-    # ensure nobody:nogroup owns changed files
+    # ensure nobody:nogroup owns changed files.
     # Ubuntu and Alpine images both have nobody and nogroup
-    assert_exec("docker exec #{cid} sh -c 'chown -R nobody:nogroup /sandbox'")
+    files.keys.each do |filename|
+      assert_exec("docker exec #{cid} sh -c 'chown -R #{user}:#{group} #{sandbox}/#{filename}'")
+    end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -70,12 +77,12 @@ class DockerRunner
     # Some languages need the current user to have a home.
     # They are all Ubuntu image based, eg C#-NUnit, F#-NUnit.
     # The nobody user does not have a home dir in Ubuntu.
-    # I usermod to solve this. Rather than switch on the image_name
+    # usermod solves this. Rather than switch on the image_name
     # or probe to determine if the image is Ubuntu based, I always
     # run usermod and it does nothing on Alpine based images
-    # (which does not have usermod, its in the shadow package).
-    # Consequently the next statement is not assert_exec(...)
-    exec("docker exec #{cid} sh -c 'usermod --home /sandbox nobody 2> /dev/null'")
+    # which do not have usermod (its in the shadow package).
+    # So this is not assert_exec(...)
+    exec("docker exec #{cid} sh -c 'usermod --home #{sandbox} #{user} 2> /dev/null'")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -95,7 +102,10 @@ class DockerRunner
 
   def image_names
     output, _ = assert_exec('docker images')
-    output.split("\n").collect { |line| line.split[0] }
+    # REPOSITORY                               TAG    IMAGE ID     CREATED     SIZE
+    # cyberdojofoundation/ruby_test_unit       latest fd0b425fb21d 7 weeks ago 126 MB
+    # cyberdojofoundation/java_cucumber_spring latest 7f59c6590213 7 weeks ago 885.7 MB
+    output[1..-1].split("\n").collect { |line| line.split[0] }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -108,16 +118,13 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def exec(command)
-    shell.exec(command)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   include NearestAncestors
   def disk;  nearest_ancestors(:disk);  end
   def shell; nearest_ancestors(:shell); end
-
+  def exec(command); shell.exec(command); end
   def success; 0; end
+  def sandbox; '/sandbox'; end
+  def user; 'nobody'; end
+  def group; 'nogroup'; end
 
 end
