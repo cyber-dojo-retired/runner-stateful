@@ -1,8 +1,7 @@
-
 require_relative './null_logger'
 require 'json'
 
-module DockerRunnerHelpers # mix-in
+module DockerRunnerHelpers
 
   module_function
 

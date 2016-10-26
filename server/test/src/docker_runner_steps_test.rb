@@ -1,4 +1,3 @@
-
 require_relative './lib_test_base'
 require_relative './docker_runner_helpers'
 
@@ -121,7 +120,6 @@ class DockerRunnerStepsTest < LibTestBase
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   private
 
   include DockerRunnerHelpers

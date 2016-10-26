@@ -1,4 +1,3 @@
-
 require 'minitest/autorun'
 
 require_relative './external_helper'

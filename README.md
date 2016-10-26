@@ -7,7 +7,7 @@
 
 ## API
 
-### pulled(image_name)
+### pulled?(image_name)
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
 - returns

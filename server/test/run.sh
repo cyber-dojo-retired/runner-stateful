@@ -1,9 +1,5 @@
 #!/bin/bash
 
-# This is the only shell script that needs bash rather than sh
-# It needs it for the (array) handling below.
-# Called from test.sh (from outside the docker-container)
-
 if [ ! -f /.dockerenv ]; then
   echo 'FAILED: run.sh is being executed outside of docker-container.'
   echo 'Use test.sh which first calls build.sh'

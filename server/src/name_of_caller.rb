@@ -1,5 +1,5 @@
 
-module NameOfCaller # mix-in
+module NameOfCaller
 
   module_function
 

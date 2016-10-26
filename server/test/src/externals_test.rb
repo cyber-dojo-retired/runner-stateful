@@ -1,4 +1,3 @@
-
 require_relative './lib_test_base'
 
 class ExternalsTest < LibTestBase

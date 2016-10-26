@@ -1,5 +1,5 @@
 
-module StringCleaner # mix-in
+module StringCleaner
 
   module_function
 

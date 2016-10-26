@@ -1,5 +1,5 @@
 
-module TestExternalHelper # mix-in
+module TestExternalHelper
 
   module_function
 

@@ -1,7 +1,3 @@
-
-# NB: if you call this file app.rb then SimpleCov fails to see it?!
-#     or rather, it botches its appearance in the html view
-
 require 'sinatra/base'
 require 'json'
 
@@ -22,10 +18,6 @@ class MicroService < Sinatra::Base
     jasoned *runner.hello(kata_id, avatar_name)
   end
 
-  post '/goodbye' do
-    jasoned *runner.goodbye(kata_id, avatar_name)
-  end
-
   post '/run' do
     cid = runner.create_container(image_name, kata_id, avatar_name)
     runner.deleted_files(cid, deleted_filenames)
@@ -34,9 +26,20 @@ class MicroService < Sinatra::Base
     jasoned *runner.run(cid, max_seconds)
   end
 
+  post '/goodbye' do
+    jasoned *runner.goodbye(kata_id, avatar_name)
+  end
+
   private
 
   include Externals
+
+  def image_name;        args['image_name' ];      end
+  def kata_id;           args['kata_id'    ];      end
+  def avatar_name;       args['avatar_name'];      end
+  def max_seconds;       args['max_seconds'];      end
+  def deleted_filenames; args['deleted_filenames']; end
+  def changed_files;     args['changed_files'];    end
 
   def runner; DockerRunner.new(self); end
   def args; @args ||= request_body_args; end
@@ -45,13 +48,6 @@ class MicroService < Sinatra::Base
     request.body.rewind
     JSON.parse(request.body.read)
   end
-
-  def image_name;        args['image_name' ];      end
-  def kata_id;           args['kata_id'    ];      end
-  def avatar_name;       args['avatar_name'];      end
-  def max_seconds;       args['max_seconds'];      end
-  def deleted_filenames; args['deleted_filenames']; end
-  def changed_files;     args['changed_files'];    end
 
   def jasoned(output, status)
     content_type :json

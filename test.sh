@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 my_dir="$( cd "$( dirname "${0}" )" && pwd )"
 docker_engine_version=$(docker --version | awk '{print $3}' | sed '$s/.$//')

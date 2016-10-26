@@ -1,9 +1,8 @@
-
 require_relative './snake_caser'
 
-# set defauls ENV-vars for all externals
-# unit-tests can set/reset these
-# see test/external_helper.rb
+# Sets defauls ENV-vars for all externals.
+# Unit-tests can set/reset these.
+# See test/external_helper.rb
 
 def env_name(suffix)
   'RUNNER_CLASS_' + suffix.upcase

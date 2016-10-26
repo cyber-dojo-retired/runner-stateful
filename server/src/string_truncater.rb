@@ -1,5 +1,5 @@
 
-module StringTruncater # mix-in
+module StringTruncater
 
   module_function
 

@@ -1,8 +1,7 @@
-
 require_relative './env_vars'
 require_relative './name_of_caller'
 
-module Externals # mix-in
+module Externals
 
   def disk ; @disk  ||= external; end
   def log  ; @log   ||= external; end

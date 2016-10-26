@@ -3,8 +3,6 @@ require 'sinatra/base'
 
 require_relative './runner'
 
-# Leaves behind a docker volume called cyber_dojo_D4C8A65D61_lion
-
 class Demo < Sinatra::Base
 
   get '/' do

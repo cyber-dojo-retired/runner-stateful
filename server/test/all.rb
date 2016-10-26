@@ -1,5 +1,4 @@
-
-# This line must come first, before any required/loaded files to be covered.
+# This require must come first.
 require_relative './coverage'
 
 require 'json'

@@ -109,6 +109,7 @@ class DockerRunner
     exec("/app/src/docker_runner.sh #{cid} #{max_seconds} 2> /dev/null")
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   private
 
   def image_names

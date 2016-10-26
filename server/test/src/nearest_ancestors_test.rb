@@ -5,21 +5,29 @@ class DummyDisk
   def read; 'hello world:' + @who; end
 end
 
+# - - - - - - - - - - - - - - - - - - - - - - - -
+
 class DummyStorer
   def initialize(who); @who = who; end
   def save; @who + ':42'; end
 end
+
+# - - - - - - - - - - - - - - - - - - - - - - - -
 
 class Anna
   def disk; @disk ||= DummyDisk.new('anna'); end
   def store; @store ||= DummyStore.new('anna'); end
 end
 
+# - - - - - - - - - - - - - - - - - - - - - - - -
+
 class Natalie
   def initialize(anna);@parent = anna; end
   attr_reader :parent
   def store; @store ||= DummyStorer.new('natalie'); end
 end
+
+# - - - - - - - - - - - - - - - - - - - - - - - -
 
 class Ellie
   def initialize(natalie); @parent = natalie; end

@@ -1,4 +1,3 @@
-
 require_relative './nearest_ancestors'
 require_relative './string_cleaner'
 
@@ -11,7 +10,7 @@ class ExternalSheller
   attr_reader :parent
 
   def cd_exec(path, *commands)
-    # the [[ -d ]] is to avoid spurious [cd path] failure
+    # [[ -d ]] avoids spurious [cd path] failure
     # output when the tests are running
     output, exit_status = exec(["[[ -d #{path} ]]", "cd #{path}"] + commands)
     [output, exit_status]
