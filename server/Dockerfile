@@ -18,5 +18,6 @@ ARG app_dir
 COPY . ${app_dir}
 
 ARG PORT
+ENV PORT=${PORT}
 EXPOSE ${PORT}
 ENTRYPOINT [ "foreman", "start", "-d", "/app" ]
