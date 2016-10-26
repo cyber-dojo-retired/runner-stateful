@@ -19,8 +19,8 @@ class Demo < Sinatra::Base
       'makefile'      => read('makefile')
     }
     html = ''
-
     json = nil
+
     duration = timed { json = pulled?(image_name) }
     html += pre('pulled?', duration, json)
 

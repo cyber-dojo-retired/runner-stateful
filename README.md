@@ -67,7 +67,7 @@ $ ./test.sh
 
 ## run a runner-client demo
 ```
-./demo.sh
+$ ./demo.sh
 ```
 Runs inside the runner-client container.
 Calls each of the runner-server's micro-service methods
