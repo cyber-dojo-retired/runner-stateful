@@ -13,7 +13,7 @@ sleep 2
 # - - - - - - - - - - - - - - - - - - - - - - - - - -
 # server
 server_cid=`docker ps --all --quiet --filter "name=runner_server"`
-docker exec ${server_cid} sh -c "cd test && ./run.sh ${*}"
+docker exec ${server_cid} sh -c "cd /app/test && ./run.sh ${*}"
 server_exit_status=$?
 docker cp ${server_cid}:/tmp/coverage ${my_dir}/server
 echo "Coverage report copied to ${my_dir}/server/coverage"

@@ -15,7 +15,7 @@ RUN apk --update add curl \
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 ARG APP_DIR
-COPY . ${app_dir}
+COPY . ${APP_DIR}
 
 ARG PORT
 ENV PORT=${PORT}

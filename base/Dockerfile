@@ -1,14 +1,6 @@
 FROM alpine:3.4
 MAINTAINER Jon Jagger <jon@jaggersoft.com>
 
-ARG app_dir
-
-WORKDIR ${app_dir}/
-
-COPY Gemfile ${app_dir}/
-
-RUN export RACK_ENV='production'
-
 # server/test/src/run.sh needs bash
 # Gemfile: source 'https://rubygems.org'
 RUN apk --update --no-cache add \
@@ -18,7 +10,13 @@ RUN apk --update --no-cache add \
 # http://stackoverflow.com/questions/1381725
 RUN echo 'gem: --no-document' > ~/.gemrc
 
+ARG APP_DIR
+COPY Gemfile ${app_dir}/
+WORKDIR ${app_dir}/
+
 RUN apk --update add --virtual build-dependencies build-base \
   && bundle install && gem clean \
   && apk del build-dependencies \
   && rm -vrf /var/cache/apk/*
+
+ENV RACK_ENV='production'

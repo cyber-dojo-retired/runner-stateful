@@ -13,11 +13,9 @@ docker_version=$(docker --version | awk '{print $3}' | sed '$s/.$//')
 server_port=4557
 client_port=4558
 
-# build base image
 my_dir="$( cd "$( dirname "${0}" )" && pwd )"
-${my_dir}/base/build-image.sh ${app_dir}
 
-# build server image
+docker-compose -f ${my_dir}/base/docker-compose.yml build
 docker-compose -f ${my_dir}/server/docker-compose.yml build
 
 # build client image
