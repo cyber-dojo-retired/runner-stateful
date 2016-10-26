@@ -5,14 +5,12 @@ services:
   runner_client:
     user: nobody
     image: cyberdojo/runner_client
-    command: [ "foreman", "start", "-d", "/app" ]
     ports: [ "4558:4558" ]
     container_name: runner_client
 
   runner_server:
     user: root
     image: cyberdojo/runner:1.12.2
-    command: [ "foreman", "start", "-d", "/app" ]
     ports: [ "4557:4557" ]
     volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
     container_name: runner_server

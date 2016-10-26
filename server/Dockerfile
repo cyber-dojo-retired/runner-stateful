@@ -17,3 +17,4 @@ RUN apk --update add curl \
 ARG app_dir
 COPY . ${app_dir}
 EXPOSE 4557
+CMD [ "foreman", "start", "-d", "/app" ]
