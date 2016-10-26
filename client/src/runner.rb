@@ -47,7 +47,7 @@ module Runner
     request.content_type = 'application/json'
     request.body = args.to_json
     response = http.request(request)
-    response.body
+    JSON.parse(response.body)
   end
 
 end

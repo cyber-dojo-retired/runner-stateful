@@ -56,10 +56,6 @@ class Demo < Sinatra::Base
     "<pre>/#{name}(#{duration})->#{JSON.pretty_unparse(json)}</pre>"
   end
 
-  def unparse(json)
-    JSON.pretty_unparse(json)
-  end
-
 end
 
 
