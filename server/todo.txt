@@ -36,5 +36,11 @@ o) log assert_exec() fail in docker_runner.rb
 
 -------------------------------------------------
 
+o) /app is still hardwired in Dockerfile
+
+o) drop foreman and start directly? See https://rubyplus.com/articles/2461
+
+o) create base ruby image without thin/foreman?
+
 o) [./cyber-dojo update]
    does not update the language images. Should it?

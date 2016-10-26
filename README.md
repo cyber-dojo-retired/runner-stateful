@@ -5,10 +5,7 @@
 
 # repo for **cyberdojo/runner** docker image
 
-## planned API
-
-- if something unexpected goes wrong on the server all methods return
-  * { status:error, output:msg }           something went wrong
+## API
 
 - pulled?
   * { status:true,  output:unspecified }   pulled already
@@ -27,6 +24,8 @@
   * { status:true,   output:output }       succeeded
   * { status:false,  output:'' }           timed-out-and-killed
 
+- if something unexpected goes wrong on the server all methods return
+  * { status:error, output:msg }           something went wrong
 
 ## rebuild the runner-client and runner-server images
 ```
