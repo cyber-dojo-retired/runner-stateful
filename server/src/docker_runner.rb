@@ -17,10 +17,19 @@ class DockerRunner
     exec("docker pull #{image_name}")
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   def hello_avatar(kata_id, avatar_name)
     _, status = exec("docker volume create --name #{volume_name(kata_id, avatar_name)}")
     ['', status]
   end
+
+  def goodbye_avatar(kata_id, avatar_name)
+    _, status = exec("docker volume rm #{volume_name(kata_id, avatar_name)}")
+    ['', status]
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def create_container(image_name, kata_id, avatar_name)
     # This creates the container but docker_runner.sh removes it.

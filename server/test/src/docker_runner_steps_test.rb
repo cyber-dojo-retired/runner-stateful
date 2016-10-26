@@ -10,17 +10,6 @@ class DockerRunnerStepsTest < LibTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test 'DBC',
-  'before new_avatar its volume does not exist,',
-  'after new_avatar it does' do
-    refute volume_exists?
-    _, status = hello_avatar
-    assert_equal success, status
-    assert volume_exists?
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   test '0C9',
   'newly created container has empty /sandbox owned by nobody:nogroup' do
     hello_avatar
