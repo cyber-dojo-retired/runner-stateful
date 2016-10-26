@@ -13,8 +13,8 @@ Planned API
   * { status:error, output:msg }           something went wrong
 
 - pull
-  * status:true,  output:unspecified }   pull succeeded
-  * status:false, output:msg }           pull failed
+  * { status:true,  output:unspecified }   pull succeeded
+  * { status:false, output:msg }           pull failed
 
 - hello_avatar
   * { status:true,  output:unspecified }   succeeded
