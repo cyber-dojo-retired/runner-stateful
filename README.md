@@ -6,17 +6,28 @@
 Work in progress.
 
 ```
+./build.sh
+```
+Rebuilds the docker runner-client and runner-server images.
+
+
+```
+./up.sh
+```
+Brings up the runner-client and runner-server containers.
+The runner-client runs on port 4558.
+The runner-server run on port 4557.
+
+
+```
 ./demo.sh
 ```
-
-Creates two docker images; a runner-client and a runner-server (both using sinatra).
-The runner-client sends a set of files (in a json body) to the runner-server and the
-runner-server returns the run output. The runner-client runs on port 4558 and the runner-server
-on port 4557. If the runner-client's IP address is 192.168.99.100 then put
+The runner-client calls each of the runner-server's micro-service methods
+once and displays their json results.
+If the runner-client's IP address is 192.168.99.100 then put
 192.168.99.100:4558 into your browser to see the output.
 
 ```
-./build_and_test.sh
+./test.sh
 ```
-
-Rebuilds the images and runs the tests inside the runner server/client containers
+Runs the runner-server's tests inside the runner-server container.
