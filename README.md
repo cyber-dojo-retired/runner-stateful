@@ -7,27 +7,25 @@ Repo for cyberdojo/runner docker image.
 
 Planned API
 
+- If something unexpected goes wrong on the server all methods return
+  * { status:error, output:msg }           something went wrong
+
 - pulled?
   * { status:true,  output:unspecified }   pulled already
   * { status:false, output:unspecified }   not pulled already
-  * { status:error, output:msg }           something went wrong
 
 - pull
   * { status:true,  output:unspecified }   pull succeeded
-  * { status:false, output:msg }           pull failed
 
 - hello_avatar
   * { status:true,  output:unspecified }   succeeded
-  * { status:false, output:msg }           failed
 
 - goodbye_avatar
   * { status:true,  output:unspecified }   succeeded
-  * { status:false, output:msg }           failed
 
 - run
   * { status:true,   output:output }       succeeded
   * { status:false,  output:'' }           timed-out-and-killed
-  * { status:error,  output:msg }          something went wrong
 
 
 ```
