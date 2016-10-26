@@ -5,7 +5,7 @@ app_dir=${1}
 docker_version=${2}
 port=${3}
 
-cat ${my_dir}/Dockerfile.PORT | sed "s/PORT/${port}/" > ${my_dir}/Dockerfile
+#cat ${my_dir}/Dockerfile.PORT | sed "s/PORT/${port}/" > ${my_dir}/Dockerfile
 cat ${my_dir}/Procfile.PORT   | sed "s/PORT/${port}/" > ${my_dir}/Procfile
 
 image_name=cyberdojo/runner:${docker_version}

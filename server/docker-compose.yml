@@ -1,0 +1,11 @@
+
+version: '2'
+
+services:
+  runner_server:
+    image: cyberdojo/runner:1.12.2
+    build:
+      context: .
+      args:
+        DOCKER_VERSION: '1.12.2'
+        PORT: 4557
