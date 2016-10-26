@@ -1,0 +1,11 @@
+
+version: '2'
+
+services:
+  runner_client:
+    image: cyberdojo/runner_client
+    build:
+      context: .
+      args:
+        APP_DIR: /app
+        PORT: 4558
