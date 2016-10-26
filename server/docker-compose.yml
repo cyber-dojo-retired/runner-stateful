@@ -7,5 +7,6 @@ services:
     build:
       context: .
       args:
+        APP_DIR: /app
         DOCKER_VERSION: '1.12.2'
         PORT: 4557

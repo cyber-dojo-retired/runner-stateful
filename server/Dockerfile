@@ -14,7 +14,7 @@ RUN apk --update add curl \
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-ARG app_dir
+ARG APP_DIR
 COPY . ${app_dir}
 
 ARG PORT
