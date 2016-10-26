@@ -31,14 +31,17 @@ Planned API
 ```
 ./build.sh
 ```
-Rebuilds the docker runner-client and runner-server images.
-
+Rebuilds the runner-client and runner-server images.
 
 ```
 ./up.sh
 ```
 Brings up the runner-client and runner-server containers.
 
+```
+./test.sh
+```
+Runs the runner-server's tests inside the runner-server container.
 
 ```
 ./demo.sh
@@ -48,7 +51,3 @@ once and displays their json results.
 If the runner-client's IP address is 192.168.99.100 then put
 192.168.99.100:4558 into your browser to see the output.
 
-```
-./test.sh
-```
-Runs the runner-server's tests inside the runner-server container.
