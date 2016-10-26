@@ -8,33 +8,43 @@
 ## API
 
 - pulled?(image_name)
-  * eg image_name = 'cyberdojofoundation/gcc_assert'
-  * { status:true,  output:unspecified }   pulled already
-  * { status:false, output:unspecified }   not pulled already
+  * parameters
+    * eg image_name = 'cyberdojofoundation/gcc_assert'
+  * returns
+    * { status:true,  output:unspecified }   pulled already
+    * { status:false, output:unspecified }   not pulled already
 
 - pull(image_name)
-  * eg image_name = 'cyberdojofoundation/gcc_assert'
-  * { status:true,  output:unspecified }   pull succeeded
+  * parameters
+    * eg image_name = 'cyberdojofoundation/gcc_assert'
+  * returns
+    * { status:true,  output:unspecified }   pull succeeded
 
 - hello_avatar(kata_id, avatar_name)
-  * eg kata_id = '15B9AD6C42'
-  * eg avatar_name = 'salmon'
-  * { status:true,  output:unspecified }   succeeded
+  * parameters
+    * eg kata_id = '15B9AD6C42'
+    * eg avatar_name = 'salmon'
+  * returns
+    * { status:true,  output:unspecified }   succeeded
 
 - goodbye_avatar(kata_id, avatar_name)
-  * eg kata_id = '15B9AD6C42'
-  * eg avatar_name = 'salmon'
-  * { status:true,  output:unspecified }   succeeded
+  * parameters
+    * eg kata_id = '15B9AD6C42'
+    * eg avatar_name = 'salmon'
+  * returns
+    * { status:true,  output:unspecified }   succeeded
 
 - run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
-  * eg image_name = 'cyberdojofoundation/gcc_assert'
-  * eg kata_id = '15B9AD6C42'
-  * eg avatar_name = 'salmon'
-  * eg max_seconds = '10'
-  * eg deleted_filenames = [ filename, ... ]
-  * eg changed_files = { filename => content, ... }
-  * { status:true,   output:output }       succeeded
-  * { status:false,  output:'' }           timed-out-and-killed
+  * parameters
+    * eg image_name = 'cyberdojofoundation/gcc_assert'
+    * eg kata_id = '15B9AD6C42'
+    * eg avatar_name = 'salmon'
+    * eg max_seconds = '10'
+    * eg deleted_filenames = [ filename, ... ]
+    * eg changed_files = { filename => content, ... }
+  * returns
+    * { status:true,   output:output }       succeeded
+    * { status:false,  output:'' }           timed-out-and-killed
 
 - if something unexpected goes wrong on the server all methods return
   * { status:error, output:msg }           something went wrong
