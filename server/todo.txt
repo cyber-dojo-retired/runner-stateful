@@ -44,7 +44,6 @@ o) what if filename has a quote in it?
 o) log assert_exec() fail in docker_runner.rb
 
 -------------------------------------------------
-documentation
 
 o) pulled?
      { status:true,  output:unspecified }   pulled already
@@ -66,5 +65,5 @@ o) run
 
 -------------------------------------------------
 
-o) Note that [./cyber-dojo update]
+o) [./cyber-dojo update]
    does not update the language images. Should it?

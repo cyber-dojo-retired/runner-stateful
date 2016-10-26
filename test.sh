@@ -1,10 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 
 my_dir="$( cd "$( dirname "${0}" )" && pwd )"
-#${my_dir}/build.sh
-#${my_dir}/up.sh
-# uuurg
-#sleep 2
+docker_engine_version=$(docker --version | awk '{print $3}' | sed '$s/.$//')
+export DOCKER_ENGINE_VERSION=${docker_engine_version}
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - -
 # server

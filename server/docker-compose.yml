@@ -3,10 +3,10 @@ version: '2'
 
 services:
   runner_server:
-    image: cyberdojo/runner:1.12.2
+    image: cyberdojo/runner:${DOCKER_ENGINE_VERSION}
     build:
       context: .
       args:
         APP_DIR: /app
-        DOCKER_VERSION: '1.12.2'
+        DOCKER_ENGINE_VERSION: ${DOCKER_ENGINE_VERSION}
         PORT: 4557

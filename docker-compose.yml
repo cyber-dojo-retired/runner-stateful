@@ -10,7 +10,7 @@ services:
 
   runner_server:
     user: root
-    image: cyberdojo/runner:1.12.2
+    image: cyberdojo/runner:${DOCKER_ENGINE_VERSION}
     volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
     container_name: runner_server
 
