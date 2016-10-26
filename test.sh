@@ -1,14 +1,10 @@
-#!/bin/sh
-
-# Don't do [set -e] because if
-# [docker exec ... cd test && ./run.sh ${*}] fails
-# I want the [docker cp] command to extract the coverage info
+#!/bin/bash
 
 my_dir="$( cd "$( dirname "${0}" )" && pwd )"
-${my_dir}/demo.sh
-
+#${my_dir}/build.sh
+#${my_dir}/up.sh
 # uuurg
-sleep 2
+#sleep 2
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - -
 # server

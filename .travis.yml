@@ -16,7 +16,10 @@ script:
     - docker pull cyberdojofoundation/ruby_mini_test
     - docker pull cyberdojofoundation/fsharp_nunit
     - docker pull cyberdojofoundation/csharp_nunit
-    - ./build_and_test.sh
+    - ./build.up
+    - ./up.sh
+    - sleep 2
+    - ./test.sh
 
 after_success:
     - docker login --username ${DOCKER_USERNAME} --password ${DOCKER_PASSWORD}
