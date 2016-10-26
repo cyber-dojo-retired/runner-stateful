@@ -44,7 +44,7 @@ $ ./up.sh
 $ ./test.sh
 ```
 
-## run a runner-client's demo
+## run a runner-client demo
 ```
 ./demo.sh
 ```
