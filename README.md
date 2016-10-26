@@ -18,21 +18,21 @@
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
 - returns
-  * { status:true, output:unspecified } -> pull succeeded
+  * { status:ok, output:unspecified } -> pull succeeded
 
 ### hello(kata_id, avatar_name)
 - parameters
   * kata_id, eg '15B9AD6C42'
   * avatar_name, eg 'salmon'
 - returns
-  * { status:true, output:unspecified } -> succeeded
+  * { status:ok, output:unspecified } -> succeeded
 
 ### goodbye(kata_id, avatar_name)
 - parameters
   * kata_id, eg '15B9AD6C42'
   * avatar_name, eg 'salmon'
 - returns
-  * { status:true, output:unspecified } -> succeeded
+  * { status:ok, output:unspecified } -> succeeded
 
 ### run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
 - parameters
@@ -43,8 +43,8 @@
   * deleted_filenames, eg [ filename, ... ]
   * changed_files, eg { filename => content, ... }
 - returns
-  * { status:true,   output:output } -> succeeded
-  * { status:false,  output:'' } -> did not complete in max_seconds
+  * { status:0,   output:output } -> succeeded
+  * { status:137,  output:'' } -> did not complete in max_seconds
 
 - if something unexpected goes wrong on the server all methods return
   * { status:error, output:msg } -> something went wrong
