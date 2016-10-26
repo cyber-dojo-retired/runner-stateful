@@ -15,8 +15,6 @@ Rebuilds the docker runner-client and runner-server images.
 ./up.sh
 ```
 Brings up the runner-client and runner-server containers.
-The runner-client runs on port 4558.
-The runner-server run on port 4557.
 
 
 ```
