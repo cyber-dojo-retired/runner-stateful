@@ -31,16 +31,16 @@ module DockerRunnerHelpers # mix-in
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def hello_avatar
-    output, status = runner.hello_avatar(kata_id, avatar_name)
+  def hello
+    output, status = runner.hello(kata_id, avatar_name)
     @volume = volume_name if status == success
     [output, status]
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def goodbye_avatar
-    output, status = runner.goodbye_avatar(kata_id, avatar_name)
+  def goodbye
+    output, status = runner.goodbye(kata_id, avatar_name)
     @volume = nil if status == success
     [output, status]
   end

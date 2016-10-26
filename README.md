@@ -7,7 +7,7 @@
 
 ## API
 
-### pulled?(image_name)
+### pulled(image_name)
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
 - returns
@@ -20,14 +20,14 @@
 - returns
   * { status:true, output:unspecified } -> pull succeeded
 
-### hello_avatar(kata_id, avatar_name)
+### hello(kata_id, avatar_name)
 - parameters
   * kata_id, eg '15B9AD6C42'
   * avatar_name, eg 'salmon'
 - returns
   * { status:true, output:unspecified } -> succeeded
 
-### goodbye_avatar(kata_id, avatar_name)
+### goodbye(kata_id, avatar_name)
 - parameters
   * kata_id, eg '15B9AD6C42'
   * avatar_name, eg 'salmon'

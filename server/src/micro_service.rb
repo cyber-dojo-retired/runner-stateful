@@ -18,12 +18,12 @@ class MicroService < Sinatra::Base
     jasoned *runner.pull(image_name)
   end
 
-  post '/hello_avatar' do
-    jasoned *runner.hello_avatar(kata_id, avatar_name)
+  post '/hello' do
+    jasoned *runner.hello(kata_id, avatar_name)
   end
 
-  post '/goodbye_avatar' do
-    jasoned *runner.goodbye_avatar(kata_id, avatar_name)
+  post '/goodbye' do
+    jasoned *runner.goodbye(kata_id, avatar_name)
   end
 
   post '/run' do

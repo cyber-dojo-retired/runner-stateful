@@ -11,11 +11,11 @@ class RunnerAppTest < LibTestBase
   end
 
   def external_setup
-    hello_avatar(kata_id, avatar_name)
+    hello(kata_id, avatar_name)
   end
 
   def external_teardown
-    goodbye_avatar(kata_id, avatar_name)
+    goodbye(kata_id, avatar_name)
   end
 
   test '348',
@@ -28,12 +28,12 @@ class RunnerAppTest < LibTestBase
   def kata_id; 'D4C8A65D61'; end
   def avatar_name; 'salmon'; end
 
-  def hello_avatar(kata_id, avatar_name)
-    post(:hello_avatar, { kata_id:kata_id, avatar_name:avatar_name })
+  def hello(kata_id, avatar_name)
+    post(:hello, { kata_id:kata_id, avatar_name:avatar_name })
   end
 
-  def goodbye_avatar(kata_id, avatar_name)
-    post(:goodbye_avatar, { kata_id:kata_id, avatar_name:avatar_name })
+  def goodbye(kata_id, avatar_name)
+    post(:goodbye, { kata_id:kata_id, avatar_name:avatar_name })
   end
 
   def post(method, args)

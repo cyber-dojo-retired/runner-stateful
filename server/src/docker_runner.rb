@@ -19,12 +19,12 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def hello_avatar(kata_id, avatar_name)
+  def hello(kata_id, avatar_name)
     _, status = exec("docker volume create --name #{volume_name(kata_id, avatar_name)}")
     ['', status]
   end
 
-  def goodbye_avatar(kata_id, avatar_name)
+  def goodbye(kata_id, avatar_name)
     _, status = exec("docker volume rm #{volume_name(kata_id, avatar_name)}")
     ['', status]
   end

@@ -13,12 +13,12 @@ module Runner # mix-in
     post(:pull, { image_name:image_name })
   end
 
-  def hello_avatar(kata_id, avatar_name)
-    post(:hello_avatar, { kata_id:kata_id, avatar_name:avatar_name })
+  def hello(kata_id, avatar_name)
+    post(:hello, { kata_id:kata_id, avatar_name:avatar_name })
   end
 
-  def goodbye_avatar(kata_id, avatar_name)
-    post(:goodbye_avatar, { kata_id:kata_id, avatar_name:avatar_name })
+  def goodbye(kata_id, avatar_name)
+    post(:goodbye, { kata_id:kata_id, avatar_name:avatar_name })
   end
 
   def run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)

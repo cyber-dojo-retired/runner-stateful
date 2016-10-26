@@ -25,12 +25,12 @@ class Demo < Sinatra::Base
     html += "<pre>/pulled?->#{unparse(json)}</pre>"
     json = pull(image_name)
     html += "<pre>/pull->#{unparse(json)}</pre>"
-    json = hello_avatar(kata_id, avatar_name)
-    html += "<pre>/hello_avatar->#{unparse(json)}</pre>"
+    json = hello(kata_id, avatar_name)
+    html += "<pre>/hello->#{unparse(json)}</pre>"
     json = run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
     html += "<pre>/run->#{unparse(json)}</pre>"
-    json = goodbye_avatar(kata_id, avatar_name)
-    html += "<pre>/goodbye_avatar->#{unparse(json)}</pre>"
+    json = goodbye(kata_id, avatar_name)
+    html += "<pre>/goodbye->#{unparse(json)}</pre>"
   end
 
   include Runner

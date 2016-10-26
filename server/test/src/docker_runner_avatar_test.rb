@@ -11,10 +11,10 @@ class DockerRunnerAvatarTest < LibTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'DBC',
-  'before hello_avatar its volume does not exist,',
-  'after hello_avatar it does' do
+  "before hello avatar's' volume does not exist,",
+  'after hello it does' do
     refute volume_exists?
-    _, status = hello_avatar
+    _, status = hello
     assert_equal success, status
     assert volume_exists?
   end
@@ -22,10 +22,10 @@ class DockerRunnerAvatarTest < LibTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '9A9',
-  'before goodbye_avatar its volume exists,',
-  'after goobye_avatar its does not' do
-    hello_avatar
-    goodbye_avatar
+  "before goodbye avatar's volume exists,",
+  'after goobye its does not' do
+    hello
+    goodbye
     refute volume_exists?
   end
 
