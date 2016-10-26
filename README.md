@@ -3,11 +3,11 @@
 
 <img src="https://raw.githubusercontent.com/cyber-dojo/nginx/master/images/home_page_logo.png" alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
 
-Repo for cyberdojo/runner docker image.
+# repo for **cyberdojo/runner** docker image
 
-Planned API
+## planned API
 
-- If something unexpected goes wrong on the server all methods return
+- if something unexpected goes wrong on the server all methods return
   * { status:error, output:msg }           something went wrong
 
 - pulled?
@@ -28,25 +28,28 @@ Planned API
   * { status:false,  output:'' }           timed-out-and-killed
 
 
+## rebuild the runner-client and runner-server images
 ```
-./build.sh
+$ ./build.sh
 ```
-Rebuilds the runner-client and runner-server images.
+
+## bring up a runner-client and runner-server container
 
 ```
-./up.sh
+$ ./up.sh
 ```
-Brings up the runner-client and runner-server containers.
 
+## run the runner-server's tests inside a runner-server container
 ```
-./test.sh
+$ ./test.sh
 ```
-Runs the runner-server's tests inside the runner-server container.
 
+## run a runner-client's demo
 ```
 ./demo.sh
 ```
-The runner-client calls each of the runner-server's micro-service methods
+Runs inside the runner-client container.
+Calls each of the runner-server's micro-service methods
 once and displays their json results.
 If the runner-client's IP address is 192.168.99.100 then put
 192.168.99.100:4558 into your browser to see the output.
