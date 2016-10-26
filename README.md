@@ -7,20 +7,32 @@
 
 ## API
 
-- pulled?
+- pulled?(image_name)
+  * eg image_name = 'cyberdojofoundation/gcc_assert'
   * { status:true,  output:unspecified }   pulled already
   * { status:false, output:unspecified }   not pulled already
 
-- pull
+- pull(image_name)
+  * eg image_name = 'cyberdojofoundation/gcc_assert'
   * { status:true,  output:unspecified }   pull succeeded
 
-- hello_avatar
+- hello_avatar(kata_id, avatar_name)
+  * eg kata_id = '15B9AD6C42'
+  * eg avatar_name = 'salmon'
   * { status:true,  output:unspecified }   succeeded
 
-- goodbye_avatar
+- goodbye_avatar(kata_id, avatar_name)
+  * eg kata_id = '15B9AD6C42'
+  * eg avatar_name = 'salmon'
   * { status:true,  output:unspecified }   succeeded
 
-- run
+- run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
+  * eg image_name = 'cyberdojofoundation/gcc_assert'
+  * eg kata_id = '15B9AD6C42'
+  * eg avatar_name = 'salmon'
+  * eg max_seconds = '10'
+  * eg deleted_filenames = [ filename, ... ]
+  * eg changed_files = { filename => content, ... }
   * { status:true,   output:output }       succeeded
   * { status:false,  output:'' }           timed-out-and-killed
 
