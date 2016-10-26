@@ -10,21 +10,30 @@ class RunnerAppTest < LibTestBase
     '201'
   end
 
+  def external_setup
+    hello_avatar(kata_id, avatar_name)
+  end
+
+  def external_teardown
+    goodbye_avatar(kata_id, avatar_name)
+  end
+
   test '348',
-  'start returns volume-name and exit_code' do
-    kata_id = 'D4C8A65D61'
-    avatar_name = 'lion'
-    json = hello_avatar(kata_id, avatar_name)
-    puts JSON.pretty_unparse(json)
-    sdsd
-    assert_equal "cyber_dojo_#{kata_id}_#{avatar_name}", output
-    assert_equal success, exit_status
+  'smoke-test' do
+    ...
   end
 
   private
 
-  def new_avatar(kata_id, avatar_name)
-    post(:new_avatar, { kata_id:kata_id, avatar_name:avatar_name })
+  def kata_id; 'D4C8A65D61'; end
+  def avatar_name; 'salmon'; end
+
+  def hello_avatar(kata_id, avatar_name)
+    post(:hello_avatar, { kata_id:kata_id, avatar_name:avatar_name })
+  end
+
+  def goodbye_avatar(kata_id, avatar_name)
+    post(:goodbye_avatar, { kata_id:kata_id, avatar_name:avatar_name })
   end
 
   def post(method, args)
