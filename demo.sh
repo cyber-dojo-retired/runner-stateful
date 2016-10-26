@@ -8,20 +8,19 @@ if [ $? != 0 ]; then
   exit 1
 fi
 
+my_dir="$( cd "$( dirname "${0}" )" && pwd )"
+
+docker-compose -f ${my_dir}/base/docker-compose.yml build
+docker-compose -f ${my_dir}/server/docker-compose.yml build
+docker-compose -f ${my_dir}/client/docker-compose.yml build
+
+# bring server up
+
 app_dir=/app
 docker_version=$(docker --version | awk '{print $3}' | sed '$s/.$//')
 server_port=4557
 client_port=4558
 
-my_dir="$( cd "$( dirname "${0}" )" && pwd )"
-
-docker-compose -f ${my_dir}/base/docker-compose.yml build
-docker-compose -f ${my_dir}/server/docker-compose.yml build
-
-# build client image
-${my_dir}/client/build-image.sh ${app_dir} ${client_port}
-
-# bring server up
 cat ${my_dir}/docker-compose.yml.PORT |
   sed "s/DOCKER_ENGINE_VERSION/${docker_version}/g" |
   sed "s/SERVER_PORT/${server_port}/g" |
