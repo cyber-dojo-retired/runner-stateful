@@ -44,7 +44,7 @@
     * eg changed_files = { filename => content, ... }
   * returns
     * { status:true,   output:output } -> succeeded
-    * { status:false,  output:'' } -> timed-out-and-killed
+    * { status:false,  output:'' } -> did not complete in max_seconds
 
 - if something unexpected goes wrong on the server all methods return
   * { status:error, output:msg } -> something went wrong
