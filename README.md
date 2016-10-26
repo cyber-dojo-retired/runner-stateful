@@ -3,7 +3,32 @@
 
 <img src="https://raw.githubusercontent.com/cyber-dojo/nginx/master/images/home_page_logo.png" alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
 
-Work in progress.
+Repo for cyberdojo/runner docker image.
+
+Planned API
+
+- pulled?
+  * { status:true,  output:unspecified }   pulled already
+  * { status:false, output:unspecified }   not pulled already
+  * { status:error, output:msg }           something went wrong
+
+- pull
+  * status:true,  output:unspecified }   pull succeeded
+  * status:false, output:msg }           pull failed
+
+- hello_avatar
+  * { status:true,  output:unspecified }   succeeded
+  * { status:false, output:msg }           failed
+
+- goodbye_avatar
+  * { status:true,  output:unspecified }   succeeded
+  * { status:false, output:msg }           failed
+
+- run
+  * { status:true,   output:output }       succeeded
+  * { status:false,  output:'' }           timed-out-and-killed
+  * { status:error,  output:msg }          something went wrong
+
 
 ```
 ./build.sh

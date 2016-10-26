@@ -14,7 +14,7 @@ class DockerRunnerTimeoutTest < LibTestBase
   'when run(test-code) is empty-infinite-loop',
   'the container is killed and',
   'a timeout-diagostic is returned' do
-    new_avatar
+    hello_avatar
     files['hiker.c'] = [
       '#include "hiker.h"',
       'int answer(void) { for(;;); return 6 * 7; }'
@@ -30,7 +30,7 @@ class DockerRunnerTimeoutTest < LibTestBase
   'when run(test-code) is printing-infinite-loop',
   'the container is killed and',
   'a timeout-diagostic is returned' do
-    new_avatar
+    hello_avatar
     files['hiker.c'] = [
       '#include "hiker.h"',
       '#include <stdio.h>',

@@ -14,7 +14,7 @@ class RunnerAppTest < LibTestBase
   'start returns volume-name and exit_code' do
     kata_id = 'D4C8A65D61'
     avatar_name = 'lion'
-    json = new_avatar(kata_id, avatar_name)
+    json = hello_avatar(kata_id, avatar_name)
     puts JSON.pretty_unparse(json)
     sdsd
     assert_equal "cyber_dojo_#{kata_id}_#{avatar_name}", output

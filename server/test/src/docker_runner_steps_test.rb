@@ -14,7 +14,7 @@ class DockerRunnerStepsTest < LibTestBase
   'before new_avatar its volume does not exist,',
   'after new_avatar it does' do
     refute volume_exists?
-    _, status = new_avatar
+    _, status = hello_avatar
     assert_equal success, status
     assert volume_exists?
   end
@@ -23,7 +23,7 @@ class DockerRunnerStepsTest < LibTestBase
 
   test '0C9',
   'newly created container has empty /sandbox owned by nobody:nogroup' do
-    new_avatar
+    hello_avatar
     @image_name = 'cyberdojofoundation/ruby_mini_test'
     cid = create_container
     begin
@@ -45,7 +45,7 @@ class DockerRunnerStepsTest < LibTestBase
 
   test '385',
   'deleted files are removed and all previous files still exist' do
-    new_avatar
+    hello_avatar
     files['cyber-dojo.sh'] = 'ls'
 
     ls_output, _ = assert_execute(files)
@@ -62,7 +62,7 @@ class DockerRunnerStepsTest < LibTestBase
 
   test '232',
   'new files are added and all previous files still exist' do
-    new_avatar
+    hello_avatar
 
     files['cyber-dojo.sh'] = 'ls'
     ls_output, _ = assert_execute(files)
@@ -82,7 +82,7 @@ class DockerRunnerStepsTest < LibTestBase
 
   test '4E8',
   "unchanged files still exist and don't get touched at all" do
-    new_avatar
+    hello_avatar
     files['cyber-dojo.sh'] = 'ls -el'
 
     before_ls, _ = assert_execute(files)
@@ -96,7 +96,7 @@ class DockerRunnerStepsTest < LibTestBase
 
   test '9A7',
   'a changed file is resaved and its size and time-stamp updates' do
-    new_avatar
+    hello_avatar
 
     files['cyber-dojo.sh'] = 'ls -el | tail -n +2'
     ls_output, _ = assert_execute(files)

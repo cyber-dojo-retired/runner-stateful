@@ -17,7 +17,7 @@ class DockerRunner
     exec("docker pull #{image_name}")
   end
 
-  def new_avatar(kata_id, avatar_name)
+  def hello_avatar(kata_id, avatar_name)
     _, status = exec("docker volume create --name #{volume_name(kata_id, avatar_name)}")
     ['', status]
   end

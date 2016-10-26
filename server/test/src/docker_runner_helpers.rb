@@ -31,8 +31,8 @@ module DockerRunnerHelpers # mix-in
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def new_avatar
-    output, status = runner.new_avatar(kata_id, avatar_name)
+  def hello_avatar
+    output, status = runner.hello_avatar(kata_id, avatar_name)
     @volume = volume_name
     [output, status]
   end
@@ -99,7 +99,7 @@ module DockerRunnerHelpers # mix-in
     command = "docker inspect --format='{{ .State.Running }}' #{@cid} 2> /dev/null"
     _, status = exec(command)
     # https://gist.github.com/ekristen/11254304
-    status == 1
+    dead = status == 1
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -119,13 +119,13 @@ module DockerRunnerHelpers # mix-in
 
   def assert_exec(command)
     output, status = exec(command)
-    assert_equal success, status
+    assert_equal success, status, output
     [output, status]
   end
 
   def assert_execute(*args)
     output, status = execute(*args)
-    assert_equal success, status
+    assert_equal success, status, output
     [output, status]
   end
 
