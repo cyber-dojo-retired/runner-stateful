@@ -1,4 +1,3 @@
-
 require_relative './nearest_ancestors'
 
 class DockerRunner

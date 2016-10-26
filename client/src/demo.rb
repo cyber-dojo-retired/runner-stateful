@@ -19,22 +19,41 @@ class Demo < Sinatra::Base
       'makefile'      => read('makefile')
     }
     html = ''
-    json = pulled?(image_name)
-    html += "<pre>/pulled?->#{unparse(json)}</pre>"
-    json = pull(image_name)
-    html += "<pre>/pull->#{unparse(json)}</pre>"
-    json = hello(kata_id, avatar_name)
-    html += "<pre>/hello->#{unparse(json)}</pre>"
-    json = run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
-    html += "<pre>/run->#{unparse(json)}</pre>"
-    json = goodbye(kata_id, avatar_name)
-    html += "<pre>/goodbye->#{unparse(json)}</pre>"
+
+    json = nil
+    duration = timed { json = pulled?(image_name) }
+    html += pre('pulled?', duration, json)
+
+    duration = timed { json = pull(image_name) }
+    html += pre('pull', duration, json)
+
+    duration = timed { json = hello(kata_id, avatar_name) }
+    html += pre('hello', duration, json)
+
+    duration = timed { json =
+      run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
+    }
+    html += pre('run', duration, json)
+
+    duration = timed { json = goodbye(kata_id, avatar_name) }
+    html += pre('goodbye', duration, json)
   end
 
   include Runner
 
   def read(filename)
     IO.read("/app/src/start_files/#{filename}")
+  end
+
+  def timed
+    started = Time.now
+    yield
+    finished = Time.now
+    '%.2f' % (finished - started)
+  end
+
+  def pre(name, duration, json)
+    "<pre>/#{name}(#{duration})->#{JSON.pretty_unparse(json)}</pre>"
   end
 
   def unparse(json)
