@@ -16,7 +16,7 @@ script:
     - docker pull cyberdojofoundation/ruby_mini_test
     - docker pull cyberdojofoundation/fsharp_nunit
     - docker pull cyberdojofoundation/csharp_nunit
-    - ./build.up
+    - ./build.sh
     - ./up.sh
     - sleep 2
     - ./test.sh
