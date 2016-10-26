@@ -22,6 +22,10 @@ class MicroService < Sinatra::Base
     jasoned *runner.hello_avatar(kata_id, avatar_name)
   end
 
+  post '/goodbye_avatar' do
+    jasoned *runner.goodbye_avatar(kata_id, avatar_name)
+  end
+
   post '/run' do
     cid = runner.create_container(image_name, kata_id, avatar_name)
     runner.deleted_files(cid, deleted_filenames)

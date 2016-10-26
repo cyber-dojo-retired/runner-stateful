@@ -17,6 +17,10 @@ module Runner # mix-in
     post(:hello_avatar, { kata_id:kata_id, avatar_name:avatar_name })
   end
 
+  def goodbye_avatar(kata_id, avatar_name)
+    post(:goodbye_avatar, { kata_id:kata_id, avatar_name:avatar_name })
+  end
+
   def run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
     post(:run, { image_name:image_name,
                     kata_id:kata_id,
