@@ -7,44 +7,44 @@
 
 ## API
 
-- pulled?(image_name)
-  * parameters
-    * eg image_name = 'cyberdojofoundation/gcc_assert'
-  * returns
-    * { status:true , output:unspecified } -> pulled already
-    * { status:false, output:unspecified } -> not pulled already
+### pulled?(image_name)
+- parameters
+  * image_name, eg 'cyberdojofoundation/gcc_assert'
+- returns
+  * { status:true , output:unspecified } -> pulled already
+  * { status:false, output:unspecified } -> not pulled already
 
-- pull(image_name)
-  * parameters
-    * eg image_name ='cyberdojofoundation/gcc_assert'
-  * returns
-    * { status:true, output:unspecified } -> pull succeeded
+### pull(image_name)
+- parameters
+  * image_name, eg 'cyberdojofoundation/gcc_assert'
+- returns
+  * { status:true, output:unspecified } -> pull succeeded
 
-- hello_avatar(kata_id, avatar_name)
-  * parameters
-    * eg kata_id = '15B9AD6C42'
-    * eg avatar_name = 'salmon'
-  * returns
-    * { status:true,  output:unspecified } -> succeeded
+### hello_avatar(kata_id, avatar_name)
+- parameters
+  * kata_id, eg '15B9AD6C42'
+  * avatar_name, eg 'salmon'
+- returns
+  * { status:true, output:unspecified } -> succeeded
 
-- goodbye_avatar(kata_id, avatar_name)
-  * parameters
-    * eg kata_id = '15B9AD6C42'
-    * eg avatar_name = 'salmon'
-  * returns
-    * { status:true,  output:unspecified } -> succeeded
+### goodbye_avatar(kata_id, avatar_name)
+- parameters
+  * kata_id, eg '15B9AD6C42'
+  * avatar_name, eg 'salmon'
+- returns
+  * { status:true, output:unspecified } -> succeeded
 
-- run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
-  * parameters
-    * eg image_name = 'cyberdojofoundation/gcc_assert'
-    * eg kata_id = '15B9AD6C42'
-    * eg avatar_name = 'salmon'
-    * eg max_seconds = '10'
-    * eg deleted_filenames = [ filename, ... ]
-    * eg changed_files = { filename => content, ... }
-  * returns
-    * { status:true,   output:output } -> succeeded
-    * { status:false,  output:'' } -> did not complete in max_seconds
+### run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
+- parameters
+  * image_name, eg 'cyberdojofoundation/gcc_assert'
+  * kata_id, eg '15B9AD6C42'
+  * avatar_name, eg 'salmon'
+  * max_seconds, eg '10'
+  * deleted_filenames, eg [ filename, ... ]
+  * changed_files, eg { filename => content, ... }
+- returns
+  * { status:true,   output:output } -> succeeded
+  * { status:false,  output:'' } -> did not complete in max_seconds
 
 - if something unexpected goes wrong on the server all methods return
   * { status:error, output:msg } -> something went wrong

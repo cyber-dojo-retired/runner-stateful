@@ -36,6 +36,14 @@ o) log assert_exec() fail in docker_runner.rb
 
 -------------------------------------------------
 
+o) can you tell the date a docker volume was created?
+   runner could write the creation-date to a known file inside the volume
+o) can you tell the last time a volume was written to?
+   runner could write the run() time to a config file inside the volume
+o) should the API include a way to determine the age of a volume?
+   or should it simply request goodbyes to anything older than a certain
+  age and it passes the age in.
+
 o) /app is still hardwired in Dockerfile
 
 o) drop foreman and start directly? See https://rubyplus.com/articles/2461
