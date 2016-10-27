@@ -3,7 +3,9 @@
 
 <img src="https://raw.githubusercontent.com/cyber-dojo/nginx/master/images/home_page_logo.png" alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
 
-# repo for **cyberdojo/runner** docker image
+# **cyberdojo/runner** docker image
+
+A cyberdojo/runner docker-container runs sinatra on port 4557.
 
 ## API
 
@@ -11,28 +13,28 @@
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
 - returns
-  * { status:true , output:unspecified } -> pulled already
-  * { status:false, output:unspecified } -> not pulled already
+  * { "status":"true" , "output":unspecified } -> pulled already
+  * { "status":"false", "output":unspecified } -> not pulled already
 
 ### pull(image_name)
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
 - returns
-  * { status:ok, output:unspecified } -> pull succeeded
+  * { "status":"ok", "output":unspecified } -> pull succeeded
 
 ### hello(kata_id, avatar_name)
 - parameters
   * kata_id, eg '15B9AD6C42'
   * avatar_name, eg 'salmon'
 - returns
-  * { status:ok, output:unspecified } -> succeeded
+  * { "status":"ok", "output":unspecified } -> succeeded
 
 ### goodbye(kata_id, avatar_name)
 - parameters
   * kata_id, eg '15B9AD6C42'
   * avatar_name, eg 'salmon'
 - returns
-  * { status:ok, output:unspecified } -> succeeded
+  * { "status":"ok", "output":unspecified } -> succeeded
 
 ### run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
 - parameters
@@ -43,8 +45,8 @@
   * deleted_filenames, eg [ filename, ... ]
   * changed_files, eg { filename => content, ... }
 - returns
-  * { status:0,   output:output } -> succeeded
-  * { status:137,  output:'' } -> did not complete in max_seconds
+  * { "status":"0",   "output":output } -> succeeded
+  * { "status":"137", "output":"" } -> did not complete in max_seconds
 
 - if something unexpected goes wrong on the server all methods return
   * { status:error, output:msg } -> something went wrong

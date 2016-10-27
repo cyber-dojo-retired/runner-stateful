@@ -1,17 +1,23 @@
 
+o) write tests that run in runner-client
+   call them from ./test.sh script
+
 o) massage micro_service returned strings.
    - clean them
    - truncate them
 
 o) should the API include a way to determine the age of a volume?
    or should it simply request goodbyes to anything older than a certain
-  age and it passes the age in.
+   age and it passes the age in. Neither. Instead...
+   runner writes the hello()-datetime to a known file inside the volume.
+   runner writes the run()-datetime to a known file inside the volume.
+   Separate reaper/pruner service can delete old volumes.
 
-o) can you tell the date a docker volume was created?
-   runner could write the creation-date to a known file inside the volume
+o) micro-service needs to check each shell call and return
+   { status:error, output:msg }
+   if somthing goes wrong.
 
-o) can you tell the last time a volume was written to?
-   runner could write the run() time to a config file inside the volume
+-------------------------------------------------
 
 o) add cpu/memory/swap limits
    See comments at https://github.com/cyber-dojo/commander/blob/master/docker-compose.yml
