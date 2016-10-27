@@ -42,7 +42,7 @@ class RunnerAppTest < LibTestBase
   def avatar_name; 'salmon'; end
 
   def read(filename)
-    IO.read("/app/src/start_files/#{filename}")
+    IO.read("/app/start_files/gcc_assert/#{filename}")
   end
 
   def hello(kata_id, avatar_name)

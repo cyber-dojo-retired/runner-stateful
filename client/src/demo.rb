@@ -42,7 +42,7 @@ class Demo < Sinatra::Base
   include Runner
 
   def read(filename)
-    IO.read("/app/src/start_files/#{filename}")
+    IO.read("/app/start_files/gcc_assert/#{filename}")
   end
 
   def timed
