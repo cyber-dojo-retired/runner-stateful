@@ -41,17 +41,6 @@ class DockerRunnerLanguageTest < LibTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-=begin
-  test '99B',
-  '[F#,NUnit] runs (it explicitly names /sandbox in cyber-dojo.sh)' do
-    # No it doesn't! Do any?
-    @expected = 'Tests run: 1, Errors: 0, Failures: 0, Inconclusive: 0'
-    assert_runs 'fsharp_nunit'
-  end
-=end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   test '182',
   '[C#-NUnit] runs (it needs to pick up HOME from the current user)' do
     @expected = 'Tests run: 1, Errors: 0, Failures: 1, Inconclusive: 0'
