@@ -13,7 +13,7 @@ class DockerRunnerLanguageTest < LibTestBase
   '[C(gcc),assert] (an Ubuntu-based image) runs and has',
   'the user nobody and',
   'the group nogroup' do
-    @expected = "All tests passed\n"
+    @expected = "Assertion failed: answer() == 42"
     assert_runs 'gcc_assert'
     assert user_nobody_exists?
     assert group_nogroup_exists?
@@ -25,7 +25,7 @@ class DockerRunnerLanguageTest < LibTestBase
   '[Ruby,MiniTest] (an Alpine-based image) runs and has',
   'the user nobody and',
   'the group nogroup' do
-    @expected = '1 runs, 1 assertions, 0 failures, 0 errors, 0 skips'
+    @expected = '1 runs, 1 assertions, 1 failures, 0 errors, 0 skips'
     assert_runs 'ruby_mini_test'
     assert user_nobody_exists?
     assert group_nogroup_exists?
@@ -54,7 +54,7 @@ class DockerRunnerLanguageTest < LibTestBase
 
   test '182',
   '[C#-NUnit] runs (it needs to pick up HOME from the current user)' do
-    @expected = 'Tests run: 1, Errors: 0, Failures: 0, Inconclusive: 0'
+    @expected = 'Tests run: 1, Errors: 0, Failures: 1, Inconclusive: 0'
     assert_runs 'csharp_nunit'
   end
 
