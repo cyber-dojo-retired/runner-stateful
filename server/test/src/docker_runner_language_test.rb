@@ -15,8 +15,6 @@ class DockerRunnerLanguageTest < LibTestBase
   'the group nogroup' do
     @expected = "Assertion failed: answer() == 42"
     assert_runs 'gcc_assert'
-    assert user_nobody_exists?
-    assert group_nogroup_exists?
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -27,8 +25,6 @@ class DockerRunnerLanguageTest < LibTestBase
   'the group nogroup' do
     @expected = '1 runs, 1 assertions, 1 failures, 0 errors, 0 skips'
     assert_runs 'ruby_mini_test'
-    assert user_nobody_exists?
-    assert group_nogroup_exists?
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -48,23 +44,14 @@ class DockerRunnerLanguageTest < LibTestBase
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Note: (Go,testing) named sandbox in its red-amber-green lambda
 
   def assert_runs(dir)
     hello
     output, _ = assert_execute(files(dir))
     assert output.include?(@expected), output
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def user_nobody_exists?
     output, _ = assert_execute({ 'cyber-dojo.sh' => 'getent passwd nobody' })
     output.start_with?('nobody')
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def group_nogroup_exists?
     output, _ = assert_execute({ 'cyber-dojo.sh' => 'getent group nogroup' })
     output.start_with?('nogroup')
   end
