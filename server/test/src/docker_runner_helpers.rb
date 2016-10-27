@@ -72,7 +72,7 @@ module DockerRunnerHelpers
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def load_files(language_dir)
-    dir = "/app/test/src/language_start_files/#{language_dir}"
+    dir = "/app/start_files/#{language_dir}"
     json = JSON.parse(IO.read("#{dir}/manifest.json"))
     @image_name = json['image_name']
     Hash[json['filenames'].collect { |filename|
