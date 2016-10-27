@@ -1,0 +1,8 @@
+{
+  "filenames": [
+    "cyber-dojo.sh",
+    "IHiker.cs",
+    "HikerTest.cs"
+  ],
+  "image_name": "cyberdojofoundation/csharp_moq"
+}

@@ -2,6 +2,22 @@ FROM cyberdojo/runner_base
 MAINTAINER Jon Jagger <jon@jaggersoft.com>
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# install tini (for pid 1 zombie reaping)
+# https://github.com/krallin/tini
+# https://blog.phusion.nl/2015/01/20/docker-and-the-pid-1-zombie-reaping-problem/
+
+RUN apk add --update --repository http://dl-cdn.alpinelinux.org/alpine/edge/community/ tini
+ENTRYPOINT ["/sbin/tini", "--"]
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# setup foreman
+
+CMD [ "foreman", "start" ]
+ARG PORT
+ENV PORT=${PORT}
+EXPOSE ${PORT}
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # install docker-client
 
 ARG DOCKER_ENGINE_VERSION
@@ -20,14 +36,3 @@ ARG APP_DIR
 COPY . ${APP_DIR}
 WORKDIR ${APP_DIR}
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# install tini (for pid 1 zombie reaping)
-# https://github.com/krallin/tini
-# https://blog.phusion.nl/2015/01/20/docker-and-the-pid-1-zombie-reaping-problem/
-
-RUN apk add --update --repository http://dl-cdn.alpinelinux.org/alpine/edge/community/ tini
-ENTRYPOINT ["/sbin/tini", "--"]
-CMD [ "foreman", "start" ]
-ARG PORT
-ENV PORT=${PORT}
-EXPOSE ${PORT}
