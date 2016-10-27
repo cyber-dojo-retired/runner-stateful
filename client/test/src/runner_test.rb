@@ -59,18 +59,20 @@ class RunnerAppTest < LibTestBase
     # This test passes but there is a problem.
     # Here's the log (after the test has finished)
     #
-    # runner_server  | 12:59:13 web.1  | "----------------------------------------"
-    # runner_server  | 12:59:13 web.1  | "COMMAND:docker volume rm cyber_dojo_201BCE6F_salmon"
-    # runner_server  | 12:59:13 web.1  | Error response from daemon: Unable to remove volume,
+    # runner_server | 12:59:13 web.1 | "COMMAND:docker volume rm cyber_dojo_201BCE6F_salmon"
+    # runner_server | 12:59:13 web.1 | Error response from daemon: Unable to remove volume,
     #    volume still in use: remove cyber_dojo_201BCE6F_salmon: volume is in use -
     #    [b66474ead6b0720c71a120cde915b20d88c9560a158e4b4f8302fd0d9baf382b]
     #
-    # doing [docker ps -a] shows that b6647... is not there/
-    # This relates to thethe child-process [docker rm]...
-    # Note that the runner_server's microservice's goodbye() does *not*
-    # have the synchronization that docker_helpers_test.rb has.
+    # doing [docker ps -a] shows that b6647... is *not* there
+    # but of course at the time it was.
+    # doing [docker volume ls] shows [local cyber_dojo_201BCE6F_salmon] is there.
+    # This relates to the child-process [docker rm]...
+    # Note runner_server's microservice's goodbye() does *not* have the
+    # synchronization that docker_helpers_test.rb has.
+    #
     # Should a run() somehow record the cid inside the volume
-    # so the volume can get its cid and do the same synchronization?
+    # so goodbye() can get its cid and do the same synchronization?
     # It seems logical that goodbye on the runner-server should
     # be self-contained.
     hello
