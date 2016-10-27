@@ -57,26 +57,35 @@ class RunnerAppTest < LibTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 =begin
-  # This test fails.
-  # The problem manifests itself with log output...
+  # This test passes but kills the runner_server!!!
+  # The problems can be seen on the log (after the test has finished)
   #
+  # PROBLEM 1
+  # ---------
+  # runner_server    | 12:59:13 web.1  | "----------------------------------------"
+  # runner_server    | 12:59:13 web.1  | "COMMAND:docker volume rm cyber_dojo_201BCE6F_salmon"
+  # runner_server    | 12:59:13 web.1  | Error response from daemon: Unable to remove volume,
+  #    volume still in use: remove cyber_dojo_201BCE6F_salmon: volume is in use -
+  #    [b66474ead6b0720c71a120cde915b20d88c9560a158e4b4f8302fd0d9baf382b]
+  #
+  # doing [docker ps -a] shows that b6647... is not there/
+  # I'm sure this is the child-process [docker rm] again.
+  # Note that the runner_server's microservice's goodbye() does not
+  # have the synchronization that docker_helpers_test.rb has.
+  # Should a run() somehow record the cid inside the volume
+  # so the volume can get its cid and do the same synchronization?
+  # It seems logical that goodbye on the runner-server should
+  # be self-contained.
+  #
+  # PROBLEM 2
+  # ---------
   # runner_server    | 11:50:58 web.1  | "NO-OUTPUT:"
   # runner_server    | 11:50:58 web.1  | "EXITED:137"
   # runner_server    | 11:50:59        | exited with code 0
   # runner_server    | 11:50:59 system | sending SIGTERM to all processes
   # runner_server    | 11:50:59 web.1  | terminated by SIGTERM
   #
-  # My guess: this is related to the pkill in the server's docker_runner.sh
-  # - - - - - - - - - - - - - - - - - - - - - - - -
-  # Technically I think there is potentially another problem.
-  # The call to goodbye...
-  # Could the volume's container still be alive?
-  # Note that the goodbye's in the server's docker_helpers_test.rb
-  # have to syncronize carelly.
-  # Should a run() somehow record the cid inside the volume
-  # so the volume can get its cid and do the same synchronization?
-  # It seems logical that goodbye on the runner-server should
-  # be self-contained.
+  # My guess: this is also related to the pkill in the server's docker_runner.sh
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'E6F',
