@@ -24,6 +24,10 @@ module TestHexIdHelper # mix-in
     base.extend(ClassMethods)
   end
 
+  def test_id
+    ENV['TEST_ID']
+  end
+
   module ClassMethods
 
     @@args = (ARGV.sort.uniq - ['--']).map(&:upcase)  # eg 2DD6F3 eg 2dd
