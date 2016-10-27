@@ -6,10 +6,7 @@ o) massage micro_service returned strings.
    - clean them
    - truncate them
 
-o) should the API include a way to determine the age of a volume?
-   or should it simply request goodbyes to anything older than a certain
-   age and it passes the age in. Neither. Instead...
-   runner writes the hello()-datetime to a known file inside the volume.
+o) runner writes the hello()-datetime to a known file inside the volume.
    runner writes the run()-datetime to a known file inside the volume.
    Separate reaper/pruner service can delete old volumes.
 

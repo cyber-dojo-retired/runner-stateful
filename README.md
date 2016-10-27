@@ -3,9 +3,9 @@
 
 <img src="https://raw.githubusercontent.com/cyber-dojo/nginx/master/images/home_page_logo.png" alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
 
-# **cyberdojo/runner** docker image
+# cyberdojo/runner docker image
 
-A cyberdojo/runner docker-container runs sinatra on port 4557.
+A **cyberdojo/runner** docker container runs sinatra on port 4557.
 
 ## API
 
@@ -72,7 +72,7 @@ $ ./test.sh
 $ ./demo.sh
 ```
 Runs inside the runner-client container.
-Calls each of the runner-server's micro-service methods
+Calls and times each of the runner-server's micro-service methods
 once and displays their json results.
 If the runner-client's IP address is 192.168.99.100 then put
 192.168.99.100:4558 into your browser to see the output.
