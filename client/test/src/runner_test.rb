@@ -11,8 +11,11 @@ class RunnerAppTest < LibTestBase
     '201BC'
   end
 
-  def teardown
+  def external_setup
     # can't do hello in setup because test_id not yet set
+  end
+
+  def external_teardown
     goodbye
   end
 
