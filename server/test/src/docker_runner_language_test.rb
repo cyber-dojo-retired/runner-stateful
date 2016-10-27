@@ -44,7 +44,6 @@ class DockerRunnerLanguageTest < LibTestBase
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # Note: (Go,testing) named sandbox in its red-amber-green lambda
 
   def assert_runs(dir)
     hello
