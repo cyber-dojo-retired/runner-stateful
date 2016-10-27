@@ -54,7 +54,29 @@ class RunnerAppTest < LibTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 =begin
-  test 'D6F',
+  # This test fails.
+  # The problem manifests itself with log output...
+  #
+  # runner_server    | 11:50:58 web.1  | "NO-OUTPUT:"
+  # runner_server    | 11:50:58 web.1  | "EXITED:137"
+  # runner_server    | 11:50:59        | exited with code 0
+  # runner_server    | 11:50:59 system | sending SIGTERM to all processes
+  # runner_server    | 11:50:59 web.1  | terminated by SIGTERM
+  #
+  # My guess: this is related to the pkill in the server's docker_runner.sh
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+  # Technically I think there is potentially another problem.
+  # The call to goodbye...
+  # Could the volume's container still be alive?
+  # Note that the goodbye's in the server's docker_helpers_test.rb
+  # have to syncronize carelly.
+  # Should a run() somehow record the cid inside the volume
+  # so the volume can get its cid and do the same synchronization?
+  # It seems logical that goodbye on the runner-server should
+  # be self-contained.
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test 'E6F',
   'timed-out-traffic-light' do
     hello
     files['hiker.c'] = files['hiker.c'].sub('return', 'for(;;); return')
