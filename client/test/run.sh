@@ -10,7 +10,6 @@ if [ ! -f /.dockerenv ]; then
   exit 1
 fi
 
-echo "HELLO from run.sh"
 #cov_dir=/tmp/coverage
 #mkdir ${cov_dir}
 #test_log=${cov_dir}/test.log
@@ -27,5 +26,4 @@ ruby -e "require './runner_test.rb'"
 #ruby -e "%w( ${files[*]} ).map{ |file| './'+file }.each { |file| require file }"
 #     -- ${args[@]} | tee ${test_log}
 
-#cd ${my_dir} && ruby ./check_test_results.rb ${test_log} ${cov_dir}/index.html >
-${cov_dir}/done.txt
+#cd ${my_dir} && ruby ./check_test_results.rb ${test_log} ${cov_dir}/index.html > ${cov_dir}/done.txt

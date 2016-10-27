@@ -3,6 +3,7 @@
 
 require_relative './lib_test_base'
 require 'net/http'
+require 'json'
 
 class RunnerAppTest < LibTestBase
 
@@ -20,7 +21,7 @@ class RunnerAppTest < LibTestBase
 
   test '348',
   'smoke-test' do
-    ...
+    assert_equal 1, 1
   end
 
   private
@@ -43,7 +44,7 @@ class RunnerAppTest < LibTestBase
     request.content_type = 'application/json'
     request.body = args.to_json
     response = http.request(request)
-    response.body
+    JSON.parse(response.body)
   end
 
 end
