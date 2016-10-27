@@ -41,10 +41,13 @@ run_client_tests ${*}
 
 if [[ ( ${server_status} == 0 && ${client_status} == 0 ) ]];  then
   docker_engine_version=$(docker --version | awk '{print $3}' | sed '$s/.$//')
+  echo "------------------------------------------------------"
+  echo "All passed"
+  echo "------------------------------------------------------"
+  echo "Removing runner_client and runner_server containers..."
   export DOCKER_ENGINE_VERSION=${docker_engine_version}
   docker-compose down
-  echo
-  echo "All passed. Removed runner_client and runner_server containers"
+  echo "Removed runner_client and runner_server containers"
   exit 0
 else
   echo
