@@ -34,9 +34,6 @@ run_client_tests()
 # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 run_server_tests ${*}
-# TODO: for client tests would be nice to set server's Logger
-#       to NullLogger
-#       to quiter logger, eg one that does not log success
 run_client_tests ${*}
 
 if [[ ( ${server_status} == 0 && ${client_status} == 0 ) ]];  then

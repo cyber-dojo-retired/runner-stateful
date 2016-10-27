@@ -1,5 +1,14 @@
 
-o) client runner_test.rb E6F reveals a problem
+-------------------------------------------------
+runner_server:
+-------------------------------------------------
+
+o) client tests: would be nice to set runner_server's Logger
+    to NullLogger, or to quieter logger, eg one that does not log success
+    Getting lots of stdout loggin from the runner-server when the
+    runner-client calls into it.
+
+o) client runner_test.rb E6F reveals a problem on the runner_server
     # Here's the log (after the test has finished)
     #
     # runner_server | 12:59:13 web.1 | "COMMAND:docker volume rm cyber_dojo_201BCE6F_salmon"
@@ -23,15 +32,13 @@ o) massage micro_service returned strings.
    - clean them
    - truncate them
 
-o) runner writes the hello()-datetime to a known file inside the volume.
-   runner writes the run()-datetime to a known file inside the volume.
+o) write the hello()-datetime to a known file inside the volume.
+   write the run()-datetime to a known file inside the volume.
    Separate reaper/pruner service can delete old volumes.
 
-o) micro-service needs to check each shell call and return
+o) runner_server micro-service needs to check each shell call and return
    { status:error, output:msg }
    if somthing goes wrong.
-
--------------------------------------------------
 
 o) add cpu/memory/swap limits
    See comments at https://github.com/cyber-dojo/commander/blob/master/docker-compose.yml
