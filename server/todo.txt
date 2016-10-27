@@ -3,38 +3,60 @@
 runner_server:
 -------------------------------------------------
 
-o) client tests: would be nice to set runner_server's Logger
-    to NullLogger, or to quieter logger, eg one that does not log success
-    Getting lots of stdout loggin from the runner-server when the
-    runner-client calls into it.
-
 o) client runner_test.rb E6F reveals a problem on the runner_server
-    # Here's the log (after the test has finished)
-    #
-    # runner_server | 12:59:13 web.1 | "COMMAND:docker volume rm cyber_dojo_201BCE6F_salmon"
-    # runner_server | 12:59:13 web.1 | Error response from daemon: Unable to remove volume,
-    #    volume still in use: remove cyber_dojo_201BCE6F_salmon: volume is in use -
-    #    [b66474ead6b0720c71a120cde915b20d88c9560a158e4b4f8302fd0d9baf382b]
-    #
-    # doing [docker ps -a] shows that b6647... is *not* there
-    # but of course at the time it was.
-    # doing [docker volume ls] shows [local cyber_dojo_201BCE6F_salmon] is there.
-    # This relates to the child-process [docker rm]...
-    # Note runner_server's microservice's goodbye() does *not* have the
-    # synchronization that docker_helpers_test.rb has.
-    #
-    # Should a run() somehow record the cid inside the volume
-    # so goodbye() can get its cid and do the same synchronization?
-    # It seems logical that goodbye on the runner-server should
-    # be self-contained.
+   Here's the log (after the test has finished)
+
+   runner_server | 12:59:13 web.1 | "COMMAND:docker volume rm cyber_dojo_201BCE6F_salmon"
+   runner_server | 12:59:13 web.1 | Error response from daemon: Unable to remove volume,
+      volume still in use: remove cyber_dojo_201BCE6F_salmon: volume is in use -
+      [b66474ead6b0720c71a120cde915b20d88c9560a158e4b4f8302fd0d9baf382b]
+
+   doing [docker ps -a] shows that b6647... is *not* there
+   but of course at the time it was.
+   doing [docker volume ls] shows [local cyber_dojo_201BCE6F_salmon] is there.
+   This relates to the child-process [docker rm]...
+   Note runner_server's microservice's goodbye() does *not* have the
+   synchronization that docker_helpers_test.rb has.
+
+   Should a run() somehow record the cid inside the volume
+   so goodbye() can get its cid and do the same synchronization?
+   It seems logical that goodbye on the runner-server should be self-contained.
+   This suggests making the sandbox folders off a dir and not root.
+   ...
+   Should there be a volume per kata rather than per animal?
+   ...
+   This feels right. Fits with the value-system of cyber-dojo.
+   Means _each_ avatar would store the datetime inside its own file.
+   Also I no longer need to have a folder called sandbox.
+     /cyber-dojo/datetime    (when kata was started)
+     /cyber-dojo/cidfiles/lion (lion's most recent run)
+     /cyber-dojo/cidfiles/bee  (bee's most recent run)
+     /cyber-dojo/lion/cyber-dojo.sh
+     /cyber-dojo/lion/hiker.c
+     /cyber-dojo/bee/cyber-dojo.sh
+     /cyber-dojo/bee/hiker.c
+   This will directly affect C#-Moq which names /sandbox in its cyber-dojo.sh
+   export HOME=/sandbox
+   Means hello()/goodbye() will only need kata_id.
+   And could be renamed... new_kata(id), old_kata(id)
+   Remember the volume is not where the traffic-lights are stored
+   it is where the run() takes place. Nevertheless the potential
+   exists for one avatar to overwrite another avatars files.
+   Should I use a different uid for the run of each avatar
+   and for the rights of their files?
+
+o) write the hello()-datetime to a known file inside the volume.
+   write the run()-datetime to a known file inside the volume.
+   Separate reaper/pruner service can delete old volumes.
 
 o) massage micro_service returned strings.
    - clean them
    - truncate them
 
-o) write the hello()-datetime to a known file inside the volume.
-   write the run()-datetime to a known file inside the volume.
-   Separate reaper/pruner service can delete old volumes.
+o) client tests: would be nice to set runner_server's Logger
+    to NullLogger, or to quieter logger, eg one that does not log success
+    Getting lots of stdout loggin from the runner-server when the
+    runner-client calls into it.
 
 o) runner_server micro-service needs to check each shell call and return
    { status:error, output:msg }
