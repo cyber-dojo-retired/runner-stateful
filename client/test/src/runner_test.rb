@@ -20,8 +20,20 @@ class RunnerAppTest < LibTestBase
   end
 
   test '348',
-  'smoke-test' do
-    assert_equal 1, 1
+  'red-traffic-light' do
+    image_name = 'cyberdojofoundation/gcc_assert'
+    max_seconds = 10
+    deleted_filenames = []
+    changed_files = {
+      'hiker.c'       => read('hiker.c'),
+      'hiker.h'       => read('hiker.h'),
+      'hiker.tests.c' => read('hiker.tests.c'),
+      'cyber-dojo.sh' => read('cyber-dojo.sh'),
+      'makefile'      => read('makefile')
+    }
+    json = do_run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
+    assert_equal 0, json['status']
+    assert json['output'].start_with?('Assertion failed: answer() == 42')
   end
 
   private
@@ -29,8 +41,21 @@ class RunnerAppTest < LibTestBase
   def kata_id; 'D4C8A65D61'; end
   def avatar_name; 'salmon'; end
 
+  def read(filename)
+    IO.read("/app/src/start_files/#{filename}")
+  end
+
   def hello(kata_id, avatar_name)
     post(:hello, { kata_id:kata_id, avatar_name:avatar_name })
+  end
+
+  def do_run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
+    post(:run, { image_name:image_name,
+                    kata_id:kata_id,
+                avatar_name:avatar_name,
+                max_seconds:max_seconds,
+          deleted_filenames:deleted_filenames,
+              changed_files:changed_files})
   end
 
   def goodbye(kata_id, avatar_name)

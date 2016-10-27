@@ -16,7 +16,6 @@ fi
 
 my_dir="$( cd "$( dirname "${0}" )" && pwd )"
 cd ${my_dir}/src
-ls -al
 ruby -e "require './runner_test.rb'"
 
 #files=(*_test.rb)
