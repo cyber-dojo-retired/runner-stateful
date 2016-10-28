@@ -14,7 +14,7 @@ before_install:
 script:
     - docker pull cyberdojofoundation/gcc_assert
     - docker pull cyberdojofoundation/ruby_mini_test
-    - docker pull cyberdojofoundation/fsharp_nunit
+    - docker pull cyberdojofoundation/csharp_moq
     - docker pull cyberdojofoundation/csharp_nunit
     - ./build.sh
     - ./up.sh
@@ -22,5 +22,9 @@ script:
     - ./test.sh
 
 after_success:
-    - docker login --username ${DOCKER_USERNAME} --password ${DOCKER_PASSWORD}
-    - docker push cyberdojo/runner:${DOCKER_ENGINE_VERSION}
+    - if [ "${TRAVIS_BRANCH}" == "master" ]; then
+        docker login --username "${DOCKER_USERNAME}" --password "${DOCKER_PASSWORD}";
+        docker push cyberdojo/runner:${DOCKER_ENGINE_VERSION};
+      fi
+    #- docker login --username ${DOCKER_USERNAME} --password ${DOCKER_PASSWORD}
+    #- docker push cyberdojo/runner:${DOCKER_ENGINE_VERSION}
