@@ -1,5 +1,4 @@
 require_relative './runner_test_base'
-require_relative './docker_runner_helpers'
 
 class DockerRunnerStepsTest < RunnerTestBase
 
@@ -121,8 +120,6 @@ class DockerRunnerStepsTest < RunnerTestBase
   end
 
   private
-
-  include DockerRunnerHelpers
 
   def ls_parse(ls_output)
     # each line looks like this...

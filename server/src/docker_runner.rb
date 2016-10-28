@@ -31,6 +31,10 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  # TODO: put run() here
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   def create_container(image_name, kata_id, avatar_name)
     # This creates the container but docker_runner.sh removes it.
     # Mounts new_avatar's volume in /sandbox
