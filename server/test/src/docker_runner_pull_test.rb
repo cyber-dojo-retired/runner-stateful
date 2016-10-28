@@ -1,7 +1,7 @@
-require_relative './lib_test_base'
+require_relative './runner_test_base'
 require_relative './docker_runner_helpers'
 
-class DockerRunnerPullTest < HexMiniTest
+class DockerRunnerPullTest < RunnerTestBase
 
   def self.hex_prefix
     'CFC'

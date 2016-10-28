@@ -1,7 +1,7 @@
-require_relative './lib_test_base'
+require_relative './runner_test_base'
 require_relative './../../src/string_truncater'
 
-class StringTruncaterTest < HexMiniTest
+class StringTruncaterTest < RunnerTestBase
 
   include StringTruncater
 

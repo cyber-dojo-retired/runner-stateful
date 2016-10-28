@@ -1,6 +1,6 @@
-require_relative './lib_test_base'
+require_relative './runner_test_base'
 
-class SnakeCaserTest < HexMiniTest
+class SnakeCaserTest < RunnerTestBase
 
   def self.hex_prefix
     '59B'

@@ -1,5 +1,5 @@
 require_relative '../all'
 
-class LibTestBase < TestBase
+class RunnerTestBase < TestBase
 
 end

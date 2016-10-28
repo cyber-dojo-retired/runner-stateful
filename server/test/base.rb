@@ -1,7 +1,7 @@
 require 'minitest/autorun'
-require_relative './hex_mini_test.rb'
+require_relative './hex_mini_test'
 
-class TestBase < MiniTest::Test
+class TestBase < HexMiniTest#MiniTest::Test
 
 end
 

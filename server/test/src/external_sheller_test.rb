@@ -1,8 +1,8 @@
-require_relative './lib_test_base'
+require_relative './runner_test_base'
 require_relative './spy_logger'
 
 
-class ExternalShellerTest < HexMiniTest
+class ExternalShellerTest < RunnerTestBase
 
   def self.hex_prefix
     'C89'

@@ -1,6 +1,6 @@
-require_relative './lib_test_base'
+require_relative './runner_test_base'
 
-class NameOfCallerTest < HexMiniTest
+class NameOfCallerTest < RunnerTestBase
 
   include NameOfCaller
 

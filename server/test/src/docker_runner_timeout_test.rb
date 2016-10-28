@@ -1,7 +1,7 @@
-require_relative './lib_test_base'
+require_relative './runner_test_base'
 require_relative './docker_runner_helpers'
 
-class DockerRunnerTimeoutTest < HexMiniTest
+class DockerRunnerTimeoutTest < RunnerTestBase
 
   def self.hex_prefix
     '45B57'

@@ -1,6 +1,6 @@
-require_relative './lib_test_base'
+require_relative './runner_test_base'
 
-class ExternalsTest < HexMiniTest
+class ExternalsTest < RunnerTestBase
 
   include Externals
 
