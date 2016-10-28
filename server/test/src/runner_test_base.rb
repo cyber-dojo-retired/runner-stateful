@@ -1,5 +1,10 @@
-require_relative '../all'
+#require_relative '../all'
+
+require_relative '../coverage'
+require_relative '../base'
+require_relative '../../src/micro_service'
 require_relative './docker_runner_helpers'
+require 'json'
 
 class RunnerTestBase < TestBase
 
