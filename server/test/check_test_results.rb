@@ -103,7 +103,7 @@ table =
     [ 'coverage(test)[%]',      test_coverage,      '>=', 100 ],
     [ 'hits_per_line(src)',     hits_per_line_src,  '<=', 100 ],
     [ 'hits_per_line(test)',    hits_per_line_test, '<=',   5 ],
-    [ 'lines(test)/lines(src)', f2(line_ratio),     '>=',   2 ],
+    [ 'lines(test)/lines(src)', f2(line_ratio),     '>=', 1.5 ],
   ]
 
 # - - - - - - - - - - - - - - - - - - - - - - -
@@ -114,7 +114,7 @@ table.each do |name,value,op,limit|
   result = eval("#{value} #{op} #{limit}")
   puts "%s | %s %s %s | %s" % [
     name.rjust(25), value.to_s.rjust(7), op, limit.to_s.rjust(3), result.to_s
-  ] unless result
+    ] unless result
   done << result
 end
 puts
