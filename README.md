@@ -5,6 +5,7 @@
 
 # cyberdojo/runner docker image
 
+Work in progress. Not live yet.
 A **cyberdojo/runner** docker container runs sinatra on port 4557.
 
 ## API
