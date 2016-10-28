@@ -14,11 +14,11 @@ class HexMiniTest < MiniTest::Test
     @@seen_hex_ids << hex_id
     if @@args == [] || @@args.any?{ |arg| hex_id.include?(arg) }
       execute_around = lambda {
-        _secret_hex_setup(hex_id)
+        _hex_setup_caller(hex_id)
         begin
           self.instance_eval &test_block
         ensure
-          _secret_hex_teardown
+          _hex_teardown_caller
         end
       }
       proposition = lines.join(space = ' ')
@@ -26,28 +26,6 @@ class HexMiniTest < MiniTest::Test
       define_method("test_\n#{name}".to_sym, &execute_around)
     end
   end
-
-  # - - - - - - - - - - - - - - - - - - - - - -
-
-  def _secret_hex_setup(hex_id)
-    @_secret_test_id = hex_id
-    @config = {}
-    env_map.keys.each { |key| @config[key] = ENV[key] }
-    hex_setup
-  end
-
-  def test_id
-    @_secret_test_id
-  end
-
-  def _secret_hex_teardown
-    hex_teardown
-  ensure
-    env_map.keys.each { |key| ENV[key] = @config[key] }
-  end
-
-  def hex_setup; end
-  def hex_teardown; end
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
@@ -71,6 +49,32 @@ class HexMiniTest < MiniTest::Test
     fail "\n\n#{pointer}empty#{pointee}" if hex_suffix == ''
     fail "\n\n#{pointer}not hex#{pointee}" unless hex_suffix =~ /^[0-9A-F]+$/
     fail "\n\n#{pointer}duplicate#{pointee}" if @@seen_hex_ids.include?(hex_id)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - -
+
+  def _hex_setup_caller(hex_id)
+    @config = {}
+    env_map.keys.each { |key| @config[key] = ENV[key] }
+    @_hex_test_id = hex_id
+    hex_setup
+  end
+
+  def _hex_teardown_caller
+    hex_teardown
+  ensure
+    env_map.keys.each { |key| ENV[key] = @config[key] }
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - -
+
+  def hex_setup; end
+  def hex_teardown; end
+
+  # - - - - - - - - - - - - - - - - - - - - - -
+
+  def test_id
+    @_hex_test_id
   end
 
 end
