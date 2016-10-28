@@ -31,8 +31,17 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  # TODO: put run() here
+  def run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
+    cid = create_container(image_name, kata_id, avatar_name)
+    delete_files(cid, deleted_filenames)
+    change_files(cid, changed_files)
+    setup_home(cid)
+    output, status = run_cyber_dojo_sh(cid, max_seconds)
+    remove_container(cid)
+    [output, status]
+  end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def create_container(image_name, kata_id, avatar_name)
@@ -103,7 +112,7 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def run(cid, max_seconds)
+  def run_cyber_dojo_sh(cid, max_seconds)
     cmd = [
       'docker exec',
       "--user=nobody",
