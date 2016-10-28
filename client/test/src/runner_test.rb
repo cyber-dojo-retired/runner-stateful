@@ -31,7 +31,7 @@ class RunnerAppTest < LibTestBase
     files['hiker.c'] = files['hiker.c'].sub('6 * 9', '6 * 7')
     execute(files)
     assert_equal success, status, json
-    assert_equal 'All tests passed', output, json
+    assert_equal "All tests passed\n", output, json
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

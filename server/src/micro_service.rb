@@ -47,7 +47,7 @@ class MicroService < Sinatra::Base
 
   def jasoned(output, status)
     content_type :json
-    { status:status, output:output.strip }.to_json
+    { status:status, output:output }.to_json
   end
 
 end
