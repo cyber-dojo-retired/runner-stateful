@@ -3,6 +3,13 @@
 runner_server:
 -------------------------------------------------
 
+o) Should there be a volume per kata rather than per animal?
+   This feels right. Fits with the value-system of cyber-dojo.
+   Keeps the number of volumes down too.
+   Means hello()/goodbye() will only need kata_id.
+   And could be renamed... new_kata(id), old_kata(id)
+   Resuming an avatar will need to redo the new_kata(id)
+
 o) client runner_test.rb E6F reveals a problem on the runner_server
    Here's the log (after the test has finished)
 
@@ -16,61 +23,32 @@ o) client runner_test.rb E6F reveals a problem on the runner_server
    doing [docker volume ls] shows [local cyber_dojo_201BCE6F_salmon] is there.
    This relates to the child-process [docker rm]...
    Note runner_server's microservice's goodbye() does *not* have the
-   synchronization that docker_helpers_test.rb has.
-
-   Should a run() somehow record the cid inside the volume
-   so goodbye() can get its cid and do the same synchronization?
-   It seems logical that goodbye on the runner-server should be self-contained.
-   It would also allow me to make runner.run() a single method again and
-   not expose the cid.
-   This suggests making the sandbox folders off a dir and not root.
-   ...
-   Should there be a volume per kata rather than per animal?
-   ...
-   This feels right. Fits with the value-system of cyber-dojo.
-   Means _each_ avatar would store the datetime inside its own file.
-   Also I no longer need to have a folder called sandbox.
-     /cyber-dojo/datetime    (when kata was started)
-     /cyber-dojo/cidfiles/lion (lion's most recent run)
-     /cyber-dojo/cidfiles/bee  (bee's most recent run)
-     /cyber-dojo/lion/cyber-dojo.sh
-     /cyber-dojo/lion/hiker.c
-     /cyber-dojo/bee/cyber-dojo.sh
-     /cyber-dojo/bee/hiker.c
-   This will directly affect C#-Moq which names /sandbox in its cyber-dojo.sh
-   export HOME=/sandbox
-   Means hello()/goodbye() will only need kata_id.
-   And could be renamed... new_kata(id), old_kata(id)
+   synchronization that docker_helpers_test.rb has. It should have!
+   goodbye() on the runner-server should be self-contained.
    Remember the volume is not where the traffic-lights are stored
    it is where the run() takes place. Nevertheless the potential
    exists for one avatar to overwrite another avatars files.
    Should I use a different uid for the run of each avatar
    and for the rights of their files?
 
-   Summary of possible designs
-   1) put sandbox off a sub-dir and put cidfiles in the sub-dir. Affects C#-Moq
-   2) have a second volume (per kata) holding the cids and timestamps
-      assuming it's not easy to get the timestamps from the sandbox timestamp
-   3) tar the volume in and out!
-   4) do the 10 second timeout in Ruby.
-      This would remove the need for docker_runner.sh
-      It also removes the need for storing the cid somewhere in the volume
+   Do the 10 second timeout in Ruby.
+   This removes the need for docker_runner.sh
+
+      require timeout
+      # note: use --workdir in create_container to avoid needing to do cd?
 
       def run(cid, max_seconds)
-        # require timeout
-        # note: use --workdir to avoid needing to do cd
-        read_out, write_out = IO.pipe
-        read_err, write_err = IO.pipe
         cmd = "docker exec --user=nobody --interactive #{cid} sh -c './cyber-dojo.sh'"
-        pid = Process.spawn(cmd, pgroup:true, out:write_out, err:write_err)
+        rout, wout = IO.pipe
+        rerr, werr = IO.pipe
+        pid = Process.spawn(cmd, pgroup:true, out:wout, err:werr)
         begin
           Timeout::timeout(max_seconds) do
             Process.waitpid(pid)
-            # close write ends so we can read from them
-            write_out.close
-            write_err.close
-            stdout = read_out.readlines.join
-            stderr = read_err.readlines.join
+            wout.close
+            werr.close
+            stdout = rout.readlines.join
+            stderr = rerr.readlines.join
             return [true, stdout, stderr]
           end
         rescue Timeout::Error
@@ -78,15 +56,14 @@ o) client runner_test.rb E6F reveals a problem on the runner_server
           Process.detach(pid)
           return [false, '', '']
         ensure
-          write_out.close unless write_out.closed?
-          write_err.close unless write_err.closed?
-          # dispose the read ends of the pipes
-          read_out.close
-          read_err.close
+          wout.close unless wout.closed?
+          werr.close unless werr.closed?
+          rout.close
+          rerr.close
         end
       end
 
-      def remove_container(cid) # called in micro-services run() in ensure block
+      def remove_container(cid)
         # ask the docker daemon to remove the container
         shell.exec("docker rm -f #{cid}")
         # wait max 2 secs till it's gone
@@ -99,10 +76,22 @@ o) client runner_test.rb E6F reveals a problem on the runner_server
 
       def container_dead?(cid)
         # See https://gist.github.com/ekristen/11254304
-        command = "docker inspect --format='{{ .State.Running }}' #{cid} 2> /dev/null"
-        _, status = shell.exec(command)
+        cmd = "docker inspect --format='{{ .State.Running }}' #{cid} 2> /dev/null"
+        _, status = shell.exec(cmd)
         dead = status == 1
       end
+
+      # in micro_service.rb
+      post '/run' do
+        cid = runner.create_container(image_name, kata_id, avatar_name)
+        runner.deleted_files(cid, deleted_filenames)
+        runner.changed_files(cid, changed_files)
+        runner.setup_home(cid)
+        status, stdout, _stderr = runner.run(cid, max_seconds)
+        runner.remove_container(cid) # ensure
+        jasoned truncated(cleaned(stdout)), status
+      end
+
 
 o) write the hello()-datetime to a known file inside the volume.
    write the run()-datetime to a known file inside the volume.
