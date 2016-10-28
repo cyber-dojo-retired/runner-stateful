@@ -114,7 +114,7 @@ table.each do |name,value,op,limit|
   result = eval("#{value} #{op} #{limit}")
   puts "%s | %s %s %s | %s" % [
     name.rjust(25), value.to_s.rjust(7), op, limit.to_s.rjust(3), result.to_s
-    ] unless result
+  ] unless result
   done << result
 end
 puts
