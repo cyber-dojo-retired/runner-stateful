@@ -5,7 +5,7 @@ module DockerRunnerHelpers
 
   module_function
 
-  def external_setup
+  def X_external_setup
     ENV[env_name('log')] = 'NullLogger'
     assert_equal 'NullLogger', log.class.name
     assert_equal 'ExternalSheller', shell.class.name

@@ -9,3 +9,5 @@ class TestBase < MiniTest::Test
   include TestHexIdHelper
 
 end
+
+require_relative './hex_mini_test.rb'

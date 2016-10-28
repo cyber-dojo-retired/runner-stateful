@@ -1,13 +1,20 @@
 require_relative './lib_test_base'
 require_relative './docker_runner_helpers'
 
-class DockerRunnerLanguageTest < LibTestBase
+class DockerRunnerLanguageTest < HexMiniTest
 
-  def self.hex
+  def self.hex_prefix
     '9D930'
   end
 
-  def external_teardown
+  def hex_setup
+    ENV[env_name('log')] = 'NullLogger'
+    assert_equal 'NullLogger', log.class.name
+    assert_equal 'ExternalSheller', shell.class.name
+    hello
+  end
+
+  def hex_teardown
     goodbye
   end
 
@@ -50,7 +57,6 @@ class DockerRunnerLanguageTest < LibTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_runs(dir)
-    hello
     output, _status = assert_execute(files(dir))
     output, _ = assert_execute({ 'cyber-dojo.sh' => 'getent passwd nobody' })
     output.start_with?('nobody')
