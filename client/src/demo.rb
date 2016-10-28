@@ -41,7 +41,6 @@ class Demo < Sinatra::Base
 
   private
 
-  #include Runner
   def runner
     @runner ||= RunnerServiceAdapter.new
   end

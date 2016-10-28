@@ -1,9 +1,5 @@
-
-# NB: if you call this file app_test.rb then SimpleCov fails to see it?!
-
 require_relative './lib_test_base'
-require 'net/http'
-require 'json'
+# NB: if you call this file app_test.rb then SimpleCov fails to see it?!
 
 class RunnerAppTest < LibTestBase
 
@@ -46,12 +42,11 @@ class RunnerAppTest < LibTestBase
     files['hiker.c'] = files['hiker.c'].sub('6 * 9', '6 * 9sss')
     execute(files)
     assert_equal success, status, json
-    [
+    lines = [
       "invalid suffix \"sss\" on integer constant",
       'return 6 * 9sss'
-    ].each do |line|
-      assert output.include?(line), json
-    end
+    ]
+    lines.each { |line| assert output.include?(line), json }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -65,9 +60,27 @@ class RunnerAppTest < LibTestBase
     assert_equal '', output
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   private
+
+  def hello
+    @json = runner.hello(kata_id, avatar_name)
+  end
+
+  def goodbye
+    @json = runner.goodbye(kata_id, avatar_name)
+  end
+
+  def execute(changed_files, max_seconds = 10)
+    @json = runner.execute(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
+  end
+
+  def runner
+    @runner ||= RunnerServiceAdapter.new
+  end
+
+  def json; @json; end
+  def status; json['status']; end
+  def output; json['output']; end
 
   def image_name; 'cyberdojofoundation/gcc_assert'; end
   def kata_id; test_id; end
@@ -81,38 +94,6 @@ class RunnerAppTest < LibTestBase
       [filename, IO.read("/app/start_files/gcc_assert/#{filename}")]
     }]
   end
-
-  def hello
-    post(:hello, { kata_id:kata_id, avatar_name:avatar_name })
-  end
-
-  def goodbye
-    post(:goodbye, { kata_id:kata_id, avatar_name:avatar_name })
-  end
-
-  def execute(changed_files, max_seconds = 10)
-    post(:execute, {
-             image_name:image_name,
-                kata_id:kata_id,
-            avatar_name:avatar_name,
-            max_seconds:max_seconds,
-      deleted_filenames:deleted_filenames,
-          changed_files:changed_files})
-  end
-
-  def post(method, args)
-    uri = URI.parse('http://runner_server:4557/' + method.to_s)
-    http = Net::HTTP.new(uri.host, uri.port)
-    request = Net::HTTP::Post.new(uri.request_uri)
-    request.content_type = 'application/json'
-    request.body = args.to_json
-    response = http.request(request)
-    @json = JSON.parse(response.body)
-  end
-
-  def json; @json; end
-  def status; json['status']; end
-  def output; json['output']; end
 
   def success; 0; end
   def timed_out; (timed_out = 128) + (killed = 9); end
