@@ -7,6 +7,10 @@ class DockerRunnerLanguageTest < LibTestBase
     '9D930'
   end
 
+  def external_teardown
+    goodbye
+  end
+
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'CDE',

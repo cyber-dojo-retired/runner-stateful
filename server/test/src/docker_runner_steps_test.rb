@@ -7,6 +7,10 @@ class DockerRunnerStepsTest < LibTestBase
     '4D87A'
   end
 
+  def external_teardown
+    goodbye
+  end
+
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '0C9',
@@ -24,8 +28,7 @@ class DockerRunnerStepsTest < LibTestBase
       output, _ = assert_exec("docker exec #{cid} sh -c 'stat -c \"%G\" #{sandbox}'")
       assert_equal 'nogroup', (group_name = output.strip)
     ensure
-      # not calling runner.run so have to delete container
-      assert_exec("docker rm --force #{cid}")
+      runner.remove_container(cid)
     end
   end
 

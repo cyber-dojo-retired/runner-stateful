@@ -7,6 +7,10 @@ class DockerRunnerTimeoutTest < LibTestBase
     '45B57'
   end
 
+  def external_teardown
+    goodbye
+  end
+
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'B2B',

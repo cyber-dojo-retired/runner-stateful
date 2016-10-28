@@ -11,7 +11,7 @@ module DockerRunnerHelpers
     assert_equal 'ExternalSheller', shell.class.name
   end
 
-  def external_teardown
+  def X_external_teardown
     wait_till_container_dead unless @cid.nil?
     remove_volume unless @volume.nil?
   end
@@ -91,7 +91,7 @@ module DockerRunnerHelpers
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def wait_till_container_dead
+  def X_wait_till_container_dead
     # docker_runner.sh does [docker rm --force ${cid}] in a child process.
     # This has a race so you need to wait for the container (which has the
     # volume mounted) to be removed before you can remove the volume.
@@ -104,7 +104,7 @@ module DockerRunnerHelpers
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def container_dead?
+  def X_container_dead?
     refute_nil @cid
     command = "docker inspect --format='{{ .State.Running }}' #{@cid} 2> /dev/null"
     _, status = exec(command)
@@ -114,7 +114,7 @@ module DockerRunnerHelpers
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def remove_volume
+  def X_remove_volume
     assert_exec("docker volume rm #{volume_name} 2>&1")
   end
 

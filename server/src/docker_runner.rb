@@ -100,7 +100,6 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run(cid, max_seconds)
-    # TODO: use --workdir=/sandbox in create_container and drop cd here
     cmd = [
       'docker exec',
       "--user=nobody",
@@ -129,12 +128,12 @@ class DockerRunner
         stderr = rerr.readlines.join
         #puts "run() from Process.spawn, [#{cmd}]-stdout:#{stdout}:"
         #puts "run() from Process.spawn, [#{cmd}]-stderr:#{stderr}:"
-        return [stdout, 0]
+        return [stdout, success]
       end
     rescue Timeout::Error
       Process.kill(-9, pid)
       Process.detach(pid)
-      return ['', 128+9]
+      return ['', timed_out_and_killed]
     ensure
       wout.close unless wout.closed?
       werr.close unless werr.closed?
@@ -175,7 +174,6 @@ class DockerRunner
     cmd = "docker inspect --format='{{ .State.Running }}' #{cid} 2> /dev/null"
     _, status = exec(cmd)
     dead = status == 1
-    dead
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -199,20 +197,9 @@ class DockerRunner
   def shell; nearest_ancestors(:shell); end
   def exec(command); shell.exec(command); end
   def success; 0; end
+  def timed_out_and_killed; timed_out=128 + killed=9; end
   def sandbox; '/sandbox'; end
   def user; 'nobody'; end
   def group; 'nogroup'; end
-
-
-  def X_run(cid, max_seconds)
-    # docker_runner.sh does a [docker rm CID] in a child process
-    # (for the max_seconds timeout).
-    # This has a race-condition and can issue a diagnostic to stderr,
-    #   Error response from daemon: No such exec instance
-    #          'cfc1ce94ec97f86ad0a73c6f.....' found in daemon
-    # Tests show the container _is_ removed.
-    # I pipe stderr to /dev/null so the diagnostic does not appear in test output.
-    exec("/app/src/docker_runner.sh #{cid} #{max_seconds} 2> /dev/null")
-  end
 
 end
