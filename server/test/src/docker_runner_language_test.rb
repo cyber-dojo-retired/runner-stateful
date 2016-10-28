@@ -1,5 +1,4 @@
 require_relative './runner_test_base'
-require_relative './docker_runner_helpers'
 
 class DockerRunnerLanguageTest < RunnerTestBase
 
@@ -63,8 +62,6 @@ class DockerRunnerLanguageTest < RunnerTestBase
     output, _ = assert_execute({ 'cyber-dojo.sh' => 'getent group nogroup' })
     output.start_with?('nogroup')
   end
-
-  include DockerRunnerHelpers
 
 end
 
