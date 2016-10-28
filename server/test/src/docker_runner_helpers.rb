@@ -5,14 +5,6 @@ module DockerRunnerHelpers
 
   module_function
 
-  def X_external_setup
-    ENV[env_name('log')] = 'NullLogger'
-    assert_equal 'NullLogger', log.class.name
-    assert_equal 'ExternalSheller', shell.class.name
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   def pulled?(image_name);runner.pulled?(image_name); end
   def pull(image_name); runner.pull(image_name); end
 

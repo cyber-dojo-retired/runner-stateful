@@ -1,13 +1,7 @@
 require 'minitest/autorun'
-
-require_relative './external_helper'
-require_relative './hex_id_helper'
+require_relative './hex_mini_test.rb'
 
 class TestBase < MiniTest::Test
 
-  include TestExternalHelper
-  include TestHexIdHelper
-
 end
 
-require_relative './hex_mini_test.rb'
