@@ -1,5 +1,4 @@
 require_relative './runner_test_base'
-require_relative './docker_runner_helpers'
 
 class DockerRunnerPullTest < RunnerTestBase
 
@@ -47,10 +46,6 @@ class DockerRunnerPullTest < RunnerTestBase
     output, status = shell.exec("docker rmi #{image_name}")
     fail "exited(#{status}):#{output}:" unless status == success
   end
-
-  private
-
-  include DockerRunnerHelpers
 
 end
 
