@@ -15,6 +15,13 @@ module DockerRunnerHelpers
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  def execute(changed_files, max_seconds = 10, deleted_filenames = [])
+    runner.execute(@image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   def files(language_dir = 'gcc_assert')
     @files ||= load_files(language_dir)
   end
@@ -26,12 +33,6 @@ module DockerRunnerHelpers
     Hash[json['filenames'].collect { |filename|
       [filename, IO.read("#{dir}/#{filename}")]
     }]
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def execute(changed_files, max_seconds = 10, deleted_filenames = [])
-    runner.execute(@image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -48,8 +49,13 @@ module DockerRunnerHelpers
   def success; runner.success; end
   def sandbox; runner.sandbox; end
   def timed_out_and_killed; runner.timed_out_and_killed; end
-  def kata_id; test_id; end
+
   def avatar_name; 'salmon'; end
+  def kata_id;
+    assert_equal 8, test_id.length
+    assert test_id =~ /^[0-9A-F]+$/
+    test_id + '00'
+  end
 
   def assert_exec(command)
     output, status = exec(command)

@@ -10,7 +10,7 @@ class HexMiniTest < MiniTest::Test
   def self.test(hex_suffix, *lines, &test_block)
     validate_hex_prefix
     validate_hex_id(hex_suffix, lines)
-    hex_id = hex_prefix + '-' + hex_suffix
+    hex_id = hex_prefix + hex_suffix
     @@seen_hex_ids << hex_id
     if @@args == [] || @@args.any?{ |arg| hex_id.include?(arg) }
       execute_around = lambda {
@@ -50,7 +50,7 @@ class HexMiniTest < MiniTest::Test
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def self.validate_hex_prefix
-    is_hex = hex_prefix.chars.all? { |ch| '0123456789ABCDEF'.include? ch }
+    is_hex = hex_prefix =~ /^[0-9A-F]+$/
     spacer = "\n\n         !"
     diagnostic = [
       '',
@@ -68,7 +68,7 @@ class HexMiniTest < MiniTest::Test
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def self.validate_hex_id(hex_suffix, lines)
-    is_hex = hex_suffix.chars.all? { |ch| '0123456789ABCDEF'.include? ch }
+    is_hex = hex_suffix =~ /^[0-9A-F]+$/
     proposition = lines.join(space = ' ')
     spacer = "\n\n     !"
     diagnostic = [
@@ -82,7 +82,7 @@ class HexMiniTest < MiniTest::Test
 
     fail "#{spacer}empty#{diagnostic}" if hex_suffix == ''
     fail "#{spacer}not hex#{diagnostic}" unless is_hex
-    hex_id = hex_prefix + '-' + hex_suffix
+    hex_id = hex_prefix + hex_suffix
     fail "#{spacer}duplicate#{diagnostic}" if @@seen_hex_ids.include?(hex_id)
   end
 

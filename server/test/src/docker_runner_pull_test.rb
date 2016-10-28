@@ -3,7 +3,7 @@ require_relative './runner_test_base'
 class DockerRunnerPullTest < RunnerTestBase
 
   def self.hex_prefix
-    'CFC'
+    'CFC38'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -

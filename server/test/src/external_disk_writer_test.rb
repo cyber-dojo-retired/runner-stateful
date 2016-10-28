@@ -3,7 +3,7 @@ require_relative './runner_test_base'
 class ExternalDiskWriterTest < RunnerTestBase
 
   def self.hex_prefix
-    'FDF'
+    'FDF13'
   end
 
   class App; include Externals; end
