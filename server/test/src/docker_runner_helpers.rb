@@ -11,11 +11,6 @@ module DockerRunnerHelpers
     assert_equal 'ExternalSheller', shell.class.name
   end
 
-  def X_external_teardown
-    wait_till_container_dead unless @cid.nil?
-    remove_volume unless @volume.nil?
-  end
-
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def pulled?(image_name)
@@ -91,35 +86,6 @@ module DockerRunnerHelpers
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def X_wait_till_container_dead
-    # docker_runner.sh does [docker rm --force ${cid}] in a child process.
-    # This has a race so you need to wait for the container (which has the
-    # volume mounted) to be removed before you can remove the volume.
-    20.times do
-      # do the sleep first to keep test coverage at 100%
-      sleep(1.0 / 10.0)
-      break if container_dead?
-    end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def X_container_dead?
-    refute_nil @cid
-    command = "docker inspect --format='{{ .State.Running }}' #{@cid} 2> /dev/null"
-    _, status = exec(command)
-    # https://gist.github.com/ekristen/11254304
-    dead = status == 1
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def X_remove_volume
-    assert_exec("docker volume rm #{volume_name} 2>&1")
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   def runner; DockerRunner.new(self); end
   def success; 0; end
   def timed_out_and_killed; (timeout = 128) + (kill = 9); end
@@ -135,8 +101,6 @@ module DockerRunnerHelpers
 
   def assert_execute(*args)
     output, status = execute(*args)
-    #p "assert_execute:status-:#{status}:"
-    #p "assert_execute:output-:#{output}:"
     assert_equal success, status, output
     [output, status]
   end

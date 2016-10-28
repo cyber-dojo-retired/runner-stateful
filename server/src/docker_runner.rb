@@ -113,11 +113,6 @@ class DockerRunner
     rout, wout = IO.pipe
     rerr, werr = IO.pipe
 
-    #cmd = 'docker ps -a'
-    #output,status = shell.exec(cmd)
-    #puts "run() from main process, [#{cmd}] status:#{status}:"
-    #puts "run() from main process, [#{cmd}] output:#{output}:"
-
     pid = Process.spawn(cmd, pgroup:true, out:wout, err:werr)
     begin
       Timeout::timeout(max_seconds) do
@@ -126,8 +121,6 @@ class DockerRunner
         werr.close
         stdout = rout.readlines.join
         stderr = rerr.readlines.join
-        #puts "run() from Process.spawn, [#{cmd}]-stdout:#{stdout}:"
-        #puts "run() from Process.spawn, [#{cmd}]-stderr:#{stderr}:"
         return [stdout, success]
       end
     rescue Timeout::Error
