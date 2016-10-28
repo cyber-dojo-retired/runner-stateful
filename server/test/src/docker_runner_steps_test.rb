@@ -19,8 +19,8 @@ class DockerRunnerStepsTest < RunnerTestBase
 
   test '0C9',
   'newly created container has empty sandbox owned by nobody:nogroup' do
-    @image_name = 'cyberdojofoundation/ruby_mini_test'
-    cid = create_container
+    image_name = 'cyberdojofoundation/ruby_mini_test'
+    cid = runner.create_container(image_name, kata_id, avatar_name)
     begin
       _, status = exec("docker exec #{cid} sh -c '[ -d #{sandbox} ]'")
       assert_equal 0, status, "#{sandbox} does not exist"

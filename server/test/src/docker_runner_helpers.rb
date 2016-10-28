@@ -30,13 +30,6 @@ module DockerRunnerHelpers
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def create_container
-    refute_nil @image_name
-    @cid = runner.create_container(@image_name, kata_id, avatar_name)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   def execute(changed_files, max_seconds = 10, deleted_filenames = [])
     runner.execute(@image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
   end
