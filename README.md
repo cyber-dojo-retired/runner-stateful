@@ -42,8 +42,8 @@ A **cyberdojo/runner** docker container runs sinatra on port 4557.
   * kata_id, eg '15B9AD6C42'
   * avatar_name, eg 'salmon'
   * max_seconds, eg '10'
-  * deleted_filenames, eg [ filename, ... ]
-  * changed_files, eg { filename => content, ... }
+  * deleted_filenames, eg [ 'hiker.h', ... ]
+  * changed_files, eg { 'fizz_buzz.h' => '#include', ... }
 - returns
   * { "status":"0",   "output":output } -> succeeded
   * { "status":"137", "output":"" } -> did not complete in max_seconds
