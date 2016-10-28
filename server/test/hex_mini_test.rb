@@ -27,6 +27,8 @@ class HexMiniTest < MiniTest::Test
     end
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - -
+
   def _secret_hex_setup(hex_id)
     @_secret_test_id = hex_id
     @config = {}
@@ -50,7 +52,6 @@ class HexMiniTest < MiniTest::Test
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def self.validate_hex_prefix
-    is_hex = hex_prefix =~ /^[0-9A-F]+$/
     spacer = "\n\n         !"
     diagnostic = [
       '',
@@ -62,27 +63,25 @@ class HexMiniTest < MiniTest::Test
 
     fail "#{spacer}missing#{diagnostic}" unless self.respond_to?(:hex_prefix)
     fail "#{spacer}empty#{diagnostic}" if hex_prefix == ''
-    fail "#{spacer}not hex#{diagnostic}" unless is_hex
+    fail "#{spacer}not hex#{diagnostic}" unless hex_prefix =~ /^[0-9A-F]+$/
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def self.validate_hex_id(hex_suffix, lines)
-    is_hex = hex_suffix =~ /^[0-9A-F]+$/
     proposition = lines.join(space = ' ')
-    spacer = "\n\n     !"
+    spacer = "\n\n      !"
     diagnostic = [
       '',
-      '     !',
-      "hex '#{hex_suffix}',",
+      '      !',
+      "test '#{hex_suffix}',",
       "'#{proposition}'",
       '',
       ''
     ].join("\n")
-
-    fail "#{spacer}empty#{diagnostic}" if hex_suffix == ''
-    fail "#{spacer}not hex#{diagnostic}" unless is_hex
     hex_id = hex_prefix + hex_suffix
+    fail "#{spacer}empty#{diagnostic}" if hex_suffix == ''
+    fail "#{spacer}not hex#{diagnostic}" unless hex_suffix =~ /^[0-9A-F]+$/
     fail "#{spacer}duplicate#{diagnostic}" if @@seen_hex_ids.include?(hex_id)
   end
 
