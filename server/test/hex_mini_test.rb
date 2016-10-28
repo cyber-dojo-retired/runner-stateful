@@ -8,10 +8,7 @@ class HexMiniTest < MiniTest::Test
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def self.test(hex_suffix, *lines, &test_block)
-    validate_hex_prefix
-    validate_hex_id(hex_suffix, lines)
-    hex_id = hex_prefix + hex_suffix
-    @@seen_hex_ids << hex_id
+    hex_id = checked_hex_id(hex_suffix, lines)
     if @@args == [] || @@args.any?{ |arg| hex_id.include?(arg) }
       execute_around = lambda {
         _hex_setup_caller(hex_id)
@@ -29,26 +26,26 @@ class HexMiniTest < MiniTest::Test
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  def self.validate_hex_prefix
+  def self.checked_hex_id(hex_suffix, lines)
     method = 'def self.hex_prefix'
     pointer = ' ' * method.index('.') + '!'
     pointee = (['',pointer,method,'','']).join("\n")
-    fail "\n\n#{pointer}missing#{pointee}" unless self.respond_to?(:hex_prefix)
-    fail "\n\n#{pointer}empty#{pointee}" if hex_prefix == ''
-    fail "\n\n#{pointer}not hex#{pointee}" unless hex_prefix =~ /^[0-9A-F]+$/
-  end
+    pointer.prepend("\n\n")
+    fail "#{pointer}missing#{pointee}" unless respond_to?(:hex_prefix)
+    fail "#{pointer}empty#{pointee}" if hex_prefix == ''
+    fail "#{pointer}not hex#{pointee}" unless hex_prefix =~ /^[0-9A-F]+$/
 
-  # - - - - - - - - - - - - - - - - - - - - - -
-
-  def self.validate_hex_id(hex_suffix, lines)
     method = "test '#{hex_suffix}',"
-    proposition = lines.join(space = ' ')
     pointer = ' ' * method.index("'") + '!'
+    proposition = lines.join(space = ' ')
     pointee = ['',pointer,method,"'#{proposition}'",'',''].join("\n")
     hex_id = hex_prefix + hex_suffix
-    fail "\n\n#{pointer}empty#{pointee}" if hex_suffix == ''
-    fail "\n\n#{pointer}not hex#{pointee}" unless hex_suffix =~ /^[0-9A-F]+$/
-    fail "\n\n#{pointer}duplicate#{pointee}" if @@seen_hex_ids.include?(hex_id)
+    pointer.prepend("\n\n")
+    fail "#{pointer}empty#{pointee}" if hex_suffix == ''
+    fail "#{pointer}not hex#{pointee}" unless hex_suffix =~ /^[0-9A-F]+$/
+    fail "#{pointer}duplicate#{pointee}" if @@seen_hex_ids.include?(hex_id)
+    @@seen_hex_ids << hex_id
+    hex_id
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
