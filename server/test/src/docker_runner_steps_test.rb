@@ -138,6 +138,4 @@ class DockerRunnerStepsTest < RunnerTestBase
     }]
   end
 
-  def sandbox; '/sandbox'; end
-
 end

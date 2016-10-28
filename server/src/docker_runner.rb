@@ -157,10 +157,11 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  def sandbox; '/sandbox'; end
   def success; 0; end
   def timed_out_and_killed; (timed_out = 128) + (killed = 9); end
 
-  private #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+  private # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
   def image_names
     output, _ = assert_exec('docker images')
@@ -202,7 +203,6 @@ class DockerRunner
   def shell; nearest_ancestors(:shell); end
   def exec(command); shell.exec(command); end
 
-  def sandbox; '/sandbox'; end
   def user; 'nobody'; end
   def group; 'nogroup'; end
 

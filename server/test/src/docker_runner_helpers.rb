@@ -49,7 +49,6 @@ module DockerRunnerHelpers
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def volume_exists?
     volume_name = 'cyber_dojo_' + kata_id + '_' + avatar_name
@@ -61,6 +60,7 @@ module DockerRunnerHelpers
 
   def runner; DockerRunner.new(self); end
   def success; runner.success; end
+  def sandbox; runner.sandbox; end
   def timed_out_and_killed; runner.timed_out_and_killed; end
   def kata_id; test_id; end
   def avatar_name; 'salmon'; end
