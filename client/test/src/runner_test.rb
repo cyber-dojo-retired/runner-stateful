@@ -22,7 +22,7 @@ class RunnerAppTest < LibTestBase
   test '348',
   'red-traffic-light' do
     hello
-    do_run(files)
+    execute(files)
     assert_equal success, status
     assert output.start_with?('Assertion failed: answer() == 42'), output
   end
@@ -33,7 +33,7 @@ class RunnerAppTest < LibTestBase
   'green-traffic-light' do
     hello
     files['hiker.c'] = files['hiker.c'].sub('6 * 9', '6 * 7')
-    do_run(files)
+    execute(files)
     assert_equal success, status, json
     assert_equal 'All tests passed', output, json
   end
@@ -44,7 +44,7 @@ class RunnerAppTest < LibTestBase
   'amber-traffic-light' do
     hello
     files['hiker.c'] = files['hiker.c'].sub('6 * 9', '6 * 9sss')
-    do_run(files)
+    execute(files)
     assert_equal success, status, json
     [
       "invalid suffix \"sss\" on integer constant",
@@ -60,7 +60,7 @@ class RunnerAppTest < LibTestBase
   'timed-out-traffic-light' do
     hello
     files['hiker.c'] = files['hiker.c'].sub('return', 'for(;;); return')
-    do_run(files, 3)
+    execute(files, 3)
     assert_equal timed_out, status, json
     assert_equal '', output
   end
@@ -90,8 +90,8 @@ class RunnerAppTest < LibTestBase
     post(:goodbye, { kata_id:kata_id, avatar_name:avatar_name })
   end
 
-  def do_run(changed_files, max_seconds = 10)
-    post(:run, {
+  def execute(changed_files, max_seconds = 10)
+    post(:execute, {
              image_name:image_name,
                 kata_id:kata_id,
             avatar_name:avatar_name,

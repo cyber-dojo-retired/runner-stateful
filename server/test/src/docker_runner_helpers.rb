@@ -38,8 +38,7 @@ module DockerRunnerHelpers
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def execute(changed_files, max_seconds = 10, deleted_filenames = [])
-    # Don't call this run (MiniTest uses that method name)
-    runner.run(@image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
+    runner.execute(@image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
