@@ -1,4 +1,4 @@
-require 'minitest/autorun'
+#require 'minitest/autorun'
 
 class HexMiniTest < MiniTest::Test
 
