@@ -10,14 +10,6 @@ RUN apk add --update --repository http://dl-cdn.alpinelinux.org/alpine/edge/comm
 ENTRYPOINT ["/sbin/tini", "--"]
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# setup foreman
-
-CMD [ "foreman", "start" ]
-ARG PORT
-ENV PORT=${PORT}
-EXPOSE ${PORT}
-
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # install docker-client
 
 ARG DOCKER_ENGINE_VERSION
@@ -28,6 +20,14 @@ RUN apk --update add curl \
   && rmdir docker \
   && rm docker-${DOCKER_ENGINE_VERSION}.tgz \
   && apk del curl
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# setup foreman
+
+CMD [ "foreman", "start" ]
+ARG PORT
+ENV PORT=${PORT}
+EXPOSE ${PORT}
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # install app

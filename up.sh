@@ -14,4 +14,3 @@ export DOCKER_ENGINE_VERSION=${docker_engine_version}
 
 docker-compose -f ${my_dir}/docker-compose.yml down
 docker-compose -f ${my_dir}/docker-compose.yml up &
-
