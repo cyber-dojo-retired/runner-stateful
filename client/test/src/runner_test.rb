@@ -8,7 +8,7 @@ require 'json'
 class RunnerAppTest < LibTestBase
 
   def self.hex
-    '201BC'
+    '201BCEF'
   end
 
   def external_setup
@@ -91,7 +91,7 @@ class RunnerAppTest < LibTestBase
   end
 
   def do_run(changed_files, max_seconds = 10)
-    @json = post(:run, {
+    post(:run, {
              image_name:image_name,
                 kata_id:kata_id,
             avatar_name:avatar_name,
@@ -100,12 +100,6 @@ class RunnerAppTest < LibTestBase
           changed_files:changed_files})
   end
 
-  def json; @json; end
-  def status; json['status']; end
-  def output; json['output']; end
-  def success; 0; end
-  def timed_out; 137; end
-
   def post(method, args)
     uri = URI.parse('http://runner_server:4557/' + method.to_s)
     http = Net::HTTP.new(uri.host, uri.port)
@@ -113,7 +107,14 @@ class RunnerAppTest < LibTestBase
     request.content_type = 'application/json'
     request.body = args.to_json
     response = http.request(request)
-    JSON.parse(response.body)
+    @json = JSON.parse(response.body)
   end
+
+  def json; @json; end
+  def status; json['status']; end
+  def output; json['output']; end
+
+  def success; 0; end
+  def timed_out; (timed_out = 128) + (killed = 9); end
 
 end

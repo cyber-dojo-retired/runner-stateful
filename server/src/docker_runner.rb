@@ -120,7 +120,8 @@ class DockerRunner
         wout.close
         werr.close
         stdout = rout.readlines.join
-        stderr = rerr.readlines.join
+        _stderr = rerr.readlines.join
+        #puts "run():Process.spawn(#{cmd})-stdout:#{stdout}:"
         return [stdout, success]
       end
     rescue Timeout::Error
@@ -150,6 +151,8 @@ class DockerRunner
     end
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   def success; 0; end
   def timed_out_and_killed; (timed_out = 128) + (killed = 9); end
 
@@ -174,9 +177,11 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_exec(command)
-    output, status = exec(command)
+  def assert_exec(cmd)
+    output, status = exec(cmd)
     fail "exited(#{status}):#{output}:" unless status == success
+    #puts "assert_exec(#{cmd})-status:#{status}:"
+    #puts "assert_exec(#{cmd})-output:#{output}:"
     [output, status]
   end
 
@@ -192,6 +197,7 @@ class DockerRunner
   def disk;  nearest_ancestors(:disk);  end
   def shell; nearest_ancestors(:shell); end
   def exec(command); shell.exec(command); end
+
   def sandbox; '/sandbox'; end
   def user; 'nobody'; end
   def group; 'nogroup'; end

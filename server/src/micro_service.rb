@@ -23,8 +23,9 @@ class MicroService < Sinatra::Base
     runner.delete_files(cid, deleted_filenames)
     runner.change_files(cid, changed_files)
     runner.setup_home(cid)
+    output, status = runner.run(cid, max_seconds)
     runner.remove_container(cid)
-    jasoned *runner.run(cid, max_seconds)
+    jasoned(output, status)
   end
 
   post '/goodbye' do
