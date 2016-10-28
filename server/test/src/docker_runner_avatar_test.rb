@@ -1,5 +1,4 @@
 require_relative './runner_test_base'
-require_relative './docker_runner_helpers'
 
 class DockerRunnerAvatarTest < RunnerTestBase
 
@@ -32,9 +31,5 @@ class DockerRunnerAvatarTest < RunnerTestBase
     goodbye
     refute volume_exists?
   end
-
-  private
-
-  include DockerRunnerHelpers
 
 end
