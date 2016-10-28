@@ -40,8 +40,9 @@ class DockerRunner
       '--net=none',                        # security - no network
       '--pids-limit=64',                   # security - no fork bombs
       '--security-opt=no-new-privileges',  # security - no escalation
+      "--workdir=#{sandbox}",
       '--user=root',
-      "--volume=#{volume_name(kata_id, avatar_name)}:/sandbox"
+      "--volume=#{volume_name(kata_id, avatar_name)}:#{sandbox}"
     ].join(space = ' ')
     output, _ = assert_exec("docker run #{args} #{image_name} sh")
     cid = output.strip
@@ -106,7 +107,7 @@ class DockerRunner
       "--interactive",
       cid,
       'sh -c',
-      "'cd /sandbox && ./cyber-dojo.sh 2>&1'"
+      "./cyber-dojo.sh 2>&1"
     ].join(space = ' ')
 
     # http://stackoverflow.com/questions/8292031/ruby-timeouts-and-system-commands
