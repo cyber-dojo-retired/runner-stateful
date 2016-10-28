@@ -1,9 +1,7 @@
 require 'json'
 require 'net/http'
 
-module Runner
-
-  module_function
+class RunnerServiceAdapter
 
   def pulled?(image_name)
     get(:pulled, { image_name:image_name })

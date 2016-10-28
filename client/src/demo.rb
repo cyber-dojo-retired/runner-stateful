@@ -1,7 +1,7 @@
 require 'sinatra'
 require 'sinatra/base'
 
-require_relative './runner'
+require_relative './runner_service_adapter'
 
 class Demo < Sinatra::Base
 
@@ -21,25 +21,30 @@ class Demo < Sinatra::Base
     html = ''
     json = nil
 
-    duration = timed { json = pulled?(image_name) }
+    duration = timed { json = runner.pulled?(image_name) }
     html += pre('pulled?', duration, json)
 
-    duration = timed { json = pull(image_name) }
+    duration = timed { json = runner.pull(image_name) }
     html += pre('pull', duration, json)
 
-    duration = timed { json = hello(kata_id, avatar_name) }
+    duration = timed { json = runner.hello(kata_id, avatar_name) }
     html += pre('hello', duration, json)
 
     duration = timed { json =
-      execute(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
+      runner.execute(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
     }
     html += pre('execute', duration, json)
 
-    duration = timed { json = goodbye(kata_id, avatar_name) }
+    duration = timed { json = runner.goodbye(kata_id, avatar_name) }
     html += pre('goodbye', duration, json)
   end
 
-  include Runner
+  private
+
+  #include Runner
+  def runner
+    @runner ||= RunnerServiceAdapter.new
+  end
 
   def read(filename)
     IO.read("/app/start_files/gcc_assert/#{filename}")
