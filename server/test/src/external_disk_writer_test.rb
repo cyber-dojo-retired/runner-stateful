@@ -1,8 +1,8 @@
 require_relative './lib_test_base'
 
-class ExternalDiskWriterTest < LibTestBase
+class ExternalDiskWriterTest < HexMiniTest
 
-  def self.hex
+  def self.hex_prefix
     'FDF'
   end
 

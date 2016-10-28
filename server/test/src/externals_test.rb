@@ -1,12 +1,14 @@
 require_relative './lib_test_base'
 
-class ExternalsTest < LibTestBase
+class ExternalsTest < HexMiniTest
 
-  def self.hex
+  include Externals
+
+  def self.hex_prefix
     '7A9'
   end
 
-  include Externals
+  # - - - - - - - - - - - - - - - - -
 
   test '920',
   'default file is ExternalDiskWriter' do

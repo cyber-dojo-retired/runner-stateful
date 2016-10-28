@@ -44,14 +44,13 @@ end
 
 # - - - - - - - - - - - - - - - - - - - - - - - -
 
-class TestNearestAncestors < LibTestBase
+class TestNearestAncestors < HexMiniTest
 
-  def self.hex
+  def self.hex_prefix
     '9D4'
   end
 
-  def setup
-    super
+  def hex_setup
     anna = Anna.new
     natalie = Natalie.new(anna)
     @ellie = Ellie.new(natalie)

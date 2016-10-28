@@ -1,8 +1,8 @@
 require_relative './lib_test_base'
 
-class SnakeCaserTest < LibTestBase
+class SnakeCaserTest < HexMiniTest
 
-  def self.hex
+  def self.hex_prefix
     '59B'
   end
 

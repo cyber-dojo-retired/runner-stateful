@@ -1,12 +1,12 @@
 require_relative './lib_test_base'
 
-class NameOfCallerTest < LibTestBase
-
-  def self.hex
-    '07A'
-  end
+class NameOfCallerTest < HexMiniTest
 
   include NameOfCaller
+
+  def self.hex_prefix
+    '07A'
+  end
 
   test 'DA9',
   'name of caller is name of callers method' do

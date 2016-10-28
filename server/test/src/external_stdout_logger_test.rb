@@ -1,8 +1,8 @@
 require_relative './lib_test_base'
 
-class ExternalStdoutLoggerTest < LibTestBase
+class ExternalStdoutLoggerTest < HexMiniTest
 
-  def self.hex
+  def self.hex_prefix
     '1B6'
   end
 
