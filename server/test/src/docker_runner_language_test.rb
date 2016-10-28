@@ -20,9 +20,7 @@ class DockerRunnerLanguageTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'CDE',
-  '[C(gcc),assert] (an Ubuntu-based image) runs and has',
-  'the user nobody and',
-  'the group nogroup' do
+  '[C(gcc),assert] (an Ubuntu-based image)' do
     @expected = "Assertion failed: answer() == 42"
     assert_runs 'gcc_assert'
   end
@@ -30,9 +28,7 @@ class DockerRunnerLanguageTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '5F0',
-  '[Ruby,MiniTest] (an Alpine-based image) runs and has',
-  'the user nobody and',
-  'the group nogroup' do
+  '[Ruby,MiniTest] (an Alpine-based image)' do
     @expected = '1 runs, 1 assertions, 1 failures, 0 errors, 0 skips'
     assert_runs 'ruby_mini_test'
   end
@@ -56,7 +52,9 @@ class DockerRunnerLanguageTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_runs(dir)
+    refute_nil @expected
     output, _status = assert_execute(files(dir))
+    assert output.include?(@expected), output
     output, _ = assert_execute({ 'cyber-dojo.sh' => 'getent passwd nobody' })
     output.start_with?('nobody')
     output, _ = assert_execute({ 'cyber-dojo.sh' => 'getent group nogroup' })
