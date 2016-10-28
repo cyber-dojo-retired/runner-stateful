@@ -52,27 +52,27 @@ A **cyberdojo/runner** docker container runs sinatra on port 4557.
 - if something unexpected goes wrong on the server all methods return
   * { status:error, output:msg } -> something went wrong
 
-## build the docker images
+# build the docker images
 This builds the runner-server image and an example runner-client image.
 ```
 $ ./build.sh
 ```
 
-## bring up the docker containers
+# bring up the docker containers
 This brings up a runner-server container and a runner-client container.
 
 ```
 $ ./up.sh
 ```
 
-## run the tests
+# run the tests
 This runs the runner-server's tests from inside a runner-server container
 and then the runner-client's tests from inside the runner-client container.
 ```
 $ ./test.sh
 ```
 
-## run a demo
+# run the demo
 Runs inside the runner-client's container.
 Calls each of the runner-server's micro-service methods
 once and displays their json results and how long they took.
