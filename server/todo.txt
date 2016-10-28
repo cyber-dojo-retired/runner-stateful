@@ -38,6 +38,7 @@ o) client runner_test.rb E6F reveals a problem on the runner_server
       # note: use --workdir in create_container to avoid needing to do cd?
 
       def run(cid, max_seconds)
+        # http://stackoverflow.com/questions/8292031/ruby-timeouts-and-system-commands
         cmd = "docker exec --user=nobody --interactive #{cid} sh -c './cyber-dojo.sh'"
         rout, wout = IO.pipe
         rerr, werr = IO.pipe
@@ -70,7 +71,7 @@ o) client runner_test.rb E6F reveals a problem on the runner_server
         200.times do
           # do the sleep first to keep test coverage at 100%
           sleep(1.0 / 100.0)
-          break if container_dead(cid)?
+          break if container_dead?(cid)
         end
       end
 
@@ -83,12 +84,25 @@ o) client runner_test.rb E6F reveals a problem on the runner_server
 
       # in micro_service.rb
       post '/run' do
-        cid = runner.create_container(image_name, kata_id, avatar_name)
-        runner.deleted_files(cid, deleted_filenames)
-        runner.changed_files(cid, changed_files)
-        runner.setup_home(cid)
+        status, output = runner.create_container(image_name, kata_id, avatar_name)
+        # return jasoned(logged(output, 'error')) if status == 'error'
+
+        cid = output.strip
+
+        status, output = runner.delete_files(cid, deleted_filenames)
+        # return jasoned(logged(output, 'error')) if status == 'error'
+
+        status, output = runner.change_files(cid, changed_files)
+        # return jasoned(logged(output, 'error')) if status == 'error'
+
+        status output = runner.setup_home(cid)
+        # return jasoned(logged(output, 'error')) if status == 'error'
+
         status, stdout, _stderr = runner.run(cid, max_seconds)
+        # return jasoned(logged(output, 'error')) if status == 'error'
+
         runner.remove_container(cid) # ensure
+
         jasoned truncated(cleaned(stdout)), status
       end
 

@@ -1,4 +1,5 @@
 require_relative './nearest_ancestors'
+require 'timeout'
 
 class DockerRunner
 
@@ -98,18 +99,65 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run(cid, max_seconds)
-    # docker_runner.sh does a [docker rm CID] in a child process
-    # (for the max_seconds timeout).
-    # This has a race-condition and can issue a diagnostic to stderr,
-    #   Error response from daemon: No such exec instance
-    #          'cfc1ce94ec97f86ad0a73c6f.....' found in daemon
-    # Tests show the container _is_ removed.
-    # I pipe stderr to /dev/null so the diagnostic does not appear in test output.
-    exec("/app/src/docker_runner.sh #{cid} #{max_seconds} 2> /dev/null")
+    # TODO: use --workdir=/sandbox in create_container and drop cd here
+    cmd = [
+      'docker exec',
+      "--user=nobody",
+      "--interactive",
+      cid,
+      'sh -c',
+      "'cd /sandbox && ./cyber-dojo.sh 2>&1'"
+    ].join(space = ' ')
+
+    # http://stackoverflow.com/questions/8292031/ruby-timeouts-and-system-commands
+    rout, wout = IO.pipe
+    rerr, werr = IO.pipe
+
+    #cmd = 'docker ps -a'
+    #output,status = shell.exec(cmd)
+    #puts "run() from main process, [#{cmd}] status:#{status}:"
+    #puts "run() from main process, [#{cmd}] output:#{output}:"
+
+    pid = Process.spawn(cmd, pgroup:true, out:wout, err:werr)
+    begin
+      Timeout::timeout(max_seconds) do
+        Process.waitpid(pid)
+        wout.close
+        werr.close
+        stdout = rout.readlines.join
+        stderr = rerr.readlines.join
+        #puts "run() from Process.spawn, [#{cmd}]-stdout:#{stdout}:"
+        #puts "run() from Process.spawn, [#{cmd}]-stderr:#{stderr}:"
+        return [stdout, 0]
+      end
+    rescue Timeout::Error
+      Process.kill(-9, pid)
+      Process.detach(pid)
+      return ['', 128+9]
+    ensure
+      wout.close unless wout.closed?
+      werr.close unless werr.closed?
+      rout.close
+      rerr.close
+    end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  private
+
+  # TODO: shell.exec()->exec
+  # TODO: error handling
+  def remove_container(cid)
+    # ask the docker daemon to remove the container
+    shell.exec("docker rm -f #{cid}")
+    # wait max 2 secs till it's gone
+    200.times do
+      # do the sleep first to keep test coverage at 100%
+      sleep(1.0 / 100.0)
+      break if container_dead?(cid)
+    end
+  end
+
+  private #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
   def image_names
     output, _ = assert_exec('docker images')
@@ -117,6 +165,16 @@ class DockerRunner
     # cyberdojofoundation/ruby_test_unit       latest fd0b425fb21d 7 weeks ago 126 MB
     # cyberdojofoundation/java_cucumber_spring latest 7f59c6590213 7 weeks ago 885.7 MB
     output[1..-1].split("\n").collect { |line| line.split[0] }
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def container_dead?(cid)
+    # See https://gist.github.com/ekristen/11254304
+    cmd = "docker inspect --format='{{ .State.Running }}' #{cid} 2> /dev/null"
+    _, status = exec(cmd)
+    dead = status == 1
+    dead
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -143,5 +201,17 @@ class DockerRunner
   def sandbox; '/sandbox'; end
   def user; 'nobody'; end
   def group; 'nogroup'; end
+
+
+  def X_run(cid, max_seconds)
+    # docker_runner.sh does a [docker rm CID] in a child process
+    # (for the max_seconds timeout).
+    # This has a race-condition and can issue a diagnostic to stderr,
+    #   Error response from daemon: No such exec instance
+    #          'cfc1ce94ec97f86ad0a73c6f.....' found in daemon
+    # Tests show the container _is_ removed.
+    # I pipe stderr to /dev/null so the diagnostic does not appear in test output.
+    exec("/app/src/docker_runner.sh #{cid} #{max_seconds} 2> /dev/null")
+  end
 
 end

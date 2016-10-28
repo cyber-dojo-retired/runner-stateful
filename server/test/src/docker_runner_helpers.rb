@@ -65,7 +65,9 @@ module DockerRunnerHelpers
     runner.deleted_files(cid, deleted_filenames)
     runner.changed_files(cid, changed_files)
     runner.setup_home(cid)
-    runner.run(cid, max_seconds)
+    output, status = runner.run(cid, max_seconds)
+    runner.remove_container(cid)
+    [output, status]
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -80,6 +82,7 @@ module DockerRunnerHelpers
     }]
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def volume_exists?
     output, _ = assert_exec('docker volume ls')
@@ -132,6 +135,8 @@ module DockerRunnerHelpers
 
   def assert_execute(*args)
     output, status = execute(*args)
+    #p "assert_execute:status-:#{status}:"
+    #p "assert_execute:output-:#{output}:"
     assert_equal success, status, output
     [output, status]
   end
