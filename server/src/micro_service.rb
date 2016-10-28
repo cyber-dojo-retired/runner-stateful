@@ -20,9 +20,10 @@ class MicroService < Sinatra::Base
 
   post '/run' do
     cid = runner.create_container(image_name, kata_id, avatar_name)
-    runner.deleted_files(cid, deleted_filenames)
-    runner.changed_files(cid, changed_files)
+    runner.delete_files(cid, deleted_filenames)
+    runner.change_files(cid, changed_files)
     runner.setup_home(cid)
+    runner.remove_container(cid)
     jasoned *runner.run(cid, max_seconds)
   end
 

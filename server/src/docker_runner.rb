@@ -53,7 +53,7 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def deleted_files(cid, filenames)
+  def delete_files(cid, filenames)
     # filenames have been deleted in the browser
     # so delete them from the container.
     filenames.each do |filename|
@@ -63,7 +63,7 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def changed_files(cid, files)
+  def change_files(cid, files)
     # files have been created or changed in the browser
     # so create or change them in the container.
     Dir.mktmpdir('runner') do |tmp_dir|
@@ -150,6 +150,9 @@ class DockerRunner
     end
   end
 
+  def success; 0; end
+  def timed_out_and_killed; (timed_out = 128) + (killed = 9); end
+
   private #= = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
   def image_names
@@ -189,8 +192,6 @@ class DockerRunner
   def disk;  nearest_ancestors(:disk);  end
   def shell; nearest_ancestors(:shell); end
   def exec(command); shell.exec(command); end
-  def success; 0; end
-  def timed_out_and_killed; timed_out=128 + killed=9; end
   def sandbox; '/sandbox'; end
   def user; 'nobody'; end
   def group; 'nogroup'; end
