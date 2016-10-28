@@ -1,10 +1,14 @@
 require_relative './lib_test_base'
 require_relative './docker_runner_helpers'
 
-class DockerRunnerAvatarTest < LibTestBase
+class DockerRunnerAvatarTest < HexMiniTest
 
-  def self.hex
+  def self.hex_prefix
     'FEA56'
+  end
+
+  def hex_setup
+    ENV[env_name('log')] = 'NullLogger'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -29,7 +33,6 @@ class DockerRunnerAvatarTest < LibTestBase
     refute volume_exists?
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
   private
 
   include DockerRunnerHelpers
