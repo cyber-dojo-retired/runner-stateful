@@ -1,18 +1,16 @@
 require_relative './lib_test_base'
 require_relative './docker_runner_helpers'
 
-class DockerRunnerPullTest < LibTestBase
+class DockerRunnerPullTest < HexMiniTest
 
-  def self.hex
+  def self.hex_prefix
     'CFC'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def external_setup
+  def hex_setup
     ENV[env_name('log')] = 'NullLogger'
-    assert_equal 'NullLogger', log.class.name
-    assert_equal 'ExternalSheller', shell.class.name
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -

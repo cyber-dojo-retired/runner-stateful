@@ -1,21 +1,25 @@
 require_relative './lib_test_base'
 require_relative './docker_runner_helpers'
 
-class DockerRunnerStepsTest < LibTestBase
+class DockerRunnerStepsTest < HexMiniTest
 
-  def self.hex
+  def self.hex_prefix
     '4D87A'
   end
 
-  def external_teardown
+  def hex_setup
+    ENV[env_name('log')] = 'NullLogger'
+    hello
+  end
+
+  def hex_teardown
     goodbye
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '0C9',
-  'newly created container has empty /sandbox owned by nobody:nogroup' do
-    hello
+  'newly created container has empty sandbox owned by nobody:nogroup' do
     @image_name = 'cyberdojofoundation/ruby_mini_test'
     cid = create_container
     begin
@@ -36,7 +40,6 @@ class DockerRunnerStepsTest < LibTestBase
 
   test '385',
   'deleted files are removed and all previous files still exist' do
-    hello
     files['cyber-dojo.sh'] = 'ls'
 
     ls_output, _ = assert_execute(files)
@@ -53,8 +56,6 @@ class DockerRunnerStepsTest < LibTestBase
 
   test '232',
   'new files are added and all previous files still exist' do
-    hello
-
     files['cyber-dojo.sh'] = 'ls'
     ls_output, _ = assert_execute(files)
     before_filenames = ls_output.split
@@ -73,7 +74,6 @@ class DockerRunnerStepsTest < LibTestBase
 
   test '4E8',
   "unchanged files still exist and don't get touched at all" do
-    hello
     files['cyber-dojo.sh'] = 'ls -el'
 
     before_ls, _ = assert_execute(files)
@@ -87,8 +87,6 @@ class DockerRunnerStepsTest < LibTestBase
 
   test '9A7',
   'a changed file is resaved and its size and time-stamp updates' do
-    hello
-
     files['cyber-dojo.sh'] = 'ls -el | tail -n +2'
     ls_output, _ = assert_execute(files)
     # each line looks like this...
@@ -122,7 +120,6 @@ class DockerRunnerStepsTest < LibTestBase
     end
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
   private
 
   include DockerRunnerHelpers

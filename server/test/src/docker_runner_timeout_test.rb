@@ -1,13 +1,18 @@
 require_relative './lib_test_base'
 require_relative './docker_runner_helpers'
 
-class DockerRunnerTimeoutTest < LibTestBase
+class DockerRunnerTimeoutTest < HexMiniTest
 
-  def self.hex
+  def self.hex_prefix
     '45B57'
   end
 
-  def external_teardown
+  def hex_setup
+    ENV[env_name('log')] = 'NullLogger'
+    hello
+  end
+
+  def hex_teardown
     goodbye
   end
 
@@ -17,7 +22,6 @@ class DockerRunnerTimeoutTest < LibTestBase
   'when run(test-code) is empty-infinite-loop',
   'the container is killed and',
   'a timeout-diagostic is returned' do
-    hello
     files['hiker.c'] = [
       '#include "hiker.h"',
       'int answer(void) { for(;;); return 6 * 7; }'
@@ -33,7 +37,6 @@ class DockerRunnerTimeoutTest < LibTestBase
   'when run(test-code) is printing-infinite-loop',
   'the container is killed and',
   'a timeout-diagostic is returned' do
-    hello
     files['hiker.c'] = [
       '#include "hiker.h"',
       '#include <stdio.h>',
