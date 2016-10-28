@@ -1,5 +1,4 @@
 require_relative './runner_test_base'
-require_relative './docker_runner_helpers'
 
 class DockerRunnerTimeoutTest < RunnerTestBase
 
@@ -46,10 +45,6 @@ class DockerRunnerTimeoutTest < RunnerTestBase
     assert_equal '', output
     assert_equal timed_out_and_killed, status
   end
-
-  private
-
-  include DockerRunnerHelpers
 
 end
 
