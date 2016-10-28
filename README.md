@@ -57,7 +57,7 @@ It's API is as follows:
 
 # build the docker images
 Builds the runner-server image and an example runner-client image.
-```
+```bash
 $ ./build.sh
 ```
 
