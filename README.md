@@ -7,37 +7,36 @@
 
 Work in progress. Not live yet.
 A **cyberdojo/runner** docker container runs sinatra on port 4557.
+It's API is as follows:
 
-## API
+# pulled
+## parameters
+- image_name, eg 'cyberdojofoundation/gcc_assert'
+## returns
+- { "status":"true" , "output":unspecified } -> pulled already
+- { "status":"false", "output":unspecified } -> not pulled already
 
-### pulled
-- parameters
-  * image_name, eg 'cyberdojofoundation/gcc_assert'
-- returns
-  * { "status":"true" , "output":unspecified } -> pulled already
-  * { "status":"false", "output":unspecified } -> not pulled already
-
-### pull
+## pull
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
 - returns
   * { "status":"ok", "output":unspecified } -> pull succeeded
 
-### hello
+## hello
 - parameters
   * kata_id, eg '15B9AD6C42'
   * avatar_name, eg 'salmon'
 - returns
   * { "status":"ok", "output":unspecified } -> succeeded
 
-### goodbye
+## goodbye
 - parameters
   * kata_id, eg '15B9AD6C42'
   * avatar_name, eg 'salmon'
 - returns
   * { "status":"ok", "output":unspecified } -> succeeded
 
-### execute
+## execute
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
   * kata_id, eg '15B9AD6C42'
