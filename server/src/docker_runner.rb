@@ -57,8 +57,7 @@ class DockerRunner
     ].join(space = ' ')
     output, _ = assert_exec("docker run #{args} #{image_name} sh")
     cid = output.strip
-    chown = "chown #{user}:#{group} #{sandbox}"
-    assert_docker_exec(cid, chown)
+    assert_docker_exec(cid, "chown #{user}:#{group} #{sandbox}")
     cid
   end
 
@@ -66,8 +65,7 @@ class DockerRunner
 
   def delete_files(cid, filenames)
     filenames.each do |filename|
-      rm = "rm #{sandbox}/#{filename}"
-      assert_docker_exec(cid, rm)
+      assert_docker_exec(cid, "rm #{sandbox}/#{filename}")
     end
   end
 
@@ -80,13 +78,10 @@ class DockerRunner
         disk.write(host_filename, content)
         assert_exec("chmod +x #{host_filename}") if filename.end_with?('.sh')
       end
-      # The dot in this command is very important.
-      # See https://docs.docker.com/engine/reference/commandline/cp/
       assert_exec("docker cp #{tmp_dir}/. #{cid}:#{sandbox}")
     end
     files.keys.each do |filename|
-      chown = "chown #{user}:#{group} #{sandbox}/#{filename}"
-      assert_docker_exec(cid, chown)
+      assert_docker_exec(cid, "chown #{user}:#{group} #{sandbox}/#{filename}")
     end
   end
 
@@ -108,41 +103,26 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run_cyber_dojo_sh(cid, max_seconds)
-    cmd = [
-      'docker exec',
-      "--user=#{user}",
-      "--interactive",
-      cid,
-      'sh -c',
-      "./cyber-dojo.sh"
-    ].join(space = ' ')
-
-    # http://stackoverflow.com/questions/8292031/ruby-timeouts-and-system-commands
-    rout, wout = IO.pipe
-    rerr, werr = IO.pipe
-
-    pid = Process.spawn(cmd, pgroup:true, out:wout, err:werr)
+    cmd = "docker exec --user=#{user} --interactive #{cid} sh -c './cyber-dojo.sh'"
+    read_out, write_out = IO.pipe
+    read_err, write_err = IO.pipe
+    pid = Process.spawn(cmd, pgroup:true, out:write_out, err:write_err)
     begin
       Timeout::timeout(max_seconds) do
         Process.waitpid(pid)
-        wout.close
-        werr.close
-        stdout = rout.readlines.join
-        stderr = rerr.readlines.join
-        #puts "run_cyber_dojo_sh():Process.spawn(#{cmd})-stdout:#{stdout}:"
-        #puts "run_cyber_dojo_sh():Process.spawn(#{cmd})-stdout:#{stderr}:"
-        [completed, stdout, stderr]
+        write_out.close
+        write_err.close
+        [completed, read_out.readlines.join, read_err.readlines.join]
       end
     rescue Timeout::Error
-      # don't attempt to retrieve stdout,stderr. It blocks
       Process.kill(-9, pid)
       Process.detach(pid)
       [timed_out, '', '']
     ensure
-      wout.close unless wout.closed?
-      werr.close unless werr.closed?
-      rout.close
-      rerr.close
+      write_out.close unless write_out.closed?
+      write_err.close unless write_err.closed?
+      read_out.close
+      read_err.close
     end
   end
 
@@ -150,8 +130,8 @@ class DockerRunner
 
   def remove_container(cid)
     assert_exec("docker rm --force #{cid}")
-    200.times do # try max 2 secs
-      sleep(1.0 / 100.0) # sleep then break to keep coverage at 100%
+    200.times do
+      sleep(1.0 / 100.0)
       break if container_dead?(cid)
     end
   end
@@ -169,16 +149,12 @@ class DockerRunner
 
   def image_names
     output, _ = assert_exec('docker images')
-    # REPOSITORY                               TAG    IMAGE ID     CREATED     SIZE
-    # cyberdojofoundation/ruby_test_unit       latest fd0b425fb21d 7 weeks ago 126 MB
-    # cyberdojofoundation/java_cucumber_spring latest 7f59c6590213 7 weeks ago 885.7 MB
     output[1..-1].split("\n").collect { |line| line.split[0] }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def container_dead?(cid)
-    # See https://gist.github.com/ekristen/11254304
     cmd = "docker inspect --format='{{ .State.Running }}' #{cid} 2> /dev/null"
     _, status = exec(cmd, logging = false)
     dead = status == 1
@@ -193,8 +169,6 @@ class DockerRunner
   def assert_exec(cmd)
     output, status = exec(cmd)
     fail "exited(#{status}):#{output}:" unless status == 0
-    #puts "assert_exec(#{cmd})-status:#{status}:"
-    #puts "assert_exec(#{cmd})-output:#{output}:"
     [output, status]
   end
 
