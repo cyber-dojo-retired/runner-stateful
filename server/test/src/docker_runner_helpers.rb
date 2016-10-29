@@ -15,8 +15,8 @@ module DockerRunnerHelpers
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def execute(changed_files, max_seconds = 10, deleted_filenames = [])
-    runner.execute(@image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
+  def do_run(changed_files, max_seconds = 10, deleted_filenames = [])
+    runner.run(@image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -63,8 +63,8 @@ module DockerRunnerHelpers
     [output, status]
   end
 
-  def assert_execute(*args)
-    output, status = execute(*args)
+  def assert_run(*args)
+    output, status = do_run(*args)
     assert_equal success, status, output
     [output, status]
   end

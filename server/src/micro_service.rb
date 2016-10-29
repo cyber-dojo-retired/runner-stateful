@@ -18,8 +18,8 @@ class MicroService < Sinatra::Base
     jasoned *runner.hello(kata_id, avatar_name)
   end
 
-  post '/execute' do
-    jasoned *runner.execute(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
+  post '/run' do
+    jasoned *runner.run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
   end
 
   post '/goodbye' do

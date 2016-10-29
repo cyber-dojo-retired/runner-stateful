@@ -29,14 +29,7 @@ It's API is as follows:
 - returns
   * { "status":"ok", "output":unspecified } -> succeeded
 
-# goodbye
-- parameters
-  * kata_id, eg '15B9AD6C42'
-  * avatar_name, eg 'salmon'
-- returns
-  * { "status":"ok", "output":unspecified } -> succeeded
-
-# execute
+# run
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
   * kata_id, eg '15B9AD6C42'
@@ -47,6 +40,13 @@ It's API is as follows:
 - returns
   * { "status":"0",   "output":output } -> succeeded
   * { "status":"137", "output":"" } -> did not complete in max_seconds
+
+# goodbye
+- parameters
+  * kata_id, eg '15B9AD6C42'
+  * avatar_name, eg 'salmon'
+- returns
+  * { "status":"ok", "output":unspecified } -> succeeded
 
 - if something unexpected goes wrong on the server all methods return
   * { status:error, output:msg } -> something went wrong

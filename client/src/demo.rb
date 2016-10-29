@@ -31,9 +31,9 @@ class Demo < Sinatra::Base
     html += pre('hello', duration, json)
 
     duration = timed { json =
-      runner.execute(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
+      runner.run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
     }
-    html += pre('execute', duration, json)
+    html += pre('run', duration, json)
 
     duration = timed { json = runner.goodbye(kata_id, avatar_name) }
     html += pre('goodbye', duration, json)

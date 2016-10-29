@@ -18,7 +18,7 @@ class RunnerAppTest < LibTestBase
   test '348',
   'red-traffic-light' do
     hello
-    execute(files)
+    do_run(files)
     assert_equal success, status
     assert output.start_with?('Assertion failed: answer() == 42'), output
   end
@@ -29,7 +29,7 @@ class RunnerAppTest < LibTestBase
   'green-traffic-light' do
     hello
     files['hiker.c'] = files['hiker.c'].sub('6 * 9', '6 * 7')
-    execute(files)
+    do_run(files)
     assert_equal success, status, json
     assert_equal "All tests passed\n", output, json
   end
@@ -40,7 +40,7 @@ class RunnerAppTest < LibTestBase
   'amber-traffic-light' do
     hello
     files['hiker.c'] = files['hiker.c'].sub('6 * 9', '6 * 9sss')
-    execute(files)
+    do_run(files)
     assert_equal success, status, json
     lines = [
       "invalid suffix \"sss\" on integer constant",
@@ -55,7 +55,7 @@ class RunnerAppTest < LibTestBase
   'timed-out-traffic-light' do
     hello
     files['hiker.c'] = files['hiker.c'].sub('return', 'for(;;); return')
-    execute(files, 3)
+    do_run(files, 3)
     assert_equal timed_out, status, json
     assert_equal '', output
   end
@@ -70,8 +70,8 @@ class RunnerAppTest < LibTestBase
     @json = runner.goodbye(kata_id, avatar_name)
   end
 
-  def execute(changed_files, max_seconds = 10)
-    @json = runner.execute(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
+  def do_run(changed_files, max_seconds = 10)
+    @json = runner.run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
   end
 
   def runner

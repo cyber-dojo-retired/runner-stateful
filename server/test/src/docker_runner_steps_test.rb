@@ -41,10 +41,10 @@ class DockerRunnerStepsTest < RunnerTestBase
   'deleted files are removed and all previous files still exist' do
     files['cyber-dojo.sh'] = 'ls'
 
-    ls_output, _ = assert_execute(files)
+    ls_output, _ = assert_run(files)
     before_filenames = ls_output.split
 
-    ls_output, _ = assert_execute({}, max_seconds = 10, [ 'makefile' ])
+    ls_output, _ = assert_run({}, max_seconds = 10, [ 'makefile' ])
     after_filenames = ls_output.split
 
     deleted_filenames = before_filenames - after_filenames
@@ -56,11 +56,11 @@ class DockerRunnerStepsTest < RunnerTestBase
   test '232',
   'new files are added and all previous files still exist' do
     files['cyber-dojo.sh'] = 'ls'
-    ls_output, _ = assert_execute(files)
+    ls_output, _ = assert_run(files)
     before_filenames = ls_output.split
 
     files = { 'newfile.txt' => 'hello world' }
-    ls_output, _ = assert_execute(files)
+    ls_output, _ = assert_run(files)
     after_filenames = ls_output.split
 
     new_filenames = after_filenames - before_filenames
@@ -75,8 +75,8 @@ class DockerRunnerStepsTest < RunnerTestBase
   "unchanged files still exist and don't get touched at all" do
     files['cyber-dojo.sh'] = 'ls -el'
 
-    before_ls, _ = assert_execute(files)
-    after_ls, _ = assert_execute({})
+    before_ls, _ = assert_run(files)
+    after_ls, _ = assert_run({})
 
     assert_equal before_ls, after_ls
     assert_equal 6, before_ls.split("\n").size
@@ -87,7 +87,7 @@ class DockerRunnerStepsTest < RunnerTestBase
   test '9A7',
   'a changed file is resaved and its size and time-stamp updates' do
     files['cyber-dojo.sh'] = 'ls -el | tail -n +2'
-    ls_output, _ = assert_execute(files)
+    ls_output, _ = assert_run(files)
     # each line looks like this...
     # -rwxr-xr-x 1 nobody root 19 Sun Oct 23 19:15:35 2016 cyber-dojo.sh
     before = ls_parse(ls_output)
@@ -98,7 +98,7 @@ class DockerRunnerStepsTest < RunnerTestBase
     hiker_h = files['hiker.h']
     extra = '//hello'
     files = { 'hiker.h' => hiker_h + extra }
-    ls_output, _ = assert_execute(files)
+    ls_output, _ = assert_run(files)
     after = ls_parse(ls_output)
 
     assert_equal before.keys, after.keys
