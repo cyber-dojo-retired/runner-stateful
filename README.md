@@ -13,21 +13,21 @@ It's API is as follows:
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
 - returns
-  * { "status":"true" , "output":unspecified } -> pulled already
-  * { "status":"false", "output":unspecified } -> not pulled already
+  * { "status":"true"  } -> pulled already
+  * { "status":"false" } -> not pulled already
 
 # pull
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
 - returns
-  * { "status":"ok", "output":unspecified } -> pull succeeded
+  * { "status":"ok" } -> pull succeeded
 
 # hello
 - parameters
   * kata_id, eg '15B9AD6C42'
   * avatar_name, eg 'salmon'
 - returns
-  * { "status":"ok", "output":unspecified } -> succeeded
+  * { "status":"ok" } -> succeeded
 
 # run
 - parameters
@@ -46,10 +46,10 @@ It's API is as follows:
   * kata_id, eg '15B9AD6C42'
   * avatar_name, eg 'salmon'
 - returns
-  * { "status":"ok", "output":unspecified } -> succeeded
+  * { "status":"ok" } -> succeeded
 
 - if something unexpected goes wrong on the server all methods return
-  * { status:error, output:msg } -> something went wrong
+  * { "status":"error", "msg":msg } -> something went wrong
 
 
 - - - -
