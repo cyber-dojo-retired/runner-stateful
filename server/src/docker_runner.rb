@@ -31,12 +31,14 @@ class DockerRunner
 
   def run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
     cid = create_container(image_name, kata_id, avatar_name)
-    delete_files(cid, deleted_filenames)
-    change_files(cid, changed_files)
-    setup_home(cid)
-    status, stdout, stderr = run_cyber_dojo_sh(cid, max_seconds)
-    remove_container(cid)
-    [status, stdout, stderr]
+    begin
+      delete_files(cid, deleted_filenames)
+      change_files(cid, changed_files)
+      setup_home(cid)
+      run_cyber_dojo_sh(cid, max_seconds)
+    ensure
+      remove_container(cid)
+    end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
