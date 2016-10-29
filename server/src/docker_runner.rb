@@ -45,8 +45,6 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def create_container(image_name, kata_id, avatar_name)
-    # This creates the container but docker_runner.sh removes it.
-    # Mounts new_avatar's volume in /sandbox
     args = [
       '--detach',                          # get the cid
       '--interactive',                     # later execs
@@ -67,8 +65,6 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def delete_files(cid, filenames)
-    # filenames have been deleted in the browser
-    # so delete them from the container.
     filenames.each do |filename|
       assert_exec("docker exec #{cid} sh -c 'rm #{sandbox}/#{filename}'")
     end
@@ -77,8 +73,6 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def change_files(cid, files)
-    # files have been created or changed in the browser
-    # so create or change them in the container.
     Dir.mktmpdir('runner') do |tmp_dir|
       files.each do |filename, content|
         host_filename = tmp_dir + '/' + filename
@@ -89,8 +83,6 @@ class DockerRunner
       # See https://docs.docker.com/engine/reference/commandline/cp/
       assert_exec("docker cp #{tmp_dir}/. #{cid}:#{sandbox}")
     end
-    # ensure nobody:nogroup owns changed files.
-    # Ubuntu and Alpine images both have nobody and nogroup
     files.keys.each do |filename|
       assert_exec("docker exec #{cid} sh -c 'chown #{user}:#{group} #{sandbox}/#{filename}'")
     end
@@ -156,10 +148,9 @@ class DockerRunner
   def remove_container(cid)
     # ask the docker daemon to remove the container
     shell.exec("docker rm -f #{cid}")
-    # wait max 2 secs till it's gone
-    200.times do
-      # do the sleep first to keep test coverage at 100%
-      sleep(1.0 / 100.0)
+
+    200.times do # try max 2 secs
+      sleep(1.0 / 100.0) # sleep then break to keep coverage at 100%
       break if container_dead?(cid)
     end
   end
