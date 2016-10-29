@@ -3,21 +3,15 @@ require_relative './spy_logger'
 
 class ExternalShellerTest < RunnerTestBase
 
+  include Externals
+
   def self.hex_prefix
     'C89'
   end
 
   def hex_setup
     ENV[env_name('log')] = 'SpyLogger'
-    @app = App.new
   end
-
-  # - - - - - - - - - - - - - - - - -
-
-  class App; include Externals; end
-
-  def shell; @app.shell; end
-  def log  ; @app.log  ; end
 
   # - - - - - - - - - - - - - - - - -
 
@@ -69,7 +63,7 @@ class ExternalShellerTest < RunnerTestBase
   'when exec(cmd,logging=false) with output fails:',
   '(1)output,status are captured and returned',
   '(2)cmd,output,status are not logged' do
-    shell_exec('sed salmon 2>&1', logginf = false)
+    shell_exec('sed salmon 2>&1', logging = false)
     assert_output "sed: unmatched 'a'\n"
     assert_status 1
     assert_log []

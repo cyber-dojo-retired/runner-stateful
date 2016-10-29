@@ -1,4 +1,4 @@
-require_relative './env_vars'
+require_relative './external_env_vars'
 require_relative './name_of_caller'
 
 module Externals
