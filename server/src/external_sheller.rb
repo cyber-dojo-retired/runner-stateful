@@ -19,20 +19,20 @@ class ExternalSheller
         log << "STATUS:#{status}"
       end
       [output, status]
-    rescue Exception => e
+    rescue Exception => error
       log << line
       log << "COMMAND:#{command}"
-      log << "RAISED-CLASS:#{e.class.name}"
-      log << "RAISED-TO_S:#{e.to_s}"
-      raise e
+      log << "RAISED-CLASS:#{error.class.name}"
+      log << "RAISED-TO_S:#{error.to_s}"
+      raise error
     end
   end
 
   private
 
   include NearestAncestors
-
   def log; nearest_ancestors(:log); end
+
   def success; 0; end
   def line; '-' * 40; end
 end
