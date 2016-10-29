@@ -41,10 +41,8 @@ if [[ ( ${server_status} == 0 && ${client_status} == 0 ) ]];  then
   echo "------------------------------------------------------"
   echo "All passed"
   echo "------------------------------------------------------"
-  echo "Removing runner_client and runner_server containers..."
   export DOCKER_ENGINE_VERSION=${docker_engine_version}
   docker-compose down
-  echo "Removed runner_client and runner_server containers"
   exit 0
 else
   echo
