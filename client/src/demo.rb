@@ -42,7 +42,7 @@ class Demo < Sinatra::Base
   private
 
   def runner
-    @runner ||= RunnerServiceAdapter.new
+    RunnerServiceAdapter.new
   end
 
   def read(filename)
