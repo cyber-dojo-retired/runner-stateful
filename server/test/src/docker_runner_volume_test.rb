@@ -1,13 +1,9 @@
 require_relative './runner_test_base'
 
-class DockerRunnerAvatarTest < RunnerTestBase
+class DockerRunnerVolumeTest < RunnerTestBase
 
   def self.hex_prefix
     'FEA56'
-  end
-
-  def hex_setup
-    ENV[env_name('log')] = 'NullLogger'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
