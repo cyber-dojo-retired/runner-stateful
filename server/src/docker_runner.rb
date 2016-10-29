@@ -34,9 +34,9 @@ class DockerRunner
     delete_files(cid, deleted_filenames)
     change_files(cid, changed_files)
     setup_home(cid)
-    output, status = run_cyber_dojo_sh(cid, max_seconds)
+    stdout, stderr, status = run_cyber_dojo_sh(cid, max_seconds)
     remove_container(cid)
-    [output, status]
+    [stdout, stderr, status]
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -126,15 +126,15 @@ class DockerRunner
         wout.close
         werr.close
         stdout = rout.readlines.join
-        _stderr = rerr.readlines.join
+        stderr = rerr.readlines.join
         #puts "run():Process.spawn(#{cmd})-stdout:#{stdout}:"
-        return [stdout, completed]
+        return [stdout, stderr, completed]
       end
     rescue Timeout::Error
       # don't attempt to retrieve stdout,stderr. It blocks
       Process.kill(-9, pid)
       Process.detach(pid)
-      return ['', timed_out]
+      return ['', '', timed_out]
     ensure
       wout.close unless wout.closed?
       werr.close unless werr.closed?
