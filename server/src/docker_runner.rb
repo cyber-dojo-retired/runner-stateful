@@ -158,7 +158,7 @@ class DockerRunner
   def success; 0; end
   def timed_out_and_killed; (timed_out = 128) + (killed = 9); end
 
-  private # = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+  private
 
   def image_names
     output, _ = assert_exec('docker images')
@@ -198,6 +198,6 @@ class DockerRunner
   include NearestAncestors
   def disk;  nearest_ancestors(:disk);  end
   def shell; nearest_ancestors(:shell); end
-  def exec(command); shell.exec(command); end
+  def exec(cmd); shell.exec(cmd); end
 
 end
