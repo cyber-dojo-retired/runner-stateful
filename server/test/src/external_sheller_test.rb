@@ -24,7 +24,7 @@ class ExternalShellerTest < RunnerTestBase
 
   test 'DBB',
   'when exec(cmd) succeeds:',
-  '(1)output,status is captured and returned,',
+  '(1)output,status are captured and returned,',
   '(2)nothing is logged' do
     shell_exec('echo -n Hello')
     assert_output 'Hello'
@@ -36,8 +36,8 @@ class ExternalShellerTest < RunnerTestBase
 
   test '490',
   'when exec(cmd) with no output fails:',
-  '(1)output,status is captured and returned,',
-  '(2)cmd,output,status is logged' do
+  '(1)output,status are captured and returned,',
+  '(2)cmd,output,status are logged' do
     shell_exec('false')
     assert_output ''
     assert_status 1
@@ -50,7 +50,19 @@ class ExternalShellerTest < RunnerTestBase
 
   # - - - - - - - - - - - - - - - - -
 
-  # TODO: exec(cmd) with output fails: stdout and stderr?
+  test '46B',
+  'when exec(cmd) with output fails:',
+  '(1)output,status are captured and returned',
+  '(2)cmd,output,status are logged' do
+    shell_exec('sed salmon 2>&1')
+    assert_output "sed: unmatched 'a'\n"
+    assert_status 1
+    assert_log [
+      'COMMAND:sed salmon 2>&1',
+      "OUTPUT:sed: unmatched 'a'\n",
+      'STATUS:1'
+    ]
+  end
 
   # - - - - - - - - - - - - - - - - -
 
