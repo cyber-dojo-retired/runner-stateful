@@ -9,12 +9,11 @@ class ExternalSheller
 
   attr_reader :parent
 
-  def exec(*commands)
-    command = commands.join(' && ')
+  def exec(command)
     begin
       output = `#{command}`
     rescue Exception => e
-      log << '-' * 40
+      log << line
       log << "COMMAND:#{command}"
       log << "RAISED-CLASS:#{e.class.name}"
       log << "RAISED-TO_S:#{e.to_s}"
@@ -23,7 +22,7 @@ class ExternalSheller
 
     status = $?.exitstatus
     if status != success
-      log << '-' * 40
+      log << line
       log << "COMMAND:#{command}"
       log << "OUTPUT:#{output}"
       log << "STATUS:#{status}"
@@ -38,5 +37,5 @@ class ExternalSheller
 
   def log; nearest_ancestors(:log); end
   def success; 0; end
-
+  def line; '-' * 40; end
 end
