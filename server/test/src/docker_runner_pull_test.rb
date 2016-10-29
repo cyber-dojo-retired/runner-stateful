@@ -8,12 +8,6 @@ class DockerRunnerPullTest < RunnerTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def hex_setup
-    ENV[env_name('log')] = 'NullLogger'
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   test 'A71',
   'pulled?(image_name) is false when image_name has not yet been pulled' do
     _output, status = pulled?('thisdoes/not_exist')
