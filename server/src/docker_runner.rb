@@ -128,9 +128,10 @@ class DockerRunner
         return [stdout, success]
       end
     rescue Timeout::Error
+      # don't attempt to retrieve stdout,stderr. It blocks
       Process.kill(-9, pid)
       Process.detach(pid)
-      return ['', timed_out_and_killed]
+      return ['', timed_out]
     ensure
       wout.close unless wout.closed?
       werr.close unless werr.closed?
@@ -156,7 +157,7 @@ class DockerRunner
   def sandbox; '/sandbox'; end
 
   def success; 0; end
-  def timed_out_and_killed; (timed_out = 128) + (killed = 9); end
+  def timed_out; 128; end
 
   private
 

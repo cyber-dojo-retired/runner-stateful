@@ -39,7 +39,7 @@ It's API is as follows:
   * changed_files, eg { 'fizz_buzz.h' => '#include', ... }
 - returns
   * { "status":"0",   "output":output } -> succeeded
-  * { "status":"137", "output":"" } -> did not complete in max_seconds
+  * { "status":"128", "output":"" } -> did not complete in max_seconds
 
 # goodbye
 - parameters

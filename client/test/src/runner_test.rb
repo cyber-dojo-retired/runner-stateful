@@ -96,6 +96,6 @@ class RunnerAppTest < LibTestBase
   end
 
   def success; 0; end
-  def timed_out; (timed_out = 128) + (killed = 9); end
+  def timed_out; 128; end
 
 end

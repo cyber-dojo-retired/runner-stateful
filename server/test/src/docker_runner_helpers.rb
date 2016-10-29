@@ -52,7 +52,7 @@ module DockerRunnerHelpers
   def sandbox; runner.sandbox; end
 
   def success; runner.success; end
-  def timed_out_and_killed; runner.timed_out_and_killed; end
+  def timed_out; runner.timed_out; end
 
   def avatar_name; 'salmon'; end
   def kata_id;

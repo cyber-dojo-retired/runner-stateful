@@ -18,32 +18,34 @@ class DockerRunnerTimeoutTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'B2B',
-  'when run(test-code) is empty-infinite-loop',
-  'the container is killed and',
-  'a timeout-diagostic is returned' do
+  'when run(test-code) does not complete in max_seconds',
+  'and does not produce output,',
+  'the output is empty, and',
+  'the status is timed_out' do
     files['hiker.c'] = [
       '#include "hiker.h"',
       'int answer(void) { for(;;); return 6 * 7; }'
     ].join("\n")
     output, status = do_run(files, max_seconds = 2)
     assert_equal '', output
-    assert_equal timed_out_and_killed, status
+    assert_equal timed_out, status
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '4D7',
-  'when run(test-code) is printing-infinite-loop',
-  'the container is killed and',
-  'a timeout-diagostic is returned' do
+  'when run(test-code) does not complete in max_seconds',
+  'and does produce output,',
+  'the output is nonetheless empty, and',
+  'the status is timed_out' do
     files['hiker.c'] = [
       '#include "hiker.h"',
       '#include <stdio.h>',
-      'int answer(void) { for(;;) printf("...."); return 6 * 7; }'
+      'int answer(void) { for(;;) printf("Hello"); return 6 * 7; }'
     ].join("\n")
     output, status = do_run(files, max_seconds = 2)
     assert_equal '', output
-    assert_equal timed_out_and_killed, status
+    assert_equal timed_out, status
   end
 
 end
