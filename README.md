@@ -77,8 +77,9 @@ $ ./test.sh
 
 # run the demo
 Runs inside the runner-client's container.
-Calls each of the runner-server's micro-service methods
-once and displays their json results and how long they took.
+Calls the runner-server's micro-service methods
+and displays their json results and how long they took.
+(The time-out for the grey section was 3 seconds)
 ```
 $ ./demo.sh
 ```
