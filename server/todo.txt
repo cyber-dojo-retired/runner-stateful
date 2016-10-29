@@ -3,35 +3,17 @@
 runner_server:
 -------------------------------------------------
 
+o) if the file being copied is wibble.sh (say) and has
+   execute rights then does [docker cp] preservice the
+   execute status of wibble.sh inside the container?
+
 o) massage micro_service returned strings.
    - clean them
    - truncate them
 
-o) write the hello()-datetime to a known file inside the volume.
-   write the run()-datetime to a known file inside the volume.
-   Separate reaper/pruner service can delete old volumes.
-   Or should the time-stamps come from the storer?
-
-o) validate microservice parameters?
-   - kata_id = 10 hex chars
-   - avatar_name = one of the known 64 animals
-   - max_seconds = integer (with max of 15 seconds?)
-   - deleted_filenames (what chars are illegal in linux filename?)
-   - changed_files
-
 o) runner_server micro-service needs to check each shell call and return
    { status:error, output:msg }
    if something goes wrong.
-
-o) Should there be a volume per kata rather than per animal?
-   This feels right. Fits with the value-system of cyber-dojo.
-   Keeps the number of volumes down too.
-   Means hello()/goodbye() will only need kata_id.
-   And could be renamed... new_kata(id), old_kata(id)
-   Resuming an avatar will need to redo the new_kata(id)
-
-o) Should I use a different uid for the run of each avatar
-   and for the rights of their files?
 
 o) add cpu/memory/swap limits
    See comments at https://github.com/cyber-dojo/commander/blob/master/docker-compose.yml
@@ -63,6 +45,39 @@ o) add cpu/memory/swap limits
 o) what if filename has a quote in it?
 
 o) log assert_exec() fail in docker_runner.rb
+
+-------------------------------------------------
+
+o) can you copying a changed file into the container via a named-pipe?
+   - https://en.wikipedia.org/wiki/Named_pipe
+   - https://github.com/shurizzle/ruby-mkfifo
+
+   File.mkfifo('/tmp/file')
+   tar -zcf /tmp/file | docker exec ... sh -c 'tar -zxf - -C /sandbox'
+   IO.write('/tmp/file', content)
+   `rm /tmp/file`
+
+o) write the hello()-datetime to a known file inside the volume.
+   write the run()-datetime to a known file inside the volume.
+   Separate reaper/pruner service can delete old volumes.
+   Or should the time-stamps come from the storer?
+
+o) validate microservice parameters?
+   - kata_id = 10 hex chars
+   - avatar_name = one of the known 64 animals
+   - max_seconds = integer (with max of 15 seconds?)
+   - deleted_filenames (what chars are illegal in linux filename?)
+   - changed_files
+
+o) Should there be a volume per kata rather than per animal?
+   This feels right. Fits with the value-system of cyber-dojo.
+   Keeps the number of volumes down too.
+   Means hello()/goodbye() will only need kata_id.
+   And could be renamed... new_kata(id), old_kata(id)
+   Resuming an avatar will need to redo the new_kata(id)
+
+o) Should I use a different uid for the run of each avatar
+   and for the rights of their files?
 
 -------------------------------------------------
 
