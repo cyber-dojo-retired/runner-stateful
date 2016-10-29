@@ -66,6 +66,18 @@ class ExternalShellerTest < RunnerTestBase
 
   # - - - - - - - - - - - - - - - - -
 
+  test '6D5',
+  'when exec(cmd,logging=false) with output fails:',
+  '(1)output,status are captured and returned',
+  '(2)cmd,output,status are not logged' do
+    shell_exec('sed salmon 2>&1', log=false)
+    assert_output "sed: unmatched 'a'\n"
+    assert_status 1
+    assert_log []
+  end
+
+  # - - - - - - - - - - - - - - - - -
+
   test 'AF6',
   'when exec() raises:',
   '(0)exception is raised,',
@@ -82,8 +94,8 @@ class ExternalShellerTest < RunnerTestBase
 
   # - - - - - - - - - - - - - - - - -
 
-  def shell_exec(command)
-    @output, @status = shell.exec(command)
+  def shell_exec(command, log=true)
+    @output, @status = shell.exec(command, log)
   end
 
   def assert_output(expected)

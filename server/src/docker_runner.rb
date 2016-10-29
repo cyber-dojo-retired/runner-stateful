@@ -173,7 +173,7 @@ class DockerRunner
   def container_dead?(cid)
     # See https://gist.github.com/ekristen/11254304
     cmd = "docker inspect --format='{{ .State.Running }}' #{cid} 2> /dev/null"
-    _, status = exec(cmd)
+    _, status = exec(cmd, logging = false)
     dead = status == 1
   end
 
@@ -198,6 +198,6 @@ class DockerRunner
   include NearestAncestors
   def disk;  nearest_ancestors(:disk);  end
   def shell; nearest_ancestors(:shell); end
-  def exec(cmd); shell.exec(cmd); end
+  def exec(cmd, logging = true); shell.exec(cmd, logging); end
 
 end

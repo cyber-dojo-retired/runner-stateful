@@ -9,7 +9,7 @@ class ExternalSheller
 
   attr_reader :parent
 
-  def exec(command)
+  def exec(command, logging = true)
     begin
       output = `#{command}`
     rescue Exception => e
@@ -21,7 +21,7 @@ class ExternalSheller
     end
 
     status = $?.exitstatus
-    if status != success
+    if status != success && logging
       log << line
       log << "COMMAND:#{command}"
       log << "OUTPUT:#{output}"
