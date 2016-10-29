@@ -46,8 +46,12 @@ module DockerRunnerHelpers
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def runner; DockerRunner.new(self); end
-  def success; runner.success; end
+
+  def user; runner.user; end
+  def group; runner.group; end
   def sandbox; runner.sandbox; end
+
+  def success; runner.success; end
   def timed_out_and_killed; runner.timed_out_and_killed; end
 
   def avatar_name; 'salmon'; end

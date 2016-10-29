@@ -166,7 +166,10 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  def user; 'nobody'; end
+  def group; 'nogroup'; end
   def sandbox; '/sandbox'; end
+
   def success; 0; end
   def timed_out_and_killed; (timed_out = 128) + (killed = 9); end
 
@@ -211,8 +214,5 @@ class DockerRunner
   def disk;  nearest_ancestors(:disk);  end
   def shell; nearest_ancestors(:shell); end
   def exec(command); shell.exec(command); end
-
-  def user; 'nobody'; end
-  def group; 'nogroup'; end
 
 end
