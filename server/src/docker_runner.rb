@@ -96,7 +96,7 @@ class DockerRunner
     # or probe to determine if the image is Ubuntu based, I always
     # run usermod and it does nothing on Alpine based images
     # which do not have usermod (its in the shadow package).
-    # So this is not assert_exec(...)
+    # So this is not assert_exec(...) and logging is off
     cmd = "docker exec #{cid} sh -c 'usermod --home #{sandbox} #{user} 2> /dev/null'"
     exec(cmd, logging = false)
   end

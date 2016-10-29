@@ -39,7 +39,7 @@ class DockerRunnerTimeoutTest < RunnerTestBase
     files['hiker.c'] = [
       '#include "hiker.h"',
       '#include <stdio.h>',
-      'int answer(void) { for(;;) printf("Hello"); return 6 * 7; }'
+      'int answer(void) { for(;;) puts("Hello"); return 6 * 7; }'
     ].join("\n")
     output, _ = assert_run_times_out(files, max_seconds = 2)
     assert_equal '', output
