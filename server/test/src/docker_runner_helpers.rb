@@ -50,15 +50,15 @@ module DockerRunnerHelpers
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_run_completes(*args)
-    stdout, stderr, status = runner_run(*args)
+    status, stdout, stderr = runner_run(*args)
     assert_equal completed, status, [stdout, stderr]
-    [stdout, completed]
+    [stdout, stderr]
   end
 
   def assert_run_times_out(*args)
-    stdout, stderr, status = runner_run(*args)
+    status, stdout, stderr = runner_run(*args)
     assert_equal timed_out, status, [stdout, stderr]
-    [stdout, timed_out]
+    [stdout, stderr]
   end
 
   def runner_run(changed_files, max_seconds = 10, deleted_filenames = [])

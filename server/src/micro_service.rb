@@ -13,7 +13,7 @@ class MicroService < Sinatra::Base
   post '/goodbye' do; jasoned *runner.goodbye(kata_id, avatar_name); end
 
   post '/run' do
-    stdout, _stderr, status = runner.run(
+    status, stdout, _stderr = runner.run(
       image_name,
       kata_id, avatar_name,
       max_seconds,
