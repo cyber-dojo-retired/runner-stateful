@@ -25,10 +25,10 @@ class DockerRunnerStepsTest < RunnerTestBase
       assert_equal 0, status, "#{sandbox} does not exist"
       _, status = exec("docker exec #{cid} sh -c '[ \"$(ls -A #{sandbox})\" ]'", logging = false)
       assert_equal 1, status, "#{sandbox} is not empty"
-      output, _ = assert_exec("docker exec #{cid} sh -c 'stat -c \"%U\" #{sandbox}'")
-      assert_equal 'nobody', (user_name = output.strip)
-      output, _ = assert_exec("docker exec #{cid} sh -c 'stat -c \"%G\" #{sandbox}'")
-      assert_equal 'nogroup', (group_name = output.strip)
+      stdout, _ = assert_exec("docker exec #{cid} sh -c 'stat -c \"%U\" #{sandbox}'")
+      assert_equal 'nobody', (user_name = stdout.strip)
+      stdout, _ = assert_exec("docker exec #{cid} sh -c 'stat -c \"%G\" #{sandbox}'")
+      assert_equal 'nogroup', (group_name = stdout.strip)
     ensure
       runner.remove_container(cid)
     end
@@ -39,12 +39,13 @@ class DockerRunnerStepsTest < RunnerTestBase
   test '385',
   'deleted files are removed and all previous files still exist' do
     files['cyber-dojo.sh'] = 'ls'
+    ls_stdout, stderr = assert_run_completes(files)
+    assert_equal '', stderr
+    before_filenames = ls_stdout.split
 
-    ls_output, _ = assert_run_completes(files)
-    before_filenames = ls_output.split
-
-    ls_output, _ = assert_run_completes({}, max_seconds = 10, [ 'makefile' ])
-    after_filenames = ls_output.split
+    ls_stdout, stderr = assert_run_completes({}, max_seconds = 10, [ 'makefile' ])
+    assert_equal '', stderr
+    after_filenames = ls_stdout.split
 
     deleted_filenames = before_filenames - after_filenames
     assert_equal [ 'makefile' ], deleted_filenames
@@ -55,12 +56,14 @@ class DockerRunnerStepsTest < RunnerTestBase
   test '232',
   'new files are added and all previous files still exist' do
     files['cyber-dojo.sh'] = 'ls'
-    ls_output, _ = assert_run_completes(files)
-    before_filenames = ls_output.split
+    ls_stdout, stderr = assert_run_completes(files)
+    assert_equal '', stderr
+    before_filenames = ls_stdout.split
 
     files = { 'newfile.txt' => 'hello world' }
-    ls_output, _ = assert_run_completes(files)
-    after_filenames = ls_output.split
+    ls_stdout, stdout = assert_run_completes(files)
+    assert_equal '', stderr
+    after_filenames = ls_stdout.split
 
     new_filenames = after_filenames - before_filenames
     assert_equal 5, before_filenames.size
@@ -73,9 +76,10 @@ class DockerRunnerStepsTest < RunnerTestBase
   test '4E8',
   "unchanged files still exist and don't get touched at all" do
     files['cyber-dojo.sh'] = 'ls -el'
-
-    before_ls, _ = assert_run_completes(files)
-    after_ls, _ = assert_run_completes({})
+    before_ls, stderr = assert_run_completes(files)
+    assert_equal '', stderr
+    after_ls, stderr = assert_run_completes({})
+    assert_equal '', stderr
 
     assert_equal before_ls, after_ls
     assert_equal 6, before_ls.split("\n").size
