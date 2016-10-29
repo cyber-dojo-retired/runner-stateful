@@ -55,8 +55,8 @@ class DockerRunner
     ].join(space = ' ')
     output, _ = assert_exec("docker run #{args} #{image_name} sh")
     cid = output.strip
-    # Change ownership of /sandbox
-    assert_exec("docker exec #{cid} sh -c 'chown #{user}:#{group} #{sandbox}'")
+    chown = "chown #{user}:#{group} #{sandbox}"
+    assert_exec("docker exec #{cid} sh -c '#{chown}'")
     cid
   end
 
@@ -64,7 +64,8 @@ class DockerRunner
 
   def delete_files(cid, filenames)
     filenames.each do |filename|
-      assert_exec("docker exec #{cid} sh -c 'rm #{sandbox}/#{filename}'")
+      rm = "rm #{sandbox}/#{filename}"
+      assert_exec("docker exec #{cid} sh -c '#{rm}'")
     end
   end
 
@@ -82,7 +83,8 @@ class DockerRunner
       assert_exec("docker cp #{tmp_dir}/. #{cid}:#{sandbox}")
     end
     files.keys.each do |filename|
-      assert_exec("docker exec #{cid} sh -c 'chown #{user}:#{group} #{sandbox}/#{filename}'")
+      chown = "chown #{user}:#{group} #{sandbox}/#{filename}"
+      assert_exec("docker exec #{cid} sh -c '#{chown}'")
     end
   end
 
@@ -97,8 +99,8 @@ class DockerRunner
     # run usermod and it does nothing on Alpine based images
     # which do not have usermod (its in the shadow package).
     # So this is not assert_exec(...) and logging is off
-    cmd = "docker exec #{cid} sh -c 'usermod --home #{sandbox} #{user} 2> /dev/null'"
-    exec(cmd, logging = false)
+    usermod = "usermod --home #{sandbox} #{user} 2> /dev/null"
+    exec("docker exec #{cid} sh -c '#{usermod}'", logging = false)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -106,7 +108,7 @@ class DockerRunner
   def run_cyber_dojo_sh(cid, max_seconds)
     cmd = [
       'docker exec',
-      "--user=nobody",
+      "--user=#{user}",
       "--interactive",
       cid,
       'sh -c',
