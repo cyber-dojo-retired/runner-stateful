@@ -20,13 +20,11 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def hello(kata_id, avatar_name)
-    _, status = exec("docker volume create --name #{volume_name(kata_id, avatar_name)}")
-    ['', status]
+    assert_exec("docker volume create --name #{volume_name(kata_id, avatar_name)}")
   end
 
   def goodbye(kata_id, avatar_name)
-    _, status = exec("docker volume rm #{volume_name(kata_id, avatar_name)}")
-    ['', status]
+    assert_exec("docker volume rm #{volume_name(kata_id, avatar_name)}")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -143,12 +141,8 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  # TODO: shell.exec()->exec
-  # TODO: error handling
   def remove_container(cid)
-    # ask the docker daemon to remove the container
-    shell.exec("docker rm -f #{cid}")
-
+    assert_exec("docker rm -f #{cid}")
     200.times do # try max 2 secs
       sleep(1.0 / 100.0) # sleep then break to keep coverage at 100%
       break if container_dead?(cid)
