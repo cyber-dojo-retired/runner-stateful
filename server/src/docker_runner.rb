@@ -125,7 +125,7 @@ class DockerRunner
         stdout = rout.readlines.join
         _stderr = rerr.readlines.join
         #puts "run():Process.spawn(#{cmd})-stdout:#{stdout}:"
-        return [stdout, success]
+        return [stdout, completed]
       end
     rescue Timeout::Error
       # don't attempt to retrieve stdout,stderr. It blocks
@@ -156,7 +156,7 @@ class DockerRunner
   def group; 'nogroup'; end
   def sandbox; '/sandbox'; end
 
-  def success; 0; end
+  def completed;   0; end
   def timed_out; 128; end
 
   private
@@ -182,7 +182,7 @@ class DockerRunner
 
   def assert_exec(cmd)
     output, status = exec(cmd)
-    fail "exited(#{status}):#{output}:" unless status == success
+    fail "exited(#{status}):#{output}:" unless status == 0
     #puts "assert_exec(#{cmd})-status:#{status}:"
     #puts "assert_exec(#{cmd})-output:#{output}:"
     [output, status]

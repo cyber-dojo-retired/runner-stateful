@@ -51,7 +51,7 @@ module DockerRunnerHelpers
   def group; runner.group; end
   def sandbox; runner.sandbox; end
 
-  def success; runner.success; end
+  def completed; runner.completed; end
   def timed_out; runner.timed_out; end
 
   def avatar_name; 'salmon'; end
@@ -67,14 +67,20 @@ module DockerRunnerHelpers
     [output, status]
   end
 
-  def assert_run(*args)
+  def assert_run_completes(*args)
     output, status = do_run(*args)
-    assert_equal success, status, output
-    [output, status]
+    assert_equal completed, status, output
+    [output, completed]
   end
 
-  def exec(command); shell.exec(command); end
+  def assert_run_times_out(*args)
+    output, status = do_run(*args)
+    assert_equal timed_out, status, output
+    [output, timed_out]
+  end
 
   include Externals # for shell
+  def exec(command); shell.exec(command); end
+  def success; 0; end
 
 end

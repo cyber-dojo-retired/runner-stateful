@@ -21,7 +21,7 @@ class DockerRunnerLanguageTest < RunnerTestBase
 
   test 'CDE',
   '[C(gcc),assert] (an Ubuntu-based image)' do
-    output, _status = assert_run(files('gcc_assert'))
+    output, _ = assert_run_completes(files('gcc_assert'))
     assert output.include?('Assertion failed: answer() == 42'), output
   end
 
@@ -29,7 +29,7 @@ class DockerRunnerLanguageTest < RunnerTestBase
 
   test '5F0',
   '[Ruby,MiniTest] (an Alpine-based image)' do
-    output, _status = assert_run(files('ruby_mini_test'))
+    output, _ = assert_run_completes(files('ruby_mini_test'))
     assert output.include?('1 runs, 1 assertions, 1 failures, 0 errors, 0 skips'), output
   end
 
@@ -37,7 +37,7 @@ class DockerRunnerLanguageTest < RunnerTestBase
 
   test 'C87',
   '[C#,Moq] runs (it explicitly names /sandbox in cyber-dojo.sh)' do
-    output, _status = assert_run(files('csharp_moq'))
+    output, _ = assert_run_completes(files('csharp_moq'))
     assert output.include?('Tests run: 1, Errors: 0, Failures: 1, Inconclusive: 0'), output
   end
 
@@ -45,7 +45,7 @@ class DockerRunnerLanguageTest < RunnerTestBase
 
   test '182',
   '[C#-NUnit] runs (it needs to pick up HOME from the current user)' do
-    output, _status = assert_run(files('csharp_nunit'))
+    output, _ = assert_run_completes(files('csharp_nunit'))
     assert output.include?('Tests run: 1, Errors: 0, Failures: 1, Inconclusive: 0'), output
   end
 

@@ -26,9 +26,8 @@ class DockerRunnerTimeoutTest < RunnerTestBase
       '#include "hiker.h"',
       'int answer(void) { for(;;); return 6 * 7; }'
     ].join("\n")
-    output, status = do_run(files, max_seconds = 2)
+    output, _ = assert_run_times_out(files, max_seconds = 2)
     assert_equal '', output
-    assert_equal timed_out, status
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -43,10 +42,10 @@ class DockerRunnerTimeoutTest < RunnerTestBase
       '#include <stdio.h>',
       'int answer(void) { for(;;) printf("Hello"); return 6 * 7; }'
     ].join("\n")
-    output, status = do_run(files, max_seconds = 2)
+    output, _ = assert_run_times_out(files, max_seconds = 2)
     assert_equal '', output
-    assert_equal timed_out, status
   end
 
 end
+
 
