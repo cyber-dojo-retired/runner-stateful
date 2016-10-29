@@ -7,7 +7,6 @@ class DockerRunnerStepsTest < RunnerTestBase
   end
 
   def hex_setup
-    ENV[env_name('log')] = 'NullLogger'
     hello
   end
 
@@ -24,7 +23,7 @@ class DockerRunnerStepsTest < RunnerTestBase
     begin
       _, status = exec("docker exec #{cid} sh -c '[ -d #{sandbox} ]'")
       assert_equal 0, status, "#{sandbox} does not exist"
-      _, status = exec("docker exec #{cid} sh -c '[ \"$(ls -A #{sandbox})\" ]'")
+      _, status = exec("docker exec #{cid} sh -c '[ \"$(ls -A #{sandbox})\" ]'", logging = false)
       assert_equal 1, status, "#{sandbox} is not empty"
       output, _ = assert_exec("docker exec #{cid} sh -c 'stat -c \"%U\" #{sandbox}'")
       assert_equal 'nobody', (user_name = output.strip)

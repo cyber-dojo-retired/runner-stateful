@@ -7,7 +7,6 @@ class DockerRunnerTimeoutTest < RunnerTestBase
   end
 
   def hex_setup
-    ENV[env_name('log')] = 'NullLogger'
     hello
   end
 

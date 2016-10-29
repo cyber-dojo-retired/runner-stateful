@@ -97,7 +97,8 @@ class DockerRunner
     # run usermod and it does nothing on Alpine based images
     # which do not have usermod (its in the shadow package).
     # So this is not assert_exec(...)
-    exec("docker exec #{cid} sh -c 'usermod --home #{sandbox} #{user} 2> /dev/null'")
+    cmd = "docker exec #{cid} sh -c 'usermod --home #{sandbox} #{user} 2> /dev/null'"
+    exec(cmd, logging = false)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

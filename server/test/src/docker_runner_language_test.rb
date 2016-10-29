@@ -7,9 +7,6 @@ class DockerRunnerLanguageTest < RunnerTestBase
   end
 
   def hex_setup
-    ENV[env_name('log')] = 'NullLogger'
-    assert_equal 'NullLogger', log.class.name
-    assert_equal 'ExternalSheller', shell.class.name
     hello
   end
 

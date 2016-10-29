@@ -61,8 +61,8 @@ module DockerRunnerHelpers
     test_id + '00'
   end
 
-  def assert_exec(command)
-    output, status = exec(command)
+  def assert_exec(cmd)
+    output, status = exec(cmd)
     assert_equal success, status, output
     [output, status]
   end
@@ -80,7 +80,7 @@ module DockerRunnerHelpers
   end
 
   include Externals # for shell
-  def exec(command); shell.exec(command); end
+  def exec(cmd, logging = true); shell.exec(cmd, logging); end
   def success; 0; end
 
 end
