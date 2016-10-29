@@ -56,7 +56,7 @@ class DockerRunner
     output, _ = assert_exec("docker run #{args} #{image_name} sh")
     cid = output.strip
     chown = "chown #{user}:#{group} #{sandbox}"
-    assert_exec("docker exec #{cid} sh -c '#{chown}'")
+    assert_docker_exec(cid, chown)
     cid
   end
 
@@ -65,7 +65,7 @@ class DockerRunner
   def delete_files(cid, filenames)
     filenames.each do |filename|
       rm = "rm #{sandbox}/#{filename}"
-      assert_exec("docker exec #{cid} sh -c '#{rm}'")
+      assert_docker_exec(cid, rm)
     end
   end
 
@@ -84,7 +84,7 @@ class DockerRunner
     end
     files.keys.each do |filename|
       chown = "chown #{user}:#{group} #{sandbox}/#{filename}"
-      assert_exec("docker exec #{cid} sh -c '#{chown}'")
+      assert_docker_exec(cid, chown)
     end
   end
 
@@ -146,7 +146,7 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def remove_container(cid)
-    assert_exec("docker rm -f #{cid}")
+    assert_exec("docker rm --force #{cid}")
     200.times do # try max 2 secs
       sleep(1.0 / 100.0) # sleep then break to keep coverage at 100%
       break if container_dead?(cid)
@@ -182,6 +182,10 @@ class DockerRunner
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def assert_docker_exec(cid, cmd)
+    assert_exec("docker exec #{cid} sh -c '#{cmd}'")
+  end
 
   def assert_exec(cmd)
     output, status = exec(cmd)
