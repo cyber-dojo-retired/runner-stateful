@@ -7,11 +7,11 @@ class DockerRunnerTimeoutTest < RunnerTestBase
   end
 
   def hex_setup
-    hello
+    new_avatar
   end
 
   def hex_teardown
-    goodbye
+    old_avatar
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -

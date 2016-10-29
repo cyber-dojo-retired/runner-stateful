@@ -9,21 +9,21 @@ class DockerRunner
 
   attr_reader :parent
 
-  def pulled?(image_name)
+  def pulled_image?(image_name)
     ['', image_names.include?(image_name)]
   end
 
-  def pull(image_name)
+  def pull_image(image_name)
     exec("docker pull #{image_name}")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def hello(kata_id, avatar_name)
+  def new_avatar(kata_id, avatar_name)
     assert_exec("docker volume create --name #{volume_name(kata_id, avatar_name)}")
   end
 
-  def goodbye(kata_id, avatar_name)
+  def old_avatar(kata_id, avatar_name)
     assert_exec("docker volume rm #{volume_name(kata_id, avatar_name)}")
   end
 

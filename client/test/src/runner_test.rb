@@ -12,12 +12,12 @@ class RunnerAppTest < LibTestBase
   end
 
   def external_teardown
-    goodbye
+    old_avatar
   end
 
   test '348',
   'red-traffic-light' do
-    hello
+    new_avatar
     runner_run(files)
     assert_equal completed, status
     assert stderr.start_with?('Assertion failed: answer() == 42'), json
@@ -28,7 +28,7 @@ class RunnerAppTest < LibTestBase
 
   test '16F',
   'green-traffic-light' do
-    hello
+    new_avatar
     files['hiker.c'] = files['hiker.c'].sub('6 * 9', '6 * 7')
     runner_run(files)
     assert_equal completed, status, json
@@ -40,7 +40,7 @@ class RunnerAppTest < LibTestBase
 
   test '295',
   'amber-traffic-light' do
-    hello
+    new_avatar
     files['hiker.c'] = files['hiker.c'].sub('6 * 9', '6 * 9sss')
     runner_run(files)
     assert_equal completed, status, json
@@ -56,7 +56,7 @@ class RunnerAppTest < LibTestBase
 
   test 'E6F',
   'timed-out-traffic-light' do
-    hello
+    new_avatar
     files['hiker.c'] = files['hiker.c'].sub('return', 'for(;;); return')
     runner_run(files, 3)
     assert_equal timed_out, status, json
@@ -66,12 +66,12 @@ class RunnerAppTest < LibTestBase
 
   private
 
-  def hello
-    @json = runner.hello(kata_id, avatar_name)
+  def new_avatar
+    @json = runner.new_avatar(kata_id, avatar_name)
   end
 
-  def goodbye
-    @json = runner.goodbye(kata_id, avatar_name)
+  def old_avatar
+    @json = runner.old_avatar(kata_id, avatar_name)
   end
 
   def runner_run(changed_files, max_seconds = 10)

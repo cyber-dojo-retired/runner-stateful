@@ -9,22 +9,25 @@ class DockerRunnerVolumeTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'DBC',
-  "before hello volume does not exist,",
-  'after hello it does' do
+  "before new_avatar volume does not exist,",
+  'after new_avatar it does' do
     refute volume_exists?
-    _, status = hello
-    assert_equal success, status
-    assert volume_exists?
-    goodbye
+    _, status = new_avatar
+    begin
+      assert_equal success, status
+      assert volume_exists?
+    ensure
+      old_avatar
+    end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '9A9',
-  "before goodbye volume exists,",
-  'after goobye its does not' do
-    hello
-    goodbye
+  "before old_avatar volume exists,",
+  'after old_avatar its does not' do
+    new_avatar
+    old_avatar
     refute volume_exists?
   end
 

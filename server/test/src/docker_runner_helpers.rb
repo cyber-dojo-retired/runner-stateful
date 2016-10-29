@@ -4,13 +4,13 @@ module DockerRunnerHelpers
 
   module_function
 
-  def pulled?(image_name);runner.pulled?(image_name); end
-  def pull(image_name); runner.pull(image_name); end
+  def pulled_image?(image_name);runner.pulled_image?(image_name); end
+  def pull_image(image_name); runner.pull_image(image_name); end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def hello; runner.hello(kata_id, avatar_name); end
-  def goodbye; runner.goodbye(kata_id, avatar_name); end
+  def new_avatar; runner.new_avatar(kata_id, avatar_name); end
+  def old_avatar; runner.old_avatar(kata_id, avatar_name); end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

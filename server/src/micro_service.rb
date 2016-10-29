@@ -6,11 +6,11 @@ require_relative './docker_runner'
 
 class MicroService < Sinatra::Base
 
-  get '/pulled' do; jasoned *runner.pulled?(image_name); end
-  post '/pull'  do; jasoned *runner.pull(image_name); end
+  get '/pulled_image' do; jasoned *runner.pulled_image?(image_name); end
+  post '/pull_image'  do; jasoned *runner.pull_image(image_name); end
 
-  post '/hello'   do; jasoned *runner.hello(kata_id, avatar_name); end
-  post '/goodbye' do; jasoned *runner.goodbye(kata_id, avatar_name); end
+  post '/new_avatar' do; jasoned *runner.new_avatar(kata_id, avatar_name); end
+  post '/old_avatar' do; jasoned *runner.old_avatar(kata_id, avatar_name); end
 
   post '/run' do
     status, stdout, stderr = runner.run(

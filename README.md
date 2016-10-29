@@ -9,20 +9,20 @@ Work in progress. Not live yet.
 A **cyberdojo/runner** docker container runs sinatra on port 4557.
 It's API is as follows:
 
-# pulled
+# pulled_image
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
 - returns
   * { "status":"true"  } -> pulled already
   * { "status":"false" } -> not pulled already
 
-# pull
+# pull_image
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
 - returns
   * { "status":"ok" } -> pull succeeded
 
-# hello
+# new_avatar
 - parameters
   * kata_id, eg '15B9AD6C42'
   * avatar_name, eg 'salmon'
@@ -41,7 +41,7 @@ It's API is as follows:
   * { "status":"0",   "stdout":output, "stderr":error } -> completed
   * { "status":"128", "stdout":"", "stderr":"" } -> did not complete in max_seconds
 
-# goodbye
+# old_avatar
 - parameters
   * kata_id, eg '15B9AD6C42'
   * avatar_name, eg 'salmon'

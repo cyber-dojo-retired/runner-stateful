@@ -17,14 +17,14 @@ class Demo < Sinatra::Base
     json = nil
     html = '<div style="font-size:0.5em">'
 
-    duration = timed { json = runner.pulled?(image_name) }
-    html += pre('pulled?', duration, json)
+    duration = timed { json = runner.pulled_image?(image_name) }
+    html += pre('pulled_image?', duration, json)
 
-    duration = timed { json = runner.pull(image_name) }
-    html += pre('pull', duration, json)
+    duration = timed { json = runner.pull_image(image_name) }
+    html += pre('pull_image', duration, json)
 
-    duration = timed { json = runner.hello(kata_id, avatar_name) }
-    html += pre('hello', duration, json)
+    duration = timed { json = runner.new_avatar(kata_id, avatar_name) }
+    html += pre('new_avatar', duration, json)
 
     duration = timed { json = run(tests_run_but_fail) }
     html += pre('run', duration, json, 'red')
@@ -41,8 +41,8 @@ class Demo < Sinatra::Base
     duration = timed { json = run(times_out, 3) }
     html += pre('run', duration, json, 'gray')
 
-    duration = timed { json = runner.goodbye(kata_id, avatar_name) }
-    html += pre('goodbye', duration, json)
+    duration = timed { json = runner.old_avatar(kata_id, avatar_name) }
+    html += pre('old_avatar', duration, json)
 
     html += '</div>'
   end
