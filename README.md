@@ -38,8 +38,8 @@ It's API is as follows:
   * deleted_filenames, eg [ 'hiker.h', ... ]
   * changed_files, eg { 'fizz_buzz.h' => '#include', ... }
 - returns
-  * { "status":"0",   "output":output } -> completed
-  * { "status":"128", "output":"" } -> did not complete in max_seconds
+  * { "status":"0",   "stdout":output, "stderr":error } -> completed
+  * { "status":"128", "stdout":"", "stderr":"" } -> did not complete in max_seconds
 
 # goodbye
 - parameters
