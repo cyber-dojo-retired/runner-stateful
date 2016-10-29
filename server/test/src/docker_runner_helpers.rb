@@ -13,12 +13,6 @@ module DockerRunnerHelpers
   def goodbye; runner.goodbye(kata_id, avatar_name); end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def do_run(changed_files, max_seconds = 10, deleted_filenames = [])
-    runner.run(@image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def files(language_dir = 'gcc_assert')
@@ -53,12 +47,36 @@ module DockerRunnerHelpers
   def completed; runner.completed; end
   def timed_out; runner.timed_out; end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def assert_run_completes(*args)
+    output, status = runner_run(*args)
+    assert_equal completed, status, output
+    [output, completed]
+  end
+
+  def assert_run_times_out(*args)
+    output, status = runner_run(*args)
+    assert_equal timed_out, status, output
+    [output, timed_out]
+  end
+
+  def runner_run(changed_files, max_seconds = 10, deleted_filenames = [])
+    # don't call this run() as it clashes with MiniTest
+    runner.run(@image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
+  end
+
   def avatar_name; 'salmon'; end
+
   def kata_id;
     assert_equal 8, test_id.length
     assert test_id =~ /^[0-9A-F]+$/
     test_id + '00'
   end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  include Externals # for shell
 
   def assert_exec(cmd)
     output, status = exec(cmd)
@@ -66,19 +84,6 @@ module DockerRunnerHelpers
     [output, status]
   end
 
-  def assert_run_completes(*args)
-    output, status = do_run(*args)
-    assert_equal completed, status, output
-    [output, completed]
-  end
-
-  def assert_run_times_out(*args)
-    output, status = do_run(*args)
-    assert_equal timed_out, status, output
-    [output, timed_out]
-  end
-
-  include Externals # for shell
   def exec(cmd, logging = true); shell.exec(cmd, logging); end
   def success; 0; end
 
