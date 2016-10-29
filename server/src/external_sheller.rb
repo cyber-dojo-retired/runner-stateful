@@ -1,5 +1,4 @@
 require_relative './nearest_ancestors'
-require_relative './string_cleaner'
 
 class ExternalSheller
 
@@ -12,6 +11,14 @@ class ExternalSheller
   def exec(command, logging = true)
     begin
       output = `#{command}`
+      status = $?.exitstatus
+      if status != success && logging
+        log << line
+        log << "COMMAND:#{command}"
+        log << "OUTPUT:#{output}"
+        log << "STATUS:#{status}"
+      end
+      [output, status]
     rescue Exception => e
       log << line
       log << "COMMAND:#{command}"
@@ -19,21 +26,11 @@ class ExternalSheller
       log << "RAISED-TO_S:#{e.to_s}"
       raise e
     end
-
-    status = $?.exitstatus
-    if status != success && logging
-      log << line
-      log << "COMMAND:#{command}"
-      log << "OUTPUT:#{output}"
-      log << "STATUS:#{status}"
-    end
-    [cleaned(output), status]
   end
 
   private
 
   include NearestAncestors
-  include StringCleaner
 
   def log; nearest_ancestors(:log); end
   def success; 0; end
