@@ -1,7 +1,6 @@
 require_relative './runner_test_base'
 require_relative './spy_logger'
 
-
 class ExternalShellerTest < RunnerTestBase
 
   def self.hex_prefix
@@ -70,7 +69,7 @@ class ExternalShellerTest < RunnerTestBase
   'when exec(cmd,logging=false) with output fails:',
   '(1)output,status are captured and returned',
   '(2)cmd,output,status are not logged' do
-    shell_exec('sed salmon 2>&1', log=false)
+    shell_exec('sed salmon 2>&1', logginf = false)
     assert_output "sed: unmatched 'a'\n"
     assert_status 1
     assert_log []
@@ -94,8 +93,8 @@ class ExternalShellerTest < RunnerTestBase
 
   # - - - - - - - - - - - - - - - - -
 
-  def shell_exec(command, log=true)
-    @output, @status = shell.exec(command, log)
+  def shell_exec(command, logging = true)
+    @output, @status = shell.exec(command, logging)
   end
 
   def assert_output(expected)
@@ -108,7 +107,7 @@ class ExternalShellerTest < RunnerTestBase
 
   def assert_log(expected)
     line = '-' * 40
-    expected = [line] + expected if expected != []
+    expected.unshift(line) unless expected == []
     assert_equal expected, log.spied
   end
 

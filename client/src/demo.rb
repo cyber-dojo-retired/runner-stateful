@@ -27,19 +27,19 @@ class Demo < Sinatra::Base
     html += pre('new_avatar', duration, json)
 
     duration = timed { json = run(tests_run_but_fail) }
-    html += pre('run', duration, json, 'red')
+    html += pre('run', duration, json, 'Red')
 
     syntax_error = { 'hiker.c' => 'sdsdsdsd' }
     duration = timed { json = run(syntax_error) }
-    html += pre('run', duration, json, 'yellow')
+    html += pre('run', duration, json, 'Yellow')
 
     tests_run_and_pass = { 'hiker.c' => hiker_c.sub('6 * 9', '6 * 7') }
     duration = timed { json = run(tests_run_and_pass) }
-    html += pre('run', duration, json, 'green')
+    html += pre('run', duration, json, 'Lime')
 
     times_out = { 'hiker.c' => hiker_c.sub('return', 'for(;;); return') }
     duration = timed { json = run(times_out, 3) }
-    html += pre('run', duration, json, 'gray')
+    html += pre('run', duration, json, 'LightGray')
 
     duration = timed { json = runner.old_avatar(kata_id, avatar_name) }
     html += pre('old_avatar', duration, json)
