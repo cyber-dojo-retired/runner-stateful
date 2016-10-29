@@ -26,5 +26,3 @@ after_success:
         docker login --username "${DOCKER_USERNAME}" --password "${DOCKER_PASSWORD}";
         docker push cyberdojo/runner:${DOCKER_ENGINE_VERSION};
       fi
-    #- docker login --username ${DOCKER_USERNAME} --password ${DOCKER_PASSWORD}
-    #- docker push cyberdojo/runner:${DOCKER_ENGINE_VERSION}
