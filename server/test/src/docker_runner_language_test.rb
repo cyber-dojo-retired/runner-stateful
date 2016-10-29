@@ -23,8 +23,6 @@ class DockerRunnerLanguageTest < RunnerTestBase
   '[C(gcc),assert] (an Ubuntu-based image)' do
     output, _status = assert_run(files('gcc_assert'))
     assert output.include?('Assertion failed: answer() == 42'), output
-    assert_user_exists
-    assert_group_exists
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -33,8 +31,6 @@ class DockerRunnerLanguageTest < RunnerTestBase
   '[Ruby,MiniTest] (an Alpine-based image)' do
     output, _status = assert_run(files('ruby_mini_test'))
     assert output.include?('1 runs, 1 assertions, 1 failures, 0 errors, 0 skips'), output
-    assert_user_exists
-    assert_group_exists
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -43,8 +39,6 @@ class DockerRunnerLanguageTest < RunnerTestBase
   '[C#,Moq] runs (it explicitly names /sandbox in cyber-dojo.sh)' do
     output, _status = assert_run(files('csharp_moq'))
     assert output.include?('Tests run: 1, Errors: 0, Failures: 1, Inconclusive: 0'), output
-    assert_user_exists
-    assert_group_exists
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -53,20 +47,6 @@ class DockerRunnerLanguageTest < RunnerTestBase
   '[C#-NUnit] runs (it needs to pick up HOME from the current user)' do
     output, _status = assert_run(files('csharp_nunit'))
     assert output.include?('Tests run: 1, Errors: 0, Failures: 1, Inconclusive: 0'), output
-    assert_user_exists
-    assert_group_exists
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def assert_user_exists
-    output, _ = assert_run({ 'cyber-dojo.sh' => 'getent passwd nobody' })
-    assert output.start_with?(user), output
-  end
-
-  def assert_group_exists
-    output, _ = assert_run({ 'cyber-dojo.sh' => 'getent group nogroup' })
-    assert output.start_with?(group), output
   end
 
 end
