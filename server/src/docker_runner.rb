@@ -112,7 +112,7 @@ class DockerRunner
         Process.waitpid(pid)
         write_out.close
         write_err.close
-        [completed, read_out.readlines.join, read_err.readlines.join]
+        [completed, read_out.read, read_err.read]
       end
     rescue Timeout::Error
       Process.kill(-9, pid)
