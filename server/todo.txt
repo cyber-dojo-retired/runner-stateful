@@ -10,22 +10,18 @@ o) massage micro_service returned strings.
 o) write the hello()-datetime to a known file inside the volume.
    write the run()-datetime to a known file inside the volume.
    Separate reaper/pruner service can delete old volumes.
+   Or should the time-stamps come from the storer?
 
-o) validate microservice parameters.
+o) validate microservice parameters?
    - kata_id = 10 hex chars
    - avatar_name = one of the known 64 animals
    - max_seconds = integer (with max of 15 seconds?)
    - deleted_filenames (what chars are illegal in linux filename?)
    - changed_files
 
-o) client tests: would be nice to set runner_server's Logger
-    to NullLogger, or to quieter logger, eg one that does not log success
-    Getting lots of stdout loggin from the runner-server when the
-    runner-client calls into it.
-
 o) runner_server micro-service needs to check each shell call and return
    { status:error, output:msg }
-   if somthing goes wrong.
+   if something goes wrong.
 
 o) Should there be a volume per kata rather than per animal?
    This feels right. Fits with the value-system of cyber-dojo.
