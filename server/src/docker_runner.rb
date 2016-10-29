@@ -1,4 +1,4 @@
-require_relative './nearest_ancestors'
+require_relative './nearest_external'
 require 'timeout'
 
 class DockerRunner
@@ -206,9 +206,9 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  include NearestAncestors
-  def disk;  nearest_ancestors(:disk);  end
-  def shell; nearest_ancestors(:shell); end
+  include NearestExternal
+  def disk;  nearest_external(:disk);  end
+  def shell; nearest_external(:shell); end
   def exec(cmd, logging = true); shell.exec(cmd, logging); end
 
 end

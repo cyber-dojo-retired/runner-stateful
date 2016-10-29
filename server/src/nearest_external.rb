@@ -1,7 +1,7 @@
 
-module NearestAncestors
+module NearestExternal
 
-  def nearest_ancestors(symbol, my = self)
+  def nearest_external(symbol, my = self)
     loop {
       fail "#{my.class.name} does not have a parent" unless my.respond_to? :parent
       my = my.parent
@@ -21,6 +21,5 @@ end
 #   o) log   - memory/stdout based logging
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Allows classes representing external objects to easily access
-# each other as well. For example:
-#     HostShell -> log   -> HostLog
+# each other as well.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

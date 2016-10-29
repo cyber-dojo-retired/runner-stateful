@@ -1,4 +1,4 @@
-require_relative './nearest_ancestors'
+require_relative './nearest_external'
 
 class ExternalSheller
 
@@ -30,8 +30,8 @@ class ExternalSheller
 
   private
 
-  include NearestAncestors
-  def log; nearest_ancestors(:log); end
+  include NearestExternal
+  def log; nearest_external(:log); end
 
   def success; 0; end
   def line; '-' * 40; end
