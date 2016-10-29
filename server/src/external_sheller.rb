@@ -11,21 +11,23 @@ class ExternalSheller
 
   def exec(*commands)
     command = commands.join(' && ')
-    log << '-'*40
-    log << "COMMAND:#{command}"
-
     begin
       output = `#{command}`
     rescue Exception => e
+      log << '-' * 40
+      log << "COMMAND:#{command}"
       log << "RAISED-CLASS:#{e.class.name}"
       log << "RAISED-TO_S:#{e.to_s}"
       raise e
     end
 
     status = $?.exitstatus
-    log << "NO-OUTPUT:" if output == ''
-    log << "OUTPUT:#{output}" if output != ''
-    log << "EXITED:#{status}"
+    if status != success
+      log << '-' * 40
+      log << "COMMAND:#{command}"
+      log << "OUTPUT:#{output}"
+      log << "STATUS:#{status}"
+    end
     [cleaned(output), status]
   end
 
@@ -35,5 +37,6 @@ class ExternalSheller
   include StringCleaner
 
   def log; nearest_ancestors(:log); end
+  def success; 0; end
 
 end

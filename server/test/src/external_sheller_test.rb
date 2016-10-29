@@ -23,27 +23,42 @@ class ExternalShellerTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - -
 
   test 'DBB',
-  'when exec() succeeds:' +
-  '(1)output is captured,' +
-  '(2)exit-status is success,' +
-  '(3)log records success' do
+  'when exec(cmd) succeeds:',
+  '(1)output,status is captured and returned,',
+  '(2)nothing is logged' do
     shell_exec('echo -n Hello')
     assert_output 'Hello'
-    assert_exit_status success
+    assert_status 0
+    assert_log []
+  end
+
+  # - - - - - - - - - - - - - - - - -
+
+  test '490',
+  'when exec(cmd) with no output fails:',
+  '(1)output,status is captured and returned,',
+  '(2)cmd,output,status is logged' do
+    shell_exec('false')
+    assert_output ''
+    assert_status 1
     assert_log [
-      'COMMAND:echo -n Hello',
-      'OUTPUT:Hello',
-      'EXITED:0'
+      'COMMAND:false',
+      'OUTPUT:',
+      'STATUS:1'
     ]
   end
 
   # - - - - - - - - - - - - - - - - -
 
+  # TODO: exec(cmd) with output fails: stdout and stderr?
+
+  # - - - - - - - - - - - - - - - - -
+
   test 'AF6',
-  'when exec() fails:' +
-  '(0)exception is raised,' +
+  'when exec() raises:',
+  '(0)exception is raised,',
   '(1)output is captured,' +
-  '(2)exit-status is not success,' +
+  '(2)exit-status is not success,',
   '(3)log records failure' do
     assert_raises { shell_exec('zzzz') }
     assert_log [
@@ -56,24 +71,21 @@ class ExternalShellerTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - -
 
   def shell_exec(command)
-    @output, @exit_status = shell.exec(command)
+    @output, @status = shell.exec(command)
   end
 
   def assert_output(expected)
     assert_equal expected, @output
   end
 
-  def assert_exit_status(expected)
-    assert_equal expected, @exit_status
+  def assert_status(expected)
+    assert_equal expected, @status
   end
 
   def assert_log(expected)
     line = '-' * 40
-    assert_equal [line] + expected, log.spied
-  end
-
-  def success
-    0
+    expected = [line] + expected if expected != []
+    assert_equal expected, log.spied
   end
 
 end
