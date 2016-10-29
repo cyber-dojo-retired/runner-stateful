@@ -79,8 +79,11 @@ $ ./test.sh
 Runs inside the runner-client's container.
 Calls each of the runner-server's micro-service methods
 once and displays their json results and how long they took.
-If the runner-client's IP address is 192.168.99.100 then put
-192.168.99.100:4558 into your browser to see the output.
 ```
 $ ./demo.sh
 ```
+If the runner-client's IP address is 192.168.99.100 then put
+192.168.99.100:4558 into your browser to see the output.
+
+![Alt text](red_amber_green_demo.png?raw=true "title")
+
