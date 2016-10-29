@@ -1,4 +1,3 @@
-require_relative './null_logger'
 require 'json'
 
 module DockerRunnerHelpers
