@@ -20,7 +20,8 @@ class RunnerAppTest < LibTestBase
     hello
     runner_run(files)
     assert_equal completed, status
-    assert stdout.start_with?('Assertion failed: answer() == 42'), stdout
+    assert stderr.start_with?('Assertion failed: answer() == 42'), json
+    assert_equal '', stdout, json
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -32,6 +33,7 @@ class RunnerAppTest < LibTestBase
     runner_run(files)
     assert_equal completed, status, json
     assert_equal "All tests passed\n", stdout, json
+    assert_equal '', stderr, json
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -46,7 +48,8 @@ class RunnerAppTest < LibTestBase
       "invalid suffix \"sss\" on integer constant",
       'return 6 * 9sss'
     ]
-    lines.each { |line| assert stdout.include?(line), json }
+    lines.each { |line| assert stderr.include?(line), json }
+    assert_equal '', stdout, json
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -57,8 +60,8 @@ class RunnerAppTest < LibTestBase
     files['hiker.c'] = files['hiker.c'].sub('return', 'for(;;); return')
     runner_run(files, 3)
     assert_equal timed_out, status, json
-    assert_equal '', stdout
-    assert_equal '', stderr
+    assert_equal '', stdout, json
+    assert_equal '', stderr, json
   end
 
   private

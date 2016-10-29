@@ -49,6 +49,12 @@ module DockerRunnerHelpers
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  def assert_run_completes_no_stderr(*args)
+    stdout, stderr = assert_run_completes(*args)
+    assert_equal '', stderr
+    stdout
+  end
+
   def assert_run_completes(*args)
     status, stdout, stderr = runner_run(*args)
     assert_equal completed, status, [stdout, stderr]

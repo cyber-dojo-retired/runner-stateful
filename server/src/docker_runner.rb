@@ -114,7 +114,7 @@ class DockerRunner
       "--interactive",
       cid,
       'sh -c',
-      "./cyber-dojo.sh 2>&1"
+      "./cyber-dojo.sh"
     ].join(space = ' ')
 
     # http://stackoverflow.com/questions/8292031/ruby-timeouts-and-system-commands

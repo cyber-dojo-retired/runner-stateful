@@ -32,9 +32,9 @@ class DockerRunnerUserGroupTest < RunnerTestBase
 
   def assert_user_group_exists_in(image_name)
     @image_name = image_name
-    stdout, _stderr = assert_run_completes({ 'cyber-dojo.sh' => 'getent passwd nobody' })
+    stdout, _ = assert_run_completes_no_stderr({ 'cyber-dojo.sh' => 'getent passwd nobody' })
     assert stdout.start_with?(user), stdout
-    stdout, _stderr = assert_run_completes({ 'cyber-dojo.sh' => 'getent group nogroup' })
+    stdout, _ = assert_run_completes_no_stderr({ 'cyber-dojo.sh' => 'getent group nogroup' })
     assert stdout.start_with?(group), stdout
   end
 
