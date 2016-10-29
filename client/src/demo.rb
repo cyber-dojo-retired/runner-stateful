@@ -7,7 +7,7 @@ class Demo < Sinatra::Base
 
   get '/' do
     hiker_c = read('hiker.c')
-    files = {
+    tests_run_but_fail = {
       'hiker.c'       => hiker_c,
       'hiker.h'       => read('hiker.h'),
       'hiker.tests.c' => read('hiker.tests.c'),
@@ -26,14 +26,20 @@ class Demo < Sinatra::Base
     duration = timed { json = runner.hello(kata_id, avatar_name) }
     html += pre('hello', duration, json)
 
-    duration = timed { json = run(files) }
+    duration = timed { json = run(tests_run_but_fail) }
     html += pre('run', duration, json, 'red')
 
-    duration = timed { json = run({ 'hiker.c' => 'sdfsdfsdf'}) }
+    syntax_error = { 'hiker.c' => 'sdsdsdsd' }
+    duration = timed { json = run(syntax_error) }
     html += pre('run', duration, json, 'yellow')
 
-    duration = timed { json = run({ 'hiker.c' => hiker_c.sub('6 * 9', '6 * 7') }) }
+    tests_run_and_pass = { 'hiker.c' => hiker_c.sub('6 * 9', '6 * 7') }
+    duration = timed { json = run(tests_run_and_pass) }
     html += pre('run', duration, json, 'green')
+
+    times_out = { 'hiker.c' => hiker_c.sub('return', 'for(;;); return') }
+    duration = timed { json = run(times_out, 3) }
+    html += pre('run', duration, json, 'gray')
 
     duration = timed { json = runner.goodbye(kata_id, avatar_name) }
     html += pre('goodbye', duration, json)
@@ -43,13 +49,12 @@ class Demo < Sinatra::Base
 
   private
 
+  def image_name; 'cyberdojofoundation/gcc_assert'; end
   def kata_id; 'D4C8A65D61'; end
   def avatar_name; 'lion'; end
-  def image_name; 'cyberdojofoundation/gcc_assert'; end
-  def max_seconds; 10; end
-  def deleted_filenames; []; end
 
-  def run(files)
+  def run(files, max_seconds = 10)
+    deleted_filenames = []
     runner.run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, files)
   end
 
