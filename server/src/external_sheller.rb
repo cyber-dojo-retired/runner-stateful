@@ -9,13 +9,6 @@ class ExternalSheller
 
   attr_reader :parent
 
-  def cd_exec(path, *commands)
-    # [[ -d ]] avoids spurious [cd path] failure
-    # output when the tests are running
-    output, exit_status = exec(["[[ -d #{path} ]]", "cd #{path}"] + commands)
-    [output, exit_status]
-  end
-
   def exec(*commands)
     command = commands.join(' && ')
     log << '-'*40
@@ -29,11 +22,11 @@ class ExternalSheller
       raise e
     end
 
-    exit_status = $?.exitstatus
+    status = $?.exitstatus
     log << "NO-OUTPUT:" if output == ''
     log << "OUTPUT:#{output}" if output != ''
-    log << "EXITED:#{exit_status}"
-    [cleaned(output), exit_status]
+    log << "EXITED:#{status}"
+    [cleaned(output), status]
   end
 
   private
