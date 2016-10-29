@@ -18,7 +18,7 @@ class Demo < Sinatra::Base
       'cyber-dojo.sh' => read('cyber-dojo.sh'),
       'makefile'      => read('makefile')
     }
-    html = ''
+    html = '<div style="font-size:0.5em">'
     json = nil
 
     duration = timed { json = runner.pulled?(image_name) }
@@ -33,10 +33,11 @@ class Demo < Sinatra::Base
     duration = timed { json =
       runner.run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
     }
-    html += pre('run', duration, json)
+    html += pre('run', duration, json, 'red')
 
     duration = timed { json = runner.goodbye(kata_id, avatar_name) }
     html += pre('goodbye', duration, json)
+    html += '</div>'
   end
 
   private
@@ -56,8 +57,14 @@ class Demo < Sinatra::Base
     '%.2f' % (finished - started)
   end
 
-  def pre(name, duration, json)
-    "<pre>/#{name}(#{duration}s)->#{JSON.pretty_unparse(json)}</pre>"
+  def pre(name, duration, json, colour = 'white')
+    border = 'border:1px solid black'
+    padding = 'padding:10px'
+    background = "background:#{colour}"
+    "<pre>/#{name}(#{duration}s)</pre>" +
+    "<pre style='#{border};#{padding};#{background}'>" +
+    "#{JSON.pretty_unparse(json)}" +
+    '</pre>'
   end
 
 end
