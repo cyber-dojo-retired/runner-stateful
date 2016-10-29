@@ -13,12 +13,14 @@ class MicroService < Sinatra::Base
   post '/goodbye' do; jasoned *runner.goodbye(kata_id, avatar_name); end
 
   post '/run' do
-    status, stdout, _stderr = runner.run(
+    status, stdout, stderr = runner.run(
       image_name,
       kata_id, avatar_name,
       max_seconds,
-      deleted_filenames, changed_files)
-    jasoned(stdout, status)
+      deleted_filenames, changed_files
+    )
+    content_type :json
+    { status:status, stdout:stdout, stderr:stderr }.to_json
   end
 
   private

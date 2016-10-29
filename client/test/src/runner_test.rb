@@ -18,9 +18,9 @@ class RunnerAppTest < LibTestBase
   test '348',
   'red-traffic-light' do
     hello
-    do_run(files)
+    runner_run(files)
     assert_equal completed, status
-    assert output.start_with?('Assertion failed: answer() == 42'), output
+    assert stdout.start_with?('Assertion failed: answer() == 42'), stdout
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -29,9 +29,9 @@ class RunnerAppTest < LibTestBase
   'green-traffic-light' do
     hello
     files['hiker.c'] = files['hiker.c'].sub('6 * 9', '6 * 7')
-    do_run(files)
+    runner_run(files)
     assert_equal completed, status, json
-    assert_equal "All tests passed\n", output, json
+    assert_equal "All tests passed\n", stdout, json
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -40,13 +40,13 @@ class RunnerAppTest < LibTestBase
   'amber-traffic-light' do
     hello
     files['hiker.c'] = files['hiker.c'].sub('6 * 9', '6 * 9sss')
-    do_run(files)
+    runner_run(files)
     assert_equal completed, status, json
     lines = [
       "invalid suffix \"sss\" on integer constant",
       'return 6 * 9sss'
     ]
-    lines.each { |line| assert output.include?(line), json }
+    lines.each { |line| assert stdout.include?(line), json }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -55,9 +55,10 @@ class RunnerAppTest < LibTestBase
   'timed-out-traffic-light' do
     hello
     files['hiker.c'] = files['hiker.c'].sub('return', 'for(;;); return')
-    do_run(files, 3)
+    runner_run(files, 3)
     assert_equal timed_out, status, json
-    assert_equal '', output
+    assert_equal '', stdout
+    assert_equal '', stderr
   end
 
   private
@@ -70,7 +71,7 @@ class RunnerAppTest < LibTestBase
     @json = runner.goodbye(kata_id, avatar_name)
   end
 
-  def do_run(changed_files, max_seconds = 10)
+  def runner_run(changed_files, max_seconds = 10)
     @json = runner.run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
   end
 
@@ -80,7 +81,8 @@ class RunnerAppTest < LibTestBase
 
   def json; @json; end
   def status; json['status']; end
-  def output; json['output']; end
+  def stdout; json['stdout']; end
+  def stderr; json['stderr']; end
 
   def image_name; 'cyberdojofoundation/gcc_assert'; end
   def kata_id; test_id; end
