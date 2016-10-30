@@ -36,4 +36,12 @@ class DockerRunnerStoringTest < RunnerTestBase
   # test
   # new_avatar is idempotent
 
+  private
+
+  def volume_exists?
+    volume_name = 'cyber_dojo_' + kata_id + '_' + avatar_name
+    output, _ = assert_exec('docker volume ls')
+    output.include? volume_name
+  end
+
 end
