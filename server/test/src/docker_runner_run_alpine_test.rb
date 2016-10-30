@@ -52,7 +52,7 @@ class DockerRunnerRunningTest < RunnerTestBase
     start_filenames = %w( hiker.h hiker.c hiker.tests.c cyber-dojo.sh makefile )
     assert_equal start_filenames.sort, gcc_assert_files.keys.sort
 
-    gcc_assert_files['cyber-dojo.sh'] = 'ls -el | tail -n +2'
+    gcc_assert_files['cyber-dojo.sh'] = 'ls -el'
     ls_stdout, _ = assert_run_completes_no_stderr(gcc_assert_files)
     files = ls_parse(ls_stdout)
     assert_equal start_filenames.sort, files.keys.sort
@@ -71,7 +71,7 @@ class DockerRunnerRunningTest < RunnerTestBase
 
   test '4E8',
   'unchanged files still exist and are unchanged' do
-    gcc_assert_files['cyber-dojo.sh'] = 'ls -el | tail -n +2'
+    gcc_assert_files['cyber-dojo.sh'] = 'ls -el'
     before_ls, _ = assert_run_completes_no_stderr(gcc_assert_files)
     after_ls, _ = assert_run_completes_no_stderr(changed_files = {})
     assert_equal before_ls, after_ls
@@ -82,7 +82,7 @@ class DockerRunnerRunningTest < RunnerTestBase
   test '385',
   'deleted files are removed',
   'and all previous files are unchanged' do
-    gcc_assert_files['cyber-dojo.sh'] = 'ls -el | tail -n +2'
+    gcc_assert_files['cyber-dojo.sh'] = 'ls -el'
     ls_stdout, _ = assert_run_completes_no_stderr(gcc_assert_files)
     before = ls_parse(ls_stdout)
     before_filenames = before.keys
@@ -107,7 +107,7 @@ class DockerRunnerRunningTest < RunnerTestBase
   test '232',
   'new files are added with appropriate ownership and permissions',
   'and all previous files are unchanged' do
-    gcc_assert_files['cyber-dojo.sh'] = 'ls -el | tail -n +2'
+    gcc_assert_files['cyber-dojo.sh'] = 'ls -el'
     ls_stdout, _ = assert_run_completes_no_stderr(gcc_assert_files)
     before = ls_parse(ls_stdout)
     before_filenames = before.keys
@@ -135,7 +135,7 @@ class DockerRunnerRunningTest < RunnerTestBase
   test '9A7',
   'a changed file is resaved and its size and time-stamp updates',
   'and all previous files are unchanged' do
-    gcc_assert_files['cyber-dojo.sh'] = 'ls -el | tail -n +2'
+    gcc_assert_files['cyber-dojo.sh'] = 'ls -el'
     ls_output, _ = assert_run_completes_no_stderr(gcc_assert_files)
     before = ls_parse(ls_output)
 
@@ -170,7 +170,7 @@ class DockerRunnerRunningTest < RunnerTestBase
     # each line looks like this...
     # -rwxr-xr-x 1 nobody root 19 Sun Oct 23 19:15:35 2016 cyber-dojo.sh
     # 0          1 2      3    4  5   6   7  8        9    10
-    Hash[ls_output.split("\n").collect { |line|
+    Hash[ls_output.split("\n")[1..-1].collect { |line|
       info = line.split
       filename = info[10]
       [filename, {
