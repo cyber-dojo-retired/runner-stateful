@@ -15,22 +15,30 @@ class DockerRunnerLanguageTest < RunnerTestBase
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # TODO: add check that gcc_assert is Alpine-based
-  # TODO: add check that Java,Cucumber is Ubuntu-based
 
   test 'CA0',
-  '[C(gcc),assert] runs (an Alpine-based image)' do
-    stdout, stderr = assert_run_completes(files('gcc_assert'))
+  'an Alpine-based image runs [C(gcc),assert]' do
+    src = files('gcc_assert')
+    stdout, stderr = assert_run_completes(src)
     assert stderr.include?('Assertion failed: answer() == 42'), stderr
     assert_equal '', stdout
+
+    src['cyber-dojo.sh'] = 'cat /etc/issue'
+    stdout, _ = assert_run_completes_no_stderr(src)
+    assert stdout.include?('Alpine'), stdout
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '5F0',
-  '[Java,Cucumber] runs (an Ubuntu-based image)' do
-    stdout, _ = assert_run_completes_no_stderr(files('java_cucumber'))
+  'an Ubuntu-based image runs [Java,Cucumber]' do
+    src = files('java_cucumber')
+    stdout, _ = assert_run_completes_no_stderr(src)
     assert stdout.include?('Hiker.feature:4 # Scenario: last earthling playing scrabble'), stdout
+
+    src['cyber-dojo.sh'] = 'cat /etc/issue'
+    stdout, _ = assert_run_completes_no_stderr(src)
+    assert stdout.include?('Ubuntu'), stdout
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
