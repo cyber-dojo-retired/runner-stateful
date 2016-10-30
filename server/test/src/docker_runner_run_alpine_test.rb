@@ -167,9 +167,11 @@ class DockerRunnerRunningTest < RunnerTestBase
   private
 
   def ls_parse(ls_output)
-    # each line looks like this...
-    # -rwxr-xr-x 1 nobody root 19 Sun Oct 23 19:15:35 2016 cyber-dojo.sh
-    # 0          1 2      3    4  5   6   7  8        9    10
+    # .............total 20
+    # -rwxr-xr-x 1 nobody root     6 Sun Oct 30 10:36:16 2016 cyber-dojo.sh
+    # -rw-r--r-- 1 nobody nogroup 59 Sun Oct 30 10:36:16 2016 hiker.c
+    # |          | |      |       |  |   |   |  |        |    |
+    # 0          1 2      3       4  5   6   7  8        9    10
     Hash[ls_output.split("\n")[1..-1].collect { |line|
       info = line.split
       filename = info[10]
