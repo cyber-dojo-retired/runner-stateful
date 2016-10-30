@@ -1,6 +1,6 @@
 require_relative './runner_test_base'
 
-class DockerRunnerStepsTest < RunnerTestBase
+class DockerRunnerRunningTest < RunnerTestBase
 
   def self.hex_prefix
     '4D87A'
@@ -38,11 +38,14 @@ class DockerRunnerStepsTest < RunnerTestBase
 
   test '385',
   'deleted files are removed and all previous files still exist' do
-    files['cyber-dojo.sh'] = 'ls'
-    ls_stdout, _ = assert_run_completes_no_stderr(files)
+    gcc_assert_files['cyber-dojo.sh'] = 'ls'
+    ls_stdout, _ = assert_run_completes_no_stderr(gcc_assert_files)
     before_filenames = ls_stdout.split
 
-    ls_stdout, _ = assert_run_completes_no_stderr({}, max_seconds = 10, [ 'makefile' ])
+    changed_files = {}
+    max_seconds = 10
+    deleted_filenames = ['makefile']
+    ls_stdout, _ = assert_run_completes_no_stderr(changed_files, max_seconds, deleted_filenames)
     after_filenames = ls_stdout.split
 
     deleted_filenames = before_filenames - after_filenames
@@ -53,12 +56,13 @@ class DockerRunnerStepsTest < RunnerTestBase
 
   test '232',
   'new files are added and all previous files still exist' do
-    files['cyber-dojo.sh'] = 'ls'
-    ls_stdout, _ = assert_run_completes_no_stderr(files)
+    assert_equal 5, gcc_assert_files.size
+    gcc_assert_files['cyber-dojo.sh'] = 'ls'
+    ls_stdout, _ = assert_run_completes_no_stderr(gcc_assert_files)
     before_filenames = ls_stdout.split
 
-    files = { 'newfile.txt' => 'hello world' }
-    ls_stdout, _ = assert_run_completes_no_stderr(files)
+    changed_files = { 'newfile.txt' => 'hello world' }
+    ls_stdout, _ = assert_run_completes_no_stderr(changed_files)
     after_filenames = ls_stdout.split
 
     new_filenames = after_filenames - before_filenames
@@ -71,8 +75,8 @@ class DockerRunnerStepsTest < RunnerTestBase
 
   test '4E8',
   "unchanged files still exist and don't get touched at all" do
-    files['cyber-dojo.sh'] = 'ls -el'
-    before_ls, _ = assert_run_completes_no_stderr(files)
+    gcc_assert_files['cyber-dojo.sh'] = 'ls -el'
+    before_ls, _ = assert_run_completes_no_stderr(gcc_assert_files)
     after_ls, _ = assert_run_completes_no_stderr({})
 
     assert_equal before_ls, after_ls
@@ -133,6 +137,10 @@ class DockerRunnerStepsTest < RunnerTestBase
          time_stamp: info[8],
       }]
     }]
+  end
+
+  def gcc_assert_files
+    files('gcc_assert')
   end
 
 end

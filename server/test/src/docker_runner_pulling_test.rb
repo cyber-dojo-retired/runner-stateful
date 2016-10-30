@@ -1,6 +1,6 @@
 require_relative './runner_test_base'
 
-class DockerRunnerPullTest < RunnerTestBase
+class DockerRunnerPullingTest < RunnerTestBase
 
   def self.hex_prefix
     'CFC38'

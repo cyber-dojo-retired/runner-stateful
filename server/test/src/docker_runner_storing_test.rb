@@ -1,6 +1,6 @@
 require_relative './runner_test_base'
 
-class DockerRunnerVolumeTest < RunnerTestBase
+class DockerRunnerStoringTest < RunnerTestBase
 
   def self.hex_prefix
     'FEA56'
@@ -30,5 +30,10 @@ class DockerRunnerVolumeTest < RunnerTestBase
     old_avatar
     refute volume_exists?
   end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  # test
+  # new_avatar is idempotent
 
 end

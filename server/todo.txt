@@ -3,6 +3,8 @@
 runner_server:
 -------------------------------------------------
 
+o) remove 'gcc_assert' default on files
+
 o) if the file being copied is wibble.sh (say) and has
    execute rights then does [docker cp] preservice the
    execute status of wibble.sh inside the container?
