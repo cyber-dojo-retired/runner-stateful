@@ -51,16 +51,12 @@ class HexMiniTest < MiniTest::Test
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def _hex_setup_caller(hex_id)
-    @config = {}
-    env_map.keys.each { |key| @config[key] = ENV[key] }
     @_hex_test_id = hex_id
     hex_setup
   end
 
   def _hex_teardown_caller
     hex_teardown
-  ensure
-    env_map.keys.each { |key| ENV[key] = @config[key] }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -

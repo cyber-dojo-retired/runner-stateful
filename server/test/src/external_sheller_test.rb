@@ -3,15 +3,15 @@ require_relative './spy_logger'
 
 class ExternalShellerTest < RunnerTestBase
 
-  include Externals
-
   def self.hex_prefix
     'C89'
   end
 
   def hex_setup
-    ENV[env_name('log')] = 'SpyLogger'
+    @log = SpyLogger.new(self)
   end
+
+  attr_reader :log
 
   # - - - - - - - - - - - - - - - - -
 

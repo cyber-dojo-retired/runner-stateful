@@ -42,8 +42,6 @@ module DockerRunnerHelpers
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def runner; DockerRunner.new(self); end
-
   def user; runner.user; end
   def group; runner.group; end
   def sandbox; runner.sandbox; end
@@ -85,8 +83,6 @@ module DockerRunnerHelpers
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  include Externals # for shell
 
   def assert_exec(cmd)
     output, status = exec(cmd)

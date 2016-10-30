@@ -6,10 +6,6 @@ class ExternalDiskWriterTest < RunnerTestBase
     'FDF13'
   end
 
-  class App; include Externals; end
-
-  def disk; App.new.disk; end
-
   test 'D4C',
   'what gets written gets read back' do
     Dir.mktmpdir('file_writer') do |tmp_dir|

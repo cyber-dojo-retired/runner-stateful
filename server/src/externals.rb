@@ -1,20 +1,11 @@
-require_relative './external_env_vars'
-require_relative './name_of_caller'
+require_relative './external_disk_writer'
+require_relative './external_sheller'
+require_relative './external_stdout_logger'
 
 module Externals
 
-  def disk ; @disk  ||= external; end
-  def log  ; @log   ||= external; end
-  def shell; @shell ||= external; end
-
-  private
-
-  def external
-    name = env_name(name_of(caller))
-    var = ENV[name] || fail("ENV[#{name}] not set")
-    Object.const_get(var).new(self)
-  end
-
-  include NameOfCaller
+  def shell; @shell ||= ExternalSheller.new(self); end
+  def  disk;  @disk ||= ExternalDiskWriter.new(self); end
+  def   log;   @log ||= ExternalStdoutLogger.new(self); end
 
 end

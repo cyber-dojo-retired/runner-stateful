@@ -9,7 +9,7 @@ class DockerRunnerStoringTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'DBC',
-  "before new_avatar volume does not exist,",
+  'before new_avatar volume does not exist,',
   'after new_avatar it does' do
     refute volume_exists?
     _, status = new_avatar
@@ -24,7 +24,7 @@ class DockerRunnerStoringTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '9A9',
-  "before old_avatar volume exists,",
+  'before old_avatar volume exists,',
   'after old_avatar its does not' do
     new_avatar
     old_avatar
