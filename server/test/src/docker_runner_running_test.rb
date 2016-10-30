@@ -77,7 +77,7 @@ class DockerRunnerRunningTest < RunnerTestBase
   "unchanged files still exist and don't get touched at all" do
     gcc_assert_files['cyber-dojo.sh'] = 'ls -el'
     before_ls, _ = assert_run_completes_no_stderr(gcc_assert_files)
-    after_ls, _ = assert_run_completes_no_stderr({})
+    after_ls, _ = assert_run_completes_no_stderr(changed_files = {})
 
     assert_equal before_ls, after_ls
     assert_equal 6, before_ls.split("\n").size
@@ -87,8 +87,8 @@ class DockerRunnerRunningTest < RunnerTestBase
 
   test '9A7',
   'a changed file is resaved and its size and time-stamp updates' do
-    files['cyber-dojo.sh'] = 'ls -el | tail -n +2'
-    ls_output, _ = assert_run_completes_no_stderr(files)
+    gcc_assert_files['cyber-dojo.sh'] = 'ls -el | tail -n +2'
+    ls_output, _ = assert_run_completes_no_stderr(gcc_assert_files)
     # each line looks like this...
     # -rwxr-xr-x 1 nobody root 19 Sun Oct 23 19:15:35 2016 cyber-dojo.sh
     before = ls_parse(ls_output)
@@ -96,10 +96,10 @@ class DockerRunnerRunningTest < RunnerTestBase
 
     sleep 2
 
-    hiker_h = files['hiker.h']
+    hiker_h = gcc_assert_files['hiker.h']
     extra = '//hello'
-    files = { 'hiker.h' => hiker_h + extra }
-    ls_output, _ = assert_run_completes_no_stderr(files)
+    changed_files = { 'hiker.h' => hiker_h + extra }
+    ls_output, _ = assert_run_completes_no_stderr(changed_files)
     after = ls_parse(ls_output)
 
     assert_equal before.keys, after.keys
@@ -137,10 +137,6 @@ class DockerRunnerRunningTest < RunnerTestBase
          time_stamp: info[8],
       }]
     }]
-  end
-
-  def gcc_assert_files
-    files('gcc_assert')
   end
 
 end

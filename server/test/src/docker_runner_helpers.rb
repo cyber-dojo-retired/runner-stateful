@@ -15,8 +15,12 @@ module DockerRunnerHelpers
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def files(language_dir = 'gcc_assert')
+  def files(language_dir)
     @files ||= load_files(language_dir)
+  end
+
+  def gcc_assert_files
+    files('gcc_assert')
   end
 
   def load_files(language_dir)

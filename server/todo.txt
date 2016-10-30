@@ -4,6 +4,7 @@ runner_server:
 -------------------------------------------------
 
 o) remove 'gcc_assert' default on files
+o) capture magic-number 5/6 in running_test
 
 o) if the file being copied is wibble.sh (say) and has
    execute rights then does [docker cp] preservice the

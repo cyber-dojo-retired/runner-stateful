@@ -21,11 +21,11 @@ class DockerRunnerTimeoutTest < RunnerTestBase
   'and does not produce output,',
   'the output is empty, and',
   'the status is timed_out' do
-    files['hiker.c'] = [
+    gcc_assert_files['hiker.c'] = [
       '#include "hiker.h"',
       'int answer(void) { for(;;); return 6 * 7; }'
     ].join("\n")
-    stdout, stderr = assert_run_times_out(files, max_seconds = 2)
+    stdout, stderr = assert_run_times_out(gcc_assert_files, max_seconds = 2)
     assert_equal '', stdout
     assert_equal '', stderr
   end
@@ -37,12 +37,12 @@ class DockerRunnerTimeoutTest < RunnerTestBase
   'and does produce output,',
   'the output is nonetheless empty, and',
   'the status is timed_out' do
-    files['hiker.c'] = [
+    gcc_assert_files['hiker.c'] = [
       '#include "hiker.h"',
       '#include <stdio.h>',
       'int answer(void) { for(;;) puts("Hello"); return 6 * 7; }'
     ].join("\n")
-    stdout, stderr = assert_run_times_out(files, max_seconds = 2)
+    stdout, stderr = assert_run_times_out(gcc_assert_files, max_seconds = 2)
     assert_equal '', stdout
     assert_equal '', stderr
   end
