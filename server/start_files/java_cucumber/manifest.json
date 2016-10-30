@@ -1,0 +1,13 @@
+
+{
+  "filenames": [
+    "README",
+    "Hiker.feature",
+    "Hiker.java",
+    "HikerStepDef.java",
+    "RunCukesTest.java",
+    "cyber-dojo.sh"
+  ],
+
+  "image_name": "cyberdojofoundation/java_cucumber_pico"
+}

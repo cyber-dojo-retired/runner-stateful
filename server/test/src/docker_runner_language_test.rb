@@ -15,28 +15,28 @@ class DockerRunnerLanguageTest < RunnerTestBase
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # TODO: add check that gcc_assert is Alpine-based
+  # TODO: add check that Java,Cucumber is Ubuntu-based
 
-  # gcc_assert is Alpine-based
-  #test 'CA0',
-  #'[C(gcc),assert] (an Ubuntu-based image)' do
-  #  stdout, stderr = assert_run_completes(files('gcc_assert'))
-  #  assert stderr.include?('Assertion failed: answer() == 42'), stderr
-  #  assert_equal '', stdout
-  #end
+  test 'CA0',
+  '[C(gcc),assert] runs (an Alpine-based image)' do
+    stdout, stderr = assert_run_completes(files('gcc_assert'))
+    assert stderr.include?('Assertion failed: answer() == 42'), stderr
+    assert_equal '', stdout
+  end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '5F0',
-  '[Ruby,MiniTest] (an Alpine-based image)' do
-    stdout, _ = assert_run_completes_no_stderr(files('ruby_mini_test'))
-    assert stdout.include?('1 runs, 1 assertions, 1 failures, 0 errors, 0 skips'), stdout
+  '[Java,Cucumber] runs (an Ubuntu-based image)' do
+    stdout, _ = assert_run_completes_no_stderr(files('java_cucumber'))
+    assert stdout.include?('Hiker.feature:4 # Scenario: last earthling playing scrabble'), stdout
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '182',
-  '[C#-NUnit] runs (an Ubuntu image)',
-  '(also, it needs to pick up HOME from the current user)' do
+  '[C#-NUnit] runs (it needs to pick up HOME from the current user)' do
     stdout, _ = assert_run_completes_no_stderr(files('csharp_nunit'))
     assert stdout.include?('Tests run: 1, Errors: 0, Failures: 1, Inconclusive: 0'), stdout
   end
