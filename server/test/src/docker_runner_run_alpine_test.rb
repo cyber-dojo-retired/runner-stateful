@@ -52,7 +52,7 @@ class DockerRunnerRunningTest < RunnerTestBase
     start_filenames = %w( hiker.h hiker.c hiker.tests.c cyber-dojo.sh makefile )
     assert_equal start_filenames.sort, gcc_assert_files.keys.sort
 
-    gcc_assert_files['cyber-dojo.sh'] = 'ls -el'
+    gcc_assert_files['cyber-dojo.sh'] = ls_cmd
     ls_stdout, _ = assert_run_completes_no_stderr(gcc_assert_files)
     files = ls_parse(ls_stdout)
     assert_equal start_filenames.sort, files.keys.sort
@@ -71,7 +71,7 @@ class DockerRunnerRunningTest < RunnerTestBase
 
   test '4E8',
   'unchanged files still exist and are unchanged' do
-    gcc_assert_files['cyber-dojo.sh'] = 'ls -el'
+    gcc_assert_files['cyber-dojo.sh'] = ls_cmd
     before_ls, _ = assert_run_completes_no_stderr(gcc_assert_files)
     after_ls, _ = assert_run_completes_no_stderr(changed_files = {})
     assert_equal before_ls, after_ls
@@ -82,7 +82,7 @@ class DockerRunnerRunningTest < RunnerTestBase
   test '385',
   'deleted files are removed',
   'and all previous files are unchanged' do
-    gcc_assert_files['cyber-dojo.sh'] = 'ls -el'
+    gcc_assert_files['cyber-dojo.sh'] = ls_cmd
     ls_stdout, _ = assert_run_completes_no_stderr(gcc_assert_files)
     before = ls_parse(ls_stdout)
     before_filenames = before.keys
@@ -107,7 +107,7 @@ class DockerRunnerRunningTest < RunnerTestBase
   test '232',
   'new files are added with appropriate ownership and permissions',
   'and all previous files are unchanged' do
-    gcc_assert_files['cyber-dojo.sh'] = 'ls -el'
+    gcc_assert_files['cyber-dojo.sh'] = ls_cmd
     ls_stdout, _ = assert_run_completes_no_stderr(gcc_assert_files)
     before = ls_parse(ls_stdout)
     before_filenames = before.keys
@@ -135,11 +135,11 @@ class DockerRunnerRunningTest < RunnerTestBase
   test '9A7',
   'a changed file is resaved and its size and time-stamp updates',
   'and all previous files are unchanged' do
-    gcc_assert_files['cyber-dojo.sh'] = 'ls -el'
+    gcc_assert_files['cyber-dojo.sh'] = ls_cmd
     ls_output, _ = assert_run_completes_no_stderr(gcc_assert_files)
     before = ls_parse(ls_output)
 
-    sleep 2
+    sleep 1.0 / 10.0
 
     hiker_h = gcc_assert_files['hiker.h']
     extra = '//hello'
@@ -166,21 +166,25 @@ class DockerRunnerRunningTest < RunnerTestBase
 
   private
 
+  def ls_cmd;
+    # Use command that works on Ubuntu and Alpine
+    'stat -c "%A %U %G %s %z %n" *'
+    # -rw-r--r--  nobody nogroup 4138 2016-06-05 07:03:14.000000000 udhcpd.conf
+    # |           |      |       |    |          |                  |
+    # 0           1      2       3    4          5                  6
+    # permissions user   group   size date       time               name
+  end
+
   def ls_parse(ls_output)
-    # .............total 20
-    # -rwxr-xr-x 1 nobody root     6 Sun Oct 30 10:36:16 2016 cyber-dojo.sh
-    # -rw-r--r-- 1 nobody nogroup 59 Sun Oct 30 10:36:16 2016 hiker.c
-    # |          | |      |       |  |   |   |  |        |    |
-    # 0          1 2      3       4  5   6   7  8        9    10
-    Hash[ls_output.split("\n")[1..-1].collect { |line|
+    Hash[ls_output.split("\n").collect { |line|
       info = line.split
-      filename = info[10]
+      filename = info[6]
       [filename, {
         permissions: info[0],
-               user: info[2],
-              group: info[3],
-               size: info[4].to_i,
-         time_stamp: info[8],
+               user: info[1],
+              group: info[2],
+               size: info[3].to_i,
+         time_stamp: info[5],
       }]
     }]
   end

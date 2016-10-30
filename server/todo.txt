@@ -3,11 +3,17 @@
 runner_server:
 -------------------------------------------------
 
-o) test new_avatar is idempotent
+o) run-alpine-test
+   - new empty file
+   - new .sh file
+   - 0C9 add permissions
+   - dont need to use gcc_assert files - can use any files!
 
 o) if the file being copied is wibble.sh (say) and has
    execute rights then does [docker cp] preserve the
    execute status of wibble.sh inside the container?
+
+o) storing test new_avatar is idempotent
 
 o) massage micro_service returned strings.
    - clean them
