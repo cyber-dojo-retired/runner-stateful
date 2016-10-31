@@ -1,5 +1,4 @@
 require_relative './client_test_base'
-# NB: if you call this file app_test.rb then SimpleCov fails to see it?!
 
 class NewAvatarTest < ClientTestBase
 

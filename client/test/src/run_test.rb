@@ -1,49 +1,10 @@
 require_relative './client_test_base'
-# NB: if you call this file app_test.rb then SimpleCov fails to see it?!
 
-class RunnerAppTest < ClientTestBase
+class RunTest < ClientTestBase
 
   def self.hex_prefix; '201BCEF'; end
   def hex_setup; new_avatar; end
   def hex_teardown; old_avatar; end
-
-  test 'C7A',
-  'pulled_image? status is true if image has been pulled' do
-    pulled_image?('cyberdojofoundation/gcc_assert')
-    assert_equal true, status
-    assert_equal '', json['output'], json
-  end
-
-  test 'F43',
-  'pulled_image? status is false if image has not been pulled' do
-    pulled_image?('cyberdojofoundation/does_not_exist')
-    assert_equal false, status
-    assert_equal '', json['output'], json
-  end
-
-  test '92F',
-  'pulled_image? with illegal image_name returns false' do
-    pulled_image?('123/456')
-    assert_equal false, status
-    assert_equal '', json['output'], json
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test '4CE',
-  'pull_image status is zero if pull succeeds' do
-    pull_image('cyberdojofoundation/gcc_assert')
-    assert_equal 0, status
-    assert json['output'].include?('Pulling from cyberdojofoundation/gcc_assert'), json
-  end
-
-  #test 'F30',
-  #'pull_image with illegal image_name returns XXXX' do
-  #  pull_image('123/456')
-  #  assert_equal 0, status
-  #  assert json['output'].include?('Pulling from cyberdojofoundation/gcc_assert'), json
-  #end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
