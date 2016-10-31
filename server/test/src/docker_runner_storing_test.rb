@@ -10,7 +10,7 @@ class DockerRunnerStoringTest < RunnerTestBase
   'before new_avatar volume does not exist,',
   'after new_avatar it does' do
     refute volume_exists?
-    _, status = new_avatar
+    _,_,status = new_avatar
     begin
       assert_equal success, status
       assert volume_exists?
@@ -33,10 +33,10 @@ class DockerRunnerStoringTest < RunnerTestBase
 
   test '5C8',
   'new_avatar is idempotent' do
-    _, status = new_avatar
+    _,_,status = new_avatar
     begin
       assert_equal success, status
-      _, status = new_avatar
+      _,_,status = new_avatar
       assert_equal success, status
     ensure
       old_avatar
@@ -47,8 +47,8 @@ class DockerRunnerStoringTest < RunnerTestBase
 
   def volume_exists?
     volume_name = 'cyber_dojo_' + kata_id + '_' + avatar_name
-    output, _ = assert_exec('docker volume ls')
-    output.include? volume_name
+    stdout, _ = assert_exec('docker volume ls')
+    stdout.include? volume_name
   end
 
 end

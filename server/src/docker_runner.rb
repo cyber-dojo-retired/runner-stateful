@@ -10,7 +10,7 @@ class DockerRunner
   attr_reader :parent
 
   def pulled_image?(image_name)
-    ['', image_names.include?(image_name)]
+    ['', '', image_names.include?(image_name)]
   end
 
   def pull_image(image_name)
@@ -155,9 +155,9 @@ class DockerRunner
   end
 
   def assert_exec(cmd)
-    output, status = exec(cmd)
-    fail "exited(#{status}):#{output}:" unless status == 0
-    [output, status]
+    stdout, stderr, status = exec(cmd)
+    fail "exited(#{status}):#{stdout}:" unless status == 0
+    [stdout, stderr, status]
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

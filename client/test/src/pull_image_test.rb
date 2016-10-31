@@ -8,7 +8,7 @@ class PullImageTest < ClientTestBase
   'pull_image status is zero if pull succeeds' do
     pull_image('cyberdojofoundation/gcc_assert')
     assert_equal 0, status
-    assert json['output'].include?('Pulling from cyberdojofoundation/gcc_assert'), json
+    assert stdout.include?('Pulling from cyberdojofoundation/gcc_assert'), json
   end
 
   #test 'F30',

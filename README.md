@@ -49,7 +49,7 @@ It's API is as follows:
   * { "status":"128", "stdout":"", "stderr":"" } -> did not complete in max_seconds
 
 - if something unexpected goes wrong on the server all methods return
-  * { "status":"error", "msg":msg } -> something went wrong
+  * { "status":"error", "stderr":msg } -> something went wrong
 
 
 - - - -

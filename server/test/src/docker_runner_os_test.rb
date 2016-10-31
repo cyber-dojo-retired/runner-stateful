@@ -65,16 +65,16 @@ class DockerRunnerRunOSTest < RunnerTestBase
     begin
       assert_docker_exec(cid, "[ -d #{sandbox} ]")
 
-      _, status = exec("docker exec #{cid} sh -c '[ \"$(ls -A #{sandbox})\" ]'", logging = false)
+      _,_,status = exec("docker exec #{cid} sh -c '[ \"$(ls -A #{sandbox})\" ]'", logging = false)
       assert_equal 1, status, "#{sandbox} is not empty"
 
-      stdout, _ = assert_docker_exec(cid, "stat -c '%U' #{sandbox}")
+      stdout,_ = assert_docker_exec(cid, "stat -c '%U' #{sandbox}")
       assert_equal 'nobody', (user_name = stdout.strip)
 
-      stdout, _ = assert_docker_exec(cid, "stat -c '%G' #{sandbox}")
+      stdout,_ = assert_docker_exec(cid, "stat -c '%G' #{sandbox}")
       assert_equal 'nogroup', (group_name = stdout.strip)
 
-      stdout, _ = assert_docker_exec(cid, "stat -c '%A' #{sandbox}")
+      stdout,_ = assert_docker_exec(cid, "stat -c '%A' #{sandbox}")
       assert_equal 'drwxr-xr-x', (permissions = stdout.strip)
     ensure
       runner.remove_container(cid)
@@ -95,7 +95,7 @@ class DockerRunnerRunOSTest < RunnerTestBase
 
   def starting_files_test
     set_image_for_os
-    ls_stdout, _ = assert_run_completes_no_stderr(starting_files)
+    ls_stdout,_ = assert_run_completes_no_stderr(starting_files)
     ls_files = ls_parse(ls_stdout)
     assert_equal starting_files.keys.sort, ls_files.keys.sort
     assert_equal_atts('empty.txt',     '-rw-r--r--', 'nobody', 'nogroup',  0, ls_files)
@@ -127,8 +127,8 @@ class DockerRunnerRunOSTest < RunnerTestBase
 
   def unchanged_files_test
     set_image_for_os
-    before_ls, _ = assert_run_completes_no_stderr(starting_files)
-    after_ls, _ = assert_run_completes_no_stderr(changed_files = {})
+    before_ls,_ = assert_run_completes_no_stderr(starting_files)
+    after_ls,_ = assert_run_completes_no_stderr(changed_files = {})
     assert_equal before_ls, after_ls
   end
 
@@ -146,14 +146,14 @@ class DockerRunnerRunOSTest < RunnerTestBase
 
   def deleted_files_test
     set_image_for_os
-    ls_stdout, _ = assert_run_completes_no_stderr(starting_files)
+    ls_stdout,_ = assert_run_completes_no_stderr(starting_files)
     before = ls_parse(ls_stdout)
     before_filenames = before.keys
 
     changed_files = {}
     max_seconds = 10
     deleted_filenames = ['hello.txt']
-    ls_stdout, _ = assert_run_completes_no_stderr(changed_files, max_seconds, deleted_filenames)
+    ls_stdout,_ = assert_run_completes_no_stderr(changed_files, max_seconds, deleted_filenames)
     after = ls_parse(ls_stdout)
     after_filenames = after.keys
 
@@ -176,14 +176,14 @@ class DockerRunnerRunOSTest < RunnerTestBase
 
   def new_files_test
     set_image_for_os
-    ls_stdout, _ = assert_run_completes_no_stderr(starting_files)
+    ls_stdout,_ = assert_run_completes_no_stderr(starting_files)
     before = ls_parse(ls_stdout)
     before_filenames = before.keys
 
     new_filename = 'fizz_buzz.h'
     new_file_content = '#ifndef...'
     changed_files = { new_filename => new_file_content }
-    ls_stdout, _ = assert_run_completes_no_stderr(changed_files)
+    ls_stdout,_ = assert_run_completes_no_stderr(changed_files)
     after = ls_parse(ls_stdout)
     after_filenames = after.keys
 
@@ -213,16 +213,16 @@ class DockerRunnerRunOSTest < RunnerTestBase
 
   def changed_file_test
     set_image_for_os
-    ls_output, _ = assert_run_completes_no_stderr(starting_files)
-    before = ls_parse(ls_output)
+    ls_stdout,_ = assert_run_completes_no_stderr(starting_files)
+    before = ls_parse(ls_stdout)
 
     sleep 2
 
     hello_txt = starting_files['hello.txt']
     extra = "\ngreetings"
     changed_files = { 'hello.txt' => hello_txt + extra }
-    ls_output, _ = assert_run_completes_no_stderr(changed_files)
-    after = ls_parse(ls_output)
+    ls_stdout,_ = assert_run_completes_no_stderr(changed_files)
+    after = ls_parse(ls_stdout)
 
     assert_equal before.keys, after.keys
     before.each do |filename, was_attr|
@@ -277,8 +277,8 @@ class DockerRunnerRunOSTest < RunnerTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def ls_parse(ls_output)
-    Hash[ls_output.split("\n").collect { |line|
+  def ls_parse(ls_stdout)
+    Hash[ls_stdout.split("\n").collect { |line|
       attr = line.split
       filename = attr[0]
       [filename, {
