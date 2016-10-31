@@ -9,6 +9,21 @@ class RunTest < ClientTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  test '42D',
+  'run with bad arguments sets error status' do
+    args = []
+    args << image_name
+    args << (kata_id = ':') #bad
+    args << (avatar_name = ':') #bad
+    args << (max_seconds = 10)
+    args << (deleted_filenames = [])
+    args << (changed_files = {})
+    @json = runner.run(*args)
+    assert_equal 'error', status
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   test '348',
   'red-traffic-light' do
     runner_run(files)

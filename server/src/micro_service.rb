@@ -20,9 +20,7 @@ class MicroService < Sinatra::Base
     args << max_seconds
     args << deleted_filenames
     args << changed_files
-    status, stdout, stderr = runner.run(*args)
-    content_type :json
-    { status:status, stdout:stdout, stderr:stderr }.to_json
+    jasoned3 { runner.run(*args) }
   end
 
   private
@@ -50,6 +48,16 @@ class MicroService < Sinatra::Base
       output, status = e.to_s, 'error'
     end
     { status:status, output:output }.to_json
+  end
+
+  def jasoned3
+    content_type :json
+    begin
+      status, stdout, stderr = yield
+    rescue RuntimeError => e
+      status, stdout, stderr = 'error', '', e.to_s
+    end
+    { status:status, stdout:stdout, stderr:stderr }.to_json
   end
 
 end
