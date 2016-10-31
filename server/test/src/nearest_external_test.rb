@@ -49,9 +49,7 @@ end
 
 class TestNearestExternal < RunnerTestBase
 
-  def self.hex_prefix
-    '9D4'
-  end
+  def self.hex_prefix; '9D4'; end
 
   def hex_setup
     anna = Anna.new

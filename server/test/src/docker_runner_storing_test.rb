@@ -2,9 +2,7 @@ require_relative './runner_test_base'
 
 class DockerRunnerStoringTest < RunnerTestBase
 
-  def self.hex_prefix
-    'FEA56'
-  end
+  def self.hex_prefix; 'FEA56'; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 

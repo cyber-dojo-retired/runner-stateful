@@ -3,11 +3,11 @@ require_relative './runner_test_base'
 class DockerRunnerRunOSTest < RunnerTestBase
 
   def self.hex_prefix; '4D'; end
-  def self.alpine_hex; '51D'; end
-  def self.ubuntu_hex; 'A7E'; end
-
   def hex_setup; new_avatar; end
   def hex_teardown; old_avatar; end
+
+  def self.alpine_hex; '51D'; end
+  def self.ubuntu_hex; 'A7E'; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 

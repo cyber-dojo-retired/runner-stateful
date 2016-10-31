@@ -4,9 +4,7 @@ class ExternalsTest < RunnerTestBase
 
   include Externals
 
-  def self.hex_prefix
-    '7A9'
-  end
+  def self.hex_prefix; '7A9'; end
 
   # - - - - - - - - - - - - - - - - -
 

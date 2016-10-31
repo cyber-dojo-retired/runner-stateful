@@ -5,9 +5,7 @@ class StringCleanerTest < RunnerTestBase
 
   include StringCleaner
 
-  def self.hex_prefix
-    '3D9'
-  end
+  def self.hex_prefix; '3D9'; end
 
   test '7FE',
   'cleaned string is not phased by invalid encodings' do

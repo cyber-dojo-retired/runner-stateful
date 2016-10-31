@@ -2,17 +2,9 @@ require_relative './runner_test_base'
 
 class DockerRunnerLanguageTest < RunnerTestBase
 
-  def self.hex_prefix
-    '9D930'
-  end
-
-  def hex_setup
-    new_avatar
-  end
-
-  def hex_teardown
-    old_avatar
-  end
+  def self.hex_prefix; '9D930'; end
+  def hex_setup; new_avatar; end
+  def hex_teardown; old_avatar; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 

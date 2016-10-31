@@ -2,17 +2,9 @@ require_relative './runner_test_base'
 
 class DockerRunnerTimeoutTest < RunnerTestBase
 
-  def self.hex_prefix
-    '45B57'
-  end
-
-  def hex_setup
-    new_avatar
-  end
-
-  def hex_teardown
-    old_avatar
-  end
+  def self.hex_prefix; '45B57'; end
+  def hex_setup; new_avatar; end
+  def hex_teardown; old_avatar; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 

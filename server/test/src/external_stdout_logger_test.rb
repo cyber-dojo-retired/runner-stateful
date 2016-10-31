@@ -2,9 +2,7 @@ require_relative './runner_test_base'
 
 class ExternalStdoutLoggerTest < RunnerTestBase
 
-  def self.hex_prefix
-    '1B6'
-  end
+  def self.hex_prefix; '1B6'; end
 
   test '962',
   '<< writes to stdout with added trailing newline' do

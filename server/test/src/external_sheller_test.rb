@@ -3,9 +3,7 @@ require_relative './spy_logger'
 
 class ExternalShellerTest < RunnerTestBase
 
-  def self.hex_prefix
-    'C89'
-  end
+  def self.hex_prefix; 'C89'; end
 
   def hex_setup
     @log = SpyLogger.new(self)

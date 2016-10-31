@@ -2,9 +2,7 @@ require_relative './runner_test_base'
 
 class ExternalDiskWriterTest < RunnerTestBase
 
-  def self.hex_prefix
-    'FDF13'
-  end
+  def self.hex_prefix; 'FDF13'; end
 
   test 'D4C',
   'what gets written gets read back' do
