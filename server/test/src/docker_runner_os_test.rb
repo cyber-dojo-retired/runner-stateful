@@ -20,7 +20,7 @@ class DockerRunnerRunOSTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test alpine_hex+'CA0',
-  '[C(gcc),assert] is an Alpine-based image with user:nobody and group:nogroup' do
+  '[Alpine] image is indeed Alpine and has user:nobody and group:nogroup' do
     set_image_for_os
     stdout, _ = assert_run_completes_no_stderr({ 'cyber-dojo.sh' => 'cat /etc/issue'})
     assert stdout.include?('Alpine'), stdout
@@ -28,13 +28,23 @@ class DockerRunnerRunOSTest < RunnerTestBase
     assert_group_nogroup_exists
   end
 
-  test ubuntu_hex+'5F0',
-  '[C#,NUnit] is an Ubuntu-based image with user:nobody and group:nogroup' do
+  test ubuntu_hex+'CA0',
+  '[Ubuntu] image is indeed Ubuntu and has user:nobody and group:nogroup' do
     set_image_for_os
     stdout, _ = assert_run_completes_no_stderr({ 'cyber-dojo.sh' => 'cat /etc/issue'})
     assert stdout.include?('Ubuntu'), stdout
     assert_user_nobody_exists
     assert_group_nogroup_exists
+  end
+
+  def assert_user_nobody_exists
+    stdout, _ = assert_run_completes_no_stderr({ 'cyber-dojo.sh' => 'getent passwd nobody' })
+    assert stdout.start_with?(user), stdout
+  end
+
+  def assert_group_nogroup_exists
+    stdout, _ = assert_run_completes_no_stderr({ 'cyber-dojo.sh' => 'getent group nogroup' })
+    assert stdout.start_with?(group), stdout
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -44,7 +54,7 @@ class DockerRunnerRunOSTest < RunnerTestBase
     create_container_test
   end
 
-  test ubuntu_hex+'977',
+  test ubuntu_hex+'0C9',
   '[Ubuntu] newly created container has empty sandbox with ownership/permissions' do
     create_container_test
   end
@@ -76,27 +86,29 @@ class DockerRunnerRunOSTest < RunnerTestBase
     starting_files_test
   end
 
-  test ubuntu_hex+'29B',
+  test ubuntu_hex+'1FB',
   '[Ubuntu] starting-files are copied into sandbox with ownership/permissions' do
     starting_files_test
   end
 
   def starting_files_test
     set_image_for_os
-    starting_filenames = starting_files.keys
     ls_stdout, _ = assert_run_completes_no_stderr(starting_files)
     ls_files = ls_parse(ls_stdout)
-    assert_equal starting_filenames.sort, ls_files.keys.sort
-    ls_files.each do |filename, attr|
-      assert_equal 'nobody',  attr[:user ], filename
-      assert_equal 'nogroup', attr[:group], filename
-      if filename.end_with?('.sh')
-        assert_equal '-rwxr-xr-x', attr[:permissions], filename
-      else
-        assert_equal '-rw-r--r--', attr[:permissions], filename
-      end
-    end
-    assert_equal 0, ls_files['empty.txt'][:size]
+    assert_equal starting_files.keys.sort, ls_files.keys.sort
+    assert_equal_atts('empty.txt',     '-rw-r--r--', 'nobody', 'nogroup',  0, ls_files)
+    assert_equal_atts('cyber-dojo.sh', '-rwxr-xr-x', 'nobody', 'nogroup', 29, ls_files)
+    assert_equal_atts('hello.txt',     '-rw-r--r--', 'nobody', 'nogroup', 11, ls_files)
+    assert_equal_atts('hello.sh',      '-rwxr-xr-x', 'nobody', 'nogroup', 16, ls_files)
+  end
+
+  def assert_equal_atts(filename, permissions, user, group, size, ls_files)
+    atts = ls_files[filename]
+    refute_nil atts, filename
+    assert_equal user, atts[:user], { filename => atts }
+    assert_equal group, atts[:group], { filename => atts }
+    assert_equal size, atts[:size], { filename => atts }
+    assert_equal permissions, atts[:permissions], { filename => atts }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -106,7 +118,7 @@ class DockerRunnerRunOSTest < RunnerTestBase
     unchanged_files_test
   end
 
-  test ubuntu_hex+'F22',
+  test ubuntu_hex+'4E8',
   '[Ubuntu] unchanged files still exist and are unchanged' do
     unchanged_files_test
   end
@@ -145,10 +157,7 @@ class DockerRunnerRunOSTest < RunnerTestBase
 
     actual_deleted_filenames = before_filenames - after_filenames
     assert_equal deleted_filenames, actual_deleted_filenames
-
-    after.each do |filename, attr|
-      assert_equal before[filename], attr
-    end
+    after.each { |filename, attr| assert_equal before[filename], attr }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -170,7 +179,8 @@ class DockerRunnerRunOSTest < RunnerTestBase
     before_filenames = before.keys
 
     new_filename = 'fizz_buzz.h'
-    changed_files = { new_filename => '#ifndef...' }
+    new_file_content = '#ifndef...'
+    changed_files = { new_filename => new_file_content }
     ls_stdout, _ = assert_run_completes_no_stderr(changed_files)
     after = ls_parse(ls_stdout)
     after_filenames = after.keys
@@ -178,13 +188,11 @@ class DockerRunnerRunOSTest < RunnerTestBase
     actual_new_filenames = after_filenames - before_filenames
     assert_equal [ new_filename ], actual_new_filenames
     attr = after[new_filename]
+    assert_equal '-rw-r--r--', attr[:permissions]
     assert_equal 'nobody', attr[:user]
     assert_equal 'nogroup', attr[:group]
-    assert_equal '-rw-r--r--', attr[:permissions]
-
-    before.each do |filename, attr|
-      assert_equal after[filename], attr
-    end
+    assert_equal new_file_content.size, attr[:size]
+    before.each { |filename, attr| assert_equal after[filename], attr }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -232,18 +240,6 @@ class DockerRunnerRunOSTest < RunnerTestBase
   end
 
   private
-
-  def assert_user_nobody_exists
-    stdout, _ = assert_run_completes_no_stderr({ 'cyber-dojo.sh' => 'getent passwd nobody' })
-    assert stdout.start_with?(user), stdout
-  end
-
-  def assert_group_nogroup_exists
-    stdout, _ = assert_run_completes_no_stderr({ 'cyber-dojo.sh' => 'getent group nogroup' })
-    assert stdout.start_with?(group), stdout
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def starting_files
     @starting_files ||= {
