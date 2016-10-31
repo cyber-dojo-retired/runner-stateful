@@ -3,21 +3,12 @@ require_relative './lib_test_base'
 
 class RunnerAppTest < LibTestBase
 
-  def self.hex
-    '201BCEF'
-  end
-
-  def external_setup
-    # can't do hello in setup because test_id not yet set
-  end
-
-  def external_teardown
-    old_avatar
-  end
+  def self.hex_prefix; '201BCEF'; end
+  def hex_setup; new_avatar; end
+  def hex_teardown; old_avatar; end
 
   test '348',
   'red-traffic-light' do
-    new_avatar
     runner_run(files)
     assert_equal completed, status
     assert stderr.start_with?('Assertion failed: answer() == 42'), json
@@ -28,7 +19,6 @@ class RunnerAppTest < LibTestBase
 
   test '16F',
   'green-traffic-light' do
-    new_avatar
     files['hiker.c'] = files['hiker.c'].sub('6 * 9', '6 * 7')
     runner_run(files)
     assert_equal completed, status, json
@@ -40,7 +30,6 @@ class RunnerAppTest < LibTestBase
 
   test '295',
   'amber-traffic-light' do
-    new_avatar
     files['hiker.c'] = files['hiker.c'].sub('6 * 9', '6 * 9sss')
     runner_run(files)
     assert_equal completed, status, json
@@ -56,7 +45,6 @@ class RunnerAppTest < LibTestBase
 
   test 'E6F',
   'timed-out-traffic-light' do
-    new_avatar
     files['hiker.c'] = files['hiker.c'].sub('return', 'for(;;); return')
     runner_run(files, 3)
     assert_equal timed_out, status, json
