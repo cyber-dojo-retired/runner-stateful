@@ -3,8 +3,6 @@
 runner_server:
 -------------------------------------------------
 
-o) storing test new_avatar is idempotent
-
 o) massage micro_service returned strings.
    - clean them
    - truncate them

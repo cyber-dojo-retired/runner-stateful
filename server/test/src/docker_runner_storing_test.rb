@@ -31,8 +31,17 @@ class DockerRunnerStoringTest < RunnerTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  # test
-  # new_avatar is idempotent
+  test '5C8',
+  'new_avatar is idempotent' do
+    _, status = new_avatar
+    begin
+      assert_equal success, status
+      _, status = new_avatar
+      assert_equal success, status
+    ensure
+      old_avatar
+    end
+  end
 
   private
 
