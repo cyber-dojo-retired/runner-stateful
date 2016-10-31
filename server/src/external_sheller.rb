@@ -19,7 +19,7 @@ class ExternalSheller
         log << "STATUS:#{status}"
       end
       [output, status]
-    rescue Exception => error
+    rescue StandardError => error
       log << line
       log << "COMMAND:#{command}"
       log << "RAISED-CLASS:#{error.class.name}"

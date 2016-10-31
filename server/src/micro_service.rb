@@ -35,6 +35,7 @@ class MicroService < Sinatra::Base
   def max_seconds;       args['max_seconds'];      end
   def deleted_filenames; args['deleted_filenames']; end
   def changed_files;     args['changed_files'];    end
+
   def request_body_args
     request.body.rewind
     JSON.parse(request.body.read)
