@@ -1,11 +1,9 @@
 
--------------------------------------------------
 runner_server:
--------------------------------------------------
 
-o) massage micro_service returned strings.
-   - clean them
-   - truncate them
+o) micro_service returned strings.
+   - clean them +test
+   - truncate them +test
 
 o) runner_server micro-service needs to check each shell call and return
    { status:error, output:msg }

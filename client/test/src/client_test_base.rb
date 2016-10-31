@@ -5,6 +5,14 @@ require_relative './../../src/runner_service_adapter'
 
 class ClientTestBase < HexMiniTest
 
+  def pulled_image?(image_name)
+    @json = runner.pulled_image?(image_name)
+  end
+
+  def pull_image(image_name)
+    @json = runner.pull_image(image_name)
+  end
+
   def new_avatar
     @json = runner.new_avatar(kata_id, avatar_name)
   end
