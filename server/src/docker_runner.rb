@@ -34,7 +34,6 @@ class DockerRunner
     begin
       delete_files(cid, deleted_filenames)
       change_files(cid, changed_files)
-      setup_home(cid)
       run_cyber_dojo_sh(cid, max_seconds)
     ensure
       remove_container(cid)
@@ -83,21 +82,6 @@ class DockerRunner
     files.keys.each do |filename|
       assert_docker_exec(cid, "chown #{user}:#{group} #{sandbox}/#{filename}")
     end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def setup_home(cid)
-    # Some languages need the current user to have a home.
-    # They are all Ubuntu image based, eg C#-NUnit, F#-NUnit.
-    # The nobody user does not have a home dir in Ubuntu.
-    # usermod solves this. Rather than switch on the image_name
-    # or probe to determine if the image is Ubuntu based, I always
-    # run usermod and it does nothing on Alpine based images
-    # which do not have usermod (its in the shadow package).
-    # So this is not assert_exec(...) and logging is off
-    usermod = "usermod --home #{sandbox} #{user} 2> /dev/null"
-    exec("docker exec #{cid} sh -c '#{usermod}'", logging = false)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
