@@ -19,7 +19,7 @@ class RunnerAppTest < LibTestBase
 
   test '16F',
   'green-traffic-light' do
-    files['hiker.c'] = files['hiker.c'].sub('6 * 9', '6 * 7')
+    file_sub('hiker.c', '6 * 9', '6 * 7')
     runner_run(files)
     assert_equal completed, status, json
     assert_equal "All tests passed\n", stdout, json
@@ -30,7 +30,7 @@ class RunnerAppTest < LibTestBase
 
   test '295',
   'amber-traffic-light' do
-    files['hiker.c'] = files['hiker.c'].sub('6 * 9', '6 * 9sss')
+    file_sub('hiker.c', '6 * 9', '6 * 9sss')
     runner_run(files)
     assert_equal completed, status, json
     lines = [
@@ -45,7 +45,7 @@ class RunnerAppTest < LibTestBase
 
   test 'E6F',
   'timed-out-traffic-light' do
-    files['hiker.c'] = files['hiker.c'].sub('return', 'for(;;); return')
+    file_sub('hiker.c', 'return', 'for(;;); return')
     runner_run(files, 3)
     assert_equal timed_out, status, json
     assert_equal '', stdout, json
@@ -86,6 +86,10 @@ class RunnerAppTest < LibTestBase
     Hash[filenames.collect { |filename|
       [filename, IO.read("/app/start_files/gcc_assert/#{filename}")]
     }]
+  end
+
+  def file_sub(name, from, to)
+    files[name] = files[name].sub(from, to)
   end
 
   def completed;   0; end
