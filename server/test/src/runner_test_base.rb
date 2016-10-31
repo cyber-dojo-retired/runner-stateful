@@ -30,13 +30,13 @@ class RunnerTestBase < HexMiniTest
   end
 
   def assert_run_completes(*args)
-    status, stdout, stderr = runner_run(*args)
+    stdout, stderr, status = runner_run(*args)
     assert_equal completed, status, [stdout, stderr]
     [stdout, stderr]
   end
 
   def assert_run_times_out(*args)
-    status, stdout, stderr = runner_run(*args)
+    stdout, stderr, status = runner_run(*args)
     assert_equal timed_out, status, [stdout, stderr]
     [stdout, stderr]
   end

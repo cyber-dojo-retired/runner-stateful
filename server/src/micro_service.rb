@@ -44,20 +44,23 @@ class MicroService < Sinatra::Base
     content_type :json
     begin
       output, status = yield
-    rescue RuntimeError => e
-      output, status = e.to_s, 'error'
+    rescue RuntimeError => error
+      output = error.to_s
+      status = :error
     end
-    { status:status, output:output }.to_json
+    { output:output, status:status }.to_json
   end
 
   def jasoned3
     content_type :json
     begin
-      status, stdout, stderr = yield
-    rescue RuntimeError => e
-      status, stdout, stderr = 'error', '', e.to_s
+      stdout, stderr, status = yield
+    rescue RuntimeError => error
+      stdout = ''
+      stderr = ''
+      status = :error
     end
-    { status:status, stdout:stdout, stderr:stderr }.to_json
+    { stdout:stdout, stderr:stderr, status:status,  }.to_json
   end
 
 end

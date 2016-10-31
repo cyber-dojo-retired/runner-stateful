@@ -5,10 +5,6 @@ o) micro_service returned strings.
    - clean them +test
    - truncate them +test
 
-o) runner_server micro-service needs to check each shell call and return
-   { status:error, output:msg }
-   if something goes wrong.
-
 o) add cpu/memory/swap limits
    See comments at https://github.com/cyber-dojo/commander/blob/master/docker-compose.yml
    See https://github.com/docker/docker/pull/9437

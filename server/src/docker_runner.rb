@@ -100,12 +100,12 @@ class DockerRunner
         Process.waitpid(pid)
         write_out.close
         write_err.close
-        [completed, read_out.read, read_err.read]
+        [read_out.read, read_err.read, completed]
       end
     rescue Timeout::Error
       Process.kill(-9, pid)
       Process.detach(pid)
-      [timed_out, '', '']
+      ['', '', timed_out]
     ensure
       write_out.close unless write_out.closed?
       write_err.close unless write_err.closed?
