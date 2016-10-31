@@ -1,6 +1,6 @@
 require_relative './runner_test_base'
 
-class DockerRunnerRunStepsTest < RunnerTestBase
+class DockerRunnerRunOSTest < RunnerTestBase
 
   def self.hex_prefix; '4D'; end
   def self.alpine_hex; '51D'; end
@@ -15,6 +15,22 @@ class DockerRunnerRunStepsTest < RunnerTestBase
   'calling set_image_for_os with a test whose test_id does not include the',
   'alpine_hex or the ubuntu_hex raises' do
     assert_raises { set_image_for_os }
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test alpine_hex+'CA0',
+  '[C(gcc),assert] is an Alpine-based image' do
+    set_image_for_os
+    stdout, _ = assert_run_completes_no_stderr({ 'cyber-dojo.sh' => 'cat /etc/issue'})
+    assert stdout.include?('Alpine'), stdout
+  end
+
+  test ubuntu_hex+'5F0',
+  '[C#,NUnit] is an Ubuntu-based image' do
+    set_image_for_os
+    stdout, _ = assert_run_completes_no_stderr({ 'cyber-dojo.sh' => 'cat /etc/issue'})
+    assert stdout.include?('Ubuntu'), stdout
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -215,7 +231,7 @@ class DockerRunnerRunStepsTest < RunnerTestBase
   private
 
   def starting_files
-    {
+    @starting_files ||= {
       'cyber-dojo.sh' => ls_cmd,
       'empty.txt' => '',
       'hello.txt' => 'hello world',
