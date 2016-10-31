@@ -34,7 +34,6 @@ class DockerRunner
     begin
       delete_files(cid, deleted_filenames)
       change_files(cid, changed_files)
-      setup_home(cid)
       run_cyber_dojo_sh(cid, max_seconds)
     ensure
       remove_container(cid)
@@ -58,6 +57,10 @@ class DockerRunner
     output, _ = assert_exec("docker run #{args} #{image_name} sh")
     cid = output.strip
     assert_docker_exec(cid, "chown #{user}:#{group} #{sandbox}")
+    # Some languages need the current user to have a home. They are all
+    # Ubuntu image based, eg C#-NUnit. The nobody user does not have a
+    # home dir in Ubuntu. usermod solves this.
+    assert_docker_exec(cid, "cat /etc/issue | grep Alpine || usermod --home #{sandbox} #{user}")
     cid
   end
 
@@ -83,18 +86,6 @@ class DockerRunner
     files.keys.each do |filename|
       assert_docker_exec(cid, "chown #{user}:#{group} #{sandbox}/#{filename}")
     end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def setup_home(cid)
-    # Some languages need the current user to have a home.
-    # They are all Ubuntu image based, eg C#-NUnit.
-    # The nobody user does not have a home dir in Ubuntu.
-    # usermod solves this.
-    usermod = "usermod --home #{sandbox} #{user}"
-    cmd = "cat /etc/issue | grep Alpine || #{usermod}"
-    assert_docker_exec(cid, cmd)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
