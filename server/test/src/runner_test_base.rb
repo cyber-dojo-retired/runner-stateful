@@ -80,8 +80,7 @@ class RunnerTestBase < HexMiniTest
   def avatar_name; 'salmon'; end
 
   def kata_id;
-    assert_equal 8, test_id.length
-    assert test_id =~ /^[0-9A-F]+$/
+    assert_equal 8, test_id.length, 'test_id.length'
     test_id + '00'
   end
 
