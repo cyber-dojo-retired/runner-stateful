@@ -53,10 +53,6 @@ class RunnerTestBase < HexMiniTest
     @files ||= load_files(language_dir)
   end
 
-  def gcc_assert_files
-    files('gcc_assert')
-  end
-
   def load_files(language_dir)
     dir = "/app/start_files/#{language_dir}"
     json = JSON.parse(IO.read("#{dir}/manifest.json"))

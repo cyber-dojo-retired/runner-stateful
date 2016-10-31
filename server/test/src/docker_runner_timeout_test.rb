@@ -47,6 +47,12 @@ class DockerRunnerTimeoutTest < RunnerTestBase
     assert_equal '', stderr
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def gcc_assert_files
+    files('gcc_assert')
+  end
+
 end
 
 
