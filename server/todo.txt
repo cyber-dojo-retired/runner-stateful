@@ -3,9 +3,6 @@
 runner_server:
 -------------------------------------------------
 
-o) run-alpine-test
-   - 0C9 add permissions
-
 o) storing test new_avatar is idempotent
 
 o) massage micro_service returned strings.

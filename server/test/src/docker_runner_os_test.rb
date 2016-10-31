@@ -74,8 +74,8 @@ class DockerRunnerRunOSTest < RunnerTestBase
       stdout, _ = assert_docker_exec(cid, "stat -c '%G' #{sandbox}")
       assert_equal 'nogroup', (group_name = stdout.strip)
 
-      # TODO permission of sandbox dir
-
+      stdout, _ = assert_docker_exec(cid, "stat -c '%A' #{sandbox}")
+      assert_equal 'drwxr-xr-x', (permissions = stdout.strip)
     ensure
       runner.remove_container(cid)
     end
