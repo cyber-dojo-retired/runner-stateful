@@ -7,6 +7,7 @@ if [ ! -f /.dockerenv ]; then
 fi
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# server
 
 rm -rf /tmp/cyber-dojo
 mkdir /tmp/cyber-dojo
