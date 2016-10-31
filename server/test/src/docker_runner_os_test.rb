@@ -63,13 +63,15 @@ class DockerRunnerRunOSTest < RunnerTestBase
     set_image_for_os
     cid = runner.create_container(@image_name, kata_id, avatar_name)
     begin
-      _, status = exec("docker exec #{cid} sh -c '[ -d #{sandbox} ]'")
-      assert_equal 0, status, "#{sandbox} does not exist"
+      assert_docker_exec(cid, "[ -d #{sandbox} ]")
+
       _, status = exec("docker exec #{cid} sh -c '[ \"$(ls -A #{sandbox})\" ]'", logging = false)
       assert_equal 1, status, "#{sandbox} is not empty"
-      stdout, _ = assert_exec("docker exec #{cid} sh -c 'stat -c \"%U\" #{sandbox}'")
+
+      stdout, _ = assert_docker_exec(cid, "stat -c '%U' #{sandbox}")
       assert_equal 'nobody', (user_name = stdout.strip)
-      stdout, _ = assert_exec("docker exec #{cid} sh -c 'stat -c \"%G\" #{sandbox}'")
+
+      stdout, _ = assert_docker_exec(cid, "stat -c '%G' #{sandbox}")
       assert_equal 'nogroup', (group_name = stdout.strip)
 
       # TODO permission of sandbox dir

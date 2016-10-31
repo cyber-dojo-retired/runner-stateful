@@ -41,6 +41,10 @@ class RunnerTestBase < HexMiniTest
     [stdout, stderr]
   end
 
+  def assert_docker_exec(cid, cmd)
+    assert_exec("docker exec #{cid} sh -c '#{cmd}'")
+  end
+
   def assert_exec(cmd)
     output, status = exec(cmd)
     assert_equal success, status, output
