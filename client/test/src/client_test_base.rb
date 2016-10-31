@@ -13,11 +13,11 @@ class ClientTestBase < HexMiniTest
     @json = runner.pull_image(image_name)
   end
 
-  def new_avatar
+  def new_avatar(kata_id = test_id, avatar_name = 'salmon')
     @json = runner.new_avatar(kata_id, avatar_name)
   end
 
-  def old_avatar
+  def old_avatar(kata_id = test_id, avatar_name = 'salmon')
     @json = runner.old_avatar(kata_id, avatar_name)
   end
 

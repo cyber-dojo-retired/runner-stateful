@@ -7,9 +7,9 @@ require_relative './docker_runner'
 class MicroService < Sinatra::Base
 
   get '/pulled_image' do; jasoned *runner.pulled_image?(image_name); end
-  post '/pull_image'  do; jasoned *runner.pull_image(image_name); end
+  post '/pull_image'  do; jasoned2 { runner.pull_image(image_name) }; end
 
-  post '/new_avatar'  do; jasoned *runner.new_avatar(kata_id, avatar_name); end
+  post '/new_avatar'  do; jasoned2 { runner.new_avatar(kata_id, avatar_name) }; end
   post '/old_avatar'  do; jasoned *runner.old_avatar(kata_id, avatar_name); end
 
   post '/run' do
@@ -38,6 +38,16 @@ class MicroService < Sinatra::Base
   def request_body_args
     request.body.rewind
     JSON.parse(request.body.read)
+  end
+
+  def jasoned2
+    content_type :json
+    begin
+      output, status = yield
+    rescue RuntimeError => e
+      output, status = e.to_s, 'error'
+    end
+    { status:status, output:output }.to_json
   end
 
   def jasoned(output, status)

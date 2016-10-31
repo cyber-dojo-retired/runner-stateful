@@ -14,7 +14,7 @@ class DockerRunner
   end
 
   def pull_image(image_name)
-    exec("docker pull #{image_name}")
+    assert_exec("docker pull #{image_name}")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

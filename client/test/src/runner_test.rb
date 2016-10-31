@@ -21,6 +21,14 @@ class RunnerAppTest < ClientTestBase
     assert_equal '', json['output'], json
   end
 
+  test '92F',
+  'pulled_image? with illegal image_name returns false' do
+    pulled_image?('123/456')
+    assert_equal false, status
+    assert_equal '', json['output'], json
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '4CE',
@@ -30,6 +38,14 @@ class RunnerAppTest < ClientTestBase
     assert json['output'].include?('Pulling from cyberdojofoundation/gcc_assert'), json
   end
 
+  #test 'F30',
+  #'pull_image with illegal image_name returns XXXX' do
+  #  pull_image('123/456')
+  #  assert_equal 0, status
+  #  assert json['output'].include?('Pulling from cyberdojofoundation/gcc_assert'), json
+  #end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '348',
