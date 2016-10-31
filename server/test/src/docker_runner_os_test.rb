@@ -20,17 +20,21 @@ class DockerRunnerRunOSTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test alpine_hex+'CA0',
-  '[C(gcc),assert] is an Alpine-based image' do
+  '[C(gcc),assert] is an Alpine-based image with user:nobody and group:nogroup' do
     set_image_for_os
     stdout, _ = assert_run_completes_no_stderr({ 'cyber-dojo.sh' => 'cat /etc/issue'})
     assert stdout.include?('Alpine'), stdout
+    assert_user_nobody_exists
+    assert_group_nogroup_exists
   end
 
   test ubuntu_hex+'5F0',
-  '[C#,NUnit] is an Ubuntu-based image' do
+  '[C#,NUnit] is an Ubuntu-based image with user:nobody and group:nogroup' do
     set_image_for_os
     stdout, _ = assert_run_completes_no_stderr({ 'cyber-dojo.sh' => 'cat /etc/issue'})
     assert stdout.include?('Ubuntu'), stdout
+    assert_user_nobody_exists
+    assert_group_nogroup_exists
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -230,6 +234,18 @@ class DockerRunnerRunOSTest < RunnerTestBase
 
   private
 
+  def assert_user_nobody_exists
+    stdout, _ = assert_run_completes_no_stderr({ 'cyber-dojo.sh' => 'getent passwd nobody' })
+    assert stdout.start_with?(user), stdout
+  end
+
+  def assert_group_nogroup_exists
+    stdout, _ = assert_run_completes_no_stderr({ 'cyber-dojo.sh' => 'getent group nogroup' })
+    assert stdout.start_with?(group), stdout
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   def starting_files
     @starting_files ||= {
       'cyber-dojo.sh' => ls_cmd,
@@ -242,9 +258,13 @@ class DockerRunnerRunOSTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def set_image_for_os
-    return @image_name = 'cyberdojofoundation/gcc_assert'   if test_id.include? self.class.alpine_hex
-    return @image_name = 'cyberdojofoundation/csharp_nunit' if test_id.include? self.class.ubuntu_hex
-    fail "unknown os"
+    if test_id.include? self.class.alpine_hex
+      return @image_name = 'cyberdojofoundation/gcc_assert'
+    end
+    if test_id.include? self.class.ubuntu_hex
+      return @image_name = 'cyberdojofoundation/csharp_nunit'
+    end
+    fail "cannot set os from test 'HEX_ID'"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
