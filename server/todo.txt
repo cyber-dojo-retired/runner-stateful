@@ -1,6 +1,30 @@
 
 runner_server:
 
+Redo shell.exec
+  require 'open3'
+  def exec(command, logging = true)
+    begin
+      stdout, stderr, status = Open3.capture(command)
+      if status != success && logging
+        log << line
+        log << "COMMAND:#{command}"
+        log << "STATUS:#{status}"
+        log << "STDOUT:#{stdout}"
+        log << "STDERR:#{stderr}"
+      end
+      [stdout, stderr, status]
+    rescue StandardError => error
+      log << line
+      log << "COMMAND:#{command}"
+      log << "RAISED-CLASS:#{error.class.name}"
+      log << "RAISED-TO_S:#{error.to_s}"
+      raise error
+    end
+  end
+
+
+
 o) micro_service returned strings.
    - clean them +test
    - truncate them +test

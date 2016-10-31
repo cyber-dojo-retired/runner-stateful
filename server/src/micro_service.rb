@@ -45,7 +45,7 @@ class MicroService < Sinatra::Base
     content_type :json
     begin
       output, status = yield
-    rescue RuntimeError => error
+    rescue StandardError => error
       output = error.to_s
       status = :error
     end
@@ -56,9 +56,9 @@ class MicroService < Sinatra::Base
     content_type :json
     begin
       stdout, stderr, status = yield
-    rescue RuntimeError => error
+    rescue StandardError => error
       stdout = ''
-      stderr = ''
+      stderr = error.to_s
       status = :error
     end
     { stdout:stdout, stderr:stderr, status:status,  }.to_json
