@@ -203,7 +203,6 @@ class DockerRunnerRunOSTest < RunnerTestBase
 
   def changed_file_test
     set_image_for_os
-    gcc_assert_files['cyber-dojo.sh'] = ls_cmd
     ls_output, _ = assert_run_completes_no_stderr(starting_files)
     before = ls_parse(ls_output)
 
