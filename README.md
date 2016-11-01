@@ -18,7 +18,7 @@ Asks the question 'has the runner-server [docker pull]'ed image_name'?
   * { "status":"false" } -> not pulled already
 
 # pull_image
-Commands the runner-server to [docker pull] image_name.
+Tells the runner-server to [docker pull] image_name.
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
 - returns
@@ -41,7 +41,7 @@ Informs the runner-server the given avatar will no longer be issuing run command
   * { "status":"ok" } -> succeeded
 
 # run
-Commands the runner-server to run the attached code.
+Tells the runner-server to run the attached code.
 A sequence of run commands must be preceeded by a call to new_avatar.
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
