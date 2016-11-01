@@ -10,6 +10,9 @@ No longer get this diagnostic but still not getting images from nginx.
 
 
 Redo shell.exec
+=======
+o) redo shell.exec
+
   require 'open3'
   def exec(command, logging = true)
     begin
@@ -30,8 +33,6 @@ Redo shell.exec
       raise error
     end
   end
-
-
 
 o) micro_service returned strings.
    - clean them +test

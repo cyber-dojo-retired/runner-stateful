@@ -18,7 +18,7 @@ class ExternalSheller
         log << "OUTPUT:#{output}"
         log << "STATUS:#{status}"
       end
-      [output, status]
+      [output, stderr='', status]
     rescue StandardError => error
       log << line
       log << "COMMAND:#{command}"

@@ -6,11 +6,11 @@ require_relative './docker_runner'
 
 class MicroService < Sinatra::Base
 
-  get '/pulled_image' do; jasoned2 { runner.pulled_image?(image_name) }; end
-  post '/pull_image'  do; jasoned2 { runner.pull_image(image_name) }; end
+  get '/pulled_image' do; jasoned { runner.pulled_image?(image_name) }; end
+  post '/pull_image'  do; jasoned { runner.pull_image(image_name) }; end
 
-  post '/new_avatar'  do; jasoned2 { runner.new_avatar(kata_id, avatar_name) }; end
-  post '/old_avatar'  do; jasoned2 { runner.old_avatar(kata_id, avatar_name) }; end
+  post '/new_avatar'  do; jasoned { runner.new_avatar(kata_id, avatar_name) }; end
+  post '/old_avatar'  do; jasoned { runner.old_avatar(kata_id, avatar_name) }; end
 
   post '/run' do
     args = []
@@ -20,7 +20,7 @@ class MicroService < Sinatra::Base
     args << max_seconds
     args << deleted_filenames
     args << changed_files
-    jasoned3 { runner.run(*args) }
+    jasoned { runner.run(*args) }
   end
 
   private
@@ -41,18 +41,7 @@ class MicroService < Sinatra::Base
     JSON.parse(request.body.read)
   end
 
-  def jasoned2
-    content_type :json
-    begin
-      output, status = yield
-    rescue StandardError => error
-      output = error.to_s
-      status = :error
-    end
-    { output:output, status:status }.to_json
-  end
-
-  def jasoned3
+  def jasoned
     content_type :json
     begin
       stdout, stderr, status = yield

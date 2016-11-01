@@ -10,7 +10,7 @@ class DockerRunner
   attr_reader :parent
 
   def pulled_image?(image_name)
-    ['', image_names.include?(image_name)]
+    ['', '', image_names.include?(image_name)]
   end
 
   def pull_image(image_name)
@@ -120,8 +120,9 @@ class DockerRunner
     assert_exec("docker rm --force #{cid}")
     200.times do
       sleep(1.0 / 100.0)
-      break if container_dead?(cid)
+      return if container_dead?(cid)
     end
+    # If we get to here something went wrong!
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -144,7 +145,7 @@ class DockerRunner
 
   def container_dead?(cid)
     cmd = "docker inspect --format='{{ .State.Running }}' #{cid} 2> /dev/null"
-    _, status = exec(cmd, logging = false)
+    _,_, status = exec(cmd, logging = false)
     dead = status == 1
   end
 
@@ -155,9 +156,9 @@ class DockerRunner
   end
 
   def assert_exec(cmd)
-    output, status = exec(cmd)
-    fail "exited(#{status}):#{output}:" unless status == 0
-    [output, status]
+    stdout, stderr, status = exec(cmd)
+    fail "exited(#{status}):#{stdout}:" unless status == 0
+    [stdout, stderr, status]
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

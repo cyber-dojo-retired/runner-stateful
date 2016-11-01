@@ -18,7 +18,7 @@ class ExternalShellerTest < RunnerTestBase
   '(1)output,status are captured and returned,',
   '(2)nothing is logged' do
     shell_exec('echo -n Hello')
-    assert_output 'Hello'
+    assert_stdout 'Hello'
     assert_status 0
     assert_log []
   end
@@ -30,7 +30,7 @@ class ExternalShellerTest < RunnerTestBase
   '(1)output,status are captured and returned,',
   '(2)cmd,output,status are logged' do
     shell_exec('false')
-    assert_output ''
+    assert_stdout ''
     assert_status 1
     assert_log [
       'COMMAND:false',
@@ -46,7 +46,7 @@ class ExternalShellerTest < RunnerTestBase
   '(1)output,status are captured and returned',
   '(2)cmd,output,status are logged' do
     shell_exec('sed salmon 2>&1')
-    assert_output "sed: unmatched 'a'\n"
+    assert_stdout "sed: unmatched 'a'\n"
     assert_status 1
     assert_log [
       'COMMAND:sed salmon 2>&1',
@@ -62,7 +62,7 @@ class ExternalShellerTest < RunnerTestBase
   '(1)output,status are captured and returned',
   '(2)cmd,output,status are not logged' do
     shell_exec('sed salmon 2>&1', logging = false)
-    assert_output "sed: unmatched 'a'\n"
+    assert_stdout "sed: unmatched 'a'\n"
     assert_status 1
     assert_log []
   end
@@ -86,11 +86,11 @@ class ExternalShellerTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - -
 
   def shell_exec(command, logging = true)
-    @output, @status = shell.exec(command, logging)
+    @stdout, @stderr, @status = shell.exec(command, logging)
   end
 
-  def assert_output(expected)
-    assert_equal expected, @output
+  def assert_stdout(expected)
+    assert_equal expected, @stdout
   end
 
   def assert_status(expected)

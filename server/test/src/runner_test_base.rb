@@ -46,9 +46,9 @@ class RunnerTestBase < HexMiniTest
   end
 
   def assert_exec(cmd)
-    output, status = exec(cmd)
-    assert_equal success, status, output
-    [output, status]
+    stdout, stderr, status = exec(cmd)
+    assert_equal success, status, stdout
+    [stdout, stderr]
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
