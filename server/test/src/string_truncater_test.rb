@@ -7,29 +7,37 @@ class StringTruncaterTest < RunnerTestBase
 
   def self.hex_prefix; '767'; end
 
+  test '4D1',
+  'empty string is not truncated' do
+    s = ''
+    assert_equal s, truncated(s)
+  end
+
   # - - - - - - - - - - - - - - - - - - - - - - -
 
   test '5A7',
-  'output of less than 10k is not truncated' do
-    output = 'x'* (10*1024 - 1)
-    assert_equal output, truncated(output)
+  'string of less than 10k is not truncated' do
+    s = '@' * (max_length - 1)
+    assert_equal s, truncated(s)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'D8F',
-  'output of exactly 10k is not truncated' do
-    output = 'x'* (10*1024)
-    assert_equal output, truncated(output)
+  'string of exactly 10k is not truncated' do
+    s = '@' * (max_length)
+    assert_equal s, truncated(s)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'A48',
-  'output of greater than 10k is truncated and truncated-message is appended' do
-    output = 'x'* (10*1024)
+  'string of greater than 10k is truncated and truncated-message is appended' do
+    s = '@' * (max_length)
     message = 'output truncated by cyber-dojo server'
-    assert_equal output + "\n" + message, truncated(output + 'x')
+    assert_equal s + "\n" + message, truncated(s + 'x')
   end
+
+  def max_length; 10*1024; end
 
 end

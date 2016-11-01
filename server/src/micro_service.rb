@@ -3,6 +3,8 @@ require 'json'
 
 require_relative './externals'
 require_relative './docker_runner'
+require_relative './string_cleaner'
+require_relative './string_truncater'
 
 class MicroService < Sinatra::Base
 
@@ -41,6 +43,9 @@ class MicroService < Sinatra::Base
     JSON.parse(request.body.read)
   end
 
+  include StringCleaner
+  include StringTruncater
+
   def jasoned
     content_type :json
     begin
@@ -48,7 +53,10 @@ class MicroService < Sinatra::Base
     rescue StandardError => error
       stdout,stderr,status = '', error.to_s, :error
     end
-    { stdout:stdout, stderr:stderr, status:status }.to_json
+    { stdout:truncated(cleaned(stdout)),
+      stderr:truncated(cleaned(stderr)),
+      status:status
+    }.to_json
   end
 
 end

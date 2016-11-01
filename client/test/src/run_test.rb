@@ -7,7 +7,6 @@ class RunTest < ClientTestBase
   def hex_teardown; old_avatar; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '42D',
   'run with bad arguments sets error status' do
@@ -19,7 +18,7 @@ class RunTest < ClientTestBase
     args << (deleted_filenames = [])
     args << (changed_files = {})
     @json = runner.run(*args)
-    assert_equal 'error', status
+    assert_error
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -27,9 +26,9 @@ class RunTest < ClientTestBase
   test '348',
   'red-traffic-light' do
     runner_run(files)
-    assert_equal completed, status
-    assert stderr.start_with?('Assertion failed: answer() == 42'), json
-    assert_equal '', stdout, json
+    assert_completed
+    assert_stdout ''
+    assert stderr.start_with?('Assertion failed: answer() == 42'), json.to_s
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -38,9 +37,9 @@ class RunTest < ClientTestBase
   'green-traffic-light' do
     file_sub('hiker.c', '6 * 9', '6 * 7')
     runner_run(files)
-    assert_equal completed, status, json
-    assert_equal "All tests passed\n", stdout, json
-    assert_equal '', stderr, json
+    assert_completed
+    assert_stdout "All tests passed\n"
+    assert_stderr ''
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -49,13 +48,13 @@ class RunTest < ClientTestBase
   'amber-traffic-light' do
     file_sub('hiker.c', '6 * 9', '6 * 9sss')
     runner_run(files)
-    assert_equal completed, status, json
+    assert_completed
+    assert_stdout ''
     lines = [
       "invalid suffix \"sss\" on integer constant",
       'return 6 * 9sss'
     ]
-    lines.each { |line| assert stderr.include?(line), json }
-    assert_equal '', stdout, json
+    lines.each { |line| assert stderr.include?(line), json.to_s }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -64,9 +63,49 @@ class RunTest < ClientTestBase
   'timed-out-traffic-light' do
     file_sub('hiker.c', 'return', 'for(;;); return')
     runner_run(files, 3)
-    assert_equal timed_out, status, json
-    assert_equal '', stdout, json
-    assert_equal '', stderr, json
+    assert_timed_out
+    assert_stdout ''
+    assert_stderr ''
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test 'ED4',
+  'stdout greater than 10K is truncated' do
+    # fold limit is 10000 so I do two smaller folds
+    five_K_plus_1 = 5*1024+1
+    command = [
+      'cat /dev/urandom',
+      "tr -dc 'a-zA-Z0-9'",
+      "fold -w #{five_K_plus_1}",
+      'head -n 1'
+    ].join('|')
+    runner_run({ 'cyber-dojo.sh' => "(#{command}) && (#{command})" })
+    assert_completed
+    assert stdout.end_with? 'output truncated by cyber-dojo server', json.to_s
+    assert_stderr ''
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def assert_completed
+    assert_equal completed, status, json.to_s
+  end
+
+  def assert_timed_out
+    assert_equal timed_out, status, json.to_s
+  end
+
+  def assert_error
+    assert_equal 'error', status, json.to_s
+  end
+
+  def assert_stdout(expected)
+    assert_equal expected, stdout, json.to_s
+  end
+
+  def assert_stderr(expected)
+    assert_equal expected, stderr, json.to_s
   end
 
 end

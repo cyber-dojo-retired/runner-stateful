@@ -26,7 +26,7 @@ class ClientTestBase < HexMiniTest
   end
 
   def runner
-    @runner ||= RunnerServiceAdapter.new
+    RunnerServiceAdapter.new
   end
 
   def json; @json; end
