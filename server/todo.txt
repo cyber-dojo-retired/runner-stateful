@@ -15,6 +15,10 @@ runner_server:
 o) micro_service returned strings.
    - clean them +test
    - truncate them +test
+   How to generate a large amount of text in cyber-dojo.sh?
+   This will generate N random characters
+     cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w N | head -n 1
+
 
 o) add cpu/memory/swap limits
    See comments at https://github.com/cyber-dojo/commander/blob/master/docker-compose.yml
