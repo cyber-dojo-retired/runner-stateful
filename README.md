@@ -10,6 +10,7 @@ A **cyberdojo/runner** docker container runs sinatra on port 4557.
 It's API is as follows:
 
 # pulled_image
+Asks the question 'has the runner-server [docker pull]'ed image_name'?
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
 - returns
@@ -17,12 +18,14 @@ It's API is as follows:
   * { "status":"false" } -> not pulled already
 
 # pull_image
+Commands the runner-server to [docker pull] image_name.
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
 - returns
   * { "status":"ok" } -> pull succeeded
 
 # new_avatar
+Informs the runner-server the given avatar will be issuing run commands.
 - parameters
   * kata_id, eg '15B9AD6C42'
   * avatar_name, eg 'salmon'
@@ -30,6 +33,7 @@ It's API is as follows:
   * { "status":"ok" } -> succeeded
 
 # old_avatar
+Informs the runner-server the given avatar will no longer be issuing run commands.
 - parameters
   * kata_id, eg '15B9AD6C42'
   * avatar_name, eg 'salmon'
@@ -37,6 +41,8 @@ It's API is as follows:
   * { "status":"ok" } -> succeeded
 
 # run
+Commands the runner-server to run the attached code.
+A sequence of run commands must be preceeded by a call to new_avatar.
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
   * kata_id, eg '15B9AD6C42'
