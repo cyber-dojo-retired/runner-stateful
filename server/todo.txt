@@ -1,5 +1,6 @@
 
-runner_server:
+nginx:
+======
 
 $ docker logs cyber-dojo-nginx
 2016/10/31 21:49:03 [emerg] 1#1: mkdir() "/var/cache/nginx/client_temp" failed (13: Permission denied)
@@ -8,31 +9,8 @@ nginx: [emerg] mkdir() "/var/cache/nginx/client_temp" failed (13: Permission den
 Changed to user root in docker-compose.yml
 No longer get this diagnostic but still not getting images from nginx.
 
-
-Redo shell.exec
-=======
-o) redo shell.exec
-
-  require 'open3'
-  def exec(command, logging = true)
-    begin
-      stdout, stderr, status = Open3.capture3(command)
-      if status != success && logging
-        log << line
-        log << "COMMAND:#{command}"
-        log << "STATUS:#{status}"
-        log << "STDOUT:#{stdout}"
-        log << "STDERR:#{stderr}"
-      end
-      [stdout, stderr, status]
-    rescue StandardError => error
-      log << line
-      log << "COMMAND:#{command}"
-      log << "RAISED-CLASS:#{error.class.name}"
-      log << "RAISED-TO_S:#{error.to_s}"
-      raise error
-    end
-  end
+runner_server:
+==============
 
 o) micro_service returned strings.
    - clean them +test
