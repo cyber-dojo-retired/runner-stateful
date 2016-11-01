@@ -1,6 +1,14 @@
 
 runner_server:
 
+$ docker logs cyber-dojo-nginx
+2016/10/31 21:49:03 [emerg] 1#1: mkdir() "/var/cache/nginx/client_temp" failed (13: Permission denied)
+nginx: [emerg] mkdir() "/var/cache/nginx/client_temp" failed (13: Permission denied)
+2016/10/31 21:49:54 [warn] 1#1: the "user" directive makes sense only if the master process runs with super-user privileges, ignored in /etc/nginx/nginx.conf:2
+Changed to user root in docker-compose.yml
+No longer get this diagnostic but still not getting images from nginx.
+
+
 Redo shell.exec
   require 'open3'
   def exec(command, logging = true)
