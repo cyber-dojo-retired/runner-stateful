@@ -10,4 +10,13 @@ class OldAvatarTest < ClientTestBase
     assert_equal 'error', status
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test '1ED',
+  'old_avatar with legal name succeeds' do
+    new_avatar(test_id, 'salmon')
+    old_avatar(test_id, 'salmon')
+    assert_equal 0, status
+  end
+
 end

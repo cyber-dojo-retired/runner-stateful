@@ -172,7 +172,11 @@ class DockerRunner
 
   def assert_exec(cmd)
     stdout,stderr,status = exec(cmd)
-    fail "exited(#{status}):#{stdout}:#{stderr}" unless status == success
+    fail [
+      "status(#{status})",
+      "stdout(#{stdout.strip})",
+      "stderr(#{stderr.strip})"
+    ].join("\n") unless status == success
     [stdout, stderr, status]
   end
 

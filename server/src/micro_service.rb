@@ -48,7 +48,7 @@ class MicroService < Sinatra::Base
     rescue StandardError => error
       stdout,stderr,status = '', error.to_s, :error
     end
-    { stdout:stdout, stderr:stderr, status:status,  }.to_json
+    { stdout:stdout, stderr:stderr, status:status }.to_json
   end
 
 end

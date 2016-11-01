@@ -14,15 +14,15 @@ Asks the question 'has the runner-server [docker pull]'ed image_name'?
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
 - returns
-  * { "status":"true"  } -> pulled already
-  * { "status":"false" } -> not pulled already
+  * { "status":true  } -> pulled already
+  * { "status":false } -> not pulled already
 
 # pull_image
 Tells the runner-server to [docker pull] image_name.
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
 - returns
-  * { "status":"ok" } -> pull succeeded
+  * { "status":0 } -> pull succeeded
 
 # new_avatar
 Informs the runner-server the given avatar will be issuing run commands.
@@ -30,7 +30,7 @@ Informs the runner-server the given avatar will be issuing run commands.
   * kata_id, eg '15B9AD6C42'
   * avatar_name, eg 'salmon'
 - returns
-  * { "status":"ok" } -> succeeded
+  * { "status":0 } -> succeeded
 
 # old_avatar
 Informs the runner-server the given avatar will no longer be issuing run commands.
@@ -38,7 +38,7 @@ Informs the runner-server the given avatar will no longer be issuing run command
   * kata_id, eg '15B9AD6C42'
   * avatar_name, eg 'salmon'
 - returns
-  * { "status":"ok" } -> succeeded
+  * { "status":0 } -> succeeded
 
 # run
 Tells the runner-server to run the attached code.
@@ -51,8 +51,8 @@ A sequence of run commands must be preceeded by a call to new_avatar.
   * deleted_filenames, eg [ 'hiker.h', ... ]
   * changed_files, eg { 'fizz_buzz.h' => '#include', ... }
 - returns
-  * { "status":"0",   "stdout":output, "stderr":error } -> completed
-  * { "status":"128", "stdout":"", "stderr":"" } -> did not complete in max_seconds
+  * { "status":0,   "stdout":stdout, "stderr":stderr } -> completed
+  * { "status":128, "stdout":"", "stderr":"" } -> did not complete in max_seconds
 
 - if something unexpected goes wrong on the server all methods return
   * { "status":"error", "stderr":msg } -> something went wrong
