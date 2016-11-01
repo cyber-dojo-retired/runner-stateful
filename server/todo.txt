@@ -1,7 +1,11 @@
 
+commander
+=========
+o) [./cyber-dojo update]
+   does not update the language images. Should it?
+
 nginx:
 ======
-
 $ docker logs cyber-dojo-nginx
 2016/10/31 21:49:03 [emerg] 1#1: mkdir() "/var/cache/nginx/client_temp" failed (13: Permission denied)
 nginx: [emerg] mkdir() "/var/cache/nginx/client_temp" failed (13: Permission denied)
@@ -11,7 +15,6 @@ No longer get this diagnostic but still not getting images from nginx.
 
 runner_server:
 ==============
-
 o) add cpu/memory/swap limits
    See comments at https://github.com/cyber-dojo/commander/blob/master/docker-compose.yml
    See https://github.com/docker/docker/pull/9437
@@ -21,18 +24,19 @@ o) add cpu/memory/swap limits
    I guess I can just use its integer id, 19661
 
    From [docker run --help]
+
    --blkio-weight value          Block IO (relative weight), between 10 and 1000
    --blkio-weight-device value   Block IO weight (relative device weight) (default []
    --cpu-period int              Limit CPU CFS (Completely Fair Scheduler) period
    --cpu-quota int               Limit CPU CFS (Completely Fair Scheduler) quota
-   -c, --cpu-shares int
+   -c, --cpu-shares int          CPU shares (relative weight)
    --device-read-bps value       Limit read rate (bytes per second) from a device (default [])
    --device-read-iops value      Limit read rate (IO per second) from a device (default [])
    --device-write-bps value      Limit write rate (bytes per second) to a device (default [])
    --device-write-iops value     Limit write rate (IO per second) to a device (default [])
    --isolation string            Container isolation technology
    --kernel-memory string        Kernel memory limit
-   -m, --memory string               Memory limit
+   -m, --memory string           Memory limit
    --memory-reservation string   Memory soft limit
    --memory-swap string          Swap limit equal to memory plus swap: '-1' to enable unlimited swap
    --memory-swappiness int       Tune container memory swappiness (0 to 100) (default -1)
@@ -43,8 +47,6 @@ o) what if filename has a quote in it?
 
 o) log assert_exec() fail in docker_runner.rb
 
--------------------------------------------------
-
 o) can you copying a changed file into the container via a named-pipe?
    - https://en.wikipedia.org/wiki/Named_pipe
    - https://github.com/shurizzle/ruby-mkfifo
@@ -53,11 +55,6 @@ o) can you copying a changed file into the container via a named-pipe?
    tar -zcf /tmp/file | docker exec ... sh -c 'tar -zxf - -C /sandbox'
    IO.write('/tmp/file', content)
    `rm /tmp/file`
-
-o) write the hello()-datetime to a known file inside the volume.
-   write the run()-datetime to a known file inside the volume.
-   Separate reaper/pruner service can delete old volumes.
-   Or should the time-stamps come from the storer?
 
 o) validate microservice parameters?
    - kata_id = 10 hex chars
@@ -76,7 +73,3 @@ o) Should there be a volume per kata rather than per animal?
 o) Should I use a different uid for the run of each avatar
    and for the rights of their files?
 
--------------------------------------------------
-
-o) [./cyber-dojo update]
-   does not update the language images. Should it?
