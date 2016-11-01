@@ -16,9 +16,9 @@ class ExternalSheller
       if status != success && logging
         log << line
         log << "COMMAND:#{command}"
-        log << "STDOUT:#{stdout}"
-        #TODO: add STDERR
         log << "STATUS:#{status}"
+        log << "STDOUT:#{stdout}"
+        log << "STDERR:#{stderr}"
       end
       [stdout, stderr, status]
     rescue StandardError => error

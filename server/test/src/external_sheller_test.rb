@@ -14,67 +14,61 @@ class ExternalShellerTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - -
 
   test 'DBB',
-  'when exec(cmd) succeeds:',
-  '(1)output,status are captured and returned,',
-  '(2)nothing is logged' do
+  'exec(cmd) succeeds with output' do
     shell_exec('echo -n Hello')
-    assert_stdout 'Hello'
     assert_status 0
+    assert_stdout 'Hello'
+    assert_stderr ''
     assert_log []
   end
 
   # - - - - - - - - - - - - - - - - -
 
   test '490',
-  'when exec(cmd) with no output fails:',
-  '(1)output,status are captured and returned,',
-  '(2)cmd,output,status are logged' do
+  'exec(cmd) succeeds with no output' do
     shell_exec('false')
-    assert_stdout ''
     assert_status 1
+    assert_stdout ''
+    assert_stderr ''
     assert_log [
       'COMMAND:false',
+      'STATUS:1',
       'STDOUT:',
-      'STATUS:1'
+      'STDERR:'
     ]
   end
 
   # - - - - - - - - - - - - - - - - -
 
   test '46B',
-  'when exec(cmd) with output fails:',
-  '(1)output,status are captured and returned',
-  '(2)cmd,output,status are logged' do
-    shell_exec('sed salmon 2>&1')
-    assert_stdout "sed: unmatched 'a'\n"
+  'exec(cmd) fails with output' do
+    shell_exec('sed salmon')
     assert_status 1
+    assert_stdout ''
+    assert_stderr "sed: unmatched 'a'\n"
     assert_log [
-      'COMMAND:sed salmon 2>&1',
-      "STDOUT:sed: unmatched 'a'\n",
-      'STATUS:1'
+      'COMMAND:sed salmon',
+      'STATUS:1',
+      'STDOUT:',
+      "STDERR:sed: unmatched 'a'\n"
     ]
   end
 
   # - - - - - - - - - - - - - - - - -
 
   test '6D5',
-  'when exec(cmd,logging=false) with output fails:',
-  '(1)output,status are captured and returned',
-  '(2)cmd,output,status are not logged' do
-    shell_exec('sed salmon 2>&1', logging = false)
-    assert_stdout "sed: unmatched 'a'\n"
+  'exec(cmd,logging=false) with output' do
+    shell_exec('sed salmon', logging = false)
     assert_status 1
+    assert_stdout ''
+    assert_stderr "sed: unmatched 'a'\n"
     assert_log []
   end
 
   # - - - - - - - - - - - - - - - - -
 
   test 'AF6',
-  'when exec() raises:',
-  '(0)exception is raised,',
-  '(1)output is captured,' +
-  '(2)exit-status is not success,',
-  '(3)log records failure' do
+  'exec(cmd) raises' do
     assert_raises { shell_exec('zzzz') }
     assert_log [
       'COMMAND:zzzz',
@@ -89,12 +83,16 @@ class ExternalShellerTest < RunnerTestBase
     @stdout, @stderr, @status = shell.exec(command, logging)
   end
 
+  def assert_status(expected)
+    assert_equal expected, @status
+  end
+
   def assert_stdout(expected)
     assert_equal expected, @stdout
   end
 
-  def assert_status(expected)
-    assert_equal expected, @status
+  def assert_stderr(expected)
+    assert_equal expected, @stderr
   end
 
   def assert_log(expected)
