@@ -25,10 +25,9 @@ run_client_tests()
 {
   docker exec ${client_cid} sh -c "cd /app/test && ./run.sh ${*}"
   client_status=$?
-  # Client Coverage is broken. Simplecov is not seeing the test/src/*_test.rb files
-  #docker cp ${client_cid}:/tmp/coverage ${my_dir}/client
-  #echo "Coverage report copied to ${my_dir}/client/coverage"
-  #cat ${my_dir}/client/coverage/done.txt
+  docker cp ${client_cid}:/tmp/coverage ${my_dir}/client
+  echo "Coverage report copied to ${my_dir}/client/coverage"
+  cat ${my_dir}/client/coverage/done.txt
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - -
