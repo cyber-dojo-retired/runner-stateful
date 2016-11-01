@@ -80,7 +80,7 @@ class RunTest < ClientTestBase
       "fold -w #{five_K_plus_1}",
       'head -n 1'
     ].join('|')
-    runner_run({ 'cyber-dojo.sh' => "(#{command}) && (#{command})" })
+    runner_run({ 'cyber-dojo.sh' => "seq 2 | xargs -I{} sh -c '#{command}'" })
     assert_completed
     assert stdout.end_with? 'output truncated by cyber-dojo server', json.to_s
     assert_stderr ''
