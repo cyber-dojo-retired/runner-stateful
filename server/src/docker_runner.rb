@@ -118,11 +118,21 @@ class DockerRunner
 
   def remove_container(cid)
     assert_exec("docker rm --force #{cid}")
-    200.times do
-      sleep(1.0 / 100.0) # do sleep first to keep 100% test coverage
-      return if container_dead?(cid)
+    # The docker daemon responds to [docker rm] asynchronously.
+    # This means an 'immeadiate' old_avatar()'s [docker volume rm]
+    # might fail since the container is not quite dead yet.
+    # This is unlikely to happen in real use but very likely in tests.
+    # Doing the wait in the tests only would mean exposing the cid.
+    # I choose instead to wait at most 2 seconds for verification
+    # that the container really is dead.
+    tries = 0
+    removed = false
+    while tries < 200 && !removed
+      removed = container_dead?(cid)
+      sleep(1.0 / 100.0) unless removed
+      tries += 1
     end
-    # Failed to remove the container...
+    log << "Failed:remove_container(#{cid})" unless removed
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -175,8 +185,10 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   include NearestExternal
-  def disk;  nearest_external(:disk);  end
   def shell; nearest_external(:shell); end
+  def  disk; nearest_external(:disk);  end
+  def   log; nearest_external(:log);   end
+
   def exec(cmd, logging = true); shell.exec(cmd, logging); end
   def success; shell.success; end
 
