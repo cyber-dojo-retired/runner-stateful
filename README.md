@@ -51,7 +51,7 @@ A sequence of run commands must be preceeded by a call to new_avatar.
   * deleted_filenames, eg [ 'hiker.h', ... ]
   * changed_files, eg { 'fizz_buzz.h' => '#include', ... }
 - returns
-  * { "status":0,   "stdout":stdout, "stderr":stderr } -> completed
+  * { "status":0,   "stdout":..., "stderr":... } -> completed
   * { "status":128, "stdout":"", "stderr":"" } -> did not complete in max_seconds
 
 - if something unexpected goes wrong on the server all methods return
