@@ -15,9 +15,9 @@ class ExternalShellerTest < RunnerTestBase
 
   test 'DBB',
   'exec(cmd) succeeds with output' do
-    shell_exec('echo -n Hello')
+    shell_exec('echo Hello')
     assert_status 0
-    assert_stdout 'Hello'
+    assert_stdout "Hello\n"
     assert_stderr ''
     assert_log []
   end
@@ -80,7 +80,7 @@ class ExternalShellerTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - -
 
   def shell_exec(command, logging = true)
-    @stdout, @stderr, @status = shell.exec(command, logging)
+    @stdout,@stderr,@status = shell.exec(command, logging)
   end
 
   def assert_status(expected)
