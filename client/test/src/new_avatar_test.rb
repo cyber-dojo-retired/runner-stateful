@@ -16,7 +16,7 @@ class NewAvatarTest < ClientTestBase
   'new_avatar with legal name succeeds' do
     new_avatar(test_id, 'salmon')
     begin
-      assert_equal 0, status
+      assert_equal success, status
     ensure
       old_avatar(test_id, 'salmon')
     end

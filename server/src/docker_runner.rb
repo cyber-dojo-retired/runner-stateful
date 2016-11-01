@@ -118,13 +118,13 @@ class DockerRunner
 
   def remove_container(cid)
     assert_exec("docker rm --force #{cid}")
-    # The docker daemon responds to [docker rm] asynchronously.
-    # This means an 'immeadiate' old_avatar()'s [docker volume rm]
+    # The docker daemon responds to [docker rm] asynchronously...
+    # An 'immediately' following old_avatar()'s [docker volume rm]
     # might fail since the container is not quite dead yet.
     # This is unlikely to happen in real use but very likely in tests.
-    # Doing the wait in the tests only would mean exposing the cid.
-    # I choose instead to wait at most 2 seconds for verification
-    # that the container really is dead.
+    # Doing the wait only in the tests would mean exposing the cid.
+    # I choose instead to wait for verification that the container
+    # really is dead.
     tries = 0
     removed = false
     while tries < 200 && !removed

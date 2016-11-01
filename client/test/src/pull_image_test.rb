@@ -21,9 +21,9 @@ class PullImageTest < ClientTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '4CE',
-  'pull_image status is zero if pull succeeds' do
+  'pull_image with legal name succeeds' do
     pull_image('cyberdojofoundation/gcc_assert')
-    assert_equal 0, status
+    assert_equal success, status
     assert stdout.include?('Pulling from cyberdojofoundation/gcc_assert'), json
     assert_equal '', stderr
   end
