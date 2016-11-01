@@ -54,8 +54,8 @@ class DockerRunner
       '--user=root',
       "--volume=#{volume_name(kata_id, avatar_name)}:#{sandbox}"
     ].join(space = ' ')
-    output, _ = assert_exec("docker run #{args} #{image_name} sh")
-    cid = output.strip
+    stdout,_,_ = assert_exec("docker run #{args} #{image_name} sh")
+    cid = stdout.strip
     assert_docker_exec(cid, "chown #{user}:#{group} #{sandbox}")
     # Some languages need the current user to have a home. They are all
     # Ubuntu image based, eg C#-NUnit. The nobody user does not have a
@@ -137,8 +137,10 @@ class DockerRunner
   private
 
   def image_names
-    output, _ = assert_exec('docker images')
-    output[1..-1].split("\n").collect { |line| line.split[0] }
+    stdout,_,_ = assert_exec('docker images')
+    lines = stdout.split("\n")
+    lines.shift # REPOSITORY TAG IMAGE ID CREATED SIZE
+    lines.collect { |line| line.split[0] }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -155,6 +157,8 @@ class DockerRunner
   def assert_docker_exec(cid, cmd)
     assert_exec("docker exec #{cid} sh -c '#{cmd}'")
   end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_exec(cmd)
     stdout,stderr,status = exec(cmd)
