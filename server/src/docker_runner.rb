@@ -144,9 +144,10 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def container_dead?(cid)
-    cmd = "docker inspect --format='{{ .State.Running }}' #{cid} 2> /dev/null"
-    _,_, status = exec(cmd, logging = false)
-    dead = status == 1
+    cmd = "docker inspect --format='{{ .State.Running }}' #{cid}"
+    _,stderr,status = exec(cmd, logging = false)
+    expected_stderr = "Error: No such image, container or task: #{cid}"
+    (status == 1) && (stderr.strip == expected_stderr)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

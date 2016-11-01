@@ -1,4 +1,5 @@
 require_relative './nearest_external'
+require 'open3'
 
 class ExternalSheller
 
@@ -10,15 +11,16 @@ class ExternalSheller
 
   def exec(command, logging = true)
     begin
-      output = `#{command}`
-      status = $?.exitstatus
+      stdout,stderr,r = Open3.capture3(command)
+      status = r.exitstatus
       if status != success && logging
         log << line
         log << "COMMAND:#{command}"
-        log << "OUTPUT:#{output}"
+        log << "STDOUT:#{stdout}"
+        #TODO: add STDERR
         log << "STATUS:#{status}"
       end
-      [output, stderr='', status]
+      [stdout, stderr, status]
     rescue StandardError => error
       log << line
       log << "COMMAND:#{command}"

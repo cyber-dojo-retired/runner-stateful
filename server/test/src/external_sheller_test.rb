@@ -34,7 +34,7 @@ class ExternalShellerTest < RunnerTestBase
     assert_status 1
     assert_log [
       'COMMAND:false',
-      'OUTPUT:',
+      'STDOUT:',
       'STATUS:1'
     ]
   end
@@ -50,7 +50,7 @@ class ExternalShellerTest < RunnerTestBase
     assert_status 1
     assert_log [
       'COMMAND:sed salmon 2>&1',
-      "OUTPUT:sed: unmatched 'a'\n",
+      "STDOUT:sed: unmatched 'a'\n",
       'STATUS:1'
     ]
   end
