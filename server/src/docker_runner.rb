@@ -92,25 +92,25 @@ class DockerRunner
 
   def run_cyber_dojo_sh(cid, max_seconds)
     cmd = "docker exec --user=#{user} --interactive #{cid} sh -c './cyber-dojo.sh'"
-    read_out, write_out = IO.pipe
-    read_err, write_err = IO.pipe
-    pid = Process.spawn(cmd, pgroup:true, out:write_out, err:write_err)
+    r_stdout, w_stdout = IO.pipe
+    r_stderr, w_stderr = IO.pipe
+    pid = Process.spawn(cmd, pgroup:true, out:w_stdout, err:w_stderr)
     begin
       Timeout::timeout(max_seconds) do
         Process.waitpid(pid)
-        write_out.close
-        write_err.close
-        [read_out.read, read_err.read, completed]
+        w_stdout.close
+        w_stderr.close
+        [r_stdout.read, r_stderr.read, completed]
       end
     rescue Timeout::Error
       Process.kill(-9, pid)
       Process.detach(pid)
       ['', '', timed_out]
     ensure
-      write_out.close unless write_out.closed?
-      write_err.close unless write_err.closed?
-      read_out.close
-      read_err.close
+      w_stdout.close unless w_stdout.closed?
+      w_stderr.close unless w_stderr.closed?
+      r_stdout.close
+      r_stderr.close
     end
   end
 
@@ -119,10 +119,10 @@ class DockerRunner
   def remove_container(cid)
     assert_exec("docker rm --force #{cid}")
     200.times do
-      sleep(1.0 / 100.0)
+      sleep(1.0 / 100.0) # do sleep first to keep 100% test coverage
       return if container_dead?(cid)
     end
-    # If we get to here something went wrong!
+    # Failed to remove the container...
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
