@@ -30,11 +30,12 @@ class ExternalSheller
     end
   end
 
+  def success; 0; end
+
   private
 
   include NearestExternal
   def log; nearest_external(:log); end
 
-  def success; 0; end
   def line; '-' * 40; end
 end

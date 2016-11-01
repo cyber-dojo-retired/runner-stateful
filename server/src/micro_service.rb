@@ -44,11 +44,9 @@ class MicroService < Sinatra::Base
   def jasoned
     content_type :json
     begin
-      stdout, stderr, status = yield
+      stdout,stderr,status = yield
     rescue StandardError => error
-      stdout = ''
-      stderr = error.to_s
-      status = :error
+      stdout,stderr,status = '', error.to_s, :error
     end
     { stdout:stdout, stderr:stderr, status:status,  }.to_json
   end

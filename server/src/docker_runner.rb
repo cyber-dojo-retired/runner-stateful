@@ -157,8 +157,8 @@ class DockerRunner
   end
 
   def assert_exec(cmd)
-    stdout, stderr, status = exec(cmd)
-    fail "exited(#{status}):#{stdout}:" unless status == 0
+    stdout,stderr,status = exec(cmd)
+    fail "exited(#{status}):#{stdout}:#{stderr}" unless status == success
     [stdout, stderr, status]
   end
 
@@ -174,5 +174,6 @@ class DockerRunner
   def disk;  nearest_external(:disk);  end
   def shell; nearest_external(:shell); end
   def exec(cmd, logging = true); shell.exec(cmd, logging); end
+  def success; shell.success; end
 
 end
