@@ -38,6 +38,7 @@ o) add cpu/memory/swap limits
    --pids-limit int              Tune container pids limit (set -1 for unlimited)
    --ulimit value                Ulimit options (default [])
 
+
 o) what if filename has a quote in it?
 
 o) log assert_exec() fail in docker_runner.rb
@@ -68,3 +69,43 @@ o) Should there be a volume per kata rather than per animal?
 o) Should I use a different uid for the run of each avatar
    and for the rights of their files?
 
+==============================================================================
+
+Suppose there was a container per kata, which started when the kata was
+created. When you hit test your code was run in that container. Viz
+the server would not need to start a new container for each test submission.
+Can you still have a volume per avatar? No. The volume needs to be mounted
+when the container is created. So there would need to be a volume per kata.
+Means I would need two new event-methods, new_kata, old_kata.
+Implications of this...
+o) /sandbox is no longer going to work. Would need something like
+   /sandboxes/lion
+   /sandboxes/salmon
+o) new_kata() would create the new volume and the new container
+o) old_kata() would remove the volume and the container and would become important.
+o) suggests kata creation should be time-limited at creation so the old_kata()
+   calls can happen at a known time.
+o) forking from an old traffic-light would create a new kata with a new container.
+   its database (eg) would be empty again.
+o) new_avatar(lion) would create /sandboxes/lion and give it appropriate rights/ownership.
+   There need not be a lion username, but each avatar would have to be associated
+   with a unique uid and that uid would own the sandbox.
+o) there could be users with the avatar's name. Perhaps new language images should be
+   created from a new user-base image that has 64 users in it ready.
+o) old_avatar(lion) would remove /sandboxes/lion
+o) There is one red_amber_green lambda that uses /sandbox in its regex.
+   It's Go-testing. Could change that now.
+   At least do Go-testing withs
+o) pull_image?() and pull_image() would drop away!
+   Instead new_kata(image_name, kata_id) would be called when new kata is created
+   and it would do the docker-pull it it needed to.
+o) I will need to use the kata-id as a key to retrieve the cid value.
+   Could use a /sandboxes/manifest.json that stores the cid.
+   Or name the container.
+   https://docs.docker.com/engine/reference/commandline/ps/#filtering
+   docker run --detach ... --name cyber_dojo_#{kata_id} ...
+   49f94802344e......
+   That's the name of the container. Not its cid.
+   But you can still use it to find the container... Yes
+   docker ps --quiet --filter "name=cyber_dojo_#{kata_id}"
+   49f94802344e
