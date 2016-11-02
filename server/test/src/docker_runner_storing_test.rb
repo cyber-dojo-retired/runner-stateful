@@ -3,6 +3,8 @@ require_relative './runner_test_base'
 class DockerRunnerStoringTest < RunnerTestBase
 
   def self.hex_prefix; 'FEA56'; end
+  def hex_setup; @image_name = 'cyberdojofoundation/gcc_assert'; new_kata; end
+  def hex_teardown; old_kata; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 

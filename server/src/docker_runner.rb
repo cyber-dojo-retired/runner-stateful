@@ -9,12 +9,13 @@ class DockerRunner
 
   attr_reader :parent
 
-  def pulled_image?(image_name)
-    ['', '', image_names.include?(image_name)]
+  def new_kata(kata_id, image_name)
+    pull_image(image_name) unless image_names.include?(image_name)
+    ['', '', success]
   end
 
-  def pull_image(image_name)
-    assert_exec("docker pull #{image_name}")
+  def old_kata(kata_id, image_name)
+    ['', '', success]
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -148,6 +149,12 @@ class DockerRunner
   def timed_out; 128; end
 
   private
+
+  def pull_image(image_name)
+    assert_exec("docker pull #{image_name}")
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def image_names
     stdout,_,_ = assert_exec('docker images')

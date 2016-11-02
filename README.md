@@ -10,24 +10,26 @@ Not live yet.
 A **cyberdojo/runner** docker container runs sinatra on port 4557.
 It's API is as follows:
 
-# pulled_image
-Asks the runner-server if it has [docker pull]'ed image_name'?
+# new_kata
+Tells the runner-server a kata with the given id and image_name has been set up.
+Must be called before new_avatar.
 - parameters
+  * kata_id, eg '15B9AD6C42'
   * image_name, eg 'cyberdojofoundation/gcc_assert'
 - returns
-  * { "status":true  } -> pulled already
-  * { "status":false } -> not pulled already
+  * { "status":0  } -> succeeded
 
-# pull_image
-Tells the runner-server to [docker pull] image_name.
+# old_kata
+Tells the runner-server the kata with the given id has been torn down.
 - parameters
+  * kata_id, eg '15B9AD6C42'
   * image_name, eg 'cyberdojofoundation/gcc_assert'
 - returns
-  * { "status":0 } -> pull succeeded
+  * { "status":0 } -> succeeded
 
 # new_avatar
-Tells the runner-server to create a docker volume for the given avatar.
-Must be called before run_cyber_dojo_sh.
+Tells the runner-server the given avatar has entered the given kata.
+Must be called before run.
 - parameters
   * kata_id, eg '15B9AD6C42'
   * avatar_name, eg 'salmon'
@@ -35,7 +37,7 @@ Must be called before run_cyber_dojo_sh.
   * { "status":0 } -> succeeded
 
 # old_avatar
-Tells the runner-server to remove the docker volume for the given avatar.
+Tells the runner-server the given avatar has left the given kata.
 - parameters
   * kata_id, eg '15B9AD6C42'
   * avatar_name, eg 'salmon'

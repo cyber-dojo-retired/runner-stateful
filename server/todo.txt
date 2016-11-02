@@ -89,7 +89,7 @@ o) forking from an old traffic-light would create a new kata with a new containe
    its database (eg) would be empty again.
 o) new_avatar(lion) would create /sandboxes/lion and give it appropriate rights/ownership.
    There need not be a lion username, but each avatar would have to be associated
-   with a unique uid and that uid would own the sandbox.
+   with a unique uid and that uid would own the /sandboxes/lion
 o) there could be users with the avatar's name. Perhaps new language images should be
    created from a new user-base image that has 64 users in it ready.
 o) old_avatar(lion) would remove /sandboxes/lion
@@ -116,3 +116,9 @@ o) Can you limit the disk-allocation inside a container? Depends on the driver.
    https://github.com/docker/docker/issues/3804
      docker run ... --storage-opt size=120G ...
 
+o) Note that I am already limiting the duration of a [docker exec]
+
+o) Another effect of this would be that I would not need to pass
+   image_name to run()
+   This means all the information needed to do a run would come directly
+   from the browser. No need to go to storer at all.

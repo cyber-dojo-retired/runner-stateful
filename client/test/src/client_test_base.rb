@@ -5,20 +5,20 @@ require_relative './../../src/runner_service_adapter'
 
 class ClientTestBase < HexMiniTest
 
-  def pulled_image?(image_name)
-    @json = runner.pulled_image?(image_name)
+  def new_kata(id = kata_id, name = image_name)
+    @json = runner.new_kata(id, name)
   end
 
-  def pull_image(image_name)
-    @json = runner.pull_image(image_name)
+  def old_kata(id = kata_id, name = image_name)
+    @json = runner.old_kata(id, name)
   end
 
-  def new_avatar(kata_id = test_id, avatar_name = 'salmon')
-    @json = runner.new_avatar(kata_id, avatar_name)
+  def new_avatar(id = kata_id, name = avatar_name)
+    @json = runner.new_avatar(id, name)
   end
 
-  def old_avatar(kata_id = test_id, avatar_name = 'salmon')
-    @json = runner.old_avatar(kata_id, avatar_name)
+  def old_avatar(id = kata_id, name = avatar_name)
+    @json = runner.old_avatar(id, name)
   end
 
   def runner_run(changed_files, max_seconds = 10)
