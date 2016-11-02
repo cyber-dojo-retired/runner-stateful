@@ -255,13 +255,10 @@ class DockerRunnerRunOSTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def set_image_for_os
-    if test_id.include? self.class.alpine_hex
-      return @image_name = 'cyberdojofoundation/gcc_assert'
-    end
-    if test_id.include? self.class.ubuntu_hex
-      return @image_name = 'cyberdojofoundation/csharp_nunit'
-    end
-    fail "cannot set os from test 'HEX_ID'"
+    cdf = 'cyberdojofoundation'
+    @image_name = "#{cdf}/gcc_assert" if test_id.include? self.class.alpine_hex
+    @image_name = "#{cdf}/csharp_nunit" if test_id.include? self.class.ubuntu_hex
+    fail "cannot set os from test 'HEX_ID'" if @image_name.nil?
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
