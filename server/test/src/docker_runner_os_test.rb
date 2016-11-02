@@ -3,22 +3,21 @@ require_relative './runner_test_base'
 class DockerRunnerRunOSTest < RunnerTestBase
 
   def self.hex_prefix; '4D778'; end
-  def hex_setup; new_avatar; end
-  def hex_teardown; old_avatar; end
+  def hex_setup; kata_setup; end
+  def hex_teardown; kata_teardown; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '012',
-  'calling set_image_for_os with a test whose test_id does not start with',
-  '[Alpine] or [Ubuntu] raises' do
-    assert_raises { set_image_for_os }
-  end
+  #test '012',
+  #'calling set_image_for_os with a test whose test_id does not start with',
+  #'[Alpine] or [Ubuntu] raises' do
+  #  assert_raises { set_image_for_os }
+  #end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'CA0',
   '[Alpine] image is indeed Alpine and has user:nobody and group:nogroup' do
-    set_image_for_os
     stdout, _ = assert_run_completes_no_stderr({ 'cyber-dojo.sh' => 'cat /etc/issue'})
     assert stdout.include?('Alpine'), stdout
     assert_user_nobody_exists
@@ -27,7 +26,6 @@ class DockerRunnerRunOSTest < RunnerTestBase
 
   test '1A0',
   '[Ubuntu] image is indeed Ubuntu and has user:nobody and group:nogroup' do
-    set_image_for_os
     stdout, _ = assert_run_completes_no_stderr({ 'cyber-dojo.sh' => 'cat /etc/issue'})
     assert stdout.include?('Ubuntu'), stdout
     assert_user_nobody_exists
@@ -57,7 +55,6 @@ class DockerRunnerRunOSTest < RunnerTestBase
   end
 
   def create_container_test
-    set_image_for_os
     cid = runner.create_container(@image_name, kata_id, avatar_name)
     begin
       assert_docker_exec(cid, "[ -d #{sandbox} ]")
@@ -91,7 +88,6 @@ class DockerRunnerRunOSTest < RunnerTestBase
   end
 
   def starting_files_test
-    set_image_for_os
     ls_stdout,_ = assert_run_completes_no_stderr(starting_files)
     ls_files = ls_parse(ls_stdout)
     assert_equal starting_files.keys.sort, ls_files.keys.sort
@@ -123,7 +119,6 @@ class DockerRunnerRunOSTest < RunnerTestBase
   end
 
   def unchanged_files_test
-    set_image_for_os
     before_ls,_ = assert_run_completes_no_stderr(starting_files)
     after_ls,_ = assert_run_completes_no_stderr(changed_files = {})
     assert_equal before_ls, after_ls
@@ -142,7 +137,6 @@ class DockerRunnerRunOSTest < RunnerTestBase
   end
 
   def deleted_files_test
-    set_image_for_os
     ls_stdout,_ = assert_run_completes_no_stderr(starting_files)
     before = ls_parse(ls_stdout)
     before_filenames = before.keys
@@ -172,7 +166,6 @@ class DockerRunnerRunOSTest < RunnerTestBase
   end
 
   def new_files_test
-    set_image_for_os
     ls_stdout,_ = assert_run_completes_no_stderr(starting_files)
     before = ls_parse(ls_stdout)
     before_filenames = before.keys
@@ -209,7 +202,6 @@ class DockerRunnerRunOSTest < RunnerTestBase
   end
 
   def changed_file_test
-    set_image_for_os
     ls_stdout,_ = assert_run_completes_no_stderr(starting_files)
     before = ls_parse(ls_stdout)
 
@@ -240,13 +232,15 @@ class DockerRunnerRunOSTest < RunnerTestBase
 
   private
 
-  def starting_files
-    @starting_files ||= {
-      'cyber-dojo.sh' => ls_cmd,
-      'empty.txt' => '',
-      'hello.txt' => 'hello world',
-      'hello.sh' => 'echo hello world',
-    }
+  def kata_setup
+    set_image_for_os
+    new_kata
+    new_avatar
+  end
+
+  def kata_teardown
+    old_avatar
+    old_kata
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -256,6 +250,17 @@ class DockerRunnerRunOSTest < RunnerTestBase
     @image_name = "#{cdf}/gcc_assert"   if test_name.start_with? '[Alpine]'
     @image_name = "#{cdf}/csharp_nunit" if test_name.start_with? '[Ubuntu]'
     fail 'cannot set os from test_name' if @image_name.nil?
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def starting_files
+    @starting_files ||= {
+      'cyber-dojo.sh' => ls_cmd,
+      'empty.txt' => '',
+      'hello.txt' => 'hello world',
+      'hello.sh' => 'echo hello world',
+    }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
