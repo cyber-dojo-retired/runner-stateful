@@ -11,7 +11,7 @@ A **cyberdojo/runner** docker container runs sinatra on port 4557.
 It's API is as follows:
 
 # pulled_image
-Asks the question 'has the runner-server [docker pull]'ed image_name'?
+Asks the runner-server if it has [docker pull]'ed image_name'?
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
 - returns
@@ -26,7 +26,8 @@ Tells the runner-server to [docker pull] image_name.
   * { "status":0 } -> pull succeeded
 
 # new_avatar
-Informs the runner-server the given avatar will be issuing run commands.
+Tells the runner-server to create a docker volume for the given avatar.
+Must be called before run_cyber_dojo_sh.
 - parameters
   * kata_id, eg '15B9AD6C42'
   * avatar_name, eg 'salmon'
@@ -34,7 +35,7 @@ Informs the runner-server the given avatar will be issuing run commands.
   * { "status":0 } -> succeeded
 
 # old_avatar
-Informs the runner-server the given avatar will no longer be issuing run commands.
+Tells the runner-server to remove the docker volume for the given avatar.
 - parameters
   * kata_id, eg '15B9AD6C42'
   * avatar_name, eg 'salmon'
@@ -42,8 +43,12 @@ Informs the runner-server the given avatar will no longer be issuing run command
   * { "status":0 } -> succeeded
 
 # run
-Tells the runner-server to run the attached code.
-A sequence of run commands must be preceeded by a call to new_avatar.
+- Tells the runner-server to:
+  * create a docker container from the given image_name
+  * mount the avatar's volume into /sandbox
+  * delete deleted_filenames from /sandbox
+  * write changed_files into /sandbox
+  * run cyber-dojo.sh
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
   * kata_id, eg '15B9AD6C42'
