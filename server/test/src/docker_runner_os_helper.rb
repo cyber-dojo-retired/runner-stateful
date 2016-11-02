@@ -1,36 +1,23 @@
-require_relative './runner_test_base'
 
-class DockerRunnerRunOSTest < RunnerTestBase
+module DockerRunnerOsHelper
 
-  def self.hex_prefix; '4D778'; end
+  module_function
+
   def hex_setup; kata_setup; end
   def hex_teardown; kata_teardown; end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  #test '012',
-  #'calling set_image_for_os with a test whose test_id does not start with',
-  #'[Alpine] or [Ubuntu] raises' do
-  #  assert_raises { set_image_for_os }
-  #end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test 'CA0',
-  '[Alpine] image is indeed Alpine and has user:nobody and group:nogroup' do
-    stdout, _ = assert_run_completes_no_stderr({ 'cyber-dojo.sh' => 'cat /etc/issue'})
-    assert stdout.include?('Alpine'), stdout
-    assert_user_nobody_exists
-    assert_group_nogroup_exists
+  def kata_setup
+    set_image_for_os
+    new_kata
+    new_avatar
   end
 
-  test '1A0',
-  '[Ubuntu] image is indeed Ubuntu and has user:nobody and group:nogroup' do
-    stdout, _ = assert_run_completes_no_stderr({ 'cyber-dojo.sh' => 'cat /etc/issue'})
-    assert stdout.include?('Ubuntu'), stdout
-    assert_user_nobody_exists
-    assert_group_nogroup_exists
+  def kata_teardown
+    old_avatar
+    old_kata
   end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_user_nobody_exists
     stdout, _ = assert_run_completes_no_stderr({ 'cyber-dojo.sh' => 'getent passwd nobody' })
@@ -43,16 +30,6 @@ class DockerRunnerRunOSTest < RunnerTestBase
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test '0C9',
-  '[Alpine] newly created container has empty sandbox with ownership/permissions' do
-    create_container_test
-  end
-
-  test '1C9',
-  '[Ubuntu] newly created container has empty sandbox with ownership/permissions' do
-    create_container_test
-  end
 
   def create_container_test
     cid = runner.create_container(@image_name, kata_id, avatar_name)
@@ -77,16 +54,6 @@ class DockerRunnerRunOSTest < RunnerTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '1FB',
-  '[Alpine] starting-files are copied into sandbox with ownership/permissions' do
-    starting_files_test
-  end
-
-  test '2FB',
-  '[Ubuntu] starting-files are copied into sandbox with ownership/permissions' do
-    starting_files_test
-  end
-
   def starting_files_test
     ls_stdout,_ = assert_run_completes_no_stderr(starting_files)
     ls_files = ls_parse(ls_stdout)
@@ -108,16 +75,6 @@ class DockerRunnerRunOSTest < RunnerTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '4E8',
-  '[Alpine] unchanged files still exist and are unchanged' do
-    unchanged_files_test
-  end
-
-  test '5E8',
-  '[Ubuntu] unchanged files still exist and are unchanged' do
-    unchanged_files_test
-  end
-
   def unchanged_files_test
     before_ls,_ = assert_run_completes_no_stderr(starting_files)
     after_ls,_ = assert_run_completes_no_stderr(changed_files = {})
@@ -125,16 +82,6 @@ class DockerRunnerRunOSTest < RunnerTestBase
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test '385',
-  '[Alpine] deleted files are removed and all previous files are unchanged' do
-    deleted_files_test
-  end
-
-  test '485',
-  '[Ubuntu] deleted files are removed and all previous files are unchanged' do
-    deleted_files_test
-  end
 
   def deleted_files_test
     ls_stdout,_ = assert_run_completes_no_stderr(starting_files)
@@ -154,16 +101,6 @@ class DockerRunnerRunOSTest < RunnerTestBase
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test '232',
-  '[Alpine] new files are added with ownership/permissions and all previous files are unchanged' do
-    new_files_test
-  end
-
-  test '332',
-  '[Ubuntu] new files are added with ownership/permissions and all previous files are unchanged' do
-    new_files_test
-  end
 
   def new_files_test
     ls_stdout,_ = assert_run_completes_no_stderr(starting_files)
@@ -188,18 +125,6 @@ class DockerRunnerRunOSTest < RunnerTestBase
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test '9A7',
-  '[Alpine] a changed file is resaved and its size and time-stamp updates',
-  'and all previous files are unchanged' do
-    changed_file_test
-  end
-
-  test 'AA7',
-  '[Ubuntu] a changed file is resaved and its size and time-stamp updates',
-  'and all previous files are unchanged' do
-    changed_file_test
-  end
 
   def changed_file_test
     ls_stdout,_ = assert_run_completes_no_stderr(starting_files)
@@ -231,19 +156,6 @@ class DockerRunnerRunOSTest < RunnerTestBase
   end
 
   private
-
-  def kata_setup
-    set_image_for_os
-    new_kata
-    new_avatar
-  end
-
-  def kata_teardown
-    old_avatar
-    old_kata
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def set_image_for_os
     cdf = 'cyberdojofoundation'
