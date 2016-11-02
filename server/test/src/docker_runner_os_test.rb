@@ -2,24 +2,21 @@ require_relative './runner_test_base'
 
 class DockerRunnerRunOSTest < RunnerTestBase
 
-  def self.hex_prefix; '4D'; end
+  def self.hex_prefix; '4D778'; end
   def hex_setup; new_avatar; end
   def hex_teardown; old_avatar; end
 
-  def self.alpine_hex; '51D'; end
-  def self.ubuntu_hex; 'A7E'; end
-
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '778012',
-  'calling set_image_for_os with a test whose test_id does not include the',
-  'alpine_hex or the ubuntu_hex raises' do
+  test '012',
+  'calling set_image_for_os with a test whose test_id does not start with',
+  '[Alpine] or [Ubuntu] raises' do
     assert_raises { set_image_for_os }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test alpine_hex+'CA0',
+  test 'CA0',
   '[Alpine] image is indeed Alpine and has user:nobody and group:nogroup' do
     set_image_for_os
     stdout, _ = assert_run_completes_no_stderr({ 'cyber-dojo.sh' => 'cat /etc/issue'})
@@ -28,7 +25,7 @@ class DockerRunnerRunOSTest < RunnerTestBase
     assert_group_nogroup_exists
   end
 
-  test ubuntu_hex+'CA0',
+  test '1A0',
   '[Ubuntu] image is indeed Ubuntu and has user:nobody and group:nogroup' do
     set_image_for_os
     stdout, _ = assert_run_completes_no_stderr({ 'cyber-dojo.sh' => 'cat /etc/issue'})
@@ -49,12 +46,12 @@ class DockerRunnerRunOSTest < RunnerTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test alpine_hex+'0C9',
+  test '0C9',
   '[Alpine] newly created container has empty sandbox with ownership/permissions' do
     create_container_test
   end
 
-  test ubuntu_hex+'0C9',
+  test '1C9',
   '[Ubuntu] newly created container has empty sandbox with ownership/permissions' do
     create_container_test
   end
@@ -83,12 +80,12 @@ class DockerRunnerRunOSTest < RunnerTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test alpine_hex+'1FB',
+  test '1FB',
   '[Alpine] starting-files are copied into sandbox with ownership/permissions' do
     starting_files_test
   end
 
-  test ubuntu_hex+'1FB',
+  test '2FB',
   '[Ubuntu] starting-files are copied into sandbox with ownership/permissions' do
     starting_files_test
   end
@@ -115,12 +112,12 @@ class DockerRunnerRunOSTest < RunnerTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test alpine_hex+'4E8',
+  test '4E8',
   '[Alpine] unchanged files still exist and are unchanged' do
     unchanged_files_test
   end
 
-  test ubuntu_hex+'4E8',
+  test '5E8',
   '[Ubuntu] unchanged files still exist and are unchanged' do
     unchanged_files_test
   end
@@ -134,12 +131,12 @@ class DockerRunnerRunOSTest < RunnerTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test alpine_hex+'385',
+  test '385',
   '[Alpine] deleted files are removed and all previous files are unchanged' do
     deleted_files_test
   end
 
-  test ubuntu_hex+'385',
+  test '485',
   '[Ubuntu] deleted files are removed and all previous files are unchanged' do
     deleted_files_test
   end
@@ -164,12 +161,12 @@ class DockerRunnerRunOSTest < RunnerTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test alpine_hex+'232',
+  test '232',
   '[Alpine] new files are added with ownership/permissions and all previous files are unchanged' do
     new_files_test
   end
 
-  test ubuntu_hex+'232',
+  test '332',
   '[Ubuntu] new files are added with ownership/permissions and all previous files are unchanged' do
     new_files_test
   end
@@ -199,13 +196,13 @@ class DockerRunnerRunOSTest < RunnerTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test alpine_hex+'9A7',
+  test '9A7',
   '[Alpine] a changed file is resaved and its size and time-stamp updates',
   'and all previous files are unchanged' do
     changed_file_test
   end
 
-  test ubuntu_hex+'9A7',
+  test 'AA7',
   '[Ubuntu] a changed file is resaved and its size and time-stamp updates',
   'and all previous files are unchanged' do
     changed_file_test
@@ -256,9 +253,9 @@ class DockerRunnerRunOSTest < RunnerTestBase
 
   def set_image_for_os
     cdf = 'cyberdojofoundation'
-    @image_name = "#{cdf}/gcc_assert" if test_id.include? self.class.alpine_hex
-    @image_name = "#{cdf}/csharp_nunit" if test_id.include? self.class.ubuntu_hex
-    fail "cannot set os from test 'HEX_ID'" if @image_name.nil?
+    @image_name = "#{cdf}/gcc_assert"   if test_name.start_with? '[Alpine]'
+    @image_name = "#{cdf}/csharp_nunit" if test_name.start_with? '[Ubuntu]'
+    fail 'cannot set os from test_name' if @image_name.nil?
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -

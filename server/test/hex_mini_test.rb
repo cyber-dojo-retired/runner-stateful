@@ -10,16 +10,16 @@ class HexMiniTest < MiniTest::Test
   def self.test(hex_suffix, *lines, &test_block)
     hex_id = checked_hex_id(hex_suffix, lines)
     if @@args == [] || @@args.any?{ |arg| hex_id.include?(arg) }
-      proposition = lines.join(space = ' ')
+      hex_name = lines.join(space = ' ')
       execute_around = lambda {
-        _hex_setup_caller(hex_id, proposition)
+        _hex_setup_caller(hex_id, hex_name)
         begin
           self.instance_eval &test_block
         ensure
           _hex_teardown_caller
         end
       }
-      name = "hex '#{hex_suffix}',\n'#{proposition}'"
+      name = "hex '#{hex_suffix}',\n'#{hex_name}'"
       define_method("test_\n#{name}".to_sym, &execute_around)
     end
   end
@@ -50,9 +50,9 @@ class HexMiniTest < MiniTest::Test
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  def _hex_setup_caller(hex_id, proposition)
+  def _hex_setup_caller(hex_id, hex_name)
     @_hex_test_id = hex_id
-    @_hex_test_proposition = proposition
+    @_hex_test_name = hex_name
     hex_setup
   end
 
@@ -68,6 +68,6 @@ class HexMiniTest < MiniTest::Test
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def test_id; @_hex_test_id; end
-  def test_name; @_hex_test_proposition; end
+  def test_name; @_hex_test_name; end
 
 end
