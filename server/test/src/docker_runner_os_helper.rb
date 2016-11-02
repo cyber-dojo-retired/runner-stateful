@@ -3,22 +3,6 @@ module DockerRunnerOsHelper
 
   module_function
 
-  def hex_setup; kata_setup; end
-  def hex_teardown; kata_teardown; end
-
-  def kata_setup
-    set_image_for_os
-    new_kata
-    new_avatar
-  end
-
-  def kata_teardown
-    old_avatar
-    old_kata
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   def assert_user_nobody_exists
     stdout, _ = assert_run_completes_no_stderr({ 'cyber-dojo.sh' => 'getent passwd nobody' })
     assert stdout.start_with?(user), stdout
@@ -156,15 +140,6 @@ module DockerRunnerOsHelper
   end
 
   private
-
-  def set_image_for_os
-    cdf = 'cyberdojofoundation'
-    @image_name = "#{cdf}/gcc_assert"   if test_name.start_with? '[Alpine]'
-    @image_name = "#{cdf}/csharp_nunit" if test_name.start_with? '[Ubuntu]'
-    fail 'cannot set os from test_name' if @image_name.nil?
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def starting_files
     @starting_files ||= {

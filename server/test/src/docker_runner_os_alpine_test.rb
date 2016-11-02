@@ -6,6 +6,8 @@ class DockerRunnerOSAlpineTest < RunnerTestBase
   include DockerRunnerOsHelper
 
   def self.hex_prefix; '4D778'; end
+  def hex_setup; kata_setup; end
+  def hex_teardown; kata_teardown; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 

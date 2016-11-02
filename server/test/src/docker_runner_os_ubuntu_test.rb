@@ -6,6 +6,8 @@ class DockerRunnerOSUbuntuTest < RunnerTestBase
   include DockerRunnerOsHelper
 
   def self.hex_prefix; '5A631'; end
+  def hex_setup; kata_setup; end
+  def hex_teardown; kata_teardown; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 

@@ -22,21 +22,5 @@ class DockerRunnerLanguageTest < RunnerTestBase
     assert stdout.include?('Tests run: 1, Errors: 0, Failures: 1, Inconclusive: 0'), stdout
   end
 
-  private
-
-  def kata_setup
-    cdf = 'cyberdojofoundation'
-    @image_name = "#{cdf}/csharp_nunit" if test_name.start_with?('[C#,NUnit]')
-    @image_name = "#{cdf}/csharp_moq" if test_name.start_with?('[C#,Moq]')
-    fail "cannot set @image_name from test_name" if @image_name.nil?
-    new_kata
-    new_avatar
-  end
-
-  def kata_teardown
-    old_avatar
-    old_kata
-  end
-
 end
 

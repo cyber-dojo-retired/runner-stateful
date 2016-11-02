@@ -7,6 +7,28 @@ require_relative './../../src/externals'
 
 class RunnerTestBase < HexMiniTest
 
+  def kata_setup
+    set_image_for_os
+    new_kata
+    new_avatar
+  end
+
+  def kata_teardown
+    old_avatar
+    old_kata
+  end
+
+  def set_image_for_os
+    cdf = 'cyberdojofoundation'
+    @image_name = "#{cdf}/csharp_nunit" if test_name.start_with?('[C#,NUnit]')
+    @image_name = "#{cdf}/csharp_moq"   if test_name.start_with?('[C#,Moq]')
+    @image_name = "#{cdf}/gcc_assert"   if test_name.start_with? '[Alpine]'
+    @image_name = "#{cdf}/csharp_nunit" if test_name.start_with? '[Ubuntu]'
+    fail "cannot set @image_name from test_name" if @image_name.nil?
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   include Externals
   def runner; DockerRunner.new(self); end
 
