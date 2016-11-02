@@ -1,9 +1,4 @@
 
-commander
-=========
-o) [./cyber-dojo update]
-   does not update the language images. Should it?
-
 nginx:
 ======
 $ docker logs cyber-dojo-nginx
