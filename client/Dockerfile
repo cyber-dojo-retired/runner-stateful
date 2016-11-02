@@ -1,4 +1,4 @@
-FROM cyberdojo/runner_base
+FROM cyberdojo/foreman
 MAINTAINER Jon Jagger <jon@jaggersoft.com>
 
 ARG APP_DIR
