@@ -1,11 +1,15 @@
 FROM cyberdojo/foreman
 MAINTAINER Jon Jagger <jon@jaggersoft.com>
 
-ARG APP_DIR
-COPY . ${APP_DIR}
-WORKDIR ${APP_DIR}
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# setup foreman port
 
 ARG PORT
 ENV PORT=${PORT}
 EXPOSE ${PORT}
-ENTRYPOINT [ "foreman", "start" ]
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# install app
+
+ARG APP_DIR
+COPY . ${APP_DIR}
