@@ -45,12 +45,9 @@ Tells the runner-server the given avatar has left the given kata.
   * { "status":0 } -> succeeded
 
 # run
-- Tells the runner-server to:
-  * create a docker container from the given image_name
-  * mount the avatar's volume into /sandbox
-  * delete deleted_filenames from /sandbox
-  * write changed_files into /sandbox
-  * run cyber-dojo.sh
+- Runs cyber-dojo.sh for the given avatar in the given kata, after:
+  * removing the deleted_filenames
+  * saving changed_files
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
   * kata_id, eg '15B9AD6C42'
