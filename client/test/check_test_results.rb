@@ -103,7 +103,7 @@ table =
     [ 'coverage(test)[%]',      test_coverage,      '==', 100 ],
     [ 'hits_per_line(src)',     hits_per_line_src,  '<=',  15 ],
     [ 'hits_per_line(test)',    hits_per_line_test, '<=',   2 ],
-    [ 'lines(test)/lines(src)', f2(line_ratio),     '>=', 1.5 ],
+    [ 'lines(test)/lines(src)', f2(line_ratio),     '>=',   2 ],
   ]
 
 # - - - - - - - - - - - - - - - - - - - - - - -

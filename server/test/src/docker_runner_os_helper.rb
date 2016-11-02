@@ -157,8 +157,8 @@ module DockerRunnerOsHelper
     'stat -c "%n %A %U %G %s %z" *'
     # hiker.h  -rw-r--r--  nobody nogroup 136  2016-06-05 07:03:14.000000000
     # |        |           |      |       |    |          |
-    # 0        1           2      3       4    5          6
     # filename permissions user   group   size date       time
+    # 0        1           2      3       4    5          6
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -166,8 +166,7 @@ module DockerRunnerOsHelper
   def ls_parse(ls_stdout)
     Hash[ls_stdout.split("\n").collect { |line|
       attr = line.split
-      filename = attr[0]
-      [filename, {
+      [filename = attr[0], {
         permissions: attr[1],
                user: attr[2],
               group: attr[3],
