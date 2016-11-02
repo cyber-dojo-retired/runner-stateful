@@ -109,3 +109,10 @@ o) I will need to use the kata-id as a key to retrieve the cid value.
    But you can still use it to find the container... Yes
    docker ps --quiet --filter "name=cyber_dojo_#{kata_id}"
    49f94802344e
+
+o) DO I NEED A VOLUME? Why not just use the state inside the container?
+
+o) Can you limit the disk-allocation inside a container? Depends on the driver.
+   https://github.com/docker/docker/issues/3804
+     docker run ... --storage-opt size=120G ...
+
