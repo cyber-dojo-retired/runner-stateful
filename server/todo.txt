@@ -10,8 +10,7 @@ No longer get this diagnostic but still not getting images from nginx.
 
 runner_server:
 ==============
-o) will need pull(image_name) as well as new_kata()
-   to support [cyber-dojo start-point pull NAME]
+o) will [cyber-dojo start-point pull NAME] need runner.pull(image_name)
 
 o) add cpu/memory/swap limits
    See comments at https://github.com/cyber-dojo/commander/blob/master/docker-compose.yml
