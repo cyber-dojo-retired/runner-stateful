@@ -124,3 +124,9 @@ o) Another effect of this would be that I would not need to pass
    image_name to run()
    This means all the information needed to do a run would come directly
    from the browser. No need to go to storer at all.
+
+o) Could the new_kata() container creation be done with a command that
+   includes the duration of the kata. So the container automatically
+   expires at its deadline. sleep!
+   This would indeed prevent subsequent [docker exec]'s
+   But the container would still exist in an exited state.
