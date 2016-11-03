@@ -1,7 +1,7 @@
 require 'sinatra'
 require 'sinatra/base'
 
-require_relative './runner_service_adapter'
+require_relative './runner_post_adapter'
 
 class Demo < Sinatra::Base
 
@@ -59,7 +59,7 @@ class Demo < Sinatra::Base
   end
 
   def runner
-    RunnerServiceAdapter.new
+    RunnerPostAdapter.new
   end
 
   def read(filename)

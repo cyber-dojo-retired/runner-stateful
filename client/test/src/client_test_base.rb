@@ -1,7 +1,7 @@
 # require coverage before any files to be covered.
 require_relative './../coverage'
 require_relative './../hex_mini_test'
-require_relative './../../src/runner_service_adapter'
+require_relative './../../src/runner_post_adapter'
 
 class ClientTestBase < HexMiniTest
 
@@ -26,7 +26,7 @@ class ClientTestBase < HexMiniTest
   end
 
   def runner
-    RunnerServiceAdapter.new
+    RunnerPostAdapter.new
   end
 
   def json; @json; end

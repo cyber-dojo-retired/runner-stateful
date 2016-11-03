@@ -1,7 +1,7 @@
 require 'json'
 require 'net/http'
 
-class RunnerServiceAdapter
+class RunnerPostAdapter
 
   def new_kata(kata_id, image_name)
     post(:new_kata, { kata_id:kata_id, image_name:image_name })
