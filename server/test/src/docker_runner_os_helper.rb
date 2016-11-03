@@ -3,13 +3,15 @@ module DockerRunnerOsHelper
 
   module_function
 
-  def assert_user_nobody_exists
-    stdout, _ = assert_run_completes_no_stderr({ 'cyber-dojo.sh' => 'getent passwd nobody' })
+  def assert_user_exists
+    cmd = "getent passwd #{user}"
+    stdout, _ = assert_run_completes_no_stderr({ 'cyber-dojo.sh' => cmd })
     assert stdout.start_with?(user), stdout
   end
 
-  def assert_group_nogroup_exists
-    stdout, _ = assert_run_completes_no_stderr({ 'cyber-dojo.sh' => 'getent group nogroup' })
+  def assert_group_exists
+    cmd = "getent group #{group}"
+    stdout, _ = assert_run_completes_no_stderr({ 'cyber-dojo.sh' => cmd })
     assert stdout.start_with?(group), stdout
   end
 
@@ -24,10 +26,10 @@ module DockerRunnerOsHelper
       assert_equal 1, status, "#{sandbox} is not empty"
 
       stdout,_ = assert_docker_exec(cid, "stat -c '%U' #{sandbox}")
-      assert_equal 'nobody', (user_name = stdout.strip)
+      assert_equal user, stdout.strip
 
       stdout,_ = assert_docker_exec(cid, "stat -c '%G' #{sandbox}")
-      assert_equal 'nogroup', (group_name = stdout.strip)
+      assert_equal group, stdout.strip
 
       stdout,_ = assert_docker_exec(cid, "stat -c '%A' #{sandbox}")
       assert_equal 'drwxr-xr-x', (permissions = stdout.strip)
@@ -42,10 +44,10 @@ module DockerRunnerOsHelper
     ls_stdout,_ = assert_run_completes_no_stderr(starting_files)
     ls_files = ls_parse(ls_stdout)
     assert_equal starting_files.keys.sort, ls_files.keys.sort
-    assert_equal_atts('empty.txt',     '-rw-r--r--', 'nobody', 'nogroup',  0, ls_files)
-    assert_equal_atts('cyber-dojo.sh', '-rwxr-xr-x', 'nobody', 'nogroup', 29, ls_files)
-    assert_equal_atts('hello.txt',     '-rw-r--r--', 'nobody', 'nogroup', 11, ls_files)
-    assert_equal_atts('hello.sh',      '-rwxr-xr-x', 'nobody', 'nogroup', 16, ls_files)
+    assert_equal_atts('empty.txt',     '-rw-r--r--', user, group,  0, ls_files)
+    assert_equal_atts('cyber-dojo.sh', '-rwxr-xr-x', user, group, 29, ls_files)
+    assert_equal_atts('hello.txt',     '-rw-r--r--', user, group, 11, ls_files)
+    assert_equal_atts('hello.sh',      '-rwxr-xr-x', user, group, 16, ls_files)
   end
 
   def assert_equal_atts(filename, permissions, user, group, size, ls_files)
@@ -102,8 +104,8 @@ module DockerRunnerOsHelper
     assert_equal [ new_filename ], actual_new_filenames
     attr = after[new_filename]
     assert_equal '-rw-r--r--', attr[:permissions]
-    assert_equal 'nobody', attr[:user]
-    assert_equal 'nogroup', attr[:group]
+    assert_equal user, attr[:user]
+    assert_equal group, attr[:group]
     assert_equal new_file_content.size, attr[:size]
     before.each { |filename, attr| assert_equal after[filename], attr }
   end
