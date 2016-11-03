@@ -140,13 +140,23 @@ o) A duration ties in strongly with James' idea of a readonly kata.
    Note that the duration choice might have to be re-offered (if there
    is a choice) when you fork.
 
-o) A big implication of having a container per kata is that containers
-   are now long-lived. This means Alpine images need to have tini.
-   This needs to be tested for. Would be handy to have a list of which
-   images are Ubuntu based and which are Alpine based.
-
 o) new_kata() creates the container and the base /sandboxes dir.
 o) new_avatar(lion) creates a new user called lion in the container.
    it creates /sandboxes/lion and gives lion ownership of it.
    it makes /sandboxes/lion the HOME for lion.
+
+o) A big implication of having a container per kata is that containers
+   are now long-lived. This means Alpine images need to have tini.
+   This needs to be tested for. Would be handy to have a list of which
+   images are Ubuntu based and which are Alpine based...
+   Everything is Ubuntu except these 6 which are Alpine...
+   Alpine C,gcc,assert   from language_base?
+   Alpine C#,Moq
+   Alpine Ruby,Cucumber
+   Alpine Ruby,MiniTest
+   Alpine Ruby,Rspec
+   Alpine Ruby,TestUnit
+
+
+
 
