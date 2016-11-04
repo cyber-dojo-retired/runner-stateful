@@ -64,7 +64,6 @@ class DockerRunner
       '--pids-limit=64',                   # security - no fork bombs
       '--security-opt=no-new-privileges',  # security - no escalation
       "--env CYBER_DOJO_KATA_ID=#{kata_id}",
-      "--workdir=#{sandbox(avatar_name)}",
       '--user=root',
       "--volume=#{volume_name(kata_id, avatar_name)}:#{sandbox(avatar_name)}"
     ].join(space = ' ')
@@ -110,7 +109,12 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run_cyber_dojo_sh(cid, avatar_name, max_seconds)
-    cmd = "docker exec --user=#{user} --interactive #{cid} sh -c './cyber-dojo.sh'"
+    inner_cmd = [
+      "export CYBER_DOJO_SANDBOX=#{sandbox(avatar_name)}",
+      "cd ${CYBER_DOJO_SANDBOX}",
+      './cyber-dojo.sh'
+    ].join('&&')
+    cmd = "docker exec --user=#{user} --interactive #{cid} sh -c '#{inner_cmd}'"
     r_stdout, w_stdout = IO.pipe
     r_stderr, w_stderr = IO.pipe
     pid = Process.spawn(cmd, pgroup:true, out:w_stdout, err:w_stderr)
@@ -161,7 +165,7 @@ class DockerRunner
 
   def user; 'nobody'; end
   def group; 'nogroup'; end
-  def sandbox(avatar_name); '/sandbox'; end
+  def sandbox(avatar_name); "/sandboxes/#{avatar_name}"; end
 
   def success; shell.success; end
   def timed_out; 'timed_out'; end

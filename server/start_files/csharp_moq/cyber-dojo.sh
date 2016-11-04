@@ -2,8 +2,8 @@ NUNIT_PATH=/moq/NUnit.2.6.2/lib
 MOQ_PATH=/moq/Moq.4.0.10827/lib/NET40
 export MONO_PATH=${NUNIT_PATH}:${MOQ_PATH}
 
-export HOME=/sandbox
-dmcs -t:library \
+export HOME=${CYBER_DOJO_SANDBOX}
+mcs -t:library \
   -r:${NUNIT_PATH}/nunit.framework.dll \
   -r:${MOQ_PATH}/Moq.dll \
   -out:RunTests.dll *.cs
