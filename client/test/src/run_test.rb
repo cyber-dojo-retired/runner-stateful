@@ -26,7 +26,7 @@ class RunTest < ClientTestBase
   test '348',
   'red-traffic-light' do
     runner_run(files)
-    assert_completed
+    assert_succeeded
     assert_stdout ''
     assert stderr.start_with?('Assertion failed: answer() == 42'), json.to_s
   end
@@ -37,7 +37,7 @@ class RunTest < ClientTestBase
   'green-traffic-light' do
     file_sub('hiker.c', '6 * 9', '6 * 7')
     runner_run(files)
-    assert_completed
+    assert_succeeded
     assert_stdout "All tests passed\n"
     assert_stderr ''
   end
@@ -48,7 +48,7 @@ class RunTest < ClientTestBase
   'amber-traffic-light' do
     file_sub('hiker.c', '6 * 9', '6 * 9sss')
     runner_run(files)
-    assert_completed
+    assert_succeeded
     assert_stdout ''
     lines = [
       "invalid suffix \"sss\" on integer constant",
@@ -81,15 +81,15 @@ class RunTest < ClientTestBase
       'head -n 1'
     ].join('|')
     runner_run({ 'cyber-dojo.sh' => "seq 2 | xargs -I{} sh -c '#{command}'" })
-    assert_completed
+    assert_succeeded
     assert stdout.end_with? 'output truncated by cyber-dojo server', json.to_s
     assert_stderr ''
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_completed
-    assert_equal completed, status, json.to_s
+  def assert_succeeded
+    assert_equal success, status, json.to_s
   end
 
   def assert_timed_out
@@ -98,8 +98,10 @@ class RunTest < ClientTestBase
 
   def assert_error
     assert_equal 'Fixnum', status.class.name, json.to_s
-    refute_equal completed, status, json.to_s
+    refute_equal success, status, json.to_s
   end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_stdout(expected)
     assert_equal expected, stdout, json.to_s
