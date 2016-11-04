@@ -4,33 +4,33 @@ require 'net/http'
 class RunnerPostAdapter
 
   def pull_image(image_name)
-    post(:pull_image, { image_name:image_name })
+    post(__method__, { image_name:image_name })
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - -
 
   def new_kata(kata_id, image_name)
-    post(:new_kata, { kata_id:kata_id, image_name:image_name })
+    post(__method__, { kata_id:kata_id, image_name:image_name })
   end
 
   def old_kata(kata_id)
-    post(:old_kata, { kata_id:kata_id })
+    post(__method__, { kata_id:kata_id })
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - -
 
   def new_avatar(kata_id, avatar_name)
-    post(:new_avatar, { kata_id:kata_id, avatar_name:avatar_name })
+    post(__method__, { kata_id:kata_id, avatar_name:avatar_name })
   end
 
   def old_avatar(kata_id, avatar_name)
-    post(:old_avatar, { kata_id:kata_id, avatar_name:avatar_name })
+    post(__method__, { kata_id:kata_id, avatar_name:avatar_name })
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - -
 
   def run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
-    post(:run, {
+    post(__method__, {
                  image_name:image_name,
                     kata_id:kata_id,
                 avatar_name:avatar_name,
