@@ -51,9 +51,7 @@ class ClientTestBase < HexMiniTest
     files[name] = files[name].sub(from, to)
   end
 
-  def success; 0; end
-
-  def completed;   0; end
-  def timed_out; 128; end
+  def completed; 0; end
+  def timed_out; 'timed_out'; end
 
 end

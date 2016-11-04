@@ -98,7 +98,7 @@ class RunTest < ClientTestBase
 
   def assert_error
     assert_equal 'Fixnum', status.class.name, json.to_s
-    refute_equal success, status, json.to_s
+    refute_equal completed, status, json.to_s
   end
 
   def assert_stdout(expected)

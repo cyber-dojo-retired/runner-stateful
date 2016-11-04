@@ -149,8 +149,8 @@ class DockerRunner
   def group; 'nogroup'; end
   def sandbox; '/sandbox'; end
 
-  def completed;   0; end
-  def timed_out; 128; end
+  def completed; 0; end
+  def timed_out; 'timed_out'; end
 
   private
 
