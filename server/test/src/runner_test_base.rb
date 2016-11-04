@@ -45,15 +45,15 @@ class RunnerTestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_run_completes_no_stderr(*args)
-    stdout, stderr = assert_run_completes(*args)
+  def assert_run_succeeds_no_stderr(*args)
+    stdout, stderr = assert_run_succeeds(*args)
     assert_equal '', stderr
     stdout
   end
 
-  def assert_run_completes(*args)
+  def assert_run_succeeds(*args)
     stdout, stderr, status = runner_run(*args)
-    assert_equal completed, status, [stdout, stderr]
+    assert_equal success, status, [stdout, stderr]
     [stdout, stderr]
   end
 
@@ -94,7 +94,7 @@ class RunnerTestBase < HexMiniTest
   def group; runner.group; end
   def sandbox; runner.sandbox; end
 
-  def completed; runner.completed; end
+  def success; runner.success; end
   def timed_out; runner.timed_out; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

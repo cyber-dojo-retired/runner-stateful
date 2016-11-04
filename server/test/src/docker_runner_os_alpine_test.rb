@@ -13,7 +13,7 @@ class DockerRunnerOSAlpineTest < RunnerTestBase
 
   test 'CA0',
   '[Alpine] image is indeed Alpine and has user:nobody and group:nogroup' do
-    stdout, _ = assert_run_completes_no_stderr({ 'cyber-dojo.sh' => 'cat /etc/issue'})
+    stdout, _ = assert_run_succeeds_no_stderr({ 'cyber-dojo.sh' => 'cat /etc/issue'})
     assert stdout.include?('Alpine'), stdout
     assert_user_exists
     assert_group_exists

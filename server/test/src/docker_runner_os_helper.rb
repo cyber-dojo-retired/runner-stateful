@@ -5,13 +5,13 @@ module DockerRunnerOsHelper
 
   def assert_user_exists
     cmd = "getent passwd #{user}"
-    stdout, _ = assert_run_completes_no_stderr({ 'cyber-dojo.sh' => cmd })
+    stdout, _ = assert_run_succeeds_no_stderr({ 'cyber-dojo.sh' => cmd })
     assert stdout.start_with?(user), stdout
   end
 
   def assert_group_exists
     cmd = "getent group #{group}"
-    stdout, _ = assert_run_completes_no_stderr({ 'cyber-dojo.sh' => cmd })
+    stdout, _ = assert_run_succeeds_no_stderr({ 'cyber-dojo.sh' => cmd })
     assert stdout.start_with?(group), stdout
   end
 
@@ -41,7 +41,7 @@ module DockerRunnerOsHelper
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def starting_files_test
-    ls_stdout,_ = assert_run_completes_no_stderr(starting_files)
+    ls_stdout,_ = assert_run_succeeds_no_stderr(starting_files)
     ls_files = ls_parse(ls_stdout)
     assert_equal starting_files.keys.sort, ls_files.keys.sort
     assert_equal_atts('empty.txt',     '-rw-r--r--', user, group,  0, ls_files)
@@ -62,22 +62,22 @@ module DockerRunnerOsHelper
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def unchanged_files_test
-    before_ls,_ = assert_run_completes_no_stderr(starting_files)
-    after_ls,_ = assert_run_completes_no_stderr(changed_files = {})
+    before_ls,_ = assert_run_succeeds_no_stderr(starting_files)
+    after_ls,_ = assert_run_succeeds_no_stderr(changed_files = {})
     assert_equal before_ls, after_ls
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def deleted_files_test
-    ls_stdout,_ = assert_run_completes_no_stderr(starting_files)
+    ls_stdout,_ = assert_run_succeeds_no_stderr(starting_files)
     before = ls_parse(ls_stdout)
     before_filenames = before.keys
 
     changed_files = {}
     max_seconds = 10
     deleted_filenames = ['hello.txt']
-    ls_stdout,_ = assert_run_completes_no_stderr(changed_files, max_seconds, deleted_filenames)
+    ls_stdout,_ = assert_run_succeeds_no_stderr(changed_files, max_seconds, deleted_filenames)
     after = ls_parse(ls_stdout)
     after_filenames = after.keys
 
@@ -89,14 +89,14 @@ module DockerRunnerOsHelper
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def new_files_test
-    ls_stdout,_ = assert_run_completes_no_stderr(starting_files)
+    ls_stdout,_ = assert_run_succeeds_no_stderr(starting_files)
     before = ls_parse(ls_stdout)
     before_filenames = before.keys
 
     new_filename = 'fizz_buzz.h'
     new_file_content = '#ifndef...'
     changed_files = { new_filename => new_file_content }
-    ls_stdout,_ = assert_run_completes_no_stderr(changed_files)
+    ls_stdout,_ = assert_run_succeeds_no_stderr(changed_files)
     after = ls_parse(ls_stdout)
     after_filenames = after.keys
 
@@ -113,7 +113,7 @@ module DockerRunnerOsHelper
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def changed_file_test
-    ls_stdout,_ = assert_run_completes_no_stderr(starting_files)
+    ls_stdout,_ = assert_run_succeeds_no_stderr(starting_files)
     before = ls_parse(ls_stdout)
 
     sleep 2
@@ -121,7 +121,7 @@ module DockerRunnerOsHelper
     hello_txt = starting_files['hello.txt']
     extra = "\ngreetings"
     changed_files = { 'hello.txt' => hello_txt + extra }
-    ls_stdout,_ = assert_run_completes_no_stderr(changed_files)
+    ls_stdout,_ = assert_run_succeeds_no_stderr(changed_files)
     after = ls_parse(ls_stdout)
 
     assert_equal before.keys, after.keys

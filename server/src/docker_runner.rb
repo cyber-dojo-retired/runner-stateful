@@ -107,7 +107,7 @@ class DockerRunner
         Process.waitpid(pid)
         w_stdout.close
         w_stderr.close
-        [r_stdout.read, r_stderr.read, completed]
+        [r_stdout.read, r_stderr.read, success]
       end
     rescue Timeout::Error
       Process.kill(-9, pid)
@@ -151,7 +151,7 @@ class DockerRunner
   def group; 'nogroup'; end
   def sandbox; '/sandbox'; end
 
-  def completed; 0; end
+  def success; shell.success; end
   def timed_out; 'timed_out'; end
 
   private
@@ -206,7 +206,5 @@ class DockerRunner
   def   log; nearest_external(:log);   end
 
   def exec(cmd, logging = @logging); shell.exec(cmd, logging); end
-
-  def success; shell.success; end
 
 end
