@@ -38,7 +38,7 @@ class DockerRunnerOSAlpineTest < RunnerTestBase
       [pid,cmd]
     }]
     refute_nil procs[1], 'no process at pid 1!'
-    assert procs[1].include?('/sbin/tini'), 'no tini'
+    assert procs[1].include?('/sbin/tini'), 'no tini at pid 1'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -

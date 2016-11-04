@@ -61,7 +61,7 @@ class RunTest < ClientTestBase
 
   test 'E6F',
   'timed-out-traffic-light' do
-    file_sub('hiker.c', 'return', 'for(;;); return')
+    file_sub('hiker.c', 'return', "for(;;);\nreturn")
     runner_run(files, 3)
     assert_timed_out
     assert_stdout ''
