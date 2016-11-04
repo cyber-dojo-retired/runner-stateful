@@ -33,7 +33,7 @@ class RunnerTestBase < HexMiniTest
   def runner; DockerRunner.new(self); end
 
   def new_kata; runner.new_kata(kata_id, @image_name); end
-  def old_kata; runner.old_kata(kata_id, @image_name); end
+  def old_kata; runner.old_kata(kata_id); end
 
   def new_avatar; runner.new_avatar(kata_id, avatar_name); end
   def old_avatar; runner.old_avatar(kata_id, avatar_name); end

@@ -9,7 +9,7 @@ require_relative './string_truncater'
 class MicroService < Sinatra::Base
 
   post '/new_kata'    do; jasoned { runner.new_kata(kata_id, image_name) }; end
-  post '/old_kata'    do; jasoned { runner.old_kata(kata_id, image_name) }; end
+  post '/old_kata'    do; jasoned { runner.old_kata(kata_id) }; end
 
   post '/new_avatar'  do; jasoned { runner.new_avatar(kata_id, avatar_name) }; end
   post '/old_avatar'  do; jasoned { runner.old_avatar(kata_id, avatar_name) }; end
@@ -53,7 +53,7 @@ class MicroService < Sinatra::Base
     rescue DockerRunnerError => e
       stdout,stderr,status = e.stdout, e.stderr, e.status
     rescue StandardError => e
-      stdout,stderr,status = '', e.to_s, :error
+      stdout,stderr,status = '', e.to_s, 1
     end
     { stdout:truncated(cleaned(stdout)),
       stderr:truncated(cleaned(stderr)),

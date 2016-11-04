@@ -41,7 +41,7 @@ class Demo < Sinatra::Base
     duration = timed { json = runner.old_avatar(kata_id, avatar_name) }
     html += pre('old_avatar', duration, json)
 
-    duration = timed { json = runner.old_kata(kata_id, image_name) }
+    duration = timed { json = runner.old_kata(kata_id) }
     html += pre('old_kata', duration, json)
 
     html += '</div>'

@@ -7,8 +7,8 @@ class RunnerPostAdapter
     post(:new_kata, { kata_id:kata_id, image_name:image_name })
   end
 
-  def old_kata(kata_id, image_name)
-    post(:old_kata, { kata_id:kata_id, image_name:image_name })
+  def old_kata(kata_id)
+    post(:old_kata, { kata_id:kata_id })
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - -

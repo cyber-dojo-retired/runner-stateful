@@ -9,8 +9,8 @@ class ClientTestBase < HexMiniTest
     @json = runner.new_kata(id, name)
   end
 
-  def old_kata(id = kata_id, name = image_name)
-    @json = runner.old_kata(id, name)
+  def old_kata(id = kata_id)
+    @json = runner.old_kata(id)
   end
 
   def new_avatar(id = kata_id, name = avatar_name)

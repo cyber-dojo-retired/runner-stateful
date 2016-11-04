@@ -18,7 +18,7 @@ class DockerRunner
     ['', '', success]
   end
 
-  def old_kata(kata_id, image_name)
+  def old_kata(kata_id)
     ['', '', success]
   end
 

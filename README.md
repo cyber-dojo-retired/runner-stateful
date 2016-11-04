@@ -23,7 +23,6 @@ Must be called before new_avatar.
 Tells the runner-server the kata with the given id has been torn down.
 - parameters
   * kata_id, eg '15B9AD6C42'
-  * image_name, eg 'cyberdojofoundation/gcc_assert'
 - returns
   * { "status":0 } -> succeeded
 
@@ -57,10 +56,10 @@ Tells the runner-server the given avatar has left the given kata.
   * changed_files, eg { 'fizz_buzz.h' => '#include', ... }
 - returns
   * { "status":0,   "stdout":..., "stderr":... } -> completed
-  * { "status":128, "stdout":"", "stderr":"" } -> did not complete in max_seconds
+  * { "status":"timed_out", "stdout":"", "stderr":"" } -> did not complete in max_seconds
 
 - if something unexpected goes wrong on the server all methods return
-  * { "status":"error", "stderr":msg } -> something went wrong
+  * { "status":1, "stderr":msg } -> something went wrong
 
 
 - - - -
