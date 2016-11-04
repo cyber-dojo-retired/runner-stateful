@@ -108,3 +108,7 @@ o) This also suggests that instead of being passes image_name new_kata
    If the has contains "image_name":"sdsd" then its a simple case with no
    shared state. If it contains "docker-compose.yml":"sdsdsd" then
    its the case wth shared state.
+
+o) I suspect that a docker-compose.yml file will need to be tweaked
+   inside the server. Two katas can logically use the same docker-compose.yml
+   but the containers started for each must be specific to the kata's ID.
