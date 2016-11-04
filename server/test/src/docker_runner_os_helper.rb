@@ -3,6 +3,14 @@ module DockerRunnerOsHelper
 
   module_function
 
+  def kata_id_env_var_test
+    cmd = 'printenv CYBER_DOJO_KATA_ID'
+    stdout = assert_run_succeeds_no_stderr({ 'cyber-dojo.sh' => cmd })
+    assert_equal kata_id, stdout.strip
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   def assert_user_exists
     cmd = "getent passwd #{user}"
     stdout, _ = assert_run_succeeds_no_stderr({ 'cyber-dojo.sh' => cmd })

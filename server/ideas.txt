@@ -112,3 +112,20 @@ o) This also suggests that instead of being passes image_name new_kata
 o) I suspect that a docker-compose.yml file will need to be tweaked
    inside the server. Two katas can logically use the same docker-compose.yml
    but the containers started for each must be specific to the kata's ID.
+
+o) The service names would have to be tweaked in the same way.
+   It makes sense to make the kata_id available to the avatars via an ENV-VAR.
+
+o) pull_image is very specific. Suppose the architecture moves towards
+   using a docker-compose.yml file instead of an image_name.
+   What would it be called then?
+   prepare() and it would take a hash just like new_kata()
+
+o) Would there be any way to create a dojo where half the avatars
+   worked on the server side and half the avatars worked on the
+   client side. Viz make the server containers malleable in the
+   same way the red/amber/green testing is now.
+
+
+
+

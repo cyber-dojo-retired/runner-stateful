@@ -63,6 +63,7 @@ class DockerRunner
       '--net=none',                        # security - no network
       '--pids-limit=64',                   # security - no fork bombs
       '--security-opt=no-new-privileges',  # security - no escalation
+      "--env CYBER_DOJO_KATA_ID=#{kata_id}",
       "--workdir=#{sandbox}",
       '--user=root',
       "--volume=#{volume_name(kata_id, avatar_name)}:#{sandbox}"

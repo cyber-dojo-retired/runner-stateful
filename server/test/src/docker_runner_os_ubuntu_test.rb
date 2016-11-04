@@ -11,6 +11,13 @@ class DockerRunnerOSUbuntuTest < RunnerTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  test 'A95',
+  '[Ubuntu] container has access to kata_id via ENV-VAR' do
+    kata_id_env_var_test
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   test 'CA1',
   '[Ubuntu] image is indeed Alpine and has user:nobody and group:nogroup' do
     stdout, _ = assert_run_succeeds_no_stderr({ 'cyber-dojo.sh' => 'cat /etc/issue'})
