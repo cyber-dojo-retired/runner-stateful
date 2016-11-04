@@ -65,8 +65,8 @@ Tells the runner-server the given avatar has left the given kata.
   * { "status":0,   "stdout":..., "stderr":... } -> completed
   * { "status":"timed_out", "stdout":"", "stderr":"" } -> did not complete in max_seconds
 
-- if something unexpected goes wrong on the server all methods return
-  * { "status":1, "stderr":msg } -> something went wrong
+- if something unexpected goes wrong all methods return
+{ "status":non-zero-integer-value, "stderr":msg }
 
 
 - - - -
