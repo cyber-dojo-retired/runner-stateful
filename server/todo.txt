@@ -1,16 +1,10 @@
 
-nginx:
-======
-$ docker logs cyber-dojo-nginx
-2016/10/31 21:49:03 [emerg] 1#1: mkdir() "/var/cache/nginx/client_temp" failed (13: Permission denied)
-nginx: [emerg] mkdir() "/var/cache/nginx/client_temp" failed (13: Permission denied)
-2016/10/31 21:49:54 [warn] 1#1: the "user" directive makes sense only if the master process runs with super-user privileges, ignored in /etc/nginx/nginx.conf:2
-Changed to user root in docker-compose.yml
-No longer get this diagnostic but still not getting images from nginx.
-
 runner_server:
 ==============
-o) will [cyber-dojo start-point pull NAME] need runner.pull(image_name)
+
+o) when it goes live the C#-Moq cyber-dojo.sh can be simplified to
+   1) lose the line [export HOME=/sandbox]
+   2) dmcs -t:library ---> mcs -t:library
 
 o) add cpu/memory/swap limits
    See comments at https://github.com/cyber-dojo/commander/blob/master/docker-compose.yml
@@ -39,7 +33,6 @@ o) add cpu/memory/swap limits
    --memory-swappiness int       Tune container memory swappiness (0 to 100) (default -1)
    --pids-limit int              Tune container pids limit (set -1 for unlimited)
    --ulimit value                Ulimit options (default [])
-
 
 o) what if filename has a quote in it?
 
@@ -71,3 +64,15 @@ o) Should there be a volume per kata rather than per animal?
 o) Should I use a different uid for the run of each avatar
    and for the rights of their files?
 
+
+
+
+
+nginx:
+======
+$ docker logs cyber-dojo-nginx
+2016/10/31 21:49:03 [emerg] 1#1: mkdir() "/var/cache/nginx/client_temp" failed (13: Permission denied)
+nginx: [emerg] mkdir() "/var/cache/nginx/client_temp" failed (13: Permission denied)
+2016/10/31 21:49:54 [warn] 1#1: the "user" directive makes sense only if the master process runs with super-user privileges, ignored in /etc/nginx/nginx.conf:2
+Changed to user root in docker-compose.yml
+No longer get this diagnostic but still not getting images from nginx.

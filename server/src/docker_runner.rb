@@ -45,9 +45,9 @@ class DockerRunner
   def run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
     cid = create_container(image_name, kata_id, avatar_name)
     begin
-      delete_files(cid, deleted_filenames)
-      change_files(cid, changed_files)
-      run_cyber_dojo_sh(cid, max_seconds)
+      delete_files(cid, avatar_name, deleted_filenames)
+      change_files(cid, avatar_name, changed_files)
+      run_cyber_dojo_sh(cid, avatar_name, max_seconds)
     ensure
       remove_container(cid)
     end
@@ -64,47 +64,52 @@ class DockerRunner
       '--pids-limit=64',                   # security - no fork bombs
       '--security-opt=no-new-privileges',  # security - no escalation
       "--env CYBER_DOJO_KATA_ID=#{kata_id}",
-      "--workdir=#{sandbox}",
+      "--workdir=#{sandbox(avatar_name)}",
       '--user=root',
-      "--volume=#{volume_name(kata_id, avatar_name)}:#{sandbox}"
+      "--volume=#{volume_name(kata_id, avatar_name)}:#{sandbox(avatar_name)}"
     ].join(space = ' ')
     stdout,_,_ = assert_exec("docker run #{args} #{image_name} sh")
     cid = stdout.strip
-    assert_docker_exec(cid, "chown #{user}:#{group} #{sandbox}")
+    assert_docker_exec(cid, "chown #{user}:#{group} #{sandbox(avatar_name)}")
     # Some languages need the current user to have a home. They are all
     # Ubuntu image based, eg C#-NUnit. The nobody user does not have a
     # home dir in Ubuntu. usermod solves this.
-    assert_docker_exec(cid, "cat /etc/issue | grep Alpine || usermod --home #{sandbox} #{user}")
+    command = [
+      'cat /etc/issue | grep Alpine',
+      "usermod --home #{sandbox(avatar_name)} #{user}"
+    ].join('||')
+    assert_docker_exec(cid, command)
     cid
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def delete_files(cid, filenames)
+  def delete_files(cid, avatar_name, filenames)
     filenames.each do |filename|
-      assert_docker_exec(cid, "rm #{sandbox}/#{filename}")
+      assert_docker_exec(cid, "rm #{sandbox(avatar_name)}/#{filename}")
     end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def change_files(cid, files)
+  def change_files(cid, avatar_name, files)
     Dir.mktmpdir('runner') do |tmp_dir|
       files.each do |filename, content|
         host_filename = tmp_dir + '/' + filename
         disk.write(host_filename, content)
         assert_exec("chmod +x #{host_filename}") if filename.end_with?('.sh')
       end
-      assert_exec("docker cp #{tmp_dir}/. #{cid}:#{sandbox}")
+      assert_exec("docker cp #{tmp_dir}/. #{cid}:#{sandbox(avatar_name)}")
     end
     files.keys.each do |filename|
-      assert_docker_exec(cid, "chown #{user}:#{group} #{sandbox}/#{filename}")
+      cmd = "chown #{user}:#{group} #{sandbox(avatar_name)}/#{filename}"
+      assert_docker_exec(cid, cmd)
     end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def run_cyber_dojo_sh(cid, max_seconds)
+  def run_cyber_dojo_sh(cid, avatar_name, max_seconds)
     cmd = "docker exec --user=#{user} --interactive #{cid} sh -c './cyber-dojo.sh'"
     r_stdout, w_stdout = IO.pipe
     r_stderr, w_stderr = IO.pipe
@@ -156,7 +161,7 @@ class DockerRunner
 
   def user; 'nobody'; end
   def group; 'nogroup'; end
-  def sandbox; '/sandbox'; end
+  def sandbox(avatar_name); '/sandbox'; end
 
   def success; shell.success; end
   def timed_out; 'timed_out'; end

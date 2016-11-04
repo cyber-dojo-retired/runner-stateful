@@ -94,7 +94,7 @@ class RunnerTestBase < HexMiniTest
 
   def user; runner.user; end
   def group; runner.group; end
-  def sandbox; runner.sandbox; end
+  def sandbox; runner.sandbox(avatar_name); end
 
   def success; runner.success; end
   def timed_out; runner.timed_out; end
