@@ -1,18 +1,17 @@
 require_relative './runner_test_base'
 
-class DockerRunnerKataTest < RunnerTestBase
+class DockerRunnerPullImageTest < RunnerTestBase
 
-  def self.hex_prefix; 'FB0D4'; end
+  def self.hex_prefix; '87FE3'; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test 'CC8',
-  'when image_name is valid and has not been pulled',
-  'then new_kata(kata_id, image_name) pulls it and succeeds' do
+  test '91C',
+  'when image_name is valid pull_image succeeds' do
     @image_name = 'busybox'
     exec("docker rmi #{@image_name}", logging = false)
     refute docker_pulled?(@image_name)
-    _,_,status = new_kata
+    _,_,status = pull_image
     begin
       assert status
       assert docker_pulled?(@image_name)
@@ -23,34 +22,17 @@ class DockerRunnerKataTest < RunnerTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '5E7',
-  'when image_name is valid has been pulled',
-  'then new_kata(kata_id, image_name) succeeds' do
-    @image_name = 'busybox'
-    exec("docker pull #{@image_name}", logging = false)
-    assert docker_pulled?(@image_name)
-    _,_,status = new_kata
-    begin
-      assert status
-      assert docker_pulled?(@image_name)
-    ensure
-      old_kata
-    end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test 'AED',
-  'when image_name is invalid then new_kata(kata_id, image_name) fails with not-founf' do
-    bad_image_name = '123/123'
+  test 'A73',
+  'when image_name is invalid then pull_image fails with not found' do
+    @image_name = '123/123'
     runner.logging_off
-    f = assert_raises(DockerRunnerError) { runner.new_kata(kata_id, bad_image_name) }
+    f = assert_raises(DockerRunnerError) { pull_image }
     assert_equal 1, f.status
     assert_equal [
       "Using default tag: latest",
-      "Pulling repository docker.io/#{bad_image_name}"
+      "Pulling repository docker.io/#{@image_name}"
     ].join("\n"), f.stdout
-    assert_equal "Error: image #{bad_image_name}:latest not found", f.stderr
+    assert_equal "Error: image #{@image_name}:latest not found", f.stderr
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -

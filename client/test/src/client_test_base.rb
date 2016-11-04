@@ -5,6 +5,10 @@ require_relative './../../src/runner_post_adapter'
 
 class ClientTestBase < HexMiniTest
 
+  def pull_image(name = image_name)
+    @json = runner.pull_image(name)
+  end
+
   def new_kata(id = kata_id, name = image_name)
     @json = runner.new_kata(id, name)
   end

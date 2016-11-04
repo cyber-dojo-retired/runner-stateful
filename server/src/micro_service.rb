@@ -8,6 +8,8 @@ require_relative './string_truncater'
 
 class MicroService < Sinatra::Base
 
+  post '/pull_image'  do; jasoned { runner.pull_image(image_name) }; end
+
   post '/new_kata'    do; jasoned { runner.new_kata(kata_id, image_name) }; end
   post '/old_kata'    do; jasoned { runner.old_kata(kata_id) }; end
 

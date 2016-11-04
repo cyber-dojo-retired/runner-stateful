@@ -3,6 +3,12 @@ require 'net/http'
 
 class RunnerPostAdapter
 
+  def pull_image(image_name)
+    post(:pull_image, { image_name:image_name })
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - -
+
   def new_kata(kata_id, image_name)
     post(:new_kata, { kata_id:kata_id, image_name:image_name })
   end

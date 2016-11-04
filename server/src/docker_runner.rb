@@ -15,6 +15,12 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  def pull_image(image_name)
+    assert_exec("docker pull #{image_name}")
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   def new_kata(kata_id, image_name)
     pull_image(image_name) unless image_names.include?(image_name)
     ['', '', success]
@@ -155,12 +161,6 @@ class DockerRunner
   def timed_out; 'timed_out'; end
 
   private
-
-  def pull_image(image_name)
-    assert_exec("docker pull #{image_name}")
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def image_names
     stdout,_,_ = assert_exec('docker images')

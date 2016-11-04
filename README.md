@@ -10,6 +10,13 @@ Not live yet.
 A **cyberdojo/runner** docker container runs sinatra on port 4557.
 It's API is as follows:
 
+# pull_image
+Tells the runner-server to pull the given image.
+- parameters
+  * image_name, eg 'cyberdojofoundation/gcc_assert'
+- returns
+  * { "status":0  } -> succeeded
+
 # new_kata
 Tells the runner-server a kata with the given id and image_name has been set up.
 Must be called before new_avatar.
