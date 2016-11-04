@@ -101,3 +101,10 @@ o) This design requires a long-lived container for the kata which the
    A volume is not really even that useful if the kata-container died and
    the kata was restarted.
 
+o) This also suggests that instead of being passes image_name new_kata
+   is passed a docker-compose.yml file
+   This means the runner needs docker-compose inside it like commander.
+   Maybe take a hash to allow for future expansion.
+   If the has contains "image_name":"sdsd" then its a simple case with no
+   shared state. If it contains "docker-compose.yml":"sdsdsd" then
+   its the case wth shared state.
