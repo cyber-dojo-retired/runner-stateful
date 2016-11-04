@@ -70,9 +70,7 @@ class DockerRunner
     stdout,_,_ = assert_exec("docker run #{args} #{image_name} sh")
     cid = stdout.strip
     assert_docker_exec(cid, "chown #{user}:#{group} #{sandbox(avatar_name)}")
-    # Some languages need the current user to have a home. They are all
-    # Ubuntu image based, eg C#-NUnit. The nobody user does not have a
-    # home dir in Ubuntu. usermod solves this.
+    # C#-NUnit (currently Ubuntu) needs the user to have a home.
     command = [
       'cat /etc/issue | grep Alpine',
       "usermod --home #{sandbox(avatar_name)} #{user}"
