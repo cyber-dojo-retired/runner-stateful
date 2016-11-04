@@ -6,10 +6,12 @@ class DockerRunner
 
   def initialize(parent)
     @parent = parent
+    @logging = true
   end
 
   attr_reader :parent
 
+  def logging_off; @logging = false; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -203,7 +205,8 @@ class DockerRunner
   def  disk; nearest_external(:disk);  end
   def   log; nearest_external(:log);   end
 
-  def exec(cmd, logging = true); shell.exec(cmd, logging); end
+  def exec(cmd, logging = @logging); shell.exec(cmd, logging); end
+
   def success; shell.success; end
 
 end

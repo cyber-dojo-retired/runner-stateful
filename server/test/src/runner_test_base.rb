@@ -30,7 +30,7 @@ class RunnerTestBase < HexMiniTest
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   include Externals
-  def runner; DockerRunner.new(self); end
+  def runner; @runner ||= DockerRunner.new(self); end
 
   def new_kata; runner.new_kata(kata_id, @image_name); end
   def old_kata; runner.old_kata(kata_id); end
