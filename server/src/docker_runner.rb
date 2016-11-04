@@ -1,4 +1,5 @@
 require_relative './nearest_external'
+require_relative './docker_runner_error'
 require 'timeout'
 
 class DockerRunner
@@ -8,6 +9,9 @@ class DockerRunner
   end
 
   attr_reader :parent
+
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def new_kata(kata_id, image_name)
     pull_image(image_name) unless image_names.include?(image_name)
@@ -182,11 +186,7 @@ class DockerRunner
 
   def assert_exec(cmd)
     stdout,stderr,status = exec(cmd)
-    fail [
-      "status(#{status})",
-      "stdout(#{stdout.strip})",
-      "stderr(#{stderr.strip})"
-    ].join("\n") unless status == success
+    raise DockerRunnerError.new(stdout,stderr,status,cmd) unless status == success
     [stdout, stderr, status]
   end
 

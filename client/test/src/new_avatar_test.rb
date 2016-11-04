@@ -5,9 +5,10 @@ class NewAvatarTest < ClientTestBase
   def self.hex_prefix; '4F725'; end
 
   test 'C43',
-  'new_avatar with illegal volume name is error' do
+  'new_avatar with illegal volume name is non-zero integer error' do
     new_avatar('a', ':')
-    assert_equal 'error', status
+    assert_equal 'Fixnum', status.class.name
+    refute_equal success, status
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -

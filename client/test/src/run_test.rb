@@ -9,7 +9,7 @@ class RunTest < ClientTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '42D',
-  'run with bad arguments sets error status' do
+  'run with bad arguments sets is non-zero integer error' do
     args = []
     args << image_name
     args << (kata_id = ':') #bad
@@ -97,7 +97,8 @@ class RunTest < ClientTestBase
   end
 
   def assert_error
-    assert_equal 'error', status, json.to_s
+    assert_equal 'Fixnum', status.class.name, json.to_s
+    refute_equal success, status, json.to_s
   end
 
   def assert_stdout(expected)

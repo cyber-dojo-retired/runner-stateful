@@ -50,8 +50,10 @@ class MicroService < Sinatra::Base
     content_type :json
     begin
       stdout,stderr,status = yield
-    rescue StandardError => error
-      stdout,stderr,status = '', error.to_s, :error
+    rescue DockerRunnerError => e
+      stdout,stderr,status = e.stdout, e.stderr, e.status
+    rescue StandardError => e
+      stdout,stderr,status = '', e.to_s, :error
     end
     { stdout:truncated(cleaned(stdout)),
       stderr:truncated(cleaned(stderr)),

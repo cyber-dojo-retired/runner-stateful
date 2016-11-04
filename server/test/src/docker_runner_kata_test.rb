@@ -40,6 +40,20 @@ class DockerRunnerKataTest < RunnerTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  test 'AED',
+  'when image_name is invalid then new_kata(kata_id,image_name) fails' do
+    bad_image_name = '123/123'
+    f = assert_raises(DockerRunnerError) { runner.new_kata(kata_id, bad_image_name); }
+    assert_equal [
+      "Using default tag: latest",
+      "Pulling repository docker.io/#{bad_image_name}"
+    ].join("\n"), f.stdout
+    assert_equal "Error: image #{bad_image_name}:latest not found", f.stderr
+    assert_equal 1, f.status
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   private
 
   def docker_pulled?(image_name)
