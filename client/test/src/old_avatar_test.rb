@@ -8,7 +8,7 @@ class OldAvatarTest < ClientTestBase
   'old_avatar with illegal volume name does not succeed' do
     old_avatar('a', ':')
     assert_equal 'Fixnum', status.class.name
-    refute_equal success, status
+    refute_success
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
@@ -17,7 +17,7 @@ class OldAvatarTest < ClientTestBase
   'old_avatar with legal name succeeds' do
     new_avatar(test_id, 'salmon')
     old_avatar(test_id, 'salmon')
-    assert_equal success, status
+    assert_success
   end
 
 end

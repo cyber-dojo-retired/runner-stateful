@@ -29,6 +29,8 @@ class ClientTestBase < HexMiniTest
     @json = runner.run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - -
+
   def runner
     RunnerPostAdapter.new
   end
@@ -57,5 +59,20 @@ class ClientTestBase < HexMiniTest
 
   def success; 0; end
   def timed_out; 'timed_out'; end
+
+  # - - - - - - - - - - - - - - - - - - - - - - -
+
+  def assert_success; assert_equal success, status, json.to_s; end
+  def refute_success; refute_equal success, status, json.to_s; end
+
+  def assert_timed_out; assert_equal timed_out, status, json.to_s; end
+
+  def assert_error
+    assert_equal 'Fixnum', status.class.name, json.to_s
+    refute_equal success, status, json.to_s
+  end
+
+  def assert_stdout(expected); assert_equal expected, stdout, json.to_s; end
+  def assert_stderr(expected); assert_equal expected, stderr, json.to_s; end
 
 end

@@ -7,11 +7,11 @@ class OldKataTest < ClientTestBase
   test '586',
   "old_kata(kata_id) succeeds example" do
     new_kata
-    assert_equal success, status
+    assert_success
     old_kata
-    assert_equal success, status
-    assert_equal '', stdout, json.to_s
-    assert_equal '', stderr, json.to_s
+    assert_success
+    assert_stdout ''
+    assert_stderr ''
   end
 
 end

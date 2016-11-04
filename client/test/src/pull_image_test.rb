@@ -7,7 +7,7 @@ class PullImageTest < ClientTestBase
   test 'A82',
   'when image_name is valid pull_image succeeds' do
     pull_image('busybox')
-    assert_equal success, status
+    assert_success
   end
 
 end

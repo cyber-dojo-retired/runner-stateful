@@ -7,9 +7,9 @@ class NewKataTest < ClientTestBase
   test 'C7A',
   "when image_name is valid new_kata(kata_id, image_name)'s status is zero" do
     new_kata
-    assert_equal 0, status
-    assert_equal '', stdout, json.to_s
-    assert_equal '', stderr, json.to_s
+    assert_success
+    assert_stdout ''
+    assert_stderr ''
   end
 
 end
