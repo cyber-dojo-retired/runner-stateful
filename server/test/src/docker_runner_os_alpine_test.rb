@@ -21,13 +21,25 @@ class DockerRunnerOSAlpineTest < RunnerTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-=begin
   test '214',
   '[Alpine] container must have tini installed to do zombie reaping' do
     stdout = assert_run_succeeds_no_stderr({ 'cyber-dojo.sh' => 'ps' })
-    p stdout
+    lines = stdout.strip.split("\n")
+    # PID   USER     TIME   COMMAND
+    #   1   root     0:00   sh
+    #  25   nobody   0:00   sh -c ./cyber-dojo.sh
+    #   |   |        |      |  |  |
+    #   0   1        2      3  4  5 ...
+    lines.shift
+    procs = Hash[lines.collect { |line|
+      atts = line.split
+      pid = atts[0].to_i
+      cmd = atts[3..-1].join(' ')
+      [pid,cmd]
+    }]
+    refute_nil procs[1], 'no process at pid 1!'
+    assert procs[1].include?('/sbin/tini'), 'no tini'
   end
-=end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
