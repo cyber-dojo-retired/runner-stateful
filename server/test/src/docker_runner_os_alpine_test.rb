@@ -11,19 +11,29 @@ class DockerRunnerOSAlpineTest < RunnerTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '782',
-  '[Alpine] container has access to kata_id via ENV-VAR' do
-    kata_id_env_var_test
+  test 'CA0',
+  '[Alpine] image is indeed Alpine and has user and group' do
+    stdout = assert_run_succeeds_no_stderr({ 'cyber-dojo.sh' => 'cat /etc/issue'})
+    assert stdout.include?('Alpine'), stdout
+    assert_user_exists
+    assert_group_exists
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test 'CA0',
-  '[Alpine] image is indeed Alpine and has user and group' do
-    stdout, _ = assert_run_succeeds_no_stderr({ 'cyber-dojo.sh' => 'cat /etc/issue'})
-    assert stdout.include?('Alpine'), stdout
-    assert_user_exists
-    assert_group_exists
+=begin
+  test '214',
+  '[Alpine] container must have tini installed to do zombie reaping' do
+    stdout = assert_run_succeeds_no_stderr({ 'cyber-dojo.sh' => 'ps' })
+    p stdout
+  end
+=end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test '782',
+  '[Alpine] container has access to kata_id via ENV-VAR' do
+    kata_id_env_var_test
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
