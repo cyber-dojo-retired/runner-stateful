@@ -85,7 +85,7 @@ class RunnerTestBase < HexMiniTest
     dir = "/app/start_files/#{language_dir}"
     json = JSON.parse(IO.read("#{dir}/manifest.json"))
     @image_name = json['image_name']
-    Hash[json['filenames'].collect { |filename|
+    Hash[json['visible_filenames'].collect { |filename|
       [filename, IO.read("#{dir}/#{filename}")]
     }]
   end

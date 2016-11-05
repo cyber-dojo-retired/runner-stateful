@@ -17,7 +17,7 @@ class DockerRunnerLanguageTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'C87',
-  '[C#,Moq] runs (it explicitly names /sandbox in cyber-dojo.sh)' do
+  '[C#,Moq] runs (it sets HOME to location of sandbox in cyber-dojo.sh)' do
     stdout = assert_run_succeeds_no_stderr(files('csharp_moq'))
     assert stdout.include?('Tests run: 1, Errors: 0, Failures: 1, Inconclusive: 0'), stdout
   end
