@@ -48,20 +48,20 @@ class RunnerTestBase < HexMiniTest
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_run_succeeds_no_stderr(*args)
-    stdout, stderr = assert_run_succeeds(*args)
-    assert_equal '', stderr
+    stdout,stderr = assert_run_succeeds(*args)
+    assert_equal '', stderr, stdout
     stdout
   end
 
   def assert_run_succeeds(*args)
-    stdout, stderr, status = runner_run(*args)
-    assert_equal success, status, [stdout, stderr]
+    stdout,stderr,status = runner_run(*args)
+    assert_equal success, status, [stdout,stderr]
     [stdout, stderr]
   end
 
   def assert_run_times_out(*args)
-    stdout, stderr, status = runner_run(*args)
-    assert_equal timed_out, status, [stdout, stderr]
+    stdout,stderr,status = runner_run(*args)
+    assert_equal timed_out, status, [stdout,stderr]
     [stdout, stderr]
   end
 
@@ -70,8 +70,8 @@ class RunnerTestBase < HexMiniTest
   end
 
   def assert_exec(cmd)
-    stdout, stderr, status = exec(cmd)
-    assert_equal success, status, stdout
+    stdout,stderr,status = exec(cmd)
+    assert_equal success, status, [stdout,stderr]
     [stdout, stderr]
   end
 
