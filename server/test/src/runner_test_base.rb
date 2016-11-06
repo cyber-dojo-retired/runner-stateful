@@ -20,10 +20,13 @@ class RunnerTestBase < HexMiniTest
 
   def set_image_for_os
     cdf = 'cyberdojofoundation'
-    @image_name = "#{cdf}/csharp_nunit" if test_name.start_with?('[C#,NUnit]')
-    @image_name = "#{cdf}/csharp_moq"   if test_name.start_with?('[C#,Moq]')
-    @image_name = "#{cdf}/gcc_assert"   if test_name.start_with? '[Alpine]'
-    @image_name = "#{cdf}/csharp_nunit" if test_name.start_with? '[Ubuntu]'
+    @image_name = "#{cdf}/csharp_nunit"       if test_name.start_with? '[C#,NUnit]'
+    @image_name = "#{cdf}/csharp_moq"         if test_name.start_with? '[C#,Moq]'
+    @image_name = "#{cdf}/gcc_assert"         if test_name.start_with? '[gcc,assert]'
+    @image_name = "#{cdf}/java_cucumber_pico" if test_name.start_with? '[Java,Cucumber]'
+
+    @image_name = "#{cdf}/gcc_assert"         if test_name.start_with? '[Alpine]'
+    @image_name = "#{cdf}/java_cucumber_pico" if test_name.start_with? '[Ubuntu]'
     fail "cannot set @image_name from test_name" if @image_name.nil?
   end
 

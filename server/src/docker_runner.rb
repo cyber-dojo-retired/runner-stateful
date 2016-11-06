@@ -74,12 +74,6 @@ class DockerRunner
     ].join(space = ' ')
     cid = assert_exec("docker run #{args} #{image_name} sh")[0].strip
     assert_docker_exec(cid, "chown #{user}:#{group} #{sandbox}")
-    # C#-NUnit (currently Ubuntu) needs the user to have a home.
-    command = [
-      'cat /etc/issue | grep Alpine',
-      "usermod --home #{sandbox} #{user}"
-    ].join('||')
-    assert_docker_exec(cid, command)
     cid
   end
 
