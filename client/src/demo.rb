@@ -34,7 +34,7 @@ class Demo < Sinatra::Base
     duration = timed { json = run(tests_run_and_pass) }
     html += pre('run', duration, json, 'Lime')
 
-    times_out = { 'hiker.c' => hiker_c.sub('return', 'for(;;); return') }
+    times_out = { 'hiker.c' => hiker_c.sub('return', "for(;;);\n    return") }
     duration = timed { json = run(times_out, 3) }
     html += pre('run', duration, json, 'LightGray')
 
