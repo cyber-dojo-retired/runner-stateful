@@ -101,7 +101,6 @@ class DockerRunner
       assert_exec("docker cp #{tmp_dir}/. #{cid}:#{sandbox(avatar_name)}")
     end
     files.keys.each do |filename|
-      # NECESSARY?
       cmd = "chown #{user}:#{group} #{sandbox(avatar_name)}/#{filename}"
       assert_docker_exec(cid, cmd)
     end
