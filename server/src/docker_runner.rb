@@ -48,9 +48,9 @@ class DockerRunner
   def run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
     cid = create_container(image_name, kata_id, avatar_name)
     begin
-      delete_files(cid, avatar_name, deleted_filenames)
-      change_files(cid, avatar_name, changed_files)
-      run_cyber_dojo_sh(cid, avatar_name, max_seconds)
+      delete_files(cid, deleted_filenames)
+      change_files(cid, changed_files)
+      run_cyber_dojo_sh(cid, max_seconds)
     ensure
       remove_container(cid)
     end
@@ -68,14 +68,14 @@ class DockerRunner
       '--security-opt=no-new-privileges',  # security - no escalation
       "--env CYBER_DOJO_KATA_ID=#{kata_id}",
       '--user=root',
-      "--volume=#{volume_name(kata_id, avatar_name)}:#{sandbox(avatar_name)}"
+      "--volume=#{volume_name(kata_id, avatar_name)}:#{sandbox}"
     ].join(space = ' ')
     cid = assert_exec("docker run #{args} #{image_name} sh")[0].strip
-    assert_docker_exec(cid, "chown #{user}:#{group} #{sandbox(avatar_name)}")
+    assert_docker_exec(cid, "chown #{user}:#{group} #{sandbox}")
     # C#-NUnit (currently Ubuntu) needs the user to have a home.
     command = [
       'cat /etc/issue | grep Alpine',
-      "usermod --home #{sandbox(avatar_name)} #{user}"
+      "usermod --home #{sandbox} #{user}"
     ].join('||')
     assert_docker_exec(cid, command)
     cid
@@ -83,34 +83,34 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def delete_files(cid, avatar_name, filenames)
+  def delete_files(cid, filenames)
     filenames.each do |filename|
-      assert_docker_exec(cid, "rm #{sandbox(avatar_name)}/#{filename}")
+      assert_docker_exec(cid, "rm #{sandbox}/#{filename}")
     end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def change_files(cid, avatar_name, files)
+  def change_files(cid, files)
     Dir.mktmpdir('runner') do |tmp_dir|
       files.each do |filename, content|
         host_filename = tmp_dir + '/' + filename
         disk.write(host_filename, content)
         assert_exec("chmod +x #{host_filename}") if filename.end_with?('.sh')
       end
-      assert_exec("docker cp #{tmp_dir}/. #{cid}:#{sandbox(avatar_name)}")
+      assert_exec("docker cp #{tmp_dir}/. #{cid}:#{sandbox}")
     end
     files.keys.each do |filename|
-      cmd = "chown #{user}:#{group} #{sandbox(avatar_name)}/#{filename}"
+      cmd = "chown #{user}:#{group} #{sandbox}/#{filename}"
       assert_docker_exec(cid, cmd)
     end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def run_cyber_dojo_sh(cid, avatar_name, max_seconds)
+  def run_cyber_dojo_sh(cid, max_seconds)
     inner_cmd = [
-      "export CYBER_DOJO_SANDBOX=#{sandbox(avatar_name)}",
+      "export CYBER_DOJO_SANDBOX=#{sandbox}",
       "cd ${CYBER_DOJO_SANDBOX}",
       './cyber-dojo.sh'
     ].join('&&')
@@ -165,7 +165,7 @@ class DockerRunner
 
   def user; 'nobody'; end
   def group; 'nogroup'; end
-  def sandbox(avatar_name); "/sandboxes/#{avatar_name}"; end
+  def sandbox; '/sandbox'; end
 
   def success; shell.success; end
   def timed_out; 'timed_out'; end
