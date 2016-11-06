@@ -67,8 +67,10 @@ class DockerRunner
       '--pids-limit=64',                   # security - no fork bombs
       '--security-opt=no-new-privileges',  # security - no escalation
       "--env CYBER_DOJO_KATA_ID=#{kata_id}",
+      "--env CYBER_DOJO_SANDBOX=#{sandbox}",
       '--user=root',
-      "--volume=#{volume_name(kata_id, avatar_name)}:#{sandbox}"
+      "--volume=#{volume_name(kata_id, avatar_name)}:#{sandbox}",
+      "--workdir=#{sandbox}"
     ].join(space = ' ')
     cid = assert_exec("docker run #{args} #{image_name} sh")[0].strip
     assert_docker_exec(cid, "chown #{user}:#{group} #{sandbox}")
@@ -109,12 +111,7 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run_cyber_dojo_sh(cid, max_seconds)
-    inner_cmd = [
-      "export CYBER_DOJO_SANDBOX=#{sandbox}",
-      "cd ${CYBER_DOJO_SANDBOX}",
-      './cyber-dojo.sh'
-    ].join('&&')
-    cmd = "docker exec --user=#{user} --interactive #{cid} sh -c '#{inner_cmd}'"
+    cmd = "docker exec --user=#{user} --interactive #{cid} sh -c './cyber-dojo.sh'"
     r_stdout, w_stdout = IO.pipe
     r_stderr, w_stderr = IO.pipe
     pid = Process.spawn(cmd, pgroup:true, out:w_stdout, err:w_stderr)
@@ -180,6 +177,12 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  def volume_name(kata_id, avatar_name)
+    "cyber_dojo_#{kata_id}_#{avatar_name}"
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   def container_dead?(cid)
     cmd = "docker inspect --format='{{ .State.Running }}' #{cid}"
     _,stderr,status = exec(cmd, logging = false)
@@ -201,12 +204,6 @@ class DockerRunner
 
   def exec(cmd, logging = @logging)
     shell.exec(cmd, logging)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def volume_name(kata_id, avatar_name)
-    "cyber_dojo_#{kata_id}_#{avatar_name}"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
