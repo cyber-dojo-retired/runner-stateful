@@ -2,6 +2,10 @@
 runner_server:
 ==============
 
+o) the runner server has tini installed.
+   it launches the sibling containers.
+   So does this mean the Alpine language containers do NOT need tini?
+
 o) when it goes live the C#-Moq cyber-dojo.sh can be simplified to
    1) lose the line [export HOME=/sandbox]
    2) dmcs -t:library ---> mcs -t:library
