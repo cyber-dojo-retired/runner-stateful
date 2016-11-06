@@ -2,15 +2,16 @@
 Suppose there was a container per kata, which started when the kata was
 created. When you hit test your code was run in that container. Viz
 the server would not need to start a new container for each test submission.
-Can you still have a volume per avatar? No. The volume needs to be mounted
-when the container is created. So there would need to be a volume per kata.
-Means I would need two new event-methods, new_kata, old_kata.
-Implications of this...
+No need for any volumes at all.
+
+o) Coded this up in long-lived-container branch.
+o) Statefulness means server will consume a lot more memory.
+   Probably making this idea unviable.
 o) /sandbox is no longer going to work. Would need something like
    /sandboxes/lion
    /sandboxes/salmon
-o) new_kata() would create the new volume and the new container
-o) old_kata() would remove the volume and the container and would become important.
+o) new_kata() would create the container
+o) old_kata() would remove the container.
 o) suggests kata creation should be time-limited at creation so the old_kata()
    calls can happen at a known time.
 o) forking from an old traffic-light would create a new kata with a new container.
@@ -23,22 +24,10 @@ o) there could be users with the avatar's name. Perhaps new language images shou
 o) old_avatar(lion) would remove /sandboxes/lion
 o) There is one red_amber_green lambda that uses /sandbox in its regex.
    It's Go-testing. Could change that now.
-   At least do Go-testing withs
+   At least do Go-testing
 o) pull_image?() and pull_image() would drop away!
    Instead new_kata(image_name, kata_id) would be called when new kata is created
    and it would do the docker-pull it it needed to.
-o) I will need to use the kata-id as a key to retrieve the cid value.
-   Could use a /sandboxes/manifest.json that stores the cid.
-   Or name the container.
-   https://docs.docker.com/engine/reference/commandline/ps/#filtering
-   docker run --detach ... --name cyber_dojo_#{kata_id} ...
-   49f94802344e......
-   That's the name of the container. Not its cid.
-   But you can still use it to find the container... Yes
-   docker ps --quiet --filter "name=cyber_dojo_#{kata_id}"
-   49f94802344e
-
-o) DO I NEED A VOLUME? Why not just use the state inside the container?
 
 o) Can you limit the disk-allocation inside a container? Depends on the driver.
    https://github.com/docker/docker/issues/3804
@@ -69,15 +58,16 @@ o) A duration ties in strongly with James' idea of a readonly kata.
    is a choice) when you fork.
 
 o) new_kata() creates the container and the base /sandboxes dir.
+
 o) new_avatar(lion) creates a new user called lion in the container.
    it creates /sandboxes/lion and gives lion ownership of it.
    it makes /sandboxes/lion the HOME for lion.
+   This will also mean the patch for C#-NUnit would not not be needed.
 
 o) Having a container per kata means containers are now long-lived.
-   Alpine images don't have tini and they should. Fix this.
-   This needs to be tested for. All images are Ubuntu except
-   these 6 which are Alpine...
-     Alpine C,gcc,assert   from language_base? lost!?
+   Alpine images don't have tini and they should. Even if they are not long-lived.
+   Done. All images are Ubuntu except these 6 which are Alpine...
+     Alpine C,gcc,assert
      Alpine C#,Moq
      Alpine Ruby,Cucumber
      Alpine Ruby,MiniTest
@@ -95,11 +85,6 @@ o) How to actually bring up the shared database?
       and the kata-container (for the avatars) at the same time.
    o) they both have to be long-lived. With the same duration
    o) each avatar exec's into the kata-container.
-
-o) This design requires a long-lived container for the kata which the
-   avatar's exec into. Does this mean there's no real need for a volume?
-   A volume is not really even that useful if the kata-container died and
-   the kata was restarted.
 
 o) This also suggests that instead of being passes image_name new_kata
    is passed a docker-compose.yml file

@@ -27,7 +27,6 @@ class RunTest < ClientTestBase
   'red-traffic-light' do
     runner_run(files)
     assert_success
-    assert_stdout ''
     assert stderr.start_with?('Assertion failed: answer() == 42'), json.to_s
   end
 
@@ -49,7 +48,6 @@ class RunTest < ClientTestBase
     file_sub('hiker.c', '6 * 9', '6 * 9sss')
     runner_run(files)
     assert_success
-    assert_stdout ''
     lines = [
       "invalid suffix \"sss\" on integer constant",
       'return 6 * 9sss'
