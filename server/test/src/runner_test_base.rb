@@ -56,13 +56,13 @@ class RunnerTestBase < HexMiniTest
   def assert_run_succeeds(*args)
     stdout,stderr,status = runner_run(*args)
     assert_equal success, status, [stdout,stderr]
-    [stdout, stderr]
+    [stdout,stderr]
   end
 
   def assert_run_times_out(*args)
     stdout,stderr,status = runner_run(*args)
     assert_equal timed_out, status, [stdout,stderr]
-    [stdout, stderr]
+    [stdout,stderr]
   end
 
   def assert_docker_exec(cid, cmd)
@@ -72,7 +72,11 @@ class RunnerTestBase < HexMiniTest
   def assert_exec(cmd)
     stdout,stderr,status = exec(cmd)
     assert_equal success, status, [stdout,stderr]
-    [stdout, stderr]
+    [stdout,stderr]
+  end
+
+  def exec(cmd, logging = true)
+    shell.exec(cmd, logging)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -107,10 +111,5 @@ class RunnerTestBase < HexMiniTest
     assert_equal 8, test_id.length, 'test_id.length'
     test_id + '00'
   end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def exec(cmd, logging = true); shell.exec(cmd, logging); end
-  def success; 0; end
 
 end

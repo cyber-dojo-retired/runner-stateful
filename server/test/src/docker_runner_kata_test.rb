@@ -41,7 +41,7 @@ class DockerRunnerKataTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'AED',
-  'when image_name is invalid then new_kata(kata_id, image_name) fails with not-founf' do
+  'when image_name is invalid then new_kata(kata_id, image_name) fails with not-found' do
     bad_image_name = '123/123'
     runner.logging_off
     f = assert_raises(DockerRunnerError) { runner.new_kata(kata_id, bad_image_name) }

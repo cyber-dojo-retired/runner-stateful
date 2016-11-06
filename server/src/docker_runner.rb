@@ -17,6 +17,7 @@ class DockerRunner
 
   def pull_image(image_name)
     assert_exec("docker pull #{image_name}")
+    ['', '', success]
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -34,10 +35,12 @@ class DockerRunner
 
   def new_avatar(kata_id, avatar_name)
     assert_exec("docker volume create --name #{volume_name(kata_id, avatar_name)}")
+    ['', '', success]
   end
 
   def old_avatar(kata_id, avatar_name)
     assert_exec("docker volume rm #{volume_name(kata_id, avatar_name)}")
+    ['', '', success]
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -67,8 +70,7 @@ class DockerRunner
       '--user=root',
       "--volume=#{volume_name(kata_id, avatar_name)}:#{sandbox(avatar_name)}"
     ].join(space = ' ')
-    stdout,_,_ = assert_exec("docker run #{args} #{image_name} sh")
-    cid = stdout.strip
+    cid = assert_exec("docker run #{args} #{image_name} sh")[0].strip
     assert_docker_exec(cid, "chown #{user}:#{group} #{sandbox(avatar_name)}")
     # C#-NUnit (currently Ubuntu) needs the user to have a home.
     command = [
@@ -99,6 +101,7 @@ class DockerRunner
       assert_exec("docker cp #{tmp_dir}/. #{cid}:#{sandbox(avatar_name)}")
     end
     files.keys.each do |filename|
+      # NECESSARY?
       cmd = "chown #{user}:#{group} #{sandbox(avatar_name)}/#{filename}"
       assert_docker_exec(cid, cmd)
     end
@@ -171,8 +174,7 @@ class DockerRunner
   private
 
   def image_names
-    stdout,_,_ = assert_exec('docker images')
-    lines = stdout.split("\n")
+    lines = assert_exec('docker images')[0].split("\n")
     lines.shift # REPOSITORY TAG IMAGE ID CREATED SIZE
     lines.collect { |line| line.split[0] }
   end
@@ -192,12 +194,14 @@ class DockerRunner
     assert_exec("docker exec #{cid} sh -c '#{cmd}'")
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   def assert_exec(cmd)
     stdout,stderr,status = exec(cmd)
     raise DockerRunnerError.new(stdout,stderr,status,cmd) unless status == success
-    [stdout, stderr, status]
+    [stdout,stderr]
+  end
+
+  def exec(cmd, logging = @logging)
+    shell.exec(cmd, logging)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -212,7 +216,5 @@ class DockerRunner
   def shell; nearest_external(:shell); end
   def  disk; nearest_external(:disk);  end
   def   log; nearest_external(:log);   end
-
-  def exec(cmd, logging = @logging); shell.exec(cmd, logging); end
 
 end
