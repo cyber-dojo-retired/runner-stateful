@@ -51,14 +51,14 @@ class DockerRunnerOSAlpineTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '0C9',
-  '[Alpine] newly created container has empty sandbox with ownership/permissions' do
-    create_container_test
+  '[Alpine] container has empty sandbox with ownership/permissions set' do
+    container_setup_test
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '1FB',
-  '[Alpine] starting-files are copied into sandbox with ownership/permissions' do
+  '[Alpine] starting-files are copied into sandbox with ownership/permissions set' do
     starting_files_test
   end
 

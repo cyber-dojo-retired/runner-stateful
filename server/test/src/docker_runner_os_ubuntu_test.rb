@@ -29,14 +29,14 @@ class DockerRunnerOSUbuntuTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '0CA',
-  '[Ubuntu] newly created container has empty sandbox with ownership/permissions' do
-    create_container_test
+  '[Ubuntu] container has empty sandbox with ownership/permissions set' do
+    container_setup_test
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '1FC',
-  '[Ubuntu] starting-files are copied into sandbox with ownership/permissions' do
+  '[Ubuntu] starting-files are copied into sandbox with ownership/permissions set' do
     starting_files_test
   end
 

@@ -57,7 +57,15 @@ class DockerRunner
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def user; 'nobody'; end
+  def group; 'nogroup'; end
+  def sandbox; '/sandbox'; end
+
+  def success; shell.success; end
+  def timed_out; 'timed_out'; end
+
+  private
 
   def create_container(image_name, kata_id, avatar_name)
     args = [
@@ -153,15 +161,6 @@ class DockerRunner
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def user; 'nobody'; end
-  def group; 'nogroup'; end
-  def sandbox; '/sandbox'; end
-
-  def success; shell.success; end
-  def timed_out; 'timed_out'; end
-
-  private
 
   def image_names
     lines = assert_exec('docker images')[0].split("\n")

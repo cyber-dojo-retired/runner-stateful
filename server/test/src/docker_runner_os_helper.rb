@@ -25,25 +25,20 @@ module DockerRunnerOsHelper
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def create_container_test
-    cid = runner.create_container(@image_name, kata_id, avatar_name)
-    begin
-      assert_docker_exec(cid, "[ -d #{sandbox} ]")
-
-      _,_,status = exec("docker exec #{cid} sh -c '[ \"$(ls -A #{sandbox})\" ]'", logging = false)
-      assert_equal 1, status, "#{sandbox} is not empty"
-
-      stdout,_ = assert_docker_exec(cid, "stat -c '%U' #{sandbox}")
-      assert_equal user, stdout.strip
-
-      stdout,_ = assert_docker_exec(cid, "stat -c '%G' #{sandbox}")
-      assert_equal group, stdout.strip
-
-      stdout,_ = assert_docker_exec(cid, "stat -c '%A' #{sandbox}")
-      assert_equal 'drwxr-xr-x', (permissions = stdout.strip)
-    ensure
-      runner.remove_container(cid)
-    end
+  def container_setup_test
+    # sandbox exists
+    assert_run_succeeds_no_stderr({ 'cyber-dojo.sh' => "[ -d #{sandbox} ]" })
+    # sandbox is empty
+    assert_run_succeeds_no_stderr({ 'cyber-dojo.sh' => "[ \"$(ls -A #{sandbox})\" ]" })
+    # sandbox's user is set
+    stdout = assert_run_succeeds_no_stderr({ 'cyber-dojo.sh' => "stat -c '%U' #{sandbox}" })
+    assert_equal user, stdout.strip
+    # sandbox's group is set
+    stdout = assert_run_succeeds_no_stderr({ 'cyber-dojo.sh' => "stat -c '%G' #{sandbox}" })
+    assert_equal group, stdout.strip
+    # sandbox's permissions are set
+    stdout = assert_run_succeeds_no_stderr({ 'cyber-dojo.sh' => "stat -c '%A' #{sandbox}" })
+    assert_equal 'drwxr-xr-x', stdout.strip
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
