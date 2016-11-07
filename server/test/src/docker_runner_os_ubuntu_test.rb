@@ -12,8 +12,8 @@ class DockerRunnerOSUbuntuTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'A95',
-  '[Ubuntu] container has access to kata_id via ENV-VAR' do
-    kata_id_env_var_test
+  '[Ubuntu] container has access to cyber-dojo env-vars' do
+    kata_id_env_vars_test
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -

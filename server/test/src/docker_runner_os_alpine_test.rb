@@ -44,8 +44,8 @@ class DockerRunnerOSAlpineTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '782',
-  '[Alpine] container has access to kata_id via ENV-VAR' do
-    kata_id_env_var_test
+  '[Alpine] container has access to cyber-dojo env-vars' do
+    kata_id_env_vars_test
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
