@@ -44,16 +44,14 @@ class DockerRunnerKataTest < RunnerTestBase
   'when image_name is invalid then new_kata(kata_id, image_name) fails with not-found' do
     bad_image_name = '123/123'
     runner.logging_off
-    f = assert_raises(DockerRunnerError) { runner.new_kata(kata_id, bad_image_name) }
-    assert_equal 1, f.status
+    raised = assert_raises(DockerRunnerError) { runner.new_kata(kata_id, bad_image_name) }
+    refute_equal 0, raised.status
     assert_equal [
       "Using default tag: latest",
       "Pulling repository docker.io/#{bad_image_name}"
-    ].join("\n"), f.stdout
-    assert_equal "Error: image #{bad_image_name}:latest not found", f.stderr
+    ].join("\n"), raised.stdout
+    assert_equal "Error: image #{bad_image_name}:latest not found", raised.stderr
   end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   private
 
@@ -62,23 +60,10 @@ class DockerRunnerKataTest < RunnerTestBase
   end
 
   def image_names
-    stdout,_,_ = assert_exec('docker images')
-    lines = stdout.split("\n")
+    lines = assert_exec('docker images')[0].split("\n")
     lines.shift # REPOSITORY TAG IMAGE ID CREATED SIZE
     lines.collect { |line| line.split[0] }
   end
-
-  def assert_exec(cmd)
-    stdout,stderr,status = exec(cmd)
-    fail [
-      "status(#{status})",
-      "stdout(#{stdout.strip})",
-      "stderr(#{stderr.strip})"
-    ].join("\n") unless status == success
-    [stdout, stderr, status]
-  end
-
-  def exec(cmd, logging = true); shell.exec(cmd, logging); end
 
 end
 
