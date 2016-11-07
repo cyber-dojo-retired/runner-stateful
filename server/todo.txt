@@ -6,14 +6,13 @@ o) the runner server has tini installed.
    it launches the sibling containers.
    So does this mean the Alpine language containers do NOT need tini?
 
-o) when it goes live the C#-Moq cyber-dojo.sh can be simplified to
-   1) lose the line [export HOME=/sandbox]
-   2) dmcs -t:library ---> mcs -t:library
+o) when it goes live the C#-Moq and C#-NUnit cyber-dojo.sh can be simplified to
+   the ones in runner's server's start_files
 
 o) add cpu/memory/swap limits
    See comments at https://github.com/cyber-dojo/commander/blob/master/docker-compose.yml
    See https://github.com/docker/docker/pull/9437
-   for suggestion that limits might be uid/gid based.
+   for suggestion that some limits might be uid/gid based.
    Should I use cyber-dojo user and not nobody:nogroup ?
    What if the image does not have cyber-dojo user?
    I guess I can just use its integer id, 19661
@@ -40,7 +39,7 @@ o) add cpu/memory/swap limits
 
 o) what if filename has a quote in it?
 
-o) log assert_exec() fail in docker_runner.rb
+o) log assert_exec() fail in docker_runner.rb?
 
 o) can you copying a changed file into the container via a named-pipe?
    - https://en.wikipedia.org/wiki/Named_pipe
@@ -59,14 +58,13 @@ o) validate microservice parameters?
    - changed_files
 
 o) Should there be a volume per kata rather than per animal?
-   This feels right. Fits with the value-system of cyber-dojo.
+   Fits with the value-system of cyber-dojo.
    Keeps the number of volumes down too.
    Means hello()/goodbye() will only need kata_id.
    And could be renamed... new_kata(id), old_kata(id)
-   Resuming an avatar will need to redo the new_kata(id)
-
-o) Should I use a different uid for the run of each avatar
-   and for the rights of their files?
+   Resuming an avatar will need to redo the new_kata(id).
+   Problem is it introduces the need for multiple uid's, one per avatar.
+   This information is not in the volume itself.
 
 
 
