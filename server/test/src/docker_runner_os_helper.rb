@@ -4,22 +4,19 @@ module DockerRunnerOsHelper
   module_function
 
   def kata_id_env_var_test
-    cmd = 'printenv CYBER_DOJO_KATA_ID'
-    stdout = assert_run_succeeds_no_stderr({ 'cyber-dojo.sh' => cmd })
+    stdout = assert_cyber_dojo_sh 'printenv CYBER_DOJO_KATA_ID'
     assert_equal kata_id, stdout.strip
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_user_exists
-    cmd = "getent passwd #{user}"
-    stdout = assert_run_succeeds_no_stderr({ 'cyber-dojo.sh' => cmd })
+    stdout = assert_cyber_dojo_sh "getent passwd #{user}"
     assert stdout.start_with?(user), stdout
   end
 
   def assert_group_exists
-    cmd = "getent group #{group}"
-    stdout = assert_run_succeeds_no_stderr({ 'cyber-dojo.sh' => cmd })
+    stdout = assert_cyber_dojo_sh "getent group #{group}"
     assert stdout.start_with?(group), stdout
   end
 
@@ -27,17 +24,17 @@ module DockerRunnerOsHelper
 
   def container_setup_test
     # sandbox exists
-    assert_run_succeeds_no_stderr({ 'cyber-dojo.sh' => "[ -d #{sandbox} ]" })
+    assert_cyber_dojo_sh "[ -d #{sandbox} ]"
     # sandbox is empty
-    assert_run_succeeds_no_stderr({ 'cyber-dojo.sh' => "[ \"$(ls -A #{sandbox})\" ]" })
+    assert_cyber_dojo_sh "[ \"$(ls -A #{sandbox})\" ]"
     # sandbox's user is set
-    stdout = assert_run_succeeds_no_stderr({ 'cyber-dojo.sh' => "stat -c '%U' #{sandbox}" })
+    stdout = assert_cyber_dojo_sh "stat -c '%U' #{sandbox}"
     assert_equal user, stdout.strip
     # sandbox's group is set
-    stdout = assert_run_succeeds_no_stderr({ 'cyber-dojo.sh' => "stat -c '%G' #{sandbox}" })
+    stdout = assert_cyber_dojo_sh "stat -c '%G' #{sandbox}"
     assert_equal group, stdout.strip
     # sandbox's permissions are set
-    stdout = assert_run_succeeds_no_stderr({ 'cyber-dojo.sh' => "stat -c '%A' #{sandbox}" })
+    stdout = assert_cyber_dojo_sh "stat -c '%A' #{sandbox}"
     assert_equal 'drwxr-xr-x', stdout.strip
   end
 
