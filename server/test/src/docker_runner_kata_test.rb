@@ -59,9 +59,12 @@ class DockerRunnerKataTest < RunnerTestBase
   "old_kata removes all avatar's volumes" do
     @image_name = 'busybox'
     new_kata
-    runner.new_avatar(kata_id, 'salmon')
-    runner.new_avatar(kata_id, 'lion')
-    assert_equal [ "cyber_dojo_#{kata_id}_lion", "cyber_dojo_#{kata_id}_salmon" ], volume_names.sort
+    expected = []
+    ['lion','salmon'].each do |avatar_name|
+      runner.new_avatar(kata_id, avatar_name)
+      expected << volume_name(avatar_name)
+    end
+    assert_equal expected, volume_names.sort
     old_kata
     assert_equal [], volume_names.sort
   end
@@ -73,14 +76,21 @@ class DockerRunnerKataTest < RunnerTestBase
   end
 
   def image_names
-    lines = assert_exec('docker images')[0].split("\n")
-    lines.shift # REPOSITORY TAG IMAGE ID CREATED SIZE
+    stdout,_ = assert_exec('docker images')
+    lines = stdout.split("\n")
+    lines.shift # lose headings [REPOSITORY TAG IMAGE ID CREATED SIZE]
     lines.collect { |line| line.split[0] }
   end
 
   def volume_names
-    stdout,_ = assert_exec("docker volume ls --quiet --filter 'name=cyber_dojo_#{kata_id}'")
-    stdout.strip.split("\n")
+    stdout,_ = assert_exec("docker volume ls --quiet --filter 'name=#{volume_name}'")
+    stdout.split("\n")
+  end
+
+  def volume_name(avatar_name = nil)
+    parts = [ 'cyber', 'dojo', kata_id ]
+    parts << avatar_name unless avatar_name.nil?
+    parts.join('_')
   end
 
 end
