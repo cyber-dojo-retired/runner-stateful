@@ -26,7 +26,7 @@ class ClientTestBase < HexMiniTest
   end
 
   def runner_run(changed_files, max_seconds = 10)
-    @json = runner.run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
+    @json = runner.run(image_name, kata_id, avatar_name, deleted_filenames, changed_files, max_seconds)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - -

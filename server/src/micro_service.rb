@@ -21,9 +21,9 @@ class MicroService < Sinatra::Base
     args << image_name
     args << kata_id
     args << avatar_name
-    args << max_seconds
     args << deleted_filenames
     args << changed_files
+    args << max_seconds
     jasoned { runner.run(*args) }
   end
 
@@ -36,9 +36,9 @@ class MicroService < Sinatra::Base
   def image_name;        args['image_name' ];       end
   def kata_id;           args['kata_id'    ];       end
   def avatar_name;       args['avatar_name'];       end
-  def max_seconds;       args['max_seconds'];       end
   def deleted_filenames; args['deleted_filenames']; end
   def changed_files;     args['changed_files'];     end
+  def max_seconds;       args['max_seconds'];       end
 
   def request_body_args
     request.body.rewind

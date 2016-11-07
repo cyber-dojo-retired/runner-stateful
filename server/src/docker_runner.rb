@@ -48,7 +48,7 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
+  def run(image_name, kata_id, avatar_name, deleted_filenames, changed_files, max_seconds)
     cid = create_container(image_name, kata_id, avatar_name)
     begin
       delete_files(cid, deleted_filenames)

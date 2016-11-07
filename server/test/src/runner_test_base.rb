@@ -45,7 +45,7 @@ class RunnerTestBase < HexMiniTest
 
   def runner_run(changed_files, max_seconds = 10, deleted_filenames = [])
     # don't call this run() as it clashes with MiniTest
-    runner.run(@image_name, kata_id, avatar_name, max_seconds, deleted_filenames, changed_files)
+    runner.run(@image_name, kata_id, avatar_name, deleted_filenames, changed_files, max_seconds)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -55,7 +55,7 @@ class Demo < Sinatra::Base
 
   def run(files, max_seconds = 10)
     deleted_filenames = []
-    runner.run(image_name, kata_id, avatar_name, max_seconds, deleted_filenames, files)
+    runner.run(image_name, kata_id, avatar_name, deleted_filenames, files, max_seconds)
   end
 
   def runner

@@ -58,9 +58,9 @@ Tells the runner-server the given avatar has left the given kata.
   * image_name, eg 'cyberdojofoundation/gcc_assert'
   * kata_id, eg '15B9AD6C42'
   * avatar_name, eg 'salmon'
-  * max_seconds, eg '10'
   * deleted_filenames, eg [ 'hiker.h', ... ]
   * changed_files, eg { 'fizz_buzz.h' => '#include', ... }
+  * max_seconds, eg '10'
 - returns
   * { "status":0,   "stdout":..., "stderr":... } -> completed
   * { "status":"timed_out", "stdout":"", "stderr":"" } -> did not complete in max_seconds
