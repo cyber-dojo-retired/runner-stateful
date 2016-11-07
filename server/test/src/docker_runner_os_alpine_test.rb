@@ -13,7 +13,7 @@ class DockerRunnerOSAlpineTest < RunnerTestBase
 
   test 'CA0',
   '[Alpine] image is indeed Alpine and has user and group' do
-    stdout = assert_run_succeeds_no_stderr({ 'cyber-dojo.sh' => 'cat /etc/issue'})
+    stdout = assert_cyber_dojo_sh_no_stderr 'cat /etc/issue'
     assert stdout.include?('Alpine'), stdout
     assert_user_exists
     assert_group_exists
@@ -23,7 +23,7 @@ class DockerRunnerOSAlpineTest < RunnerTestBase
 
   test '214',
   '[Alpine] container must have tini installed to do zombie reaping' do
-    stdout = assert_run_succeeds_no_stderr({ 'cyber-dojo.sh' => 'ps' })
+    stdout = assert_cyber_dojo_sh_no_stderr 'ps'
     lines = stdout.strip.split("\n")
     # PID   USER     TIME   COMMAND
     #   1   root     0:00   sh

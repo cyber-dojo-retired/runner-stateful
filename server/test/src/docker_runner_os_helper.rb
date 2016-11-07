@@ -4,19 +4,19 @@ module DockerRunnerOsHelper
   module_function
 
   def kata_id_env_var_test
-    stdout = assert_cyber_dojo_sh 'printenv CYBER_DOJO_KATA_ID'
+    stdout = assert_cyber_dojo_sh_no_stderr 'printenv CYBER_DOJO_KATA_ID'
     assert_equal kata_id, stdout.strip
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_user_exists
-    stdout = assert_cyber_dojo_sh "getent passwd #{user}"
+    stdout = assert_cyber_dojo_sh_no_stderr "getent passwd #{user}"
     assert stdout.start_with?(user), stdout
   end
 
   def assert_group_exists
-    stdout = assert_cyber_dojo_sh "getent group #{group}"
+    stdout = assert_cyber_dojo_sh_no_stderr "getent group #{group}"
     assert stdout.start_with?(group), stdout
   end
 
@@ -24,26 +24,26 @@ module DockerRunnerOsHelper
 
   def container_setup_test
     # sandbox exists
-    assert_cyber_dojo_sh "[ -d #{sandbox} ]"
+    assert_cyber_dojo_sh_no_stderr "[ -d #{sandbox} ]"
     # sandbox is empty
-    assert_cyber_dojo_sh "[ \"$(ls -A #{sandbox})\" ]"
+    assert_cyber_dojo_sh_no_stderr "[ \"$(ls -A #{sandbox})\" ]"
     # sandbox's user is set
-    stdout = assert_cyber_dojo_sh "stat -c '%U' #{sandbox}"
+    stdout = assert_cyber_dojo_sh_no_stderr "stat -c '%U' #{sandbox}"
     assert_equal user, stdout.strip
     # sandbox's group is set
-    stdout = assert_cyber_dojo_sh "stat -c '%G' #{sandbox}"
+    stdout = assert_cyber_dojo_sh_no_stderr "stat -c '%G' #{sandbox}"
     assert_equal group, stdout.strip
     # sandbox's permissions are set
-    stdout = assert_cyber_dojo_sh "stat -c '%A' #{sandbox}"
+    stdout = assert_cyber_dojo_sh_no_stderr "stat -c '%A' #{sandbox}"
     assert_equal 'drwxr-xr-x', stdout.strip
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def starting_files_test
-    ls_stdout = assert_run_succeeds_no_stderr(starting_files)
+    ls_stdout = assert_run_succeeds_no_stderr(ls_starting_files)
     ls_files = ls_parse(ls_stdout)
-    assert_equal starting_files.keys.sort, ls_files.keys.sort
+    assert_equal ls_starting_files.keys.sort, ls_files.keys.sort
     assert_equal_atts('empty.txt',     '-rw-r--r--', user, group,  0, ls_files)
     assert_equal_atts('cyber-dojo.sh', '-rwxr-xr-x', user, group, 29, ls_files)
     assert_equal_atts('hello.txt',     '-rw-r--r--', user, group, 11, ls_files)
@@ -62,7 +62,7 @@ module DockerRunnerOsHelper
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def unchanged_files_test
-    before_ls = assert_run_succeeds_no_stderr(starting_files)
+    before_ls = assert_run_succeeds_no_stderr(ls_starting_files)
     after_ls = assert_run_succeeds_no_stderr(changed_files = {})
     assert_equal before_ls, after_ls
   end
@@ -70,7 +70,7 @@ module DockerRunnerOsHelper
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def deleted_files_test
-    ls_stdout = assert_run_succeeds_no_stderr(starting_files)
+    ls_stdout = assert_run_succeeds_no_stderr(ls_starting_files)
     before = ls_parse(ls_stdout)
     before_filenames = before.keys
 
@@ -89,7 +89,7 @@ module DockerRunnerOsHelper
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def new_files_test
-    ls_stdout = assert_run_succeeds_no_stderr(starting_files)
+    ls_stdout = assert_run_succeeds_no_stderr(ls_starting_files)
     before = ls_parse(ls_stdout)
     before_filenames = before.keys
 
@@ -113,12 +113,12 @@ module DockerRunnerOsHelper
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def changed_file_test
-    ls_stdout = assert_run_succeeds_no_stderr(starting_files)
+    ls_stdout = assert_run_succeeds_no_stderr(ls_starting_files)
     before = ls_parse(ls_stdout)
 
     sleep 2
 
-    hello_txt = starting_files['hello.txt']
+    hello_txt = ls_starting_files['hello.txt']
     extra = "\ngreetings"
     changed_files = { 'hello.txt' => hello_txt + extra }
     ls_stdout = assert_run_succeeds_no_stderr(changed_files)
@@ -143,12 +143,12 @@ module DockerRunnerOsHelper
 
   private
 
-  def starting_files
-    @starting_files ||= {
+  def ls_starting_files
+    @ls_starting_files ||= {
       'cyber-dojo.sh' => ls_cmd,
-      'empty.txt' => '',
-      'hello.txt' => 'hello world',
-      'hello.sh' => 'echo hello world',
+      'empty.txt'     => '',
+      'hello.txt'     => 'hello world',
+      'hello.sh'      => 'echo hello world',
     }
   end
 

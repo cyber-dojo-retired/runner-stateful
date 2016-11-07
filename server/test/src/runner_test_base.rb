@@ -50,7 +50,7 @@ class RunnerTestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_cyber_dojo_sh(script)
+  def assert_cyber_dojo_sh_no_stderr(script)
     assert_run_succeeds_no_stderr({ 'cyber-dojo.sh' => script })
   end
 
