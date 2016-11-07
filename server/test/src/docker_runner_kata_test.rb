@@ -53,6 +53,19 @@ class DockerRunnerKataTest < RunnerTestBase
     assert_equal "Error: image #{bad_image_name}:latest not found", raised.stderr
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test 'FA0',
+  "old_kata removes all avatar's volumes" do
+    @image_name = 'busybox'
+    new_kata
+    runner.new_avatar(kata_id, 'salmon')
+    runner.new_avatar(kata_id, 'lion')
+    assert_equal [ "cyber_dojo_#{kata_id}_lion", "cyber_dojo_#{kata_id}_salmon" ], volume_names.sort
+    old_kata
+    assert_equal [], volume_names.sort
+  end
+
   private
 
   def docker_pulled?(image_name)
@@ -63,6 +76,11 @@ class DockerRunnerKataTest < RunnerTestBase
     lines = assert_exec('docker images')[0].split("\n")
     lines.shift # REPOSITORY TAG IMAGE ID CREATED SIZE
     lines.collect { |line| line.split[0] }
+  end
+
+  def volume_names
+    stdout,_ = assert_exec("docker volume ls --quiet --filter 'name=cyber_dojo_#{kata_id}'")
+    stdout.strip.split("\n")
   end
 
 end

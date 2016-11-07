@@ -28,6 +28,9 @@ class DockerRunner
   end
 
   def old_kata(kata_id)
+    volume_names(kata_id).each do |volume_name|
+      assert_exec("docker volume rm #{volume_name}")
+    end
     ['', '', success]
   end
 
@@ -170,6 +173,11 @@ class DockerRunner
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def volume_names(kata_id)
+    stdout,_ = assert_exec("docker volume ls --quiet --filter 'name=cyber_dojo_#{kata_id}'")
+    stdout.strip.split("\n")
+  end
 
   def volume_name(kata_id, avatar_name)
     "cyber_dojo_#{kata_id}_#{avatar_name}"
