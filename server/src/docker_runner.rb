@@ -15,7 +15,11 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def pull_image(image_name)
+  def pulled?(image_name)
+    ['', '', image_names.include?(image_name)]
+  end
+
+  def pull(image_name)
     assert_exec("docker pull #{image_name}")
     ['', '', success]
   end
@@ -23,7 +27,7 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def new_kata(kata_id, image_name)
-    pull_image(image_name) unless image_names.include?(image_name)
+    pull(image_name) unless image_names.include?(image_name)
     ['', '', success]
   end
 

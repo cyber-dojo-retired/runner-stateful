@@ -3,7 +3,11 @@ require 'net/http'
 
 class RunnerPostAdapter
 
-  def pull_image(image_name)
+  def pulled?(image_name)
+    post('pulled', { image_name:image_name })
+  end
+
+  def pull(image_name)
     post(__method__, { image_name:image_name })
   end
 
