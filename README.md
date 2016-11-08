@@ -6,16 +6,25 @@
 # cyberdojo/runner docker image
 
 A micro-service for [cyber-dojo](http://cyber-dojo.org).
-Not live yet.
 A **cyberdojo/runner** docker container runs sinatra on port 4557.
 It's API is as follows:
 
-# pull_image
+# pulled
+Asks the runner-server if the given image has been pulled.
+- parameters
+  * image_name, eg 'cyberdojofoundation/gcc_assert'
+- returns
+  * { "status":true  } -> image_name has been pulled
+  * { "status":false  } -> image_name has not been pulled
+
+# pull
 Tells the runner-server to pull the given image.
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
 - returns
   * { "status":0  } -> succeeded
+
+- - - -
 
 # new_kata
 Tells the runner-server a kata with the given id and image_name has been set up.
@@ -33,6 +42,8 @@ Tells the runner-server the kata with the given id has been torn down.
 - returns
   * { "status":0 } -> succeeded
 
+- - - -
+
 # new_avatar
 Tells the runner-server the given avatar has entered the given kata.
 Must be called before run.
@@ -49,6 +60,8 @@ Tells the runner-server the given avatar has left the given kata.
   * avatar_name, eg 'salmon'
 - returns
   * { "status":0 } -> succeeded
+
+- - - -
 
 # run
 - Runs cyber-dojo.sh for the given avatar in the given kata, after:
