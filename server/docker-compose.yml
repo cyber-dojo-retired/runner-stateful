@@ -3,7 +3,7 @@ version: '2'
 
 services:
   runner_server:
-    image: cyberdojo/runner:${DOCKER_ENGINE_VERSION}
+    image: cyberdojo/runner
     build:
       context: .
       args:
