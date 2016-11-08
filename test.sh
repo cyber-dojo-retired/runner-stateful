@@ -36,8 +36,6 @@ run_server_tests ${*}
 run_client_tests ${*}
 
 if [[ ( ${server_status} == 0 && ${client_status} == 0 ) ]];  then
-  docker_engine_version=$(docker --version | awk '{print $3}' | sed '$s/.$//')
-  export DOCKER_ENGINE_VERSION=${docker_engine_version}
   docker-compose down
   echo "------------------------------------------------------"
   echo "All passed"
