@@ -7,6 +7,5 @@ services:
     build:
       context: .
       args:
-        APP_DIR: /app
         DOCKER_ENGINE_VERSION: ${DOCKER_ENGINE_VERSION}
         PORT: 4557
