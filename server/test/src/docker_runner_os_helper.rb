@@ -26,11 +26,12 @@ module DockerRunnerOsHelper
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def container_setup_test
+  def new_avatar_setup_test
     # sandbox exists
     assert_cyber_dojo_sh_no_stderr "[ -d #{sandbox} ]"
-    # sandbox is empty
-    assert_cyber_dojo_sh_no_stderr "[ \"$(ls -A #{sandbox})\" ]"
+    # sandbox is not empty
+    stdout = assert_cyber_dojo_sh_no_stderr "ls -A #{sandbox}"
+    refute_equal '', stdout
     # sandbox's user is set
     stdout = assert_cyber_dojo_sh_no_stderr "stat -c '%U' #{sandbox}"
     assert_equal user, stdout.strip
@@ -45,6 +46,15 @@ module DockerRunnerOsHelper
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def starting_files_test
+    # kata_setup has already called new_avatar() which has put
+    # the starting_files into the avatar's sandbox/
+    # So I empty sandbox/ except for cyber-dojo.sh
+    stdout = assert_cyber_dojo_sh_no_stderr "ls -A #{sandbox}"
+    deleted_filenames = stdout.split("\n") - ['cyber-dojo.sh']
+    assert_run_succeeds_no_stderr(changed_files={}, max_seconds=10, deleted_filenames)
+    stdout = assert_cyber_dojo_sh_no_stderr "ls -A #{sandbox}"
+    assert_equal 'cyber-dojo.sh', stdout.strip
+
     ls_stdout = assert_run_succeeds_no_stderr(ls_starting_files)
     ls_files = ls_parse(ls_stdout)
     assert_equal ls_starting_files.keys.sort, ls_files.keys.sort

@@ -51,8 +51,8 @@ class DockerRunnerOSAlpineTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '0C9',
-  '[Alpine] container has empty sandbox with ownership/permissions set' do
-    container_setup_test
+  '[Alpine] new_avatar has non-empty sandbox with ownership/permissions set' do
+    new_avatar_setup_test
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -

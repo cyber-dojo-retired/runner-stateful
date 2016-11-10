@@ -56,8 +56,8 @@ class DockerRunnerKataTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'FA0',
-  "old_kata removes all avatar's volumes" do
-    @image_name = 'busybox'
+  "[gcc,assert] old_kata removes all avatar's volumes" do
+    @image_name = 'cyberdojofoundation/gcc_assert'
     new_kata
     expected = []
     ['lion','salmon'].each do |avatar_name|

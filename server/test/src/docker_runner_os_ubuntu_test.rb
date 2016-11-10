@@ -29,8 +29,8 @@ class DockerRunnerOSUbuntuTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '0CA',
-  '[Ubuntu] container has empty sandbox with ownership/permissions set' do
-    container_setup_test
+  '[Ubuntu] new_avatar has non-empty sandbox with ownership/permissions set' do
+    new_avatar_setup_test
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
