@@ -2,10 +2,24 @@
 runner_server:
 ==============
 
-o) runner: needs to accept initial files on new_avatar() event
+o) runner-client test needed for >10K files
++  test 'FB7E5A',
++  'test() truncates output greater 10K characters' do
++    kata = make_kata
++    @avatar = kata.start_avatar
++    big = 'X' * 10*1024
++    runner.stub_run_output(@avatar, big + 'truncated')
++    _, @visible_files, @output = DeltaMaker.new(@avatar).run_test_no_stub
++    message = 'output truncated by cyber-dojo server'
++    assert_file 'output', big + "\n" + message
++  end
+
+o) runner-server: remove thin and foreman. Just use classic sinatra
+   runner-client too.
 
 o) runner: run() needs to return 'ended' status if there is no volume
    in browser, if test returns 'ended' offer choice to fork.
+   volume-collector service will gc old volumes
 
 o) when it goes live the C#-Moq and C#-NUnit cyber-dojo.sh can be simplified to
    the ones in runner's server's start_files
@@ -14,9 +28,7 @@ o) add cpu/memory/swap limits
    See comments at https://github.com/cyber-dojo/commander/blob/master/docker-compose.yml
    See https://github.com/docker/docker/pull/9437
    for suggestion that some limits might be uid/gid based.
-   Should I use cyber-dojo user and not nobody:nogroup ?
-   What if the image does not have cyber-dojo user?
-   I guess I can just use its integer id, 19661
+   Mike mentioned someone called Jan (a different one) who might know about this stuff.
 
    From [docker run --help]
 
