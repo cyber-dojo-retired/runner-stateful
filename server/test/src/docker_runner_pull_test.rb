@@ -43,6 +43,8 @@ class DockerRunnerPullTest < RunnerTestBase
     @image_name = 'busybox'
     exec("docker rmi #{@image_name}", logging = false)
     refute docker_pulled?
+    # assumes the person running the tests has already done
+    # [docker login]
     _,_,status = pull
     begin
       assert status
