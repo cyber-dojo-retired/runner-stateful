@@ -89,7 +89,7 @@ class RunnerTestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def files(language_dir)
+  def files(language_dir = language_dir_for_os)
     @files ||= load_files(language_dir)
   end
 
@@ -100,6 +100,16 @@ class RunnerTestBase < HexMiniTest
     Hash[json['visible_filenames'].collect { |filename|
       [filename, IO.read("#{dir}/#{filename}")]
     }]
+  end
+
+  def language_dir_for_os
+    fail "@image_name.nil? so cannot set language_dir" if @image_name.nil?
+    cdf = 'cyberdojofoundation'
+    return 'csharp_nunit'  if @image_name = "#{cdf}/csharp_nunit"
+    return 'csharp_moq'    if @image_name = "#{cdf}/csharp_moq"
+    return 'gcc_assert'    if @image_name = "#{cdf}/gcc_assert"
+    return 'java_cucumber' if @image_name = "#{cdf}/java_cucumber_pico"
+    fail "no language_dir for #{@image_name}"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
