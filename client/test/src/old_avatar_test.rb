@@ -15,7 +15,7 @@ class OldAvatarTest < ClientTestBase
 
   test '1ED',
   'old_avatar with legal name succeeds' do
-    new_avatar(test_id, 'salmon')
+    new_avatar(image_name, test_id, 'salmon')
     old_avatar(test_id, 'salmon')
     assert_success
   end

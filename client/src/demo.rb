@@ -7,7 +7,7 @@ class Demo < Sinatra::Base
 
   get '/' do
     hiker_c = read('hiker.c')
-    tests_run_but_fail = {
+    files = {
       'hiker.c'       => hiker_c,
       'hiker.h'       => read('hiker.h'),
       'hiker.tests.c' => read('hiker.tests.c'),
@@ -20,10 +20,10 @@ class Demo < Sinatra::Base
     duration = timed { json = runner.new_kata(kata_id, image_name) }
     html += pre('new_kata', duration, json)
 
-    duration = timed { json = runner.new_avatar(kata_id, avatar_name) }
+    duration = timed { json = runner.new_avatar(image_name, kata_id, avatar_name, files) }
     html += pre('new_avatar', duration, json)
 
-    duration = timed { json = run(tests_run_but_fail) }
+    duration = timed { json = run({}) }
     html += pre('run', duration, json, 'Red')
 
     syntax_error = { 'hiker.c' => 'sdsdsdsd' }

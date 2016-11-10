@@ -23,8 +23,13 @@ class RunnerPostAdapter
 
   # - - - - - - - - - - - - - - - - - - - - - - -
 
-  def new_avatar(kata_id, avatar_name)
-    post(__method__, { kata_id:kata_id, avatar_name:avatar_name })
+  def new_avatar(image_name, kata_id, avatar_name, starting_files)
+    post(__method__, {
+                 image_name:image_name,
+                    kata_id:kata_id,
+                avatar_name:avatar_name,
+             starting_files:starting_files
+    })
   end
 
   def old_avatar(kata_id, avatar_name)

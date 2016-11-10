@@ -3,8 +3,8 @@ require_relative './client_test_base'
 class RunTest < ClientTestBase
 
   def self.hex_prefix; '201BCEF'; end
-  def hex_setup; new_avatar; end
-  def hex_teardown; old_avatar; end
+  def hex_setup; new_kata; new_avatar; end
+  def hex_teardown; old_kata; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

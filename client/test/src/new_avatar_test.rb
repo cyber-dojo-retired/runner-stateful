@@ -6,7 +6,7 @@ class NewAvatarTest < ClientTestBase
 
   test 'C43',
   'new_avatar with illegal volume name is non-zero integer error' do
-    new_avatar('a', ':')
+    new_avatar(image_name, 'a', ':')
     assert_equal 'Fixnum', status.class.name
     refute_success
   end
@@ -15,7 +15,7 @@ class NewAvatarTest < ClientTestBase
 
   test '26D',
   'new_avatar with legal name succeeds' do
-    new_avatar(test_id, 'salmon')
+    new_avatar(image_name, test_id, 'salmon')
     begin
       assert_success
     ensure
