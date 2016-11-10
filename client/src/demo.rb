@@ -17,7 +17,7 @@ class Demo < Sinatra::Base
     json = nil
     html = '<div style="font-size:0.5em">'
 
-    duration = timed { json = runner.new_kata(kata_id, image_name) }
+    duration = timed { json = runner.new_kata(image_name, kata_id) }
     html += pre('new_kata', duration, json)
 
     duration = timed { json = runner.new_avatar(image_name, kata_id, avatar_name, files) }

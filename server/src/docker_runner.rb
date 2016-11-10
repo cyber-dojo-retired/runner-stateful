@@ -26,7 +26,7 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def new_kata(kata_id, image_name)
+  def new_kata(image_name, kata_id)
     pull(image_name) unless image_names.include?(image_name)
     ['', '', success]
   end

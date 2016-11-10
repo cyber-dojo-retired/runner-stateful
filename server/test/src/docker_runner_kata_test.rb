@@ -25,7 +25,7 @@ class DockerRunnerKataTest < RunnerTestBase
 
   test '5E7',
   'when image_name is valid has been pulled',
-  'then new_kata(kata_id, image_name) succeeds' do
+  'then new_kata(image_name, kata_id) succeeds' do
     @image_name = 'busybox'
     exec("docker pull #{@image_name}", logging = false)
     assert docker_pulled?(@image_name)
@@ -44,7 +44,7 @@ class DockerRunnerKataTest < RunnerTestBase
   'when image_name is invalid then new_kata(kata_id, image_name) fails with not-found' do
     bad_image_name = '123/123'
     runner.logging_off
-    raised = assert_raises(DockerRunnerError) { runner.new_kata(kata_id, bad_image_name) }
+    raised = assert_raises(DockerRunnerError) { runner.new_kata(bad_image_name, kata_id) }
     refute_equal 0, raised.status
     assert_equal [
       "Using default tag: latest",

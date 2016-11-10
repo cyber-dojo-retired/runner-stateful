@@ -11,17 +11,9 @@ class RunnerPostAdapter
     post(__method__, { image_name:image_name })
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - -
-
-  def new_kata(kata_id, image_name)
-    post(__method__, { kata_id:kata_id, image_name:image_name })
+  def new_kata(image_name, kata_id)
+    post(__method__, { image_name:image_name, kata_id:kata_id })
   end
-
-  def old_kata(kata_id)
-    post(__method__, { kata_id:kata_id })
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - -
 
   def new_avatar(image_name, kata_id, avatar_name, starting_files)
     post(__method__, {
@@ -31,12 +23,6 @@ class RunnerPostAdapter
              starting_files:starting_files
     })
   end
-
-  def old_avatar(kata_id, avatar_name)
-    post(__method__, { kata_id:kata_id, avatar_name:avatar_name })
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - -
 
   def run(image_name, kata_id, avatar_name, deleted_filenames, changed_files, max_seconds)
     post(__method__, {
@@ -48,6 +34,15 @@ class RunnerPostAdapter
                 max_seconds:max_seconds
     })
   end
+
+  def old_avatar(kata_id, avatar_name)
+    post(__method__, { kata_id:kata_id, avatar_name:avatar_name })
+  end
+
+  def old_kata(kata_id)
+    post(__method__, { kata_id:kata_id })
+  end
+
 
   private
 

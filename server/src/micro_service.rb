@@ -12,7 +12,7 @@ class MicroService < Sinatra::Base
 
   post '/pull'       do; jasoned { runner.pull(image_name) }; end
 
-  post '/new_kata'   do; jasoned { runner.new_kata(kata_id, image_name) }; end
+  post '/new_kata'   do; jasoned { runner.new_kata(image_name, kata_id) }; end
 
   post '/new_avatar' do
     args = []

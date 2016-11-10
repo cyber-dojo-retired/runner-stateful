@@ -10,7 +10,7 @@ A **cyberdojo/runner** docker container runs sinatra on port 4557.
 It's API is as follows:
 
 # pulled
-Asks the runner-server if the given image has been pulled.
+Asks the runner-service if the given image has been pulled.
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
 - returns
@@ -18,7 +18,7 @@ Asks the runner-server if the given image has been pulled.
   * { "status":false  } -> image_name has not been pulled
 
 # pull
-Tells the runner-server to pull the given image.
+Tells the runner-service to pull the given image.
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
 - returns
@@ -27,16 +27,16 @@ Tells the runner-server to pull the given image.
 - - - -
 
 # new_kata
-Tells the runner-server a kata with the given id and image_name has been set up.
+Tells the runner-service a kata with the given id and image_name has been set up.
 Must be called before new_avatar.
 - parameters
-  * kata_id, eg '15B9AD6C42'
   * image_name, eg 'cyberdojofoundation/gcc_assert'
+  * kata_id, eg '15B9AD6C42'
 - returns
   * { "status":0  } -> succeeded
 
 # old_kata
-Tells the runner-server the kata with the given id has been torn down.
+Tells the runner-service the kata with the given id has been torn down.
 - parameters
   * kata_id, eg '15B9AD6C42'
 - returns
@@ -45,16 +45,18 @@ Tells the runner-server the kata with the given id has been torn down.
 - - - -
 
 # new_avatar
-Tells the runner-server the given avatar has entered the given kata.
+Tells the runner-service the given avatar has entered the given kata with the given starting files.
 Must be called before run.
 - parameters
+  * image_name, eg 'cyberdojofoundation/gcc_assert'
   * kata_id, eg '15B9AD6C42'
   * avatar_name, eg 'salmon'
+  * starting_files, eg { 'fizz_buzz.h' => '#include', ... }
 - returns
   * { "status":0 } -> succeeded
 
 # old_avatar
-Tells the runner-server the given avatar has left the given kata.
+Tells the runner-service the given avatar has left the given kata.
 - parameters
   * kata_id, eg '15B9AD6C42'
   * avatar_name, eg 'salmon'

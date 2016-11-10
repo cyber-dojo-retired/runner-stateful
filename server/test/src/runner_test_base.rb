@@ -38,7 +38,7 @@ class RunnerTestBase < HexMiniTest
   def pulled?; runner.pulled?(@image_name); end
   def pull; runner.pull(@image_name); end
 
-  def new_kata; runner.new_kata(kata_id, @image_name); end
+  def new_kata; runner.new_kata(@image_name, kata_id); end
   def old_kata; runner.old_kata(kata_id); end
 
   def new_avatar; runner.new_avatar(@image_name, kata_id, avatar_name, files); end
