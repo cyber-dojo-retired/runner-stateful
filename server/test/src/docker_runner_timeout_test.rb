@@ -3,13 +3,13 @@ require_relative './runner_test_base'
 class DockerRunnerTimeoutTest < RunnerTestBase
 
   def self.hex_prefix; '45B57'; end
-  def hex_setup; new_avatar; end
-  def hex_teardown; old_avatar; end
+  def hex_setup; kata_setup; end
+  def hex_teardown; kata_teardown; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'B2B',
-  'when run(test-code) does not complete in max_seconds',
+  '[gcc,assert] when run(test-code) does not complete in max_seconds',
   'and does not produce output,',
   'the output is empty, and',
   'the status is timed_out' do
@@ -29,7 +29,7 @@ class DockerRunnerTimeoutTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '4D7',
-  'when run(test-code) does not complete in max_seconds',
+  '[gcc,assert] when run(test-code) does not complete in max_seconds',
   'and does produce output,',
   'the output is nonetheless empty, and',
   'the status is timed_out' do

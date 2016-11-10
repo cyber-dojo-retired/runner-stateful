@@ -61,7 +61,7 @@ class DockerRunnerKataTest < RunnerTestBase
     new_kata
     expected = []
     ['lion','salmon'].each do |avatar_name|
-      runner.new_avatar(kata_id, avatar_name)
+      runner.new_avatar(@image_name, kata_id, avatar_name, files)
       expected << volume_name(avatar_name)
     end
     assert_equal expected, volume_names.sort
