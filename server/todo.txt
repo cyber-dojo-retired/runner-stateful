@@ -2,9 +2,10 @@
 runner_server:
 ==============
 
-o) the runner server has tini installed.
-   it launches the sibling containers.
-   So does this mean the Alpine language containers do NOT need tini?
+o) runner: needs to accept initial files on new_avatar() event
+
+o) runner: run() needs to return 'ended' status if there is no volume
+   in browser, if test returns 'ended' offer choice to fork.
 
 o) when it goes live the C#-Moq and C#-NUnit cyber-dojo.sh can be simplified to
    the ones in runner's server's start_files
