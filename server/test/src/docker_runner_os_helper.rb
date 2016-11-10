@@ -26,7 +26,7 @@ module DockerRunnerOsHelper
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def new_avatar_setup_test
+  def new_avatar_sandbox_setup_test
     # sandbox exists
     assert_cyber_dojo_sh_no_stderr "[ -d #{sandbox} ]"
     # sandbox is not empty
@@ -45,17 +45,23 @@ module DockerRunnerOsHelper
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def starting_files_test
-    # kata_setup has already called new_avatar() which has put
-    # the starting_files into the avatar's sandbox/
-    # So I empty sandbox/ except for cyber-dojo.sh
-    stdout = assert_cyber_dojo_sh_no_stderr "ls -A #{sandbox}"
-    deleted_filenames = stdout.split("\n") - ['cyber-dojo.sh']
-    assert_run_succeeds_no_stderr(changed_files={}, max_seconds=10, deleted_filenames)
-    stdout = assert_cyber_dojo_sh_no_stderr "ls -A #{sandbox}"
-    assert_equal 'cyber-dojo.sh', stdout.strip
-
-    ls_stdout = assert_run_succeeds_no_stderr(ls_starting_files)
+  def new_avatar_starting_files_test
+    # kata_setup has already called new_avatar() which has setup
+    # a salmon with the starting-files associated with @image_name
+    # So I create a new avatar with known starting-files
+    # kata_teardown calls old_kata which deletes all the avatar's volumes.
+    lion = runner.new_avatar(@image_name, kata_id, 'lion', ls_starting_files)
+    args = []
+    args << @image_name
+    args << kata_id
+    args << 'lion'
+    args << (deleted_filenames=[])
+    args << (changed_files={})
+    args << (max_seconds=10)
+    ls_stdout,stderr,status = runner.run(*args)
+    assert_equal success, status
+    assert_equal '', stderr
+    #ls_stdout = assert_run_succeeds_no_stderr(ls_starting_files)
     ls_files = ls_parse(ls_stdout)
     assert_equal ls_starting_files.keys.sort, ls_files.keys.sort
     assert_equal_atts('empty.txt',     '-rw-r--r--', user, group,  0, ls_files)

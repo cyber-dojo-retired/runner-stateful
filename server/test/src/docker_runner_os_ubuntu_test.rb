@@ -29,15 +29,15 @@ class DockerRunnerOSUbuntuTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '0CA',
-  '[Ubuntu] new_avatar has non-empty sandbox with ownership/permissions set' do
-    new_avatar_setup_test
+  '[Ubuntu] new_avatar has sandbox with ownership/permissions set' do
+    new_avatar_sandbox_setup_test
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '1FC',
-  '[Ubuntu] starting-files are copied into sandbox with ownership/permissions set' do
-    starting_files_test
+  '[Ubuntu] new_avatar has starting-files in sandbox with ownership/permissions set' do
+    new_avatar_starting_files_test
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
