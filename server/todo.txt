@@ -2,20 +2,7 @@
 runner_server:
 ==============
 
-o) runner-client test needed for >10K files
-+  test 'FB7E5A',
-+  'test() truncates output greater 10K characters' do
-+    kata = make_kata
-+    @avatar = kata.start_avatar
-+    big = 'X' * 10*1024
-+    runner.stub_run_output(@avatar, big + 'truncated')
-+    _, @visible_files, @output = DeltaMaker.new(@avatar).run_test_no_stub
-+    message = 'output truncated by cyber-dojo server'
-+    assert_file 'output', big + "\n" + message
-+  end
-
-o) runner-server: remove thin and foreman. Just use classic sinatra
-   runner-client too.
+o) runner-server: remove thin and foreman. Just use classic sinatra?
 
 o) runner: run() needs to return 'ended' status if there is no volume
    in browser, if test returns 'ended' offer choice to fork.
