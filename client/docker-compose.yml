@@ -7,5 +7,4 @@ services:
     build:
       context: .
       args:
-        APP_DIR: /app
         PORT: 4558
