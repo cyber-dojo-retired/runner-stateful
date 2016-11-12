@@ -2,10 +2,6 @@
 runner_server:
 ==============
 
-o) check that test-hex-id prefix doesnt end as suffix-starts
-   eg prefix=4D778  suffix=782
-   is lightly to get excess matches
-
 o) runner pulled?/pull tests. Use MockShell so they are faster and work
    if you have no internet connection.
 

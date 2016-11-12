@@ -44,6 +44,7 @@ class HexMiniTest < MiniTest::Test
     fail "#{pointer}empty#{pointee}" if hex_suffix == ''
     fail "#{pointer}not hex#{pointee}" unless hex_suffix =~ /^[0-9A-F]+$/
     fail "#{pointer}duplicate#{pointee}" if @@seen_hex_ids.include?(hex_id)
+    fail "#{pointer}overlap#{pointee}" if hex_prefix[-2..-1] == hex_suffix[0..1]
     @@seen_hex_ids << hex_id
     hex_id
   end
