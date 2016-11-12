@@ -28,7 +28,31 @@ o) Suppose you know the id of a kata done before runner was introduced
    WILL have a /s folder!
    https://github.com/docker/docker/issues/13121
    So it seems I will have to do the check.
+     def volume_exists?(kata_id, avatar_name)
+       name = volume_name(kata_id, avatar_name)
+       cmd = "docker volume ls --quiet --filter 'name=#{name}'"
+       stdout,stderr,status = exec(cmd)
+       stdout.strip == name
+     end
+   However there is another problem...
+   Suppose I start a kata, and 5 avatars enter and [test]
+   Then time passes, the gc collects the 5 avatar's volumes.
+   Now, I won't be able to [test] as these 5 avatars, but
+   I can still start a _new_ avatar. And it will have a volume created.
+   It won't work making a volume for the kata. Once the gc removes
+   an old volume I will be able to create new avatars again!
+   It seems the liveness of a kata has to be decided by the
+   web object, or the runner has to be made a bit cleverer.
 
+o) Aside, when I finally sort the above out, how to not create a traffic-light
+   in kata_controller...
+   app/views/kata/run_tests.js.erb needs a new line
+     var appendTestTrafficLight = function() {
+       var testColour = "<%= @test_colour %>";
+       if (testColour == '') { return; }  <------
+   app/controllers/kata_controller.rb must not call
+     @avatar.tested(delta, files, time_now, @output, @test_colour)
+     if the runner returns 'no-sandbox'
 
 o) Do I want the kata's 24 hours alive-time to be based on the kata or the avatar?
    If it's the kata then how does the volume-collector know the start-time of the
