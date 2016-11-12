@@ -127,11 +127,7 @@ class RunnerTestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  def kata_id; test_id + '0' * (10-test_id.length); end
   def avatar_name; 'salmon'; end
-
-  def kata_id;
-    assert_equal 8, test_id.length, 'test_id.length'
-    test_id + '00'
-  end
 
 end
