@@ -2,6 +2,9 @@
 runner_server:
 ==============
 
+o) runner pulled?/pull tests. Use MockShell so they are faster and work
+   if you have no internet connection.
+
 o) runner-server: remove thin and foreman. Just use classic sinatra?
 
 o) runner: run() needs to return 'ended' status if there is no volume

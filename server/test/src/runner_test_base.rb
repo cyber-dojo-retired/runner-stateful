@@ -19,20 +19,20 @@ class RunnerTestBase < HexMiniTest
   end
 
   def set_image_for_os
-    cdf = 'cyberdojofoundation'
-    @image_name = "#{cdf}/csharp_nunit"       if test_name.start_with? '[C#,NUnit]'
-    @image_name = "#{cdf}/csharp_moq"         if test_name.start_with? '[C#,Moq]'
-    @image_name = "#{cdf}/gcc_assert"         if test_name.start_with? '[gcc,assert]'
-    @image_name = "#{cdf}/java_cucumber_pico" if test_name.start_with? '[Java,Cucumber]'
+    @image_name = cdf('csharp_nunit')       if test_name.start_with? '[C#,NUnit]'
+    @image_name = cdf('csharp_moq')         if test_name.start_with? '[C#,Moq]'
+    @image_name = cdf('gcc_assert')         if test_name.start_with? '[gcc,assert]'
+    @image_name = cdf('java_cucumber_pico') if test_name.start_with? '[Java,Cucumber]'
 
-    @image_name = "#{cdf}/gcc_assert"         if test_name.start_with? '[Alpine]'
-    @image_name = "#{cdf}/java_cucumber_pico" if test_name.start_with? '[Ubuntu]'
+    @image_name = cdf('gcc_assert')         if test_name.start_with? '[Alpine]'
+    @image_name = cdf('java_cucumber_pico') if test_name.start_with? '[Ubuntu]'
     fail "cannot set @image_name from test_name" if @image_name.nil?
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   include Externals
+
   def runner; @runner ||= DockerRunner.new(self); end
 
   def pulled?; runner.pulled?(@image_name); end
@@ -46,7 +46,14 @@ class RunnerTestBase < HexMiniTest
 
   def runner_run(changed_files, max_seconds = 10, deleted_filenames = [])
     # don't call this run() as it clashes with MiniTest
-    runner.run(@image_name, kata_id, avatar_name, deleted_filenames, changed_files, max_seconds)
+    args = []
+    args << @image_name
+    args << kata_id
+    args << avatar_name
+    args << deleted_filenames
+    args << changed_files
+    args << max_seconds
+    runner.run(*args)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -93,6 +100,19 @@ class RunnerTestBase < HexMiniTest
     @files ||= load_files(language_dir)
   end
 
+  def language_dir_for_os
+    fail '@image_name.nil? so cannot set language_dir' if @image_name.nil?
+    return 'csharp_nunit'       if @image_name == cdf('csharp_nunit')
+    return 'csharp_moq'         if @image_name == cdf('csharp_moq')
+    return 'gcc_assert'         if @image_name == cdf('gcc_assert')
+    return 'java_cucumber_pico' if @image_name == cdf('java_cucumber_pico')
+    fail "no language_dir for #{@image_name}"
+  end
+
+  def cdf(name)
+    "cyberdojofoundation/#{name}"
+  end
+
   def load_files(language_dir)
     dir = "/app/start_files/#{language_dir}"
     json = JSON.parse(IO.read("#{dir}/manifest.json"))
@@ -100,16 +120,6 @@ class RunnerTestBase < HexMiniTest
     Hash[json['visible_filenames'].collect { |filename|
       [filename, IO.read("#{dir}/#{filename}")]
     }]
-  end
-
-  def language_dir_for_os
-    fail "@image_name.nil? so cannot set language_dir" if @image_name.nil?
-    cdf = 'cyberdojofoundation'
-    return 'csharp_nunit'  if @image_name == "#{cdf}/csharp_nunit"
-    return 'csharp_moq'    if @image_name == "#{cdf}/csharp_moq"
-    return 'gcc_assert'    if @image_name == "#{cdf}/gcc_assert"
-    return 'java_cucumber' if @image_name == "#{cdf}/java_cucumber_pico"
-    fail "no language_dir for #{@image_name}"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
