@@ -8,7 +8,7 @@ o) Suppose you know the id of a kata done before runner was introduced
    - if there is no change (since the volume gc'd) you get output of
      "sh: ./cyber-dojo.sh: not found" and an amber traffic-light.
    - if there is a change you get the same. Interesting. I was expecting
-     an exception
+     an exception.
    Why?
    It is because the volume-mount in the [docker run] fails but the
    docker run still returns a cid. The actual command [docker exec]'d is
@@ -17,11 +17,18 @@ o) Suppose you know the id of a kata done before runner was introduced
    I'd like for web to recognize this situation and not create a new traffic-light.
    Can runner detect this without an extra call which would slow down [test]?
    [docker exec]'s command can change from './cyber-dojo.sh' to something like
-   [ ! -d sandbox ] && echo 'no /sandbox' || sandbox/cyber-dojo.sh
+   [ ! -d sandbox ] && echo 'no sandbox' || sandbox/cyber-dojo.sh
    and then simply check the output.
    Of course, cyber-dojo.sh could fake by returning this string! Not a problem.
    Note that Process.waitpid(pid) returns a Process::Status object which has
    .exitstatus and also .coredump?
+   Ok. After much detailed debugging it seems that if you do
+    [docker run --volume=N:/s  ...]
+   when there is no volume called N then the container
+   WILL have a /s folder!
+   https://github.com/docker/docker/issues/13121
+   So it seems I will have to do the check.
+
 
 o) Do I want the kata's 24 hours alive-time to be based on the kata or the avatar?
    If it's the kata then how does the volume-collector know the start-time of the
