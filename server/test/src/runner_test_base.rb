@@ -41,8 +41,23 @@ class RunnerTestBase < HexMiniTest
     args << deleted_filenames
     args << changed_files
     args << max_seconds
-    runner.run(*args)
+    @sss = runner.run(*args)
   end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def sss; @sss; end
+
+  def stdout; sss[0]; end
+  def stderr; sss[1]; end
+  def status; sss[2]; end
+
+  def assert_stdout(expected); assert_equal expected, stdout, sss; end
+  def assert_stderr(expected); assert_equal expected, stderr, sss; end
+  def assert_status(expected); assert_equal expected, status, sss; end
+
+  def assert_stdout_include(text); assert stdout.include?(text), sss; end
+  def assert_stderr_include(text); assert stderr.include?(text), sss; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
