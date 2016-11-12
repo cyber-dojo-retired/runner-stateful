@@ -2,6 +2,30 @@
 runner_server:
 ==============
 
+o) Suppose you know the id of a kata done before runner was introduced
+   as a service. You can review ok. But if you hit [test] what happens?
+   Answer, you get output of "sh: ./cyber-dojo.sh: not found" and an
+   amber traffic-light. Why?
+   It is because the volume-mount in the [docker run] fails but the
+   docker run still returns a cid. The actual command [docker exec]'d is
+   './cyber-dojo.sh' because --workdir (which fails) is in the [docker run].
+   So there is no cyber-dojo.sh file.
+   How to proceed? I'd like for web to recognize this situation and not
+   create a new traffic-light. Should runner detect it? Can it do that without
+   an extra call which would slow down the [test]?
+   web could simply look to see if the output is "sh: ./cyber-dojo.sh: not found"
+   Presumably that could be faked.
+   What about returning a status from [docker exec] and capturing that in the
+   Process.waitpid(pid)
+
+o) Do I want the kata's 24 hours alive-time to be based on the kata or the avatar?
+   If it's the kata then how does the volume-collector know the start-time of the
+   kata given the current design creates volumes avatars individually?
+   Suggests the volume should be for the kata, not for each avatar.
+   In turn suggests creating a uid for each avatar and creating
+   /sandboxes/lion owned by lion's uid, and [docker exec] for the lion
+   uses lion's uid.
+
 o) runner pulled?/pull tests. Use MockShell so they are faster and work
    if you have no internet connection.
    server
@@ -9,7 +33,6 @@ o) runner pulled?/pull tests. Use MockShell so they are faster and work
      PullTest 91C A44 A73
    client
      PullTest A82
-
 
 o) runner-server: remove thin and foreman. Just use classic sinatra?
 
