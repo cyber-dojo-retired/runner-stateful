@@ -72,14 +72,16 @@ class DockerRunnerOSAlpineTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '385',
-  '[Alpine] deleted files are removed and all previous files are unchanged' do
+  '[Alpine] deleted files are removed',
+  'and all previous files are unchanged' do
     deleted_files_test
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '232',
-  '[Alpine] new files are added with ownership/permissions and all previous files are unchanged' do
+  '[Alpine] new files are added with ownership/permissions',
+  'and all previous files are unchanged' do
     new_files_test
   end
 
