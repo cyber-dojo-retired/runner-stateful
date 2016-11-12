@@ -61,7 +61,6 @@ module DockerRunnerOsHelper
     ls_stdout,stderr,status = runner.run(*args)
     assert_equal success, status
     assert_equal '', stderr
-    #ls_stdout = assert_run_succeeds_no_stderr(ls_starting_files)
     ls_files = ls_parse(ls_stdout)
     assert_equal ls_starting_files.keys.sort, ls_files.keys.sort
     assert_equal_atts('empty.txt',     '-rw-r--r--', user, group,  0, ls_files)
