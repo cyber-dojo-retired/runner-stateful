@@ -43,7 +43,7 @@ class DockerRunnerOSAlpineTest < RunnerTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '782',
+  test '997',
   '[Alpine] container has access to cyber-dojo env-vars' do
     kata_id_env_vars_test
   end
