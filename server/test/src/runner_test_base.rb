@@ -8,7 +8,7 @@ require_relative './../../src/externals'
 class RunnerTestBase < HexMiniTest
 
   def kata_setup
-    set_image_for_os
+    @image_name = image_for_test
     new_kata
     new_avatar
   end
@@ -84,21 +84,25 @@ class RunnerTestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def set_image_for_os
-    @image_name = cdf('csharp_nunit')       if test_name.start_with? '[C#,NUnit]'
-    @image_name = cdf('csharp_moq')         if test_name.start_with? '[C#,Moq]'
-    @image_name = cdf('gcc_assert')         if test_name.start_with? '[gcc,assert]'
-    @image_name = cdf('java_cucumber_pico') if test_name.start_with? '[Java,Cucumber]'
-    @image_name = cdf('gcc_assert')         if test_name.start_with? '[Alpine]'
-    @image_name = cdf('java_cucumber_pico') if test_name.start_with? '[Ubuntu]'
-    fail 'cannot set @image_name from test_name' if @image_name.nil?
+  def image_for_test
+    rows = {
+      '[C#,NUnit]'      => 'csharp_nunit',
+      '[C#,Moq]'        => 'csharp_moq',
+      '[gcc,assert]'    => 'gcc_assert',
+      '[Java,Cucumber]' => 'java_cucumber_pico',
+      '[Alpine]'        => 'gcc_assert',
+      '[Ubuntu]'        => 'java_cucumber_pico'
+    }
+    row = rows.detect { |key,name| test_name.start_with? key }
+    fail 'cannot find image_name from test_name' if row.nil?
+    'cyberdojofoundation/' + row[1]
   end
 
-  def files(language_dir = language_dir_for_os)
+  def files(language_dir = language_dir_from_image_name)
     @files ||= load_files(language_dir)
   end
 
-  def language_dir_for_os
+  def language_dir_from_image_name
     fail '@image_name.nil? so cannot set language_dir' if @image_name.nil?
     @image_name.split('/')[1]
   end
@@ -110,10 +114,6 @@ class RunnerTestBase < HexMiniTest
     Hash[json['visible_filenames'].collect { |filename|
       [filename, IO.read("#{dir}/#{filename}")]
     }]
-  end
-
-  def cdf(name)
-    "cyberdojofoundation/#{name}"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
