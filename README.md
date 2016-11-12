@@ -77,7 +77,7 @@ Tells the runner-service the given avatar has left the given kata.
   * changed_files, eg { 'fizz_buzz.h' => '#include', ... }
   * max_seconds, eg '10'
 - returns
-  * { "status":0,   "stdout":..., "stderr":... } -> completed
+  * { "status":integer,   "stdout":..., "stderr":... } -> completed
   * { "status":"timed_out", "stdout":"", "stderr":"" } -> did not complete in max_seconds
 
 - if something unexpected goes wrong all methods return

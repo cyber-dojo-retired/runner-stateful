@@ -134,9 +134,10 @@ class DockerRunner
     begin
       Timeout::timeout(max_seconds) do
         Process.waitpid(pid)
+        status = $?.exitstatus
         w_stdout.close
         w_stderr.close
-        [r_stdout.read, r_stderr.read, success]
+        [r_stdout.read, r_stderr.read, status]
       end
     rescue Timeout::Error
       Process.kill(-9, pid)

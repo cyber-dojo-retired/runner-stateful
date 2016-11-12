@@ -9,7 +9,7 @@ class RunTest < ClientTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '42D',
-  'run with bad arguments sets is non-zero integer error' do
+  'run with bad arguments sets non-zero integer error' do
     args = []
     args << image_name
     args << (kata_id = ':') #bad
@@ -26,8 +26,9 @@ class RunTest < ClientTestBase
   test '348',
   'red-traffic-light' do
     runner_run(files)
-    assert_success
+    assert_stdout "makefile:14: recipe for target 'test.output' failed\n"
     assert stderr.start_with?('Assertion failed: answer() == 42'), json.to_s
+    assert_status 2
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -36,9 +37,9 @@ class RunTest < ClientTestBase
   'green-traffic-light' do
     file_sub('hiker.c', '6 * 9', '6 * 7')
     runner_run(files)
-    assert_success
     assert_stdout "All tests passed\n"
     assert_stderr ''
+    assert_status 0
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -47,12 +48,13 @@ class RunTest < ClientTestBase
   'amber-traffic-light' do
     file_sub('hiker.c', '6 * 9', '6 * 9sss')
     runner_run(files)
-    assert_success
     lines = [
       "invalid suffix \"sss\" on integer constant",
       'return 6 * 9sss'
     ]
     lines.each { |line| assert stderr.include?(line), json.to_s }
+    assert_stdout "makefile:17: recipe for target 'test' failed\n"
+    assert_status 2
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -61,9 +63,9 @@ class RunTest < ClientTestBase
   'timed-out-traffic-light' do
     file_sub('hiker.c', 'return', "for(;;);\nreturn")
     runner_run(files, 3)
-    assert_timed_out
     assert_stdout ''
     assert_stderr ''
+    assert_timed_out
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -79,9 +81,9 @@ class RunTest < ClientTestBase
       'head -n 1'
     ].join('|')
     runner_run({ 'cyber-dojo.sh' => "seq 2 | xargs -I{} sh -c '#{command}'" })
-    assert_success
     assert stdout.end_with? 'output truncated by cyber-dojo server', json.to_s
     assert_stderr ''
+    assert_status 0
   end
 
 end

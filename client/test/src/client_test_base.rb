@@ -78,5 +78,6 @@ class ClientTestBase < HexMiniTest
 
   def assert_stdout(expected); assert_equal expected, stdout, json.to_s; end
   def assert_stderr(expected); assert_equal expected, stderr, json.to_s; end
+  def assert_status(expected); assert_equal expected, status, json.to_s; end
 
 end
