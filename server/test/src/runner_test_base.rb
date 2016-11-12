@@ -21,7 +21,6 @@ class RunnerTestBase < HexMiniTest
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   include Externals
-
   def runner; @runner ||= DockerRunner.new(self); end
 
   def pulled?; runner.pulled?(@image_name); end
@@ -90,10 +89,9 @@ class RunnerTestBase < HexMiniTest
     @image_name = cdf('csharp_moq')         if test_name.start_with? '[C#,Moq]'
     @image_name = cdf('gcc_assert')         if test_name.start_with? '[gcc,assert]'
     @image_name = cdf('java_cucumber_pico') if test_name.start_with? '[Java,Cucumber]'
-
     @image_name = cdf('gcc_assert')         if test_name.start_with? '[Alpine]'
     @image_name = cdf('java_cucumber_pico') if test_name.start_with? '[Ubuntu]'
-    fail "cannot set @image_name from test_name" if @image_name.nil?
+    fail 'cannot set @image_name from test_name' if @image_name.nil?
   end
 
   def files(language_dir = language_dir_for_os)
