@@ -88,6 +88,8 @@ Tells the runner-service the given avatar has left the given kata.
   * { "status":integer,   "stdout":..., "stderr":... } -> completed
   * { "status":"timed_out", "stdout":"", "stderr":"" } -> did not complete in max_seconds
 
+- - - -
+
 - if something unexpected goes wrong all methods return a ["status","stdout","stderr"]
 triple with status equal to a (non "timed_out") string.
 
