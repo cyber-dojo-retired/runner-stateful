@@ -46,10 +46,14 @@ o) Suppose you know the id of a kata done before runner was introduced
    The runner could be given read access to the katas dir
    structure. The date-time stamp of katas//12/3456789A/
    would indicate the validity of kata-IDs and also its liveness.
+   Tests for runner-server can simulate this by just creating
+   kata-id dirs off /usr/src/cyber-dojo/katas.
+   What about tests for runner-client?
+   They should be able to [docker exec] in and create a dir too.
 
-o) runner: run() needs to return 'ended' status if there is no volume
+o) runner: run() needs to return 'ended' status if there is no volume.
    in browser, if test returns 'ended' offer choice to fork.
-   volume-collector service will gc old volumes
+   volume-collector service will gc old volumes.
 
 o) Aside, when I finally sort the above out, how to not create a traffic-light
    in kata_controller...
