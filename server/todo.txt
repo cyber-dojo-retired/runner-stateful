@@ -55,8 +55,16 @@ o) Suppose you know the id of a kata done before runner was introduced
    In this design can you make a kata read-only immediately, before
    the gc reclaims the volumes? (As James requested)
    I think yes, by tweaking the katas' manifest.json file and setting
-   the "created":[2016,11,12,13,55,18] entry.
+   the "created":[2016,11,12,13,55,18] entry back one day.
    This is not so hard to do in the tests too.
+   No! It is simpler than that.
+   if you hit [test]
+     web sees request.
+     web checks creation date of kata.
+     if 'ended' it does not call runner.run()
+     instead it populates @output explicitly and does not create a new traffic-light.
+   Runner needs to see katas/ dir (readonly) only for kata-id validation.
+   Collector sees katas/ dir (readonly) and removes volumes.
 
 
 o) runner: run() needs to return 'ended' status if there is no volume.
