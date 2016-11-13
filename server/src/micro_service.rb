@@ -8,6 +8,10 @@ require_relative './string_truncater'
 
 class MicroService < Sinatra::Base
 
+  # Some methods have arguments that are unused.
+  # They would be used if the runner-service implementation
+  # switches from being volume-based to container-based.
+
   post '/pulled'     do; jasoned { runner.pulled?(image_name) }; end
 
   post '/pull'       do; jasoned { runner.pull(image_name) }; end

@@ -42,7 +42,8 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def new_avatar(image_name, kata_id, avatar_name, files)
-    assert_exec("docker volume create --name #{volume_name(kata_id, avatar_name)}")
+    name = volume_name(kata_id, avatar_name)
+    assert_exec("docker volume create --name #{name}")
     cid = create_container(image_name, kata_id, avatar_name)
     begin
       change_files(cid, files)
