@@ -97,7 +97,7 @@ class DockerRunner
       "--env CYBER_DOJO_AVATAR_NAME=#{avatar_name}",
       "--env CYBER_DOJO_SANDBOX=#{sandbox}",
       '--user=root',
-      "--volume=#{volume_name(kata_id, avatar_name)}:#{sandbox}",
+      "--volume=#{volume_name(kata_id, avatar_name)}:#{sandbox}:rw",
       "--workdir=#{sandbox}"
     ].join(space = ' ')
     cid = assert_exec("docker run #{args} #{image_name} sh")[0].strip
