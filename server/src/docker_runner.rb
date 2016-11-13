@@ -54,7 +54,8 @@ class DockerRunner
   end
 
   def old_avatar(kata_id, avatar_name)
-    assert_exec("docker volume rm #{volume_name(kata_id, avatar_name)}")
+    name = volume_name(kata_id, avatar_name)
+    assert_exec("docker volume rm #{name}")
     ['', '', success]
   end
 
@@ -89,6 +90,7 @@ class DockerRunner
     # If volume V does _not_ exist the [docker run] will nevertheless
     # succeed, create the container, and create a /sandbox folder in it!
     # https://github.com/docker/docker/issues/13121
+    name = volume_name(kata_id, avatar_name)
     args = [
       '--detach',                          # get the cid
       '--interactive',                     # later execs
@@ -99,9 +101,9 @@ class DockerRunner
       "--env CYBER_DOJO_AVATAR_NAME=#{avatar_name}",
       "--env CYBER_DOJO_SANDBOX=#{sandbox}",
       '--user=root',
-      "--volume=#{volume_name(kata_id, avatar_name)}:#{sandbox}:rw",
+      "--volume=#{name}:#{sandbox}:rw",
       "--workdir=#{sandbox}"
-    ].join(space = ' ')
+    ].join(space)
     cid = assert_exec("docker run #{args} #{image_name} sh")[0].strip
     assert_docker_exec(cid, "chown #{user}:#{group} #{sandbox}")
     cid
@@ -135,7 +137,13 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run_cyber_dojo_sh(cid, max_seconds)
-    cmd = "docker exec --user=#{user} --interactive #{cid} sh -c './cyber-dojo.sh'"
+    cmd = [
+      'docker exec',
+      "--user=#{user}",
+      '--interactive',
+      cid,
+      "sh -c './cyber-dojo.sh'"
+    ].join(space)
     r_stdout, w_stdout = IO.pipe
     r_stderr, w_stderr = IO.pipe
     pid = Process.spawn(cmd, pgroup:true, out:w_stdout, err:w_stderr)
@@ -194,7 +202,14 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def volume_names(kata_id)
-    stdout,_ = assert_exec("docker volume ls --quiet --filter 'name=cyber_dojo_#{kata_id}'")
+    name = "cyber_dojo_#{kata_id}"
+    docker_volume_ls = [
+      'docker volume ls',
+      '--quiet',
+      '--filter',
+      "'name=#{name}'"
+    ].join(space)
+    stdout,_ = assert_exec(docker_volume_ls)
     stdout.strip.split("\n")
   end
 
@@ -233,5 +248,7 @@ class DockerRunner
   def shell; nearest_external(:shell); end
   def  disk; nearest_external(:disk);  end
   def   log; nearest_external(:log);   end
+
+  def space; ' '; end
 
 end
