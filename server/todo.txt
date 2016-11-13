@@ -4,90 +4,27 @@ runner_server:
 
 o) Suppose you know the id of a kata done before runner was introduced
    as a service. You can review ok. But if you hit [test] what happens?
-   Answer
-   - if there is no change (since the volume gc'd) you get output of
-     "sh: ./cyber-dojo.sh: not found" and an amber traffic-light.
-   - if there is a change you get the same. Interesting. I was expecting
-     an exception.
-   Why?
-   It is because the volume-mount in the [docker run] fails but the
-   docker run still returns a cid. The actual command [docker exec]'d is
-   './cyber-dojo.sh' because --workdir (which fails) is in the [docker run].
-   So there is no cyber-dojo.sh file.
-   I'd like for web to recognize this situation and not create a new traffic-light.
-   Can runner detect this without an extra call which would slow down [test]?
-   [docker exec]'s command can change from './cyber-dojo.sh' to something like
-   [ ! -d sandbox ] && echo 'no sandbox' || sandbox/cyber-dojo.sh
-   and then simply check the output.
-   Of course, cyber-dojo.sh could fake by returning this string! Not a problem.
-   Note that Process.waitpid(pid) returns a Process::Status object which has
-   .exitstatus and also .coredump?
-   Ok. After much detailed debugging it seems that if you do
-    [docker run --volume=N:/s  ...]
-   when there is no volume called N then the container
-   WILL have a /s folder!
-   https://github.com/docker/docker/issues/13121
-   So it seems I will have to do the check.
-     def volume_exists?(kata_id, avatar_name)
-       name = volume_name(kata_id, avatar_name)
-       cmd = "docker volume ls --quiet --filter 'name=#{name}'"
-       stdout,stderr,status = exec(cmd)
-       stdout.strip == name
-     end
-   However there is another problem...
-   Suppose I start a kata, and 5 avatars enter and [test]
-   Then time passes, the gc collects the 5 avatar's volumes.
-   Now, I won't be able to [test] as these 5 avatars, but
-   I can still start a _new_ avatar. And it will have a volume created.
-   It won't work making a volume for the kata. Once the gc removes
-   an old volume I will be able to create new avatars again!
-   It seems the liveness of a kata has to be decided by the
-   web object, or the runner has to be made a bit cleverer.
-   The runner could be given read access to the katas dir
-   structure. The date-time stamp of katas/12/3456789A/
-   would indicate the validity of kata-IDs and also its liveness.
-   Tests for runner-server can simulate this by just creating
-   kata-id dirs off /usr/src/cyber-dojo/katas.
-   What about tests for runner-client?
-   They should be able to [docker exec] in and create a dir too.
-   However, the creation date of the kata dir might not be what I want.
-   Do I really want the date-time the first avatar starts? Maybe later.
-   In this design can you make a kata read-only immediately, before
-   the gc reclaims the volumes? (As James requested)
-   I think yes, by tweaking the katas' manifest.json file and setting
-   the "created":[2016,11,12,13,55,18] entry back one day.
-   This is not so hard to do in the tests too.
-   No! It is simpler than that.
+   Answer. web does not call into runner...
    if you hit [test]
      web sees request.
      web checks creation date of kata.
      if 'ended' it does not call runner.run()
      instead it populates @output explicitly and does not create a new traffic-light.
-   Runner needs to see katas/ dir (readonly) only for kata-id validation.
-   Collector sees katas/ dir (readonly) and removes volumes.
-
-
-o) runner: run() needs to return 'ended' status if there is no volume.
-   in browser, if test returns 'ended' offer choice to fork.
-   volume-collector service will gc old volumes.
-
-o) Aside, when I finally sort the above out, how to not create a traffic-light
-   in kata_controller...
+   ...
+   How to not create a traffic-light in kata_controller...
    app/views/kata/run_tests.js.erb needs a new line
      var appendTestTrafficLight = function() {
        var testColour = "<%= @test_colour %>";
        if (testColour == '') { return; }  <------
    app/controllers/kata_controller.rb must not call
      @avatar.tested(delta, files, time_now, @output, @test_colour)
-     if the runner returns 'no-sandbox'
+     if the kata has ended
 
-o) Do I want the kata's 24 hours alive-time to be based on the kata or the avatar?
-   If it's the kata then how does the volume-collector know the start-time of the
-   kata given the current design creates volumes avatars individually?
-   Suggests the volume should be for the kata, not for each avatar.
-   In turn suggests creating a uid for each avatar and creating
-   /sandboxes/lion owned by lion's uid, and [docker exec] for the lion
-   uses lion's uid.
+o) Runner needs to see katas/ dir (readonly) only for kata-id validation.
+
+o) Collector sees katas/ dir (readonly) and removes volumes.
+
+o) Simplify ['','',success] calls in DockerRunner.
 
 o) runner pulled?/pull tests. Use MockShell so they are faster and work
    if you have no internet connection.
