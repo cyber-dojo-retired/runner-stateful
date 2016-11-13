@@ -9,6 +9,8 @@ A micro-service for [cyber-dojo](http://cyber-dojo.org).
 A **cyberdojo/runner** docker container runs sinatra on port 4557.
 It's API is as follows:
 
+- - - -
+
 # pulled
 Asks the runner-service if the given image has been pulled.
 - parameters
@@ -16,6 +18,8 @@ Asks the runner-service if the given image has been pulled.
 - returns
   * { "status":true  } -> image_name has been pulled
   * { "status":false  } -> image_name has not been pulled
+
+- - - -
 
 # pull
 Tells the runner-service to pull the given image.
@@ -34,6 +38,8 @@ Must be called before new_avatar.
   * kata_id, eg '15B9AD6C42'
 - returns
   * { "status":0  } -> succeeded
+
+- - - -
 
 # old_kata
 Tells the runner-service the kata with the given id has been torn down.
@@ -54,6 +60,8 @@ Must be called before run.
   * starting_files, eg { 'fizz_buzz.h' => '#include', ... }
 - returns
   * { "status":0 } -> succeeded
+
+- - - -
 
 # old_avatar
 Tells the runner-service the given avatar has left the given kata.
@@ -80,8 +88,8 @@ Tells the runner-service the given avatar has left the given kata.
   * { "status":integer,   "stdout":..., "stderr":... } -> completed
   * { "status":"timed_out", "stdout":"", "stderr":"" } -> did not complete in max_seconds
 
-- if something unexpected goes wrong all methods return
-{ "status":string, "stderr":msg }
+- if something unexpected goes wrong all methods return a ["status","stdout","stderr"]
+triple with status equal to a (non "timed_out") string.
 
 
 - - - -
