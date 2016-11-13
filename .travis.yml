@@ -18,7 +18,6 @@ script:
     - docker pull cyberdojofoundation/csharp_nunit
     - ./build.sh
     - ./up.sh
-    - sleep 2
     - ./test.sh
 
 after_success:
