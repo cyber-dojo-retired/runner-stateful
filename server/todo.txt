@@ -24,8 +24,6 @@ o) Runner needs to see katas/ dir (readonly) only for kata-id validation.
 
 o) Collector sees katas/ dir (readonly) and removes volumes.
 
-o) Simplify ['','',success] calls in DockerRunner.
-
 o) runner pulled?/pull tests. Use MockShell so they are faster and work
    if you have no internet connection.
    server
