@@ -81,6 +81,12 @@ class DockerRunner
   private
 
   def create_container(image_name, kata_id, avatar_name)
+    # Volume mounts the avatar's volume
+    #     [docker run ... --volume=V:/sandbox  ...]
+    # Volume V is assumed to exist via an earlier new_avatar() call.
+    # If volume V does _not_ exist the [docker run] will nevertheless
+    # succeed, create the container, and create a /sandbox folder in it!
+    # https://github.com/docker/docker/issues/13121
     args = [
       '--detach',                          # get the cid
       '--interactive',                     # later execs
