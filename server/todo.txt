@@ -44,12 +44,20 @@ o) Suppose you know the id of a kata done before runner was introduced
    It seems the liveness of a kata has to be decided by the
    web object, or the runner has to be made a bit cleverer.
    The runner could be given read access to the katas dir
-   structure. The date-time stamp of katas//12/3456789A/
+   structure. The date-time stamp of katas/12/3456789A/
    would indicate the validity of kata-IDs and also its liveness.
    Tests for runner-server can simulate this by just creating
    kata-id dirs off /usr/src/cyber-dojo/katas.
    What about tests for runner-client?
    They should be able to [docker exec] in and create a dir too.
+   However, the creation date of the kata dir might not be what I want.
+   Do I really want the date-time the first avatar starts? Maybe later.
+   In this design can you make a kata read-only immediately, before
+   the gc reclaims the volumes? (As James requested)
+   I think yes, by tweaking the katas' manifest.json file and setting
+   the "created":[2016,11,12,13,55,18] entry.
+   This is not so hard to do in the tests too.
+
 
 o) runner: run() needs to return 'ended' status if there is no volume.
    in browser, if test returns 'ended' offer choice to fork.
