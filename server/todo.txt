@@ -43,6 +43,13 @@ o) Suppose you know the id of a kata done before runner was introduced
    an old volume I will be able to create new avatars again!
    It seems the liveness of a kata has to be decided by the
    web object, or the runner has to be made a bit cleverer.
+   The runner could be given read access to the katas dir
+   structure. The date-time stamp of katas//12/3456789A/
+   would indicate the validity of kata-IDs and also its liveness.
+
+o) runner: run() needs to return 'ended' status if there is no volume
+   in browser, if test returns 'ended' offer choice to fork.
+   volume-collector service will gc old volumes
 
 o) Aside, when I finally sort the above out, how to not create a traffic-light
    in kata_controller...
@@ -71,10 +78,6 @@ o) runner pulled?/pull tests. Use MockShell so they are faster and work
      PullTest A82
 
 o) runner-server: remove thin and foreman. Just use classic sinatra?
-
-o) runner: run() needs to return 'ended' status if there is no volume
-   in browser, if test returns 'ended' offer choice to fork.
-   volume-collector service will gc old volumes
 
 o) when it goes live the C#-Moq and C#-NUnit cyber-dojo.sh can be simplified to
    the ones in runner's server's start_files
