@@ -8,9 +8,9 @@ if [ $? != 0 ]; then
   exit 1
 fi
 
-my_dir="$( cd "$( dirname "${0}" )" && pwd )"
 docker_engine_version=$(docker --version | awk '{print $3}' | sed '$s/.$//')
 export DOCKER_ENGINE_VERSION=${docker_engine_version}
 
+my_dir="$( cd "$( dirname "${0}" )" && pwd )"
 docker-compose -f ${my_dir}/docker-compose.yml down
-docker-compose -f ${my_dir}/docker-compose.yml up &
+docker-compose -f ${my_dir}/docker-compose.yml up -d
