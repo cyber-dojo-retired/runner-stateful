@@ -1,4 +1,5 @@
 require_relative './runner_test_base'
+require_relative './mock_sheller'
 
 class DockerRunnerKataTest < RunnerTestBase
 
@@ -6,42 +7,8 @@ class DockerRunnerKataTest < RunnerTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test 'CC8',
-  'when image_name is valid and has not been pulled',
-  'then new_kata(kata_id, image_name) pulls it and succeeds' do
-    @image_name = 'busybox'
-    exec("docker rmi #{@image_name}", logging = false)
-    refute docker_pulled?(@image_name)
-    _,_,status = new_kata
-    begin
-      assert status
-      assert docker_pulled?(@image_name)
-    ensure
-      old_kata
-    end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test '5E7',
-  'when image_name is valid has been pulled',
-  'then new_kata(image_name, kata_id) succeeds' do
-    @image_name = 'busybox'
-    exec("docker pull #{@image_name}", logging = false)
-    assert docker_pulled?(@image_name)
-    _,_,status = new_kata
-    begin
-      assert status
-      assert docker_pulled?(@image_name)
-    ensure
-      old_kata
-    end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   test 'AED',
-  'when image_name is invalid then new_kata(kata_id, image_name) fails with not-found' do
+  'when image_name is invalid then new_kata(image_name, kata_id) fails with not-found' do
     bad_image_name = '123/123'
     runner.logging_off
     raised = assert_raises(DockerRunnerError) { runner.new_kata(bad_image_name, kata_id) }

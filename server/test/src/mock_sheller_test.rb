@@ -65,6 +65,14 @@ class MockShellerTest < RunnerTestBase
 
   # - - - - - - - - - - - - - - -
 
+  test '3BE',
+  'success is zero' do
+    shell = MockSheller.new(nil)
+    assert_equal 0, shell.success
+  end
+
+  # - - - - - - - - - - - - - - -
+
   private
 
   def pwd; 'pwd'; end

@@ -11,7 +11,7 @@ o) Should new_kata() do a pull? Is it needed for fork?
 o) runner pulled?/pull tests. Use MockShell so they are faster and work
    if you have no internet connection.
    server
-     KataTest 5E7 AED CC8
+     KataTest AED
      PullTest 91C A44 A73
    client
      PullTest A82

@@ -42,6 +42,10 @@ class MockSheller
     [mock['stdout'], mock['stderr'], mock['status']]
   end
 
+  def success
+    0
+  end
+
   private
 
   def read
