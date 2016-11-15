@@ -13,15 +13,15 @@ class MicroService < Sinatra::Base
   # switches from being volume-based to container-based.
 
   post '/pulled' do
-    jasoned { runner.pulled?(image_name) }
+    jasoned(1) { runner.pulled?(image_name) }
   end
 
   post '/pull' do
-    jasoned { runner.pull(image_name) }
+    jasoned(0) { runner.pull(image_name) }
   end
 
   post '/new_kata' do
-    jasoned { runner.new_kata(image_name, kata_id) }
+    jasoned(0) { runner.new_kata(image_name, kata_id) }
   end
 
   post '/new_avatar' do
@@ -30,7 +30,7 @@ class MicroService < Sinatra::Base
     args << kata_id
     args << avatar_name
     args << starting_files
-    jasoned { runner.new_avatar(*args) }
+    jasoned(0) { runner.new_avatar(*args) }
   end
 
   post '/run' do
@@ -41,15 +41,15 @@ class MicroService < Sinatra::Base
     args << deleted_filenames
     args << changed_files
     args << max_seconds
-    jasoned { runner.run(*args) }
+    jasoned(3) { runner.run(*args) }
   end
 
   post '/old_avatar' do
-    jasoned { runner.old_avatar(kata_id, avatar_name) }
+    jasoned(0) { runner.old_avatar(kata_id, avatar_name) }
   end
 
   post '/old_kata' do
-    jasoned { runner.old_kata(kata_id) }
+    jasoned(0) { runner.old_kata(kata_id) }
   end
 
   private
@@ -76,21 +76,24 @@ class MicroService < Sinatra::Base
   include StringCleaner
   include StringTruncater
 
-  def jasoned
+  def jasoned(n)
     content_type :json
-    begin
+    case n
+    when 0
+      yield
+      return { status:0 }.to_json
+    when 1
+      return { status:yield }.to_json
+    when 3
       stdout,stderr,status = yield
-    rescue DockerRunnerError => e
-      stdout,stderr,status = e.stdout, e.stderr, e.status
-    rescue StandardError => e
-      stdout,stderr,status = '', e.to_s, 1
+      stdout = truncated(cleaned(stdout))
+      stderr = truncated(cleaned(stderr))
+      return { stdout:stdout, stderr:stderr, status:status }.to_json
     end
-    { stdout:truncated(cleaned(stdout)),
-      stderr:truncated(cleaned(stderr)),
-      status:status
-    }.to_json
+  rescue DockerRunnerError => e
+    return { stdout:e.stdout,stderr:e.stderr,status:e.status }.to_json
+  rescue StandardError => e
+    return { stdout:'', stderr:e.to_s,status:1 }.to_json
   end
 
 end
-
-

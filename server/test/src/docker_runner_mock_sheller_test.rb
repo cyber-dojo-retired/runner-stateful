@@ -17,9 +17,7 @@ class DockerRunnerMockShellerTest < RunnerTestBase
       'cdf/gcc_assert latest 28683e525ad3 9 days ago 95.97 MB'
     ].join("\n")
     shell.mock_exec('docker images', stdout, '', 0)
-    stdout,stderr,status = runner.pulled?(image_name)
-    assert_equal '', stdout
-    assert_equal '', stderr
+    status = runner.pulled?(image_name)
     assert_equal false, status
     shell.teardown
   end
@@ -34,9 +32,7 @@ class DockerRunnerMockShellerTest < RunnerTestBase
       "#{image_name}  latest 28683e525ad3 9 days ago 95.97 MB"
     ].join("\n")
     shell.mock_exec('docker images', stdout, '', 0)
-    stdout,stderr,status = runner.pulled?(image_name)
-    assert_equal '', stdout
-    assert_equal '', stderr
+    status = runner.pulled?(image_name)
     assert_equal true, status
     shell.teardown
   end
@@ -47,10 +43,7 @@ class DockerRunnerMockShellerTest < RunnerTestBase
   'pull(image_name) issues unconditional docker-pull command' do
     image_name = 'cdf/ruby_mini_test'
     shell.mock_exec("docker pull #{image_name}", '', '', success)
-    stdout,stderr,status = runner.pull(image_name)
-    assert_equal '', stdout
-    assert_equal '', stderr
-    assert_equal success, status
+    runner.pull(image_name)
     shell.teardown
   end
 

@@ -10,8 +10,6 @@ class OldKataTest < ClientTestBase
     assert_success
     old_kata
     assert_success
-    assert_stdout ''
-    assert_stderr ''
   end
 
 end

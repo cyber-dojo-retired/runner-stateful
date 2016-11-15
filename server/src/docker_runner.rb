@@ -17,26 +17,23 @@ class DockerRunner
   # [stdout,stderr,status] return simplifies MicroService.
 
   def pulled?(image_name)
-    ['', '', image_names.include?(image_name)]
+    image_names.include?(image_name)
   end
 
   def pull(image_name)
     assert_exec("docker pull #{image_name}")
-    ['', '', success]
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def new_kata(image_name, kata_id)
     pull(image_name) unless image_names.include?(image_name)
-    ['', '', success]
   end
 
   def old_kata(kata_id)
     volume_names(kata_id).each do |volume_name|
       assert_exec("docker volume rm #{volume_name}")
     end
-    ['', '', success]
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -50,13 +47,11 @@ class DockerRunner
     ensure
       remove_container(cid)
     end
-    ['', '', success]
   end
 
   def old_avatar(kata_id, avatar_name)
     name = volume_name(kata_id, avatar_name)
     assert_exec("docker volume rm #{name}")
-    ['', '', success]
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
