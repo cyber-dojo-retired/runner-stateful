@@ -18,7 +18,7 @@ class DockerRunnerMockShellerTest < RunnerTestBase
     ].join("\n")
     shell.mock_exec('docker images', stdout, '', 0)
     status = runner.pulled?(image_name)
-    assert_equal false, status
+    refute status
     shell.teardown
   end
 
@@ -33,7 +33,7 @@ class DockerRunnerMockShellerTest < RunnerTestBase
     ].join("\n")
     shell.mock_exec('docker images', stdout, '', 0)
     status = runner.pulled?(image_name)
-    assert_equal true, status
+    assert status
     shell.teardown
   end
 
