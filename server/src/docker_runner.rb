@@ -14,7 +14,6 @@ class DockerRunner
   def logging_off; @logging = false; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # [stdout,stderr,status] return simplifies MicroService.
 
   def pulled?(image_name)
     image_names.include?(image_name)
