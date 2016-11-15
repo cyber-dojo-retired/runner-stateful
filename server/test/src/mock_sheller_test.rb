@@ -5,14 +5,6 @@ class MockShellerTest < RunnerTestBase
 
   def self.hex_prefix; 'F03'; end
 
-  def X_setup_mock_sheller
-    @shell = MockSheller.new(nil)
-  end
-
-  #attr_reader :shell
-
-  # - - - - - - - - - - - - - - -
-  # initialize
   # - - - - - - - - - - - - - - -
 
   test 'B51',
@@ -24,7 +16,7 @@ class MockShellerTest < RunnerTestBase
     shell_1.mock_exec(pwd, wd, stderr='', success)
 
     shell_2 = MockSheller.new(nil)
-    stdout,stderr,status = shell_2.exec('pwd')
+    stdout,stderr,status = shell_2.exec(pwd)
     assert_equal wd, stdout
     assert_equal '', stderr
     assert_equal success, status
