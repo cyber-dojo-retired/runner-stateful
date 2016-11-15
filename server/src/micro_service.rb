@@ -12,11 +12,17 @@ class MicroService < Sinatra::Base
   # They would be used if the runner-service implementation
   # switches from being volume-based to container-based.
 
-  post '/pulled'     do; jasoned { runner.pulled?(image_name) }; end
+  post '/pulled' do
+    jasoned { runner.pulled?(image_name) }
+  end
 
-  post '/pull'       do; jasoned { runner.pull(image_name) }; end
+  post '/pull' do
+    jasoned { runner.pull(image_name) }
+  end
 
-  post '/new_kata'   do; jasoned { runner.new_kata(image_name, kata_id) }; end
+  post '/new_kata' do
+    jasoned { runner.new_kata(image_name, kata_id) }
+  end
 
   post '/new_avatar' do
     args = []
@@ -38,9 +44,13 @@ class MicroService < Sinatra::Base
     jasoned { runner.run(*args) }
   end
 
-  post '/old_avatar' do; jasoned { runner.old_avatar(kata_id, avatar_name) }; end
+  post '/old_avatar' do
+    jasoned { runner.old_avatar(kata_id, avatar_name) }
+  end
 
-  post '/old_kata'   do; jasoned { runner.old_kata(kata_id) }; end
+  post '/old_kata' do
+    jasoned { runner.old_kata(kata_id) }
+  end
 
   private
 
@@ -49,10 +59,10 @@ class MicroService < Sinatra::Base
 
   def args; @args ||= request_body_args; end
 
-  def image_name;        args['image_name' ];       end
-  def kata_id;           args['kata_id'    ];       end
-  def avatar_name;       args['avatar_name'];       end
-  def starting_files;    args['starting_files'];    end
+  def image_name;        args['image_name' ];    end
+  def kata_id;           args['kata_id'];        end
+  def avatar_name;       args['avatar_name'];    end
+  def starting_files;    args['starting_files']; end
 
   def deleted_filenames; args['deleted_filenames']; end
   def changed_files;     args['changed_files'];     end
