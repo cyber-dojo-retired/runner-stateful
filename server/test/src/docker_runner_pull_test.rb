@@ -29,20 +29,5 @@ class DockerRunnerPullTest < RunnerTestBase
     assert_equal "Error: image #{@image_name}:latest not found", raised.stderr
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  private
-
-  def docker_pulled?
-    image_names.include?(@image_name)
-  end
-
-  def image_names
-    stdout,_ = assert_exec('docker images')
-    lines = stdout.split("\n")
-    lines.shift # REPOSITORY TAG IMAGE ID CREATED SIZE
-    lines.collect { |line| line.split[0] }
-  end
-
 end
 

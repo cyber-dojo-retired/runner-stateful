@@ -38,17 +38,6 @@ class DockerRunnerKataTest < RunnerTestBase
 
   private
 
-  def docker_pulled?(image_name)
-    image_names.include?(image_name)
-  end
-
-  def image_names
-    stdout,_ = assert_exec('docker images')
-    lines = stdout.split("\n")
-    lines.shift # lose headings [REPOSITORY TAG IMAGE ID CREATED SIZE]
-    lines.collect { |line| line.split[0] }
-  end
-
   def volume_names
     stdout,_ = assert_exec("docker volume ls --quiet --filter 'name=#{volume_name}'")
     stdout.split("\n")
