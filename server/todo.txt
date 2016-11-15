@@ -12,7 +12,7 @@ o) runner pulled?/pull tests. Use MockShell so they are faster and work
    if you have no internet connection.
    server
      KataTest AED
-     PullTest 91C A44 A73
+     PullTest A73
    client
      PullTest A82
 

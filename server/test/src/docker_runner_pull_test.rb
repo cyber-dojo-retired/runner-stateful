@@ -6,52 +6,12 @@ class DockerRunnerPullTest < RunnerTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '9C3',
-  'when image_name is valid pulled? false-case' do
-    @image_name = 'busybox'
-    exec("docker rmi #{@image_name}", logging = false)
-    _,_,status = pulled?
-    refute status
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test 'A44',
-  'when image_name is valid pulled? true-case' do
-    @image_name = 'busybox'
-    exec("docker rmi #{@image_name}", logging = false)
-    pull
-    _,_,status = pulled?
-    assert status
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   test 'D97',
   'when image_name is invalid pulled? fails' do
     @image_name = '123/123'
     runner.logging_off
     _,_,status = pulled?
     refute status
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test '91C',
-  'when image_name is valid pull succeeds' do
-    @image_name = 'busybox'
-    exec("docker rmi #{@image_name}", logging = false)
-    refute docker_pulled?
-    # assumes the person running the tests has already done
-    # [docker login]
-    _,_,status = pull
-    begin
-      assert status
-      assert docker_pulled?
-    ensure
-      old_kata
-    end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
