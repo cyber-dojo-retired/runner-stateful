@@ -21,9 +21,6 @@ o) Runner.run needs to check if there is a volume for the avatar.
         stdout,stderr,status = @avatar.test(delta, files = {})
      end
 
-o) runner server needs tests to verify behaviour when mocked shell.exec
-   returns non-zero status.
-
 o) Runner needs to see katas/ dir (readonly) only for kata-id validation.
 
 o) Collector sees katas/ dir (readonly) and removes volumes.
@@ -32,9 +29,6 @@ o) Should new_kata() do a pull? Is it needed for fork?
 
 o) runner pulled?/pull tests. Use MockShell so they are faster and work
    if you have no internet connection.
-   server
-     KataTest AED
-     PullTest A73
    client
      PullTest A82
 
