@@ -42,9 +42,13 @@ class DockerRunnerAvatarTest < RunnerTestBase
   private
 
   def volume_exists?
-    volume_name = 'cyber_dojo_' + kata_id + '_' + avatar_name
-    stdout,_ = assert_exec('docker volume ls')
+    name = volume_name
+    stdout,_ = assert_exec("docker volume ls --quiet --filter 'name=#{name}'")
     stdout.include? volume_name
+  end
+
+  def volume_name
+    'cyber_dojo_' + kata_id + '_' + avatar_name
   end
 
 end
