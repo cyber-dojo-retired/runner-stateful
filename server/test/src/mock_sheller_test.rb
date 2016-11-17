@@ -35,7 +35,7 @@ class MockShellerTest < RunnerTestBase
   # - - - - - - - - - - - - - - -
 
   test '181',
-  'exec(command) raises when mock_exec is for a dfferent command' do
+  'exec(command) raises when mock_exec is for a different command' do
     shell = MockSheller.new(nil)
     shell.mock_exec(pwd, wd, stderr='', success)
     assert_raises { shell.exec(not_pwd = "cd #{wd}") }
@@ -57,7 +57,7 @@ class MockShellerTest < RunnerTestBase
   # - - - - - - - - - - - - - - -
 
   test 'D0C',
-  'teardown raises when one mock exec setup and no calls are made' do
+  'teardown raises when one mock_exec setup and no calls are made' do
     shell = MockSheller.new(nil)
     shell.mock_exec(pwd, wd, stderr='', success)
     assert_raises { shell.teardown }
