@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 hash docker 2> /dev/null
 if [ $? != 0 ]; then
