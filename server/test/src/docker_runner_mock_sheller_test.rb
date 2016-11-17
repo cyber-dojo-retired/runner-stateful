@@ -164,10 +164,7 @@ class DockerRunnerMockShellerTest < RunnerTestBase
     args << (deleted_filenames=[])
     args << (changed_files={})
     args << (max_seconds=10)
-
-    #raised = assert_raises(DockerRunnerError) { runner.run } # why is this not red?
     raised = assert_raises(DockerRunnerError) { runner.run(*args) }
-
     assert_equal 'no_avatar', raised.status
     assert_equal '', raised.stdout
     assert_equal '', raised.stderr
