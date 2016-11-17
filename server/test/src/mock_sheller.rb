@@ -35,8 +35,9 @@ class MockSheller
     if command != mock['command']
       raise [
         self.class.name,
-        "expected: exec(#{mock['command']}})",
-        "    mock: exec(#{command})"
+        "exec(command) - does not match mock",
+        "actual-command: #{command}",
+        "mocked-command: #{mock['command']}}"
       ].join("\n") + "\n"
     end
     [mock['stdout'], mock['stderr'], mock['status']]
