@@ -153,7 +153,6 @@ class DockerRunnerMockShellerTest < RunnerTestBase
   "when there is no volume, run() returns 'no_avatar' error status",
   "enabling the web server to seamlessly transition a pre-runner server's kata",
   'to the new runner' do
-    @shell = MockSheller.new(1)
     kata_id = '6352F737EA'
     name = 'cyber_dojo_' + kata_id + '_' + avatar_name
     shell.mock_exec("docker volume ls --quiet --filter 'name=#{name}'", '', '', 0)
