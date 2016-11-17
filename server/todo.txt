@@ -21,10 +21,6 @@ o) Runner.run needs to check if there is a volume for the avatar.
         stdout,stderr,status = @avatar.test(delta, files = {})
      end
 
-o) server test
-   raised = assert_raises(DockerRunnerError) { runner.run }
-   why is this not red? run takes >0 arguments
-
 o) Runner needs to see katas/ dir (readonly) only for kata-id validation.
 
 o) Collector sees katas/ dir (readonly) and removes volumes.

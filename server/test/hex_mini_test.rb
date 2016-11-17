@@ -16,6 +16,7 @@ class HexMiniTest < MiniTest::Test
         begin
           self.instance_eval &test_block
         ensure
+          puts $!.message unless $!.nil?
           _hex_teardown_caller
         end
       }
