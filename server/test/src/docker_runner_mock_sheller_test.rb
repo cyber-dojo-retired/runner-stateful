@@ -7,6 +7,8 @@ class DockerRunnerMockShellerTest < RunnerTestBase
 
   def shell; @shell ||= MockSheller.new(nil); end
 
+  def hex_teardown; shell.teardown; end
+
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
   # pulled?
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -21,7 +23,6 @@ class DockerRunnerMockShellerTest < RunnerTestBase
     shell.mock_exec('docker images', stdout, '', 0)
     runner.logging_off
     refute runner.pulled?(image_name)
-    shell.teardown
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -36,7 +37,6 @@ class DockerRunnerMockShellerTest < RunnerTestBase
     shell.mock_exec('docker images', stdout, '', 0)
     status = runner.pulled?(image_name)
     refute status
-    shell.teardown
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -51,7 +51,6 @@ class DockerRunnerMockShellerTest < RunnerTestBase
     shell.mock_exec('docker images', stdout, '', 0)
     status = runner.pulled?(image_name)
     assert status
-    shell.teardown
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -72,7 +71,6 @@ class DockerRunnerMockShellerTest < RunnerTestBase
     assert_equal 1, raised.status
     assert_equal stdout, raised.stdout
     assert_equal stderr, raised.stderr
-    shell.teardown
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -82,7 +80,6 @@ class DockerRunnerMockShellerTest < RunnerTestBase
     image_name = 'cdf/ruby_mini_test'
     shell.mock_exec("docker pull #{image_name}", '', '', success)
     runner.pull(image_name)
-    shell.teardown
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -117,7 +114,6 @@ class DockerRunnerMockShellerTest < RunnerTestBase
     assert_equal 1, raised.status
     assert_equal stdout, raised.stdout
     assert_equal stderr, raised.stderr
-    shell.teardown
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -133,7 +129,6 @@ class DockerRunnerMockShellerTest < RunnerTestBase
     shell.mock_exec('docker images', stdout, '', 0)
     shell.mock_exec("docker pull #{image_name}", '','',0)
     runner.new_kata(image_name, kata_id)
-    shell.teardown
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
