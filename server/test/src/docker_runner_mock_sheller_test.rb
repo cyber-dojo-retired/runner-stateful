@@ -143,7 +143,34 @@ class DockerRunnerMockShellerTest < RunnerTestBase
     ].join("\n")
     shell.mock_exec('docker images', stdout, '', 0)
     runner.new_kata(image_name, kata_id)
-    shell.teardown
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # run
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test 'E92',
+  "when there is no volume, run() returns 'no_avatar' error status",
+  "enabling the web server to seamlessly transition a pre-runner server's kata",
+  'to the new runner' do
+    @shell = MockSheller.new(1)
+    kata_id = '6352F737EA'
+    name = 'cyber_dojo_' + kata_id + '_' + avatar_name
+    shell.mock_exec("docker volume ls --quiet --filter 'name=#{name}'", '', '', 0)
+    args = []
+    args << 'cdf/gcc_assert'
+    args << kata_id
+    args << avatar_name
+    args << (deleted_filenames=[])
+    args << (changed_files={})
+    args << (max_seconds=10)
+
+    #raised = assert_raises(DockerRunnerError) { runner.run } # why is this not red?
+    raised = assert_raises(DockerRunnerError) { runner.run(*args) }
+
+    assert_equal 'no_avatar', raised.status
+    assert_equal '', raised.stdout
+    assert_equal '', raised.stderr
   end
 
 end

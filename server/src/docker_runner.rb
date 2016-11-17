@@ -56,6 +56,10 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run(image_name, kata_id, avatar_name, deleted_filenames, changed_files, max_seconds)
+    name = volume_name(kata_id, avatar_name)
+    cmd = "docker volume ls --quiet --filter 'name=#{name}'"
+    stdout,stderr = assert_exec(cmd)
+    fail DockerRunnerError.new(stdout,stderr,'no_avatar',cmd) unless stdout.strip == name
     cid = create_container(image_name, kata_id, avatar_name)
     begin
       delete_files(cid, deleted_filenames)

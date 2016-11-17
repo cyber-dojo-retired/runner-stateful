@@ -31,6 +31,7 @@ class MockSheller
   def exec(command, logging = true)
     mocks = read
     mock = mocks.shift
+    write(mocks)
     if command != mock['command']
       raise [
         self.class.name,
@@ -38,7 +39,6 @@ class MockSheller
         "    mock: exec(#{command})"
       ].join("\n") + "\n"
     end
-    write(mocks)
     [mock['stdout'], mock['stderr'], mock['status']]
   end
 
