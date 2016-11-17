@@ -32,6 +32,13 @@ class MockSheller
     mocks = read
     mock = mocks.shift
     write(mocks)
+    if mock.nil?
+      raise [
+        self.class.name,
+        "exec(command) - no mock",
+        "actual-command: #{command}",
+      ].join("\n") + "\n"
+    end
     if command != mock['command']
       raise [
         self.class.name,

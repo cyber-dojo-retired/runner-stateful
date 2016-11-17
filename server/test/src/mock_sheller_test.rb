@@ -34,6 +34,14 @@ class MockShellerTest < RunnerTestBase
 
   # - - - - - - - - - - - - - - -
 
+  test '652',
+  "exec(command) raises when an exec is made and there are no mock_exec's" do
+    shell = MockSheller.new(nil)
+    assert_raises { shell.exec(pwd) }
+  end
+
+  # - - - - - - - - - - - - - - -
+
   test '181',
   'exec(command) raises when mock_exec is for a different command' do
     shell = MockSheller.new(nil)
