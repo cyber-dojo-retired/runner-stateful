@@ -57,6 +57,27 @@ class DockerRunnerMockShellerTest < RunnerTestBase
   # pull
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  test '933',
+  'when there is no network connectivitity, pull(image_name) raises DockerRunnerError' do
+    image_name = 'cdf/gcc_assert'
+    stdout = [
+      'Using default tag: latest',
+      "Pulling repository docker.io/#{image_name}"
+    ].join("\n")
+    stderr = [
+      'Error while pulling image: Get',
+      "https://index.docker.io/v1/repositories/#{image_name}/images:",
+      'dial tcp: lookup index.docker.io on 10.0.2.3:53: no such host'
+    ].join(' ')
+    shell.mock_exec("docker pull #{image_name}", stdout, stderr, 1)
+    raised = assert_raises(DockerRunnerError) { runner.pull(image_name) }
+    assert_equal 1, raised.status
+    assert_equal stdout, raised.stdout
+    assert_equal stderr, raised.stderr
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   test 'A73',
   'when image_name is invalid, pulled?(image_name) raises DockerRunnerError' do
     image_name = '123/123'
@@ -84,15 +105,6 @@ class DockerRunnerMockShellerTest < RunnerTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
   # new_kata
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  # test '933', no network connectivitity
-  #stderr = [
-  # "Error while pulling image: Get",
-  # "https://index.docker.io/v1/repositories/123/123/images:"
-  # "dial tcp: lookup index.docker.io on 10.0.2.3:53: no such host"
-  # ].join(' ')
-
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'AED',
