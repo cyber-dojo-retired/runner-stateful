@@ -2,25 +2,6 @@
 runner_server:
 ==============
 
-o) Runner.run needs to check if there is a volume for the avatar.
-   If there isn't return a specific error code that the web container can see.
-   If web does a runner.run and gets this error-code it means the kata
-   was created before the new runner went live and so there has not been a
-   runner.new_avatar() call and so there is no volume. The web container does this...
-     delta = FileDeltaMaker.make_delta(incoming, outgoing)
-     files = received_files
-     stdout,stderr,status = @avatar.test(delta, files)
-     if status == 'no_volume'
-        args = []
-        args << kata.image_name
-        args << kata.id
-        args << @avatar.name
-        args << files
-        runner.new_avatar(*args)
-        delta = { changed:[], deleted:[], new:[] }
-        stdout,stderr,status = @avatar.test(delta, files = {})
-     end
-
 o) Runner needs to see katas/ dir (readonly) only for kata-id validation.
 
 o) Collector sees katas/ dir (readonly) and removes volumes.
