@@ -5,11 +5,19 @@ services:
   runner_client:
     user: nobody
     image: cyberdojo/runner_client
+    build:
+      context: client
+      args:
+        PORT: 4558
     ports: [ "4558:4558" ]
     container_name: runner_client
 
   runner_server:
     user: root
     image: cyberdojo/runner
+    build:
+      context: server
+      args:
+        PORT: 4557
     volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
     container_name: runner_server
