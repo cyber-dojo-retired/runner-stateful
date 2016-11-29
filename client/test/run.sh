@@ -2,7 +2,7 @@
 
 if [ ! -f /.dockerenv ]; then
   echo 'FAILED: run.sh is being executed outside of docker-container.'
-  echo 'Use test.sh which first calls build.sh'
+  echo 'Use pipe_build_up_test.sh'
   exit 1
 fi
 
