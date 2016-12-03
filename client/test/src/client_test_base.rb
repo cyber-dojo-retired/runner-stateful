@@ -35,9 +35,7 @@ class ClientTestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - -
 
-  def runner
-    RunnerPostAdapter.new
-  end
+  def runner; RunnerPostAdapter.new; end
 
   def json; @json; end
   def status; json['status']; end
