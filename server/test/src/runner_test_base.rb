@@ -1,6 +1,4 @@
 require 'json'
-# coverage must come first
-require_relative '../coverage'
 require_relative '../hex_mini_test'
 require_relative './../../src/docker_runner'
 require_relative './../../src/externals'
@@ -81,10 +79,6 @@ class RunnerTestBase < HexMiniTest
     stdout,stderr,status = runner_run(*args)
     assert_equal timed_out, status, [stdout,stderr]
     [stdout,stderr]
-  end
-
-  def assert_docker_exec(cid, cmd)
-    assert_exec("docker exec #{cid} sh -c '#{cmd}'")
   end
 
   def assert_exec(cmd)

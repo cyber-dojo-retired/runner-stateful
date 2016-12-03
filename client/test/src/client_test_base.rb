@@ -1,5 +1,3 @@
-# require coverage before any files to be covered.
-require_relative './../coverage'
 require_relative './../hex_mini_test'
 require_relative './../../src/runner_post_adapter'
 
