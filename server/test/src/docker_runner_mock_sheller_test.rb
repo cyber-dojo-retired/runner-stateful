@@ -20,7 +20,7 @@ class DockerRunnerMockShellerTest < RunnerTestBase
       'REPOSITORY     TAG    IMAGE ID     CREATED    SIZE',
       'cdf/gcc_assert latest 28683e525ad3 9 days ago 95.97 MB'
     ].join("\n")
-    shell.mock_exec('docker images', stdout, '', 0)
+    shell.mock_exec('docker images', stdout, '', success)
     runner.logging_off
     refute runner.pulled?(image_name)
   end
@@ -28,13 +28,13 @@ class DockerRunnerMockShellerTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '9C3',
-  'when image_name is valid, pulled?(image_name) and is false' do
+  'when image_name is valid but not in [docker images], pulled?(image_name) is false' do
     image_name = 'cdf/ruby_mini_test'
     stdout = [
       'REPOSITORY     TAG    IMAGE ID     CREATED    SIZE',
       'cdf/gcc_assert latest 28683e525ad3 9 days ago 95.97 MB'
     ].join("\n")
-    shell.mock_exec('docker images', stdout, '', 0)
+    shell.mock_exec('docker images', stdout, '', success)
     status = runner.pulled?(image_name)
     refute status
   end
@@ -42,13 +42,13 @@ class DockerRunnerMockShellerTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'A44',
-  'when image_name is valid, pulled?(image_name) is true' do
+  'when image_name is valid and in [docker images], pulled?(image_name) is true' do
     image_name = 'cdf/ruby_mini_test'
     stdout = [
       'REPOSITORY     TAG    IMAGE ID     CREATED    SIZE',
       "#{image_name}  latest 28683e525ad3 9 days ago 95.97 MB"
     ].join("\n")
-    shell.mock_exec('docker images', stdout, '', 0)
+    shell.mock_exec('docker images', stdout, '', success)
     status = runner.pulled?(image_name)
     assert status
   end
@@ -97,7 +97,7 @@ class DockerRunnerMockShellerTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '91C',
-  'when image_name is valud, pull(image_name) issues unconditional docker-pull' do
+  'when image_name is valid, pull(image_name) issues unconditional docker-pull' do
     image_name = 'cdf/ruby_mini_test'
     shell.mock_exec("docker pull #{image_name}", '', '', success)
     runner.pull(image_name)
@@ -115,7 +115,7 @@ class DockerRunnerMockShellerTest < RunnerTestBase
       'REPOSITORY     TAG    IMAGE ID     CREATED    SIZE',
       'cdf/gcc_assert latest 28683e525ad3 9 days ago 95.97 MB'
     ].join("\n")
-    shell.mock_exec('docker images', stdout, '', 0)
+    shell.mock_exec('docker images', stdout, '', success)
     stdout = [
       "Using default tag: latest",
       "Pulling repository docker.io/#{bad_image_name}"
@@ -138,8 +138,8 @@ class DockerRunnerMockShellerTest < RunnerTestBase
       'REPOSITORY     TAG    IMAGE ID     CREATED    SIZE',
       'cdf/gcc_assert latest 28683e525ad3 9 days ago 95.97 MB'
     ].join("\n")
-    shell.mock_exec('docker images', stdout, '', 0)
-    shell.mock_exec("docker pull #{image_name}", '','',0)
+    shell.mock_exec('docker images', stdout, '', success)
+    shell.mock_exec("docker pull #{image_name}", '','',success)
     runner.new_kata(image_name, kata_id)
   end
 
@@ -153,7 +153,7 @@ class DockerRunnerMockShellerTest < RunnerTestBase
       'REPOSITORY     TAG    IMAGE ID     CREATED    SIZE',
       "#{image_name}  latest 28683e525ad3 9 days ago 95.97 MB"
     ].join("\n")
-    shell.mock_exec('docker images', stdout, '', 0)
+    shell.mock_exec('docker images', stdout, '', success)
     runner.new_kata(image_name, kata_id)
   end
 
