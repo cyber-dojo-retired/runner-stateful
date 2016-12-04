@@ -11,7 +11,6 @@ script:
     - docker pull cyberdojofoundation/csharp_moq
     - docker pull cyberdojofoundation/csharp_nunit
 
-    - ./build.sh
-    - ./up.sh
-    - ./test.sh
+    - ./pipe_build_up_test.sh
+
     - ./push.sh
