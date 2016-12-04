@@ -67,11 +67,6 @@ class ClientTestBase < HexMiniTest
 
   def assert_timed_out; assert_equal timed_out, status, json.to_s; end
 
-  def assert_error
-    assert_equal 'Fixnum', status.class.name, json.to_s
-    refute_equal success, status, json.to_s
-  end
-
   def assert_stdout(expected); assert_equal expected, stdout, json.to_s; end
   def assert_stderr(expected); assert_equal expected, stderr, json.to_s; end
   def assert_status(expected); assert_equal expected, status, json.to_s; end
