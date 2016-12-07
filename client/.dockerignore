@@ -11,4 +11,4 @@
 #-----!Except these files
 
 !config.ru
-!Procfile
+!up.sh

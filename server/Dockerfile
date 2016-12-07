@@ -1,9 +1,10 @@
 FROM cyberdojo/docker
 MAINTAINER Jon Jagger <jon@jaggersoft.com>
 
-ARG PORT
-ENV PORT=${PORT}
-EXPOSE ${PORT}
-
 COPY . /app
 
+ARG PORT
+EXPOSE ${PORT}
+
+ENV PORT=${PORT}
+CMD [ "./up.sh" ]
