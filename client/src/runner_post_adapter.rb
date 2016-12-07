@@ -47,7 +47,7 @@ class RunnerPostAdapter
   private
 
   def post(method, args)
-    uri = URI.parse('http://runner_server:4557/' + method.to_s)
+    uri = URI.parse('http://runner:4557/' + method.to_s)
     http = Net::HTTP.new(uri.host, uri.port)
     request = Net::HTTP::Post.new(uri.request_uri)
     request.content_type = 'application/json'

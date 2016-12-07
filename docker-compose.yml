@@ -12,7 +12,7 @@ services:
     ports: [ "4558:4558" ]
     container_name: runner_client
 
-  runner_server:
+  runner:
     user: root
     image: cyberdojo/runner
     build:
