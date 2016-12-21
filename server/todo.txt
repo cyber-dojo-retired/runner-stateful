@@ -15,11 +15,6 @@ o) Should new_kata() do a pull? Is it needed for fork?
 o) external_sheller: only ever one command in...
    cd_exec(path, *commands)
 
-o) runner-server: remove thin and foreman. Just use classic sinatra?
-
-o) when it goes live the C#-Moq and C#-NUnit cyber-dojo.sh can be simplified to
-   the ones in runner's server's start_files
-
 o) add cpu/memory/swap limits
    See comments at https://github.com/cyber-dojo/commander/blob/master/docker-compose.yml
    See https://github.com/docker/docker/pull/9437
@@ -50,7 +45,7 @@ o) what if filename has a quote in it?
 
 o) log assert_exec() fail in docker_runner.rb?
 
-o) can you copying a changed file into the container via a named-pipe?
+o) can you copy a changed file into the container via a named-pipe?
    - https://en.wikipedia.org/wiki/Named_pipe
    - https://github.com/shurizzle/ruby-mkfifo
 
