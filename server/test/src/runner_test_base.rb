@@ -100,7 +100,7 @@ class RunnerTestBase < HexMiniTest
       '[gcc,assert]'    => 'gcc_assert',
       '[Java,Cucumber]' => 'java_cucumber_pico',
       '[Alpine]'        => 'gcc_assert',
-      '[Ubuntu]'        => 'java_cucumber_pico'
+      '[Ubuntu]'        => 'clangpp_assert'
     }
     row = rows.detect { |key,name| test_name.start_with? key }
     fail 'cannot find image_name from test_name' if row.nil?
