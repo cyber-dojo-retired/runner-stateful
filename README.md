@@ -16,8 +16,8 @@ Asks the runner-service if the given image has been pulled.
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
 - returns
-  * { "status":true  } -> image_name has been pulled
-  * { "status":false  } -> image_name has not been pulled
+  * { "pulled":true  } -> image_name has been pulled
+  * { "pulled":false  } -> image_name has not been pulled
 
 - - - -
 
@@ -25,8 +25,6 @@ Asks the runner-service if the given image has been pulled.
 Tells the runner-service to pull the given image.
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
-- returns
-  * { "status":0  } -> succeeded
 
 - - - -
 
@@ -36,8 +34,6 @@ Must be called before new_avatar.
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
   * kata_id, eg '15B9AD6C42'
-- returns
-  * { "status":0  } -> succeeded
 
 - - - -
 
@@ -45,8 +41,6 @@ Must be called before new_avatar.
 Tells the runner-service the kata with the given id has been torn down.
 - parameters
   * kata_id, eg '15B9AD6C42'
-- returns
-  * { "status":0 } -> succeeded
 
 - - - -
 
@@ -58,8 +52,6 @@ Must be called before run.
   * kata_id, eg '15B9AD6C42'
   * avatar_name, eg 'salmon'
   * starting_files, eg { 'fizz_buzz.h' => '#include', ... }
-- returns
-  * { "status":0 } -> succeeded
 
 - - - -
 
@@ -68,8 +60,6 @@ Tells the runner-service the given avatar has left the given kata.
 - parameters
   * kata_id, eg '15B9AD6C42'
   * avatar_name, eg 'salmon'
-- returns
-  * { "status":0 } -> succeeded
 
 - - - -
 
@@ -84,15 +74,26 @@ Tells the runner-service the given avatar has left the given kata.
   * deleted_filenames, eg [ 'hiker.h', ... ]
   * changed_files, eg { 'fizz_buzz.h' => '#include', ... }
   * max_seconds, eg '10'
-- returns
-  * { "status":integer,   "stdout":..., "stderr":... } -> completed
-  * { "status":"timed_out", "stdout":"", "stderr":"" } -> did not complete in max_seconds
-  * { "status":"no_avatar", "stdout":"", "stderr":"" } -> no previous call to new_avatar
+- returns eg
+```
+    { "run": {
+      "status":integer,
+      "stdout":...,
+      "stderr":...
+    } -> run completed in max_seconds
+
+    { "run": {
+      "status":"timed_out",
+      "stdout":"",
+      "stderr":""
+    } -> did not complete in max_seconds
+```
 
 - - - -
 
-- if something unexpected goes wrong all methods return a { , "status":..., "stdout":..., "stderr":... }
-hash with an unspecified  "status" string.
+- If successful, all methods return a json object with a single key equal to the
+name of the method.
+- If unsuccessful, all methods return a json object with a single 'exception' key.
 
 
 - - - -
