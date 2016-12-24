@@ -14,35 +14,28 @@ class Demo < Sinatra::Base
       'cyber-dojo.sh' => read('cyber-dojo.sh'),
       'makefile'      => read('makefile')
     }
-    json = nil
+    sss = nil
     html = '<div style="font-size:0.5em">'
 
-    duration = timed { json = runner.new_kata(image_name, kata_id) }
-    html += pre('new_kata', duration, json)
-
-    duration = timed { json = runner.new_avatar(image_name, kata_id, avatar_name, files) }
-    html += pre('new_avatar', duration, json)
-
-    duration = timed { json = run({}) }
-    html += pre('run', duration, json, 'Red')
+    runner.new_kata(image_name, kata_id)
+    runner.new_avatar(image_name, kata_id, avatar_name, files)
+    duration = timed { sss = run({}) }
+    html += pre('run', duration, sss, 'Red')
 
     syntax_error = { 'hiker.c' => 'sdsdsdsd' }
-    duration = timed { json = run(syntax_error) }
-    html += pre('run', duration, json, 'Yellow')
+    duration = timed { sss = run(syntax_error) }
+    html += pre('run', duration, sss, 'Yellow')
 
     tests_run_and_pass = { 'hiker.c' => hiker_c.sub('6 * 9', '6 * 7') }
-    duration = timed { json = run(tests_run_and_pass) }
-    html += pre('run', duration, json, 'Lime')
+    duration = timed { sss = run(tests_run_and_pass) }
+    html += pre('run', duration, sss, 'Lime')
 
     times_out = { 'hiker.c' => hiker_c.sub('return', "for(;;);\n    return") }
-    duration = timed { json = run(times_out, 3) }
-    html += pre('run', duration, json, 'LightGray')
+    duration = timed { sss = run(times_out, 3) }
+    html += pre('run', duration, sss, 'LightGray')
 
-    duration = timed { json = runner.old_avatar(kata_id, avatar_name) }
-    html += pre('old_avatar', duration, json)
-
-    duration = timed { json = runner.old_kata(kata_id) }
-    html += pre('old_kata', duration, json)
+    runner.old_avatar(kata_id, avatar_name)
+    runner.old_kata(kata_id)
 
     html += '</div>'
   end
@@ -73,10 +66,15 @@ class Demo < Sinatra::Base
     '%.2f' % (finished - started)
   end
 
-  def pre(name, duration, json, colour = 'white')
+  def pre(name, duration, sss, colour = 'white')
     border = 'border:1px solid black'
     padding = 'padding:10px'
     background = "background:#{colour}"
+    json = {
+      stdout: sss['stdout'],
+      stderr: sss['stderr'],
+      status: sss['status']
+    }
     "<pre>/#{name}(#{duration}s)</pre>" +
     "<pre style='#{border};#{padding};#{background}'>" +
     "#{JSON.pretty_unparse(json)}" +
