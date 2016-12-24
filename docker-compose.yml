@@ -19,7 +19,5 @@ services:
         PORT: 4557
     image: cyberdojo/runner
     container_name: runner_server
-    read_only: true
-    tmpfs: /tmp
     user: root
     volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]

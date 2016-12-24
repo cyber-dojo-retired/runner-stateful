@@ -5,10 +5,9 @@ class OldAvatarTest < ClientTestBase
   def self.hex_prefix; '33A'; end
 
   test '70F',
-  'old_avatar with illegal volume name does not succeed' do
-    old_avatar('a', ':')
-    assert_equal 'Fixnum', status.class.name
-    refute_success
+  'old_avatar with illegal volume name raises' do
+    error = assert_raises { old_avatar('a', ':') }
+    assert error.message.start_with? 'RunnerService:old_avatar'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
@@ -17,7 +16,6 @@ class OldAvatarTest < ClientTestBase
   'old_avatar with legal name succeeds' do
     new_avatar(image_name, test_id, 'salmon')
     old_avatar(test_id, 'salmon')
-    assert_success
   end
 
 end

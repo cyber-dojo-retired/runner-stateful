@@ -9,7 +9,7 @@ class RunTest < ClientTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '42D',
-  'run with arguments not matching started avatar returns status:no_avatar' do
+  'run with arguments not matching started avatar raises no_avatar' do
     args = []
     args << image_name
     args << (kata_id = ':') #bad
@@ -17,8 +17,8 @@ class RunTest < ClientTestBase
     args << (max_seconds = 10)
     args << (deleted_filenames = [])
     args << (changed_files = {})
-    json = runner.run(*args)
-    assert_equal 'no_avatar', json['status']
+    error = assert_raises { runner.run(*args) }
+    assert error.message.start_with? 'RunnerService:run:no_avatar'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -40,15 +40,16 @@ class RunnerTestBase < HexMiniTest
     args << changed_files
     args << max_seconds
     @sss = runner.run(*args)
+    [stdout,stderr,status]
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def sss; @sss; end
 
-  def stdout; sss[0]; end
-  def stderr; sss[1]; end
-  def status; sss[2]; end
+  def stdout; sss[:stdout]; end
+  def stderr; sss[:stderr]; end
+  def status; sss[:status]; end
 
   def assert_stdout(expected); assert_equal expected, stdout, sss; end
   def assert_stderr(expected); assert_equal expected, stderr, sss; end

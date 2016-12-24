@@ -1,5 +1,7 @@
 require_relative './nearest_external'
-require_relative './docker_runner_error'
+require_relative './string_cleaner'
+require_relative './string_truncater'
+
 require 'timeout'
 
 class DockerRunner
@@ -14,6 +16,8 @@ class DockerRunner
   def logging_off; @logging = false; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def pulled(image_name); pulled?(image_name); end
 
   def pulled?(image_name)
     image_names.include?(image_name)
@@ -59,12 +63,15 @@ class DockerRunner
     name = volume_name(kata_id, avatar_name)
     cmd = "docker volume ls --quiet --filter 'name=#{name}'"
     stdout,stderr = assert_exec(cmd)
-    fail DockerRunnerError.new(stdout,stderr,'no_avatar',cmd) unless stdout.strip == name
+    fail ArgumentError.new('no_avatar') unless stdout.strip == name
     cid = create_container(image_name, kata_id, avatar_name)
     begin
       delete_files(cid, deleted_filenames)
       change_files(cid, changed_files)
-      run_cyber_dojo_sh(cid, max_seconds)
+      stdout,stderr,status = run_cyber_dojo_sh(cid, max_seconds)
+      stdout = truncated(cleaned(stdout))
+      stderr = truncated(cleaned(stderr))
+      { stdout:stdout, stderr:stderr, status:status }
     ensure
       remove_container(cid)
     end
@@ -80,6 +87,9 @@ class DockerRunner
   def timed_out; 'timed_out'; end
 
   private
+
+  include StringCleaner
+  include StringTruncater
 
   def create_container(image_name, kata_id, avatar_name)
     # Volume mounts the avatar's volume
@@ -232,7 +242,7 @@ class DockerRunner
 
   def assert_exec(cmd)
     stdout,stderr,status = exec(cmd)
-    raise DockerRunnerError.new(stdout,stderr,status,cmd) unless status == success
+    fail StandardError.new(cmd) unless status == success
     [stdout,stderr]
   end
 

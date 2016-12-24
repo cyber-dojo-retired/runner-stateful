@@ -7,9 +7,7 @@ class OldKataTest < ClientTestBase
   test '586',
   "old_kata(kata_id) succeeds example" do
     new_kata
-    assert_success
     old_kata
-    assert_success
   end
 
 end

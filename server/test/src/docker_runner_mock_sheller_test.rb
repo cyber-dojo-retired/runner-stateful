@@ -35,8 +35,7 @@ class DockerRunnerMockShellerTest < RunnerTestBase
       'cdf/gcc_assert latest 28683e525ad3 9 days ago 95.97 MB'
     ].join("\n")
     shell.mock_exec('docker images', stdout, '', success)
-    status = runner.pulled?(image_name)
-    refute status
+    refute runner.pulled?(image_name)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -49,8 +48,7 @@ class DockerRunnerMockShellerTest < RunnerTestBase
       "#{image_name}  latest 28683e525ad3 9 days ago 95.97 MB"
     ].join("\n")
     shell.mock_exec('docker images', stdout, '', success)
-    status = runner.pulled?(image_name)
-    assert status
+    assert runner.pulled?(image_name)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -58,7 +56,7 @@ class DockerRunnerMockShellerTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '933',
-  'when there is no network connectivitity, pull(image_name) raises DockerRunnerError' do
+  'when there is no network connectivitity, pull(image_name) raises' do
     image_name = 'cdf/gcc_assert'
     stdout = [
       'Using default tag: latest',
@@ -70,16 +68,13 @@ class DockerRunnerMockShellerTest < RunnerTestBase
       'dial tcp: lookup index.docker.io on 10.0.2.3:53: no such host'
     ].join(' ')
     shell.mock_exec("docker pull #{image_name}", stdout, stderr, 1)
-    raised = assert_raises(DockerRunnerError) { runner.pull(image_name) }
-    assert_equal 1, raised.status
-    assert_equal stdout, raised.stdout
-    assert_equal stderr, raised.stderr
+    assert_raises { runner.pull(image_name) }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'A73',
-  'when image_name is invalid, pulled?(image_name) raises DockerRunnerError' do
+  'when image_name is invalid, pulled?(image_name) raises' do
     image_name = '123/123'
     stdout = [
       'Using default tag: latest',
@@ -88,10 +83,7 @@ class DockerRunnerMockShellerTest < RunnerTestBase
     stderr = "Error: image #{image_name}:latest not found"
     shell.mock_exec("docker pull #{image_name}", stdout, stderr, 1)
     runner.logging_off
-    raised = assert_raises(DockerRunnerError) { runner.pull(image_name) }
-    assert_equal 1, raised.status
-    assert_equal stdout, raised.stdout
-    assert_equal stderr, raised.stderr
+    assert_raises { runner.pull(image_name) }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -108,7 +100,7 @@ class DockerRunnerMockShellerTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'AED',
-  'when image_name is invalid, then new_kata(image_name, kata_id) fails with not-found' do
+  'when image_name is invalid, then new_kata(image_name, kata_id) raises' do
     bad_image_name = '123/123'
     runner.logging_off
     stdout = [
@@ -122,10 +114,7 @@ class DockerRunnerMockShellerTest < RunnerTestBase
     ].join("\n")
     stderr = "Error: image #{bad_image_name}:latest not found"
     shell.mock_exec("docker pull #{bad_image_name}", stdout, stderr, 1)
-    raised = assert_raises(DockerRunnerError) { runner.new_kata(bad_image_name, kata_id) }
-    assert_equal 1, raised.status
-    assert_equal stdout, raised.stdout
-    assert_equal stderr, raised.stderr
+    assert_raises { runner.new_kata(bad_image_name, kata_id) }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -175,10 +164,8 @@ class DockerRunnerMockShellerTest < RunnerTestBase
     args << (deleted_filenames=[])
     args << (changed_files={})
     args << (max_seconds=10)
-    raised = assert_raises(DockerRunnerError) { runner.run(*args) }
-    assert_equal 'no_avatar', raised.status
-    assert_equal '', raised.stdout
-    assert_equal '', raised.stderr
+    error = assert_raises { runner.run(*args) }
+    assert_equal 'no_avatar', error.message
   end
 
 end

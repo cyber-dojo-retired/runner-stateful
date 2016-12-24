@@ -50,7 +50,7 @@ module DockerRunnerOsHelper
     # a salmon with the starting-files associated with @image_name
     # So I create a new avatar with known starting-files
     # kata_teardown calls old_kata which deletes all the avatar's volumes.
-    lion = runner.new_avatar(@image_name, kata_id, 'lion', ls_starting_files)
+    runner.new_avatar(@image_name, kata_id, 'lion', ls_starting_files)
     args = []
     args << @image_name
     args << kata_id
@@ -58,7 +58,10 @@ module DockerRunnerOsHelper
     args << (deleted_filenames=[])
     args << (changed_files={})
     args << (max_seconds=10)
-    ls_stdout,stderr,status = runner.run(*args)
+    sss = runner.run(*args)
+    ls_stdout = sss[:stdout]
+    stderr = sss[:stderr]
+    status = sss[:status]
     assert_equal success, status
     assert_equal '', stderr
     ls_files = ls_parse(ls_stdout)

@@ -1,39 +1,46 @@
 require_relative './../hex_mini_test'
-require_relative './../../src/runner_post_adapter'
+require_relative './../../src/runner_service'
 
 class ClientTestBase < HexMiniTest
 
   def pulled?(name = image_name)
-    @json = runner.pulled?(name)
+    runner.pulled?(name)
   end
 
   def pull(name = image_name)
-    @json = runner.pull(name)
+    runner.pull(name)
   end
 
   def new_kata(name = image_name, id = kata_id)
-    @json = runner.new_kata(name, id)
+    runner.new_kata(name, id)
   end
 
   def old_kata(id = kata_id)
-    @json = runner.old_kata(id)
+    runner.old_kata(id)
   end
 
   def new_avatar(iname = image_name, id = kata_id, aname = avatar_name, f = files)
-    @json = runner.new_avatar(iname, id, aname, f)
+    runner.new_avatar(iname, id, aname, f)
   end
 
   def old_avatar(id = kata_id, name = avatar_name)
-    @json = runner.old_avatar(id, name)
+    runner.old_avatar(id, name)
   end
 
   def runner_run(changed_files, max_seconds = 10)
-    @json = runner.run(image_name, kata_id, avatar_name, deleted_filenames, changed_files, max_seconds)
+    args = []
+    args << image_name
+    args << kata_id
+    args << avatar_name
+    args << deleted_filenames
+    args << changed_files
+    args << max_seconds
+    @json = runner.run(*args)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - -
 
-  def runner; RunnerPostAdapter.new; end
+  def runner; RunnerService.new; end
 
   def json; @json; end
   def status; json['status']; end

@@ -5,9 +5,8 @@ class NewKataTest < ClientTestBase
   def self.hex_prefix; 'D2E7E'; end
 
   test 'C7A',
-  "when image_name is valid new_kata(kata_id, image_name)'s status is zero" do
+  "when image_name is valid new_kata(kata_id, image_name) succeeds" do
     new_kata
-    assert_success
   end
 
 end

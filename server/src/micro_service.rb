@@ -3,8 +3,6 @@ require 'json'
 
 require_relative './externals'
 require_relative './docker_runner'
-require_relative './string_cleaner'
-require_relative './string_truncater'
 
 class MicroService < Sinatra::Base
 
@@ -12,16 +10,16 @@ class MicroService < Sinatra::Base
   # They would be used if the runner-service implementation
   # switches from being volume-based to container-based.
 
-  post '/pulled' do
-    jasoned(1) { runner.pulled?(image_name) }
+  get '/pulled' do
+    getter(__method__, image_name)
   end
 
   post '/pull' do
-    jasoned(0) { runner.pull(image_name) }
+    poster(__method__, image_name)
   end
 
   post '/new_kata' do
-    jasoned(0) { runner.new_kata(image_name, kata_id) }
+    poster(__method__, image_name, kata_id)
   end
 
   post '/new_avatar' do
@@ -30,7 +28,7 @@ class MicroService < Sinatra::Base
     args << kata_id
     args << avatar_name
     args << starting_files
-    jasoned(0) { runner.new_avatar(*args) }
+    poster(__method__, *args)
   end
 
   post '/run' do
@@ -41,59 +39,59 @@ class MicroService < Sinatra::Base
     args << deleted_filenames
     args << changed_files
     args << max_seconds
-    jasoned(3) { runner.run(*args) }
+    poster(__method__, *args)
   end
 
   post '/old_avatar' do
-    jasoned(0) { runner.old_avatar(kata_id, avatar_name) }
+    poster(__method__, kata_id, avatar_name)
   end
 
   post '/old_kata' do
-    jasoned(0) { runner.old_kata(kata_id) }
+    poster(__method__, kata_id)
   end
 
   private
 
-  include Externals
-  def runner; DockerRunner.new(self); end
-
-  def args; @args ||= request_body_args; end
-
-  def image_name;        args['image_name' ];    end
-  def kata_id;           args['kata_id'];        end
-  def avatar_name;       args['avatar_name'];    end
-  def starting_files;    args['starting_files']; end
-
-  def deleted_filenames; args['deleted_filenames']; end
-  def changed_files;     args['changed_files'];     end
-  def max_seconds;       args['max_seconds'];       end
-
-  def request_body_args
-    request.body.rewind
-    JSON.parse(request.body.read)
+  def getter(name, *args)
+    storer_json('GET /', name, *args)
   end
 
-  include StringCleaner
-  include StringTruncater
+  def poster(name, *args)
+    storer_json('POST /', name, *args)
+  end
 
-  def jasoned(n)
-    content_type :json
-    case n
-    when 0
-      yield
-      return { status:0 }.to_json
-    when 1
-      return { status:yield }.to_json
-    when 3
-      stdout,stderr,status = yield
-      stdout = truncated(cleaned(stdout))
-      stderr = truncated(cleaned(stderr))
-      return { stdout:stdout, stderr:stderr, status:status }.to_json
-    end
-  rescue DockerRunnerError => e
-    return { stdout:e.stdout, stderr:e.stderr, status:e.status }.to_json
-  rescue StandardError => e
-    return { stdout:'', stderr:e.to_s, status:1 }.to_json
+  def storer_json(prefix, caller, *args)
+    name = caller.to_s[prefix.length .. -1]
+    runner = DockerRunner.new(self)
+    { name => runner.send(name, *args) }.to_json
+  rescue Exception => e
+    log << "EXCEPTION: #{e.class.name} #{e.to_s}"
+    { 'exception' => e.message }.to_json
+  end
+
+  # - - - - - - - - - - - - - - - -
+
+  include Externals
+
+  def self.request_args(*names)
+    names.each { |name|
+      define_method name, &lambda { args[name.to_s] }
+    }
+  end
+
+  request_args :image_name, :kata_id, :avatar_name
+  request_args :starting_files
+  request_args :deleted_filenames
+  request_args :changed_files
+  request_args :max_seconds
+
+  def args
+    @args ||= JSON.parse(request_body)
+  end
+
+  def request_body
+    request.body.rewind
+    request.body.read
   end
 
 end
