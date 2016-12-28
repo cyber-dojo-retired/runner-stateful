@@ -1,5 +1,5 @@
-require_relative './runner_test_base'
-require_relative './mock_sheller'
+require_relative 'runner_test_base'
+require_relative 'mock_sheller'
 
 class DockerRunnerKataTest < RunnerTestBase
 

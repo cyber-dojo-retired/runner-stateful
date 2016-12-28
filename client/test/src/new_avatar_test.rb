@@ -1,4 +1,4 @@
-require_relative './client_test_base'
+require_relative 'client_test_base'
 
 class NewAvatarTest < ClientTestBase
 

@@ -1,6 +1,6 @@
-require_relative './nearest_external'
-require_relative './string_cleaner'
-require_relative './string_truncater'
+require_relative 'nearest_external'
+require_relative 'string_cleaner'
+require_relative 'string_truncater'
 
 require 'timeout'
 

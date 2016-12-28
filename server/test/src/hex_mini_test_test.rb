@@ -1,4 +1,4 @@
-require_relative './runner_test_base'
+require_relative 'runner_test_base'
 
 class HexMiniTestTest < RunnerTestBase
 

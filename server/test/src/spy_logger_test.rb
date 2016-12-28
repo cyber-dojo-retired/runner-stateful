@@ -1,5 +1,5 @@
-require_relative './runner_test_base'
-require_relative './spy_logger'
+require_relative 'runner_test_base'
+require_relative 'spy_logger'
 
 class SpyLoggerTest < RunnerTestBase
 

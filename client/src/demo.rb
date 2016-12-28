@@ -1,7 +1,7 @@
 require 'sinatra'
 require 'sinatra/base'
 
-require_relative './runner_service'
+require_relative 'runner_service'
 
 class Demo < Sinatra::Base
 

@@ -1,5 +1,5 @@
-require_relative './runner_test_base'
-require_relative './docker_runner_os_helper'
+require_relative 'runner_test_base'
+require_relative 'docker_runner_os_helper'
 
 class DockerRunnerOSUbuntuTest < RunnerTestBase
 

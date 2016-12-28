@@ -1,4 +1,4 @@
-require_relative './nearest_external'
+require_relative 'nearest_external'
 require 'open3'
 
 class ExternalSheller

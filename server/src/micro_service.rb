@@ -1,8 +1,8 @@
 require 'sinatra/base'
 require 'json'
 
-require_relative './externals'
-require_relative './docker_runner'
+require_relative 'docker_runner'
+require_relative 'externals'
 
 class MicroService < Sinatra::Base
 

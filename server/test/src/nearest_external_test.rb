@@ -1,4 +1,4 @@
-require_relative './runner_test_base'
+require_relative 'runner_test_base'
 
 class DummyDisk
   def initialize(who); @who = who; end

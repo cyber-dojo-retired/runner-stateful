@@ -1,6 +1,6 @@
-require_relative './external_disk_writer'
-require_relative './external_sheller'
-require_relative './external_stdout_logger'
+require_relative 'external_disk_writer'
+require_relative 'external_sheller'
+require_relative 'external_stdout_logger'
 
 module Externals
 
