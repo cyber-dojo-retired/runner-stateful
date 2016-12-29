@@ -59,14 +59,14 @@ class DockerRunnerOSAlpineTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '0C9',
-  '[Alpine] new_avatar has sandbox with ownership/permissions set' do
+  '[Alpine] new_avatar has its own sandbox with ownership/permissions set' do
     new_avatar_sandbox_setup_test
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '1FB',
-  '[Alpine] new_avatar has starting-files in sandbox with ownership/permissions set' do
+  '[Alpine] new_avatar has starting-files in its sandbox with ownership/permissions set' do
     new_avatar_starting_files_test
   end
 

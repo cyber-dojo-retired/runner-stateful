@@ -8,6 +8,8 @@ class DockerRunnerAvatarTest < RunnerTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  # before new_avatar sandbox does not exist
+  # after new_avatar sandbox does exist
   test '5C8',
   'new_avatar is idempotent because [docker volume create] is!!' do
     new_avatar

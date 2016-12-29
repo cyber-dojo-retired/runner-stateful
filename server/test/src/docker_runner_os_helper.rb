@@ -38,9 +38,9 @@ module DockerRunnerOsHelper
     # sandbox is not empty
     stdout = assert_cyber_dojo_sh_no_stderr "ls -A #{sandbox}"
     refute_equal '', stdout
-    # sandbox's user is set
-    stdout = assert_cyber_dojo_sh_no_stderr "stat -c '%U' #{sandbox}"
-    assert_equal user, stdout.strip
+    # sandbox's is owned by avatar
+    stdout = assert_cyber_dojo_sh_no_stderr "stat -c '%u' #{sandbox}"
+    assert_equal user_id.to_s, stdout.strip
     # sandbox's group is set
     stdout = assert_cyber_dojo_sh_no_stderr "stat -c '%G' #{sandbox}"
     assert_equal group, stdout.strip
@@ -72,10 +72,11 @@ module DockerRunnerOsHelper
     assert_equal '', stderr
     ls_files = ls_parse(ls_stdout)
     assert_equal ls_starting_files.keys.sort, ls_files.keys.sort
-    assert_equal_atts('empty.txt',     '-rw-r--r--', user, group,  0, ls_files)
-    assert_equal_atts('cyber-dojo.sh', '-rwxr-xr-x', user, group, 29, ls_files)
-    assert_equal_atts('hello.txt',     '-rw-r--r--', user, group, 11, ls_files)
-    assert_equal_atts('hello.sh',      '-rwxr-xr-x', user, group, 16, ls_files)
+    lion_uid = user_id('lion').to_s
+    assert_equal_atts('empty.txt',     '-rw-r--r--', lion_uid, group,  0, ls_files)
+    assert_equal_atts('cyber-dojo.sh', '-rwxr-xr-x', lion_uid, group, 29, ls_files)
+    assert_equal_atts('hello.txt',     '-rw-r--r--', lion_uid, group, 11, ls_files)
+    assert_equal_atts('hello.sh',      '-rwxr-xr-x', lion_uid, group, 16, ls_files)
   end
 
   def assert_equal_atts(filename, permissions, user, group, size, ls_files)
@@ -132,7 +133,7 @@ module DockerRunnerOsHelper
     assert_equal [ new_filename ], actual_new_filenames
     attr = after[new_filename]
     assert_equal '-rw-r--r--', attr[:permissions]
-    assert_equal user, attr[:user]
+    assert_equal user_id('salmon').to_s, attr[:user]
     assert_equal group, attr[:group]
     assert_equal new_file_content.size, attr[:size]
     before.each { |filename, attr| assert_equal after[filename], attr }
@@ -155,7 +156,7 @@ module DockerRunnerOsHelper
     assert_equal before.keys, after.keys
     before.each do |filename, was_attr|
       now_attr = after[filename]
-      same = lambda { |sym| assert_equal was_attr[sym], now_attr[sym] }
+      same = lambda { |sym| assert_equal was_attr[sym].to_s, now_attr[sym].to_s }
       same.call(:permissions)
       same.call(:user)
       same.call(:group)
@@ -184,8 +185,8 @@ module DockerRunnerOsHelper
 
   def ls_cmd;
     # Works on Ubuntu and Alpine
-    'stat -c "%n %A %U %G %s %z" *'
-    # hiker.h  -rw-r--r--  nobody nogroup 136  2016-06-05 07:03:14.000000000
+    'stat -c "%n %A %u %G %s %z" *'
+    # hiker.h  -rw-r--r--  40045  nogroup 136  2016-06-05 07:03:14.000000000
     # |        |           |      |       |    |          |
     # filename permissions user   group   size date       time
     # 0        1           2      3       4    5          6
