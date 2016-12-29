@@ -22,7 +22,7 @@ class DockerRunnerMockShellerTest < RunnerTestBase
     ].join("\n")
     shell.mock_exec('docker images', stdout, '', success)
     runner.logging_off
-    refute runner.pulled?(image_name)
+    refute pulled?(image_name)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -35,7 +35,7 @@ class DockerRunnerMockShellerTest < RunnerTestBase
       'cdf/gcc_assert latest 28683e525ad3 9 days ago 95.97 MB'
     ].join("\n")
     shell.mock_exec('docker images', stdout, '', success)
-    refute runner.pulled?(image_name)
+    refute pulled?(image_name)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -48,7 +48,7 @@ class DockerRunnerMockShellerTest < RunnerTestBase
       "#{image_name}  latest 28683e525ad3 9 days ago 95.97 MB"
     ].join("\n")
     shell.mock_exec('docker images', stdout, '', success)
-    assert runner.pulled?(image_name)
+    assert pulled?(image_name)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -68,7 +68,7 @@ class DockerRunnerMockShellerTest < RunnerTestBase
       'dial tcp: lookup index.docker.io on 10.0.2.3:53: no such host'
     ].join(' ')
     shell.mock_exec("docker pull #{image_name}", stdout, stderr, 1)
-    assert_raises { runner.pull(image_name) }
+    assert_raises { pull(image_name) }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -83,7 +83,7 @@ class DockerRunnerMockShellerTest < RunnerTestBase
     stderr = "Error: image #{image_name}:latest not found"
     shell.mock_exec("docker pull #{image_name}", stdout, stderr, 1)
     runner.logging_off
-    assert_raises { runner.pull(image_name) }
+    assert_raises { pull(image_name) }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -92,7 +92,7 @@ class DockerRunnerMockShellerTest < RunnerTestBase
   'when image_name is valid, pull(image_name) issues unconditional docker-pull' do
     image_name = 'cdf/ruby_mini_test'
     shell.mock_exec("docker pull #{image_name}", '', '', success)
-    runner.pull(image_name)
+    pull(image_name)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -

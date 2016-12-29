@@ -21,12 +21,12 @@ class RunnerTestBase < HexMiniTest
   include Externals
   def runner; @runner ||= DockerRunner.new(self); end
 
-  def pulled?
-    runner.pulled?(@image_name)
+  def pulled?(name = @image_name)
+    runner.pulled?(name)
   end
 
-  def pull
-    runner.pull(@image_name)
+  def pull(name = @image_name)
+    runner.pull(name)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
