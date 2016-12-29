@@ -1,3 +1,4 @@
+require_relative 'all_avatars_names'
 require_relative 'nearest_external'
 require_relative 'string_cleaner'
 require_relative 'string_truncater'
@@ -48,6 +49,8 @@ class DockerRunner
     @avatar_name = avatar_name
     cid = create_container
     begin
+      cmd = "mkdir #{sandbox}"
+      assert_docker_exec(cid, cmd)
       cmd = "chown #{user}:#{group} #{sandbox}"
       assert_docker_exec(cid, cmd)
       change_files(cid, starting_files)
@@ -83,24 +86,25 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def user; 'nobody'; end
+  def user; 40000 + all_avatars_names.index(@avatar_name); end
   def group; 'nogroup'; end
-  def sandbox; "/sandboxes/#{@avatar_name}"; end
+  def sandbox; "#{sandboxes_root}/#{@avatar_name}"; end
 
   def success; shell.success; end
   def timed_out; 'timed_out'; end
 
   private
 
+  include AllAvatarsNames
   include StringCleaner
   include StringTruncater
 
   def create_container
     # Volume mounts the avatar's volume
-    #     [docker run ... --volume=V:/sandboxes/#{avatar_name}  ...]
+    #     [docker run ... --volume=V:/sandboxes:rw  ...]
     # Volume V is assumed to exist via an earlier new_kata() call.
     # If volume V does _not_ exist the [docker run] will nevertheless
-    # succeed, create the container, and create a /sandboxes/... folder in it!
+    # succeed, create the container, and create a /sandboxes/ folder in it!
     # https://github.com/docker/docker/issues/13121
     args = [
       '--detach',                          # get the cid
@@ -112,8 +116,7 @@ class DockerRunner
       "--env CYBER_DOJO_AVATAR_NAME=#{@avatar_name}",
       "--env CYBER_DOJO_SANDBOX=#{sandbox}",
       '--user=root',
-      "--volume=#{volume_name}:/sandboxes:rw",
-      "--workdir=#{sandbox}"
+      "--volume=#{volume_name}:/#{sandboxes_root}:rw"
     ].join(space)
     cid = assert_exec("docker run #{args} #{@image_name} sh")[0].strip
   end
@@ -151,7 +154,7 @@ class DockerRunner
       "--user=#{user}",
       '--interactive',
       cid,
-      "sh -c './cyber-dojo.sh'"
+      "sh -c 'cd #{sandbox} && ./cyber-dojo.sh'"
     ].join(space)
     r_stdout, w_stdout = IO.pipe
     r_stderr, w_stderr = IO.pipe
@@ -241,11 +244,14 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  def space; ' '; end
+  def sandboxes_root; '/sandboxes'; end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   include NearestExternal
   def shell; nearest_external(:shell); end
   def  disk; nearest_external(:disk);  end
   def   log; nearest_external(:log);   end
-
-  def space; ' '; end
 
 end
