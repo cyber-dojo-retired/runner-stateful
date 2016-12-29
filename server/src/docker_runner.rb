@@ -31,40 +31,44 @@ class DockerRunner
 
   def new_kata(image_name, kata_id)
     pull(image_name) unless pulled?(image_name)
+    @kata_id = kata_id
+    assert_exec("docker volume create --name #{volume_name}")
   end
 
   def old_kata(kata_id)
-    volume_names(kata_id).each do |volume_name|
-      assert_exec("docker volume rm #{volume_name}")
-    end
+    @kata_id = kata_id
+    assert_exec("docker volume rm #{volume_name}")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def new_avatar(image_name, kata_id, avatar_name, files)
-    name = volume_name(kata_id, avatar_name)
-    assert_exec("docker volume create --name #{name}")
-    cid = create_container(image_name, kata_id, avatar_name)
+  def new_avatar(image_name, kata_id, avatar_name, starting_files)
+    @image_name = image_name
+    @kata_id = kata_id
+    @avatar_name = avatar_name
+    cid = create_container
     begin
-      change_files(cid, files)
+      cmd = "chown #{user}:#{group} #{sandbox}"
+      assert_docker_exec(cid, cmd)
+      change_files(cid, starting_files)
     ensure
       remove_container(cid)
     end
   end
 
-  def old_avatar(kata_id, avatar_name)
-    name = volume_name(kata_id, avatar_name)
-    assert_exec("docker volume rm #{name}")
+  def old_avatar(_kata_id, _avatar_name)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run(image_name, kata_id, avatar_name, deleted_filenames, changed_files, max_seconds)
-    name = volume_name(kata_id, avatar_name)
-    cmd = "docker volume ls --quiet --filter 'name=#{name}'"
+    @image_name = image_name
+    @kata_id = kata_id
+    @avatar_name = avatar_name
+    cmd = "docker volume ls --quiet --filter 'name=#{volume_name}'"
     stdout,stderr = assert_exec(cmd)
-    fail ArgumentError.new('no_avatar') unless stdout.strip == name
-    cid = create_container(image_name, kata_id, avatar_name)
+    fail ArgumentError.new('no_kata') unless stdout.strip == volume_name
+    cid = create_container
     begin
       delete_files(cid, deleted_filenames)
       change_files(cid, changed_files)
@@ -81,7 +85,7 @@ class DockerRunner
 
   def user; 'nobody'; end
   def group; 'nogroup'; end
-  def sandbox; '/sandbox'; end
+  def sandbox; "/sandboxes/#{@avatar_name}"; end
 
   def success; shell.success; end
   def timed_out; 'timed_out'; end
@@ -91,30 +95,27 @@ class DockerRunner
   include StringCleaner
   include StringTruncater
 
-  def create_container(image_name, kata_id, avatar_name)
+  def create_container
     # Volume mounts the avatar's volume
-    #     [docker run ... --volume=V:/sandbox  ...]
-    # Volume V is assumed to exist via an earlier new_avatar() call.
+    #     [docker run ... --volume=V:/sandboxes/#{avatar_name}  ...]
+    # Volume V is assumed to exist via an earlier new_kata() call.
     # If volume V does _not_ exist the [docker run] will nevertheless
-    # succeed, create the container, and create a /sandbox folder in it!
+    # succeed, create the container, and create a /sandboxes/... folder in it!
     # https://github.com/docker/docker/issues/13121
-    name = volume_name(kata_id, avatar_name)
     args = [
       '--detach',                          # get the cid
       '--interactive',                     # later execs
       '--net=none',                        # security - no network
       '--pids-limit=64',                   # security - no fork bombs
       '--security-opt=no-new-privileges',  # security - no escalation
-      "--env CYBER_DOJO_KATA_ID=#{kata_id}",
-      "--env CYBER_DOJO_AVATAR_NAME=#{avatar_name}",
+      "--env CYBER_DOJO_KATA_ID=#{@kata_id}",
+      "--env CYBER_DOJO_AVATAR_NAME=#{@avatar_name}",
       "--env CYBER_DOJO_SANDBOX=#{sandbox}",
       '--user=root',
-      "--volume=#{name}:#{sandbox}:rw",
+      "--volume=#{volume_name}:/sandboxes:rw",
       "--workdir=#{sandbox}"
     ].join(space)
-    cid = assert_exec("docker run #{args} #{image_name} sh")[0].strip
-    assert_docker_exec(cid, "chown #{user}:#{group} #{sandbox}")
-    cid
+    cid = assert_exec("docker run #{args} #{@image_name} sh")[0].strip
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -209,20 +210,8 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def volume_names(kata_id)
-    name = "cyber_dojo_#{kata_id}"
-    docker_volume_ls = [
-      'docker volume ls',
-      '--quiet',
-      '--filter',
-      "'name=#{name}'"
-    ].join(space)
-    stdout,_ = assert_exec(docker_volume_ls)
-    stdout.strip.split("\n")
-  end
-
-  def volume_name(kata_id, avatar_name)
-    "cyber_dojo_#{kata_id}_#{avatar_name}"
+  def volume_name
+    "cyber_dojo_#{@kata_id}"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
