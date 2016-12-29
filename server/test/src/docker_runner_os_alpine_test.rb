@@ -17,10 +17,14 @@ class DockerRunnerOSAlpineTest < RunnerTestBase
     assert stdout.include?('Alpine'), stdout
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   test '267',
   "[Alpine] none of the 64 avatar's uid's are already taken" do
     refute_user_ids_exist
   end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '582',
   '[Alpine] has group used for dir/file permissions' do

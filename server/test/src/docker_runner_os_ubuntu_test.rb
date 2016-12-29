@@ -24,10 +24,14 @@ class DockerRunnerOSUbuntuTest < RunnerTestBase
     assert stdout.include?('Ubuntu'), stdout
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   test '268',
   "[Ubuntu] none of the 64 avatar's uid's are already taken" do
     refute_user_ids_exist
   end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '583',
   '[Ubuntu] has group used for dir/file permissions' do
