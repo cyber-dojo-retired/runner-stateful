@@ -1,7 +1,10 @@
+require_relative '../../src/all_avatars_names'
 
 module DockerRunnerOsHelper
 
   module_function
+
+  include AllAvatarsNames
 
   def kata_id_env_vars_test
     stdout = assert_cyber_dojo_sh_no_stderr 'printenv CYBER_DOJO_KATA_ID'
@@ -14,9 +17,12 @@ module DockerRunnerOsHelper
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_user_exists
-    stdout = assert_cyber_dojo_sh_no_stderr "getent passwd #{user}"
-    assert stdout.start_with?(user), stdout
+  def refute_user_ids_exist
+    etc_passwd = assert_cyber_dojo_sh_no_stderr 'cat /etc/passwd'
+    all_avatars_names.each do |name|
+      uid = runner.user_id(name)
+      refute etc_passwd.include?(uid.to_s), "#{name}:#{uid}"
+    end
   end
 
   def assert_group_exists

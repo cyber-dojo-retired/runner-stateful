@@ -19,10 +19,18 @@ class DockerRunnerOSUbuntuTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'CA1',
-  '[Ubuntu] image is indeed Alpine and has user:nobody and group:nogroup' do
+  '[Ubuntu] image is indeed based on Ubuntu' do
     stdout = assert_cyber_dojo_sh_no_stderr 'cat /etc/issue'
     assert stdout.include?('Ubuntu'), stdout
-    assert_user_exists
+  end
+
+  test '268',
+  "[Ubuntu] none of the 64 avatar's uid's are already taken" do
+    refute_user_ids_exist
+  end
+
+  test '583',
+  '[Ubuntu] has group used for dir/file permissions' do
     assert_group_exists
   end
 

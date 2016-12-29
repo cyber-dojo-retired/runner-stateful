@@ -12,10 +12,18 @@ class DockerRunnerOSAlpineTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'CA0',
-  '[Alpine] image is indeed Alpine and has user and group' do
+  '[Alpine] image is indeed based on Alpine' do
     stdout = assert_cyber_dojo_sh_no_stderr 'cat /etc/issue'
     assert stdout.include?('Alpine'), stdout
-    assert_user_exists
+  end
+
+  test '267',
+  "[Alpine] none of the 64 avatar's uid's are already taken" do
+    refute_user_ids_exist
+  end
+
+  test '582',
+  '[Alpine] has group used for dir/file permissions' do
     assert_group_exists
   end
 
@@ -27,7 +35,7 @@ class DockerRunnerOSAlpineTest < RunnerTestBase
     lines = stdout.strip.split("\n")
     # PID   USER     TIME   COMMAND
     #   1   root     0:00   sh
-    #  25   nobody   0:00   sh -c ./cyber-dojo.sh
+    #  25   40045    0:00   sh -c ./cyber-dojo.sh
     #   |   |        |      |  |  |
     #   0   1        2      3  4  5 ...
     lines.shift

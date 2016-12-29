@@ -51,7 +51,7 @@ class DockerRunner
     begin
       cmd = "mkdir #{sandbox}"
       assert_docker_exec(cid, cmd)
-      cmd = "chown #{user}:#{group} #{sandbox}"
+      cmd = "chown #{user_id}:#{group} #{sandbox}"
       assert_docker_exec(cid, cmd)
       change_files(cid, starting_files)
     ensure
@@ -86,7 +86,7 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def user(name = @avatar_name)
+  def user_id(name = @avatar_name)
     40000 + all_avatars_names.index(name)
   end
 
@@ -149,7 +149,7 @@ class DockerRunner
       assert_exec("docker cp #{tmp_dir}/. #{cid}:#{sandbox}")
     end
     files.keys.each do |filename|
-      cmd = "chown #{user}:#{group} #{sandbox}/#{filename}"
+      cmd = "chown #{user_id}:#{group} #{sandbox}/#{filename}"
       assert_docker_exec(cid, cmd)
     end
   end
@@ -159,7 +159,7 @@ class DockerRunner
   def run_cyber_dojo_sh(cid, max_seconds)
     cmd = [
       'docker exec',
-      "--user=#{user}",
+      "--user=#{user_id}",
       '--interactive',
       cid,
       "sh -c 'cd #{sandbox} && ./cyber-dojo.sh'"
