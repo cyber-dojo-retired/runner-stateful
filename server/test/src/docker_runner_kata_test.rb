@@ -5,33 +5,37 @@ class DockerRunnerKataTest < RunnerTestBase
 
   def self.hex_prefix; 'FB0D4'; end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+  def hex_setup; @image_name = 'cyberdojofoundation/gcc_assert'; end
 
-  test 'FA0',
-  "[gcc,assert] old_kata removes all avatar's volumes" do
-    @image_name = 'cyberdojofoundation/gcc_assert'
+  test 'DBC',
+  'before new_kata volume does not exist,',
+  'after new_kata it does,',
+  'after old_kata it does not' do
+    refute volume_exists?
     new_kata
-    expected = []
-    ['lion','salmon'].each do |avatar_name|
-      runner.new_avatar(@image_name, kata_id, avatar_name, files)
-      expected << volume_name(avatar_name)
-    end
-    assert_equal expected, volume_names.sort
+    assert volume_exists?
     old_kata
-    assert_equal [], volume_names.sort
+    refute volume_exists?
   end
 
   private
 
-  def volume_names
-    stdout,_ = assert_exec("docker volume ls --quiet --filter 'name=#{volume_name}'")
-    stdout.split("\n")
+  def volume_exists?
+    cmd = [
+      'docker volume ls',
+      '--quiet',
+      "--filter 'name=#{volume_name}'"
+    ].join(space)
+    stdout,_ = assert_exec(cmd)
+    stdout.strip == volume_name
   end
 
-  def volume_name(avatar_name = nil)
-    parts = [ 'cyber', 'dojo', kata_id ]
-    parts << avatar_name unless avatar_name.nil?
-    parts.join('_')
+  def volume_name
+    [ 'cyber', 'dojo', kata_id ].join('_')
+  end
+
+  def space
+    ' '
   end
 
 end
