@@ -20,8 +20,8 @@ module DockerRunnerOsHelper
   def refute_user_ids_exist
     etc_passwd = assert_cyber_dojo_sh_no_stderr 'cat /etc/passwd'
     all_avatars_names.each do |name|
-      uid = runner.user_id(name)
-      refute etc_passwd.include?(uid.to_s), "#{name}:#{uid}"
+      uid = runner.user_id(name).to_s
+      refute etc_passwd.include?(uid), "#{name}:#{uid}"
     end
   end
 
@@ -40,7 +40,7 @@ module DockerRunnerOsHelper
     refute_equal '', stdout
     # sandbox's is owned by avatar
     stdout = assert_cyber_dojo_sh_no_stderr "stat -c '%u' #{sandbox}"
-    assert_equal user_id.to_s, stdout.strip
+    assert_equal user_id, stdout.strip
     # sandbox's group is set
     stdout = assert_cyber_dojo_sh_no_stderr "stat -c '%G' #{sandbox}"
     assert_equal group, stdout.strip
@@ -72,7 +72,7 @@ module DockerRunnerOsHelper
     assert_equal '', stderr
     ls_files = ls_parse(ls_stdout)
     assert_equal ls_starting_files.keys.sort, ls_files.keys.sort
-    lion_uid = user_id('lion').to_s
+    lion_uid = user_id('lion')
     assert_equal_atts('empty.txt',     '-rw-r--r--', lion_uid, group,  0, ls_files)
     assert_equal_atts('cyber-dojo.sh', '-rwxr-xr-x', lion_uid, group, 29, ls_files)
     assert_equal_atts('hello.txt',     '-rw-r--r--', lion_uid, group, 11, ls_files)
@@ -133,7 +133,7 @@ module DockerRunnerOsHelper
     assert_equal [ new_filename ], actual_new_filenames
     attr = after[new_filename]
     assert_equal '-rw-r--r--', attr[:permissions]
-    assert_equal user_id('salmon').to_s, attr[:user]
+    assert_equal user_id, attr[:user]
     assert_equal group, attr[:group]
     assert_equal new_file_content.size, attr[:size]
     before.each { |filename, attr| assert_equal after[filename], attr }
@@ -156,7 +156,7 @@ module DockerRunnerOsHelper
     assert_equal before.keys, after.keys
     before.each do |filename, was_attr|
       now_attr = after[filename]
-      same = lambda { |sym| assert_equal was_attr[sym].to_s, now_attr[sym].to_s }
+      same = lambda { |sym| assert_equal was_attr[sym], now_attr[sym] }
       same.call(:permissions)
       same.call(:user)
       same.call(:group)

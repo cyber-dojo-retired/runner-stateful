@@ -150,7 +150,7 @@ class RunnerTestBase < HexMiniTest
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def user_id(name = 'salmon')
-    runner.user_id(name)
+    runner.user_id(name).to_s
   end
 
   def group
