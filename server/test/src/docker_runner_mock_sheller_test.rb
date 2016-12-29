@@ -121,7 +121,8 @@ class DockerRunnerMockShellerTest < RunnerTestBase
 
   test '36C',
   'when image_name is valid and has not been pulled',
-  'then new_kata(image_name, kata_id) pulls it' do
+  'then new_kata(image_name, kata_id) pulls it',
+  "and creates kata's volume" do
     image_name = 'cdf/ruby_mini_test'
     stdout = [
       'REPOSITORY     TAG    IMAGE ID     CREATED    SIZE',
@@ -129,6 +130,7 @@ class DockerRunnerMockShellerTest < RunnerTestBase
     ].join("\n")
     shell.mock_exec('docker images', stdout, '', success)
     shell.mock_exec("docker pull #{image_name}", '','',success)
+    shell.mock_exec("docker volume create --name #{volume_name}", '', '', success)
     runner.new_kata(image_name, kata_id)
   end
 
@@ -136,13 +138,15 @@ class DockerRunnerMockShellerTest < RunnerTestBase
 
   test 'DFA',
   'when image_name is valid has been pulled',
-  'then new_kata(image_name, kata_id) does not pull it' do
+  'then new_kata(image_name, kata_id) does not pull it',
+  "and creates kata's volume" do
     image_name = 'cdf/gcc_assert'
     stdout = [
       'REPOSITORY     TAG    IMAGE ID     CREATED    SIZE',
       "#{image_name}  latest 28683e525ad3 9 days ago 95.97 MB"
     ].join("\n")
     shell.mock_exec('docker images', stdout, '', success)
+    shell.mock_exec("docker volume create --name #{volume_name}", '', '', success)
     runner.new_kata(image_name, kata_id)
   end
 
@@ -151,12 +155,10 @@ class DockerRunnerMockShellerTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'E92',
-  "when there is no volume, run() returns 'no_avatar' error status",
-  "enabling the web server to seamlessly transition a pre-runner server's kata",
-  'to the new runner' do
-    kata_id = '6352F737EA'
-    name = 'cyber_dojo_' + kata_id + '_' + avatar_name
-    shell.mock_exec("docker volume ls --quiet --filter 'name=#{name}'", '', '', 0)
+  "when there is no volume, run() returns 'no_kata' error status",
+  'enabling the web server to seamlessly transition a pre-runner',
+  "server's kata to the new runner" do
+    shell.mock_exec("docker volume ls --quiet --filter 'name=#{volume_name}'", '', '', success)
     args = []
     args << 'cdf/gcc_assert'
     args << kata_id
@@ -165,7 +167,13 @@ class DockerRunnerMockShellerTest < RunnerTestBase
     args << (changed_files={})
     args << (max_seconds=10)
     error = assert_raises { runner.run(*args) }
-    assert_equal 'no_avatar', error.message
+    assert_equal 'no_kata', error.message
+  end
+
+  private
+
+  def volume_name
+    'cyber_dojo_' + kata_id
   end
 
 end
