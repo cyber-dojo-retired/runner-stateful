@@ -21,14 +21,35 @@ class RunnerTestBase < HexMiniTest
   include Externals
   def runner; @runner ||= DockerRunner.new(self); end
 
-  def pulled?; runner.pulled?(@image_name); end
-  def pull; runner.pull(@image_name); end
+  def pulled?
+    runner.pulled?(@image_name)
+  end
 
-  def new_kata; runner.new_kata(@image_name, kata_id); end
-  def old_kata; runner.old_kata(kata_id); end
+  def pull
+    runner.pull(@image_name)
+  end
 
-  def new_avatar; runner.new_avatar(@image_name, kata_id, avatar_name, files); end
-  def old_avatar; runner.old_avatar(kata_id, avatar_name); end
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def new_kata
+    runner.new_kata(@image_name, kata_id)
+  end
+
+  def old_kata
+    runner.old_kata(kata_id)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def new_avatar
+    runner.new_avatar(@image_name, kata_id, avatar_name, files)
+  end
+
+  def old_avatar
+    runner.old_avatar(kata_id, avatar_name)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def runner_run(changed_files, max_seconds = 10, deleted_filenames = [])
     # don't call this run() as it clashes with MiniTest
@@ -128,9 +149,17 @@ class RunnerTestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def user; runner.user; end
-  def group; runner.group; end
-  def sandbox; runner.sandbox; end
+  def user(name = 'salmon')
+    runner.user(name)
+  end
+
+  def group
+    runner.group
+  end
+
+  def sandbox(name = 'salmon')
+    runner.sandbox(name)
+  end
 
   def success; runner.success; end
   def timed_out; runner.timed_out; end

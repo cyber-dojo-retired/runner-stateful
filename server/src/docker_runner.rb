@@ -86,9 +86,17 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def user; 40000 + all_avatars_names.index(@avatar_name); end
-  def group; 'nogroup'; end
-  def sandbox; "#{sandboxes_root}/#{@avatar_name}"; end
+  def user(name = @avatar_name)
+    40000 + all_avatars_names.index(name)
+  end
+
+  def group
+    'nogroup'
+  end
+
+  def sandbox(name = @avatar_name)
+    "#{sandboxes_root}/#{name}"
+  end
 
   def success; shell.success; end
   def timed_out; 'timed_out'; end
@@ -245,6 +253,7 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def space; ' '; end
+
   def sandboxes_root; '/sandboxes'; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
