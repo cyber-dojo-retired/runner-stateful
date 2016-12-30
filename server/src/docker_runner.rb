@@ -38,6 +38,8 @@ class DockerRunner
   end
 
   def old_kata(kata_id)
+    assert_valid_id(kata_id)
+    assert_kata_exists(kata_id)
     assert_exec("docker volume rm #{volume_name(kata_id)}")
   end
 
@@ -258,6 +260,10 @@ class DockerRunner
 
   def refute_kata_exists(id)
     fail error('kata_id') if kata_exists?(id)
+  end
+
+  def assert_kata_exists(id)
+    fail error('kata_id') unless kata_exists?(id)
   end
 
   def assert_valid_id(id)
