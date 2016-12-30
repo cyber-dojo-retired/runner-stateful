@@ -96,16 +96,6 @@ class AvatarTest < TestBase
     assert_raises_method_message(:old_avatar, 'avatar_name', kata_id, avatar_name)
   end
 
-  def assert_raises_method_message(method, message, kata_id, avatar_name)
-    error = assert_raises(ArgumentError) {
-      self.send(method, {
-            kata_id:kata_id,
-        avatar_name:avatar_name
-      })
-    }
-    assert error.message.start_with?(message), error.message
-  end
-
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def invalid_avatar_names

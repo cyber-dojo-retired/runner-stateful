@@ -131,7 +131,7 @@ class RunMockShellerTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'E92',
-  "when there is no volume, run() returns 'no_kata' error status",
+  "when there is no volume, run() returns 'kata_id' error status",
   'enabling the web server to seamlessly transition a pre-runner',
   "server's kata to the new runner" do
     cmd = "docker volume ls --quiet --filter 'name=#{volume_name}'"
@@ -144,7 +144,7 @@ class RunMockShellerTest < TestBase
     args << (changed_files={})
     args << (max_seconds=10)
     error = assert_raises { runner.run(*args) }
-    assert_equal 'no_kata', error.message
+    assert_equal 'kata_id', error.message
   end
 
   private

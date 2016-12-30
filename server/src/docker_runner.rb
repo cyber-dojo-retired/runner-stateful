@@ -86,13 +86,12 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run(image_name, kata_id, avatar_name, deleted_filenames, changed_files, max_seconds)
-    name = volume_name(kata_id)
-    cmd = "docker volume ls --quiet --filter 'name=#{name}'"
-    stdout,stderr = assert_exec(cmd)
-    fail ArgumentError.new('no_kata') unless stdout.strip == name
-
+    assert_valid_id(kata_id)
+    assert_kata_exists(kata_id)
+    assert_valid_name(avatar_name)
     cid = create_container(image_name, kata_id, avatar_name)
     begin
+      assert_avatar_exists(cid, avatar_name)
       delete_files(cid, avatar_name, deleted_filenames)
       change_files(cid, avatar_name, changed_files)
       stdout,stderr,status = run_cyber_dojo_sh(cid, avatar_name, max_seconds)

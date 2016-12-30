@@ -79,7 +79,7 @@ class KataTest < TestBase
     error = assert_raises(ArgumentError) {
       new_kata( { kata_id:kata_id })
     }
-    assert error.message.start_with? 'kata_id'
+    assert error.message.start_with?('kata_id'), error.message
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
