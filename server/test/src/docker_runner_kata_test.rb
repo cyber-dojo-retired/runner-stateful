@@ -30,13 +30,8 @@ class DockerRunnerKataTest < RunnerTestBase
     stdout.strip == volume_name
   end
 
-  def volume_name
-    [ 'cyber', 'dojo', kata_id ].join('_')
-  end
-
-  def space
-    ' '
-  end
+  def volume_name; [ 'cyber', 'dojo', kata_id ].join('_'); end
+  def space; ' '; end
 
 end
 
