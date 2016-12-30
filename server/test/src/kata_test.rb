@@ -6,6 +6,10 @@ class KataTest < TestBase
 
   def hex_setup; @image_name = 'cyberdojofoundation/gcc_assert'; end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # new_kata
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   test 'D7B',
   'new_kata with an invalid kata_id raises' do
     invalid_kata_ids.each do |invalid_kata_id|
@@ -25,6 +29,8 @@ class KataTest < TestBase
     end
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # old_kata
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'CED',

@@ -29,6 +29,7 @@ class DockerRunner
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def new_kata(image_name, kata_id)
     assert_valid_id(kata_id)
@@ -37,6 +38,8 @@ class DockerRunner
     assert_exec("docker volume create --name #{volume_name(kata_id)}")
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   def old_kata(kata_id)
     assert_valid_id(kata_id)
     assert_kata_exists(kata_id)
@@ -44,13 +47,14 @@ class DockerRunner
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def new_avatar(image_name, kata_id, avatar_name, starting_files)
     assert_valid_id(kata_id)
     assert_kata_exists(kata_id)
+    assert_valid_name(avatar_name)
     cid = create_container(image_name, kata_id, avatar_name)
     begin
-      assert_valid_name(avatar_name)
       refute_avatar_exists(cid, avatar_name)
       sandbox = sandbox_path(avatar_name)
       cmd = "mkdir #{sandbox}"
@@ -64,9 +68,21 @@ class DockerRunner
     end
   end
 
-  def old_avatar(_kata_id, _avatar_name)
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def old_avatar(image_name, kata_id, avatar_name)
+    assert_valid_id(kata_id)
+    assert_kata_exists(kata_id)
+    assert_valid_name(avatar_name)
+    cid = create_container(image_name, kata_id, avatar_name)
+    begin
+      assert_avatar_exists(cid, avatar_name)
+    ensure
+      remove_container(cid)
+    end
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run(image_name, kata_id, avatar_name, deleted_filenames, changed_files, max_seconds)
@@ -129,7 +145,7 @@ class DockerRunner
       "--env CYBER_DOJO_AVATAR_NAME=#{avatar_name}",
       "--env CYBER_DOJO_SANDBOX=#{sandbox}",
       '--user=root',
-      "--volume=#{volume_name(kata_id)}:/#{sandboxes_root}:rw"
+      "--volume=#{volume_name(kata_id)}:#{sandboxes_root}:rw"
     ].join(space)
     cid = assert_exec("docker run #{args} #{image_name} sh")[0].strip
   end

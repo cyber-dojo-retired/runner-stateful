@@ -14,126 +14,124 @@ class AvatarTest < TestBase
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # new_avatar
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'B20',
   'new_avatar with an invalid kata_id raises' do
     invalid_kata_ids.each do |invalid_kata_id|
-      assert_raises_kata_id(invalid_kata_id, 'salmon')
+      assert_new_avatar_raises_kata_id(invalid_kata_id, 'salmon')
     end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  test '7C4',
+  'new_avatar with non-existant kata_id raises' do
+    kata_id = '42CF187311'
+    assert_new_avatar_raises_kata_id(kata_id, 'salmon')
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   test '35D',
-  'new_avatar with invalid avatar_name raises' do
-    invalid_avatar_names = [
-      nil,
-      Object.new,
-      [],
-      '',
-      'scissors'
-    ]
+  'new_avatar with existing kata_id but invalid avatar_name raises' do
     invalid_avatar_names.each do |invalid_avatar_name|
-      assert_raises_avatar_name(kata_id, invalid_avatar_name)
+      assert_new_avatar_raises_avatar_name(kata_id, invalid_avatar_name)
     end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '119',
-  'new_avatar with avatar_name that already exists raises' do
+  'new_avatar with existing kata_id but avatar_name that already exists raises' do
     new_avatar({ avatar_name:'salmon' })
-    assert_raises_avatar_name(kata_id, 'salmon')
+    assert_new_avatar_raises_avatar_name(kata_id, 'salmon')
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def assert_raises_kata_id(kata_id, avatar_name)
-    error = assert_raises(ArgumentError) {
-      new_avatar( { kata_id:kata_id })
-    }
-    assert error.message.start_with? 'kata_id'
-  end
-
-  def assert_raises_avatar_name(kata_id, avatar_name)
-    error = assert_raises(ArgumentError) {
-      new_avatar( {
-            kata_id:kata_id,
-        avatar_name:avatar_name
-      })
-    }
-    assert error.message.start_with? 'avatar_name'
-  end
-
-
-=begin
+  # old_avatar
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '183',
-  'new_kata with kata_id that already exists raises' do
-    new_kata
-    begin
-      assert_raises_kata_id(kata_id)
-    ensure
-      old_kata
-    end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test 'CED',
-  'old_kata with invalid kata_id raises' do
+  test '2A8',
+  'old_avatar with invalid kata_id raises' do
     invalid_kata_ids.each do |invalid_kata_id|
-      assert_raises_kata_id(invalid_kata_id)
+      assert_old_avatar_raises_kata_id(invalid_kata_id, 'salmon')
     end
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test '0A2',
-  'old_kata with valid kata_id that does not exist raises' do
-    error = assert_raises { old_kata }
-    assert error.message.start_with? 'kata_id'
+  test 'E35',
+  'old_avatar with non-existant kata_id raises' do
+    kata_id = '92BB3FE5B6'
+    assert_old_avatar_raises_kata_id(kata_id, 'salmon')
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+  test 'E5D',
+  'old_avatar with existing kata_id but invalid avatar_name raises' do
+    invalid_avatar_names.each do |invalid_avatar_name|
+      assert_old_avatar_raises_avatar_name(kata_id, invalid_avatar_name)
+    end
+  end
 
-  test 'DBC',
-  'before new_kata volume does not exist,',
-  'after new_kata it does,',
-  'after old_kata it does not' do
-    refute volume_exists?
-    new_kata
-    assert volume_exists?
-    old_kata
-    refute volume_exists?
+  test 'D6F',
+  'old_avatar with existing kata_id but avatar_name that does not exist raises' do
+    assert_old_avatar_raises_avatar_name(kata_id, 'salmon')
   end
 
   private
 
-  def assert_raises_kata_id(id)
+  def assert_new_avatar_raises_kata_id(kata_id, avatar_name)
     error = assert_raises(ArgumentError) {
-      new_kata( { kata_id:id })
+      new_avatar({
+            kata_id:kata_id,
+        avatar_name:avatar_name
+      })
     }
-    assert error.message.start_with? 'kata_id'
+    assert error.message.start_with?('kata_id'), error.message
+  end
+
+  def assert_new_avatar_raises_avatar_name(kata_id, avatar_name)
+    error = assert_raises(ArgumentError) {
+      new_avatar({
+            kata_id:kata_id,
+        avatar_name:avatar_name
+      })
+    }
+    assert error.message.start_with?('avatar_name'), error.message
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def volume_exists?
-    cmd = [
-      'docker volume ls',
-      '--quiet',
-      "--filter 'name=#{volume_name}'"
-    ].join(space)
-    stdout,_ = assert_exec(cmd)
-    stdout.strip == volume_name
+  def assert_old_avatar_raises_kata_id(kata_id, avatar_name)
+    error = assert_raises(ArgumentError) {
+      old_avatar({
+            kata_id:kata_id,
+        avatar_name:avatar_name
+      })
+    }
+    assert error.message.start_with?('kata_id'), error.message
+  end
+
+  def assert_old_avatar_raises_avatar_name(kata_id, avatar_name)
+    error = assert_raises(ArgumentError) {
+      old_avatar({
+            kata_id:kata_id,
+        avatar_name:avatar_name
+      })
+    }
+    assert error.message.start_with?('avatar_name'), error.message
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def volume_name; [ 'cyber', 'dojo', kata_id ].join('_'); end
-  def space; ' '; end
-=end
+  def invalid_avatar_names
+    [
+      nil,
+      Object.new,
+      [],
+      '',
+      'scissors'
+    ]
+  end
 
 end

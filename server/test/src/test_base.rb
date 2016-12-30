@@ -58,11 +58,13 @@ class TestBase < HexMiniTest
   end
 
   def old_avatar(options = {})
+    options[:image_name ] = @image_name unless options.key? :image_name
     options[:kata_id    ] = kata_id     unless options.key? :kata_id
     options[:avatar_name] = avatar_name unless options.key? :avatar_name
+    image_name  = options[:image_name ]
     kata_id     = options[:kata_id    ]
     avatar_name = options[:avatar_name]
-    runner.old_avatar(kata_id, avatar_name)
+    runner.old_avatar(image_name, kata_id, avatar_name)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
