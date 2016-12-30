@@ -242,22 +242,6 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_docker_exec(cid, cmd)
-    assert_exec("docker exec #{cid} sh -c '#{cmd}'")
-  end
-
-  def assert_exec(cmd)
-    stdout,stderr,status = exec(cmd)
-    fail StandardError.new(cmd) unless status == success
-    [stdout,stderr]
-  end
-
-  def exec(cmd, logging = @logging)
-    shell.exec(cmd, logging)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   def refute_kata_exists(id)
     fail error('kata_id') if kata_exists?(id)
   end
@@ -285,6 +269,22 @@ class DockerRunner
     cmd = "docker volume ls --quiet --filter 'name=#{name}'"
     stdout,stderr = assert_exec(cmd)
     stdout.strip == name
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def assert_docker_exec(cid, cmd)
+    assert_exec("docker exec #{cid} sh -c '#{cmd}'")
+  end
+
+  def assert_exec(cmd)
+    stdout,stderr,status = exec(cmd)
+    fail StandardError.new(cmd) unless status == success
+    [stdout,stderr]
+  end
+
+  def exec(cmd, logging = @logging)
+    shell.exec(cmd, logging)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

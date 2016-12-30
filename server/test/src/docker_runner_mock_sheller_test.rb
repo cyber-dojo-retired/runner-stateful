@@ -101,6 +101,9 @@ class DockerRunnerMockShellerTest < RunnerTestBase
 
   test 'AED',
   'when image_name is invalid, then new_kata(image_name, kata_id) raises' do
+    cmd = "docker volume ls --quiet --filter 'name=#{volume_name}'"
+    shell.mock_exec(cmd, '', '', success)
+
     bad_image_name = '123/123'
     runner.logging_off
     stdout = [
@@ -123,6 +126,9 @@ class DockerRunnerMockShellerTest < RunnerTestBase
   'when image_name is valid and has not been pulled',
   'then new_kata(image_name, kata_id) pulls it',
   "and creates kata's volume" do
+    cmd = "docker volume ls --quiet --filter 'name=#{volume_name}'"
+    shell.mock_exec(cmd, '', '', success)
+
     image_name = 'cdf/ruby_mini_test'
     stdout = [
       'REPOSITORY     TAG    IMAGE ID     CREATED    SIZE',
@@ -140,6 +146,9 @@ class DockerRunnerMockShellerTest < RunnerTestBase
   'when image_name is valid has been pulled',
   'then new_kata(image_name, kata_id) does not pull it',
   "and creates kata's volume" do
+    cmd = "docker volume ls --quiet --filter 'name=#{volume_name}'"
+    shell.mock_exec(cmd, '', '', success)
+
     image_name = 'cdf/gcc_assert'
     stdout = [
       'REPOSITORY     TAG    IMAGE ID     CREATED    SIZE',
@@ -147,8 +156,10 @@ class DockerRunnerMockShellerTest < RunnerTestBase
     ].join("\n")
     cmd = 'docker images'
     shell.mock_exec(cmd, stdout, '', success)
+
     cmd = "docker volume create --name #{volume_name}"
     shell.mock_exec(cmd, '', '', success)
+
     runner.new_kata(image_name, kata_id)
   end
 
