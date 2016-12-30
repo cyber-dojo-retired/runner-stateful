@@ -32,7 +32,7 @@ class DockerRunner
 
   def new_kata(image_name, kata_id)
     assert_valid_id(kata_id)
-
+    refute_kata_exists(kata_id)
     pull(image_name) unless pulled?(image_name)
     assert_exec("docker volume create --name #{volume_name(kata_id)}")
   end
@@ -256,6 +256,10 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  def refute_kata_exists(id)
+    fail error('kata_id') if kata_exists?(id)
+  end
+
   def assert_valid_id(id)
     fail error('kata_id') unless valid_id?(id)
   end
@@ -268,6 +272,13 @@ class DockerRunner
 
   def hex?(char)
     '0123456789ABCDEF'.include?(char)
+  end
+
+  def kata_exists?(id)
+    name = volume_name(id)
+    cmd = "docker volume ls --quiet --filter 'name=#{name}'"
+    stdout,stderr = assert_exec(cmd)
+    stdout.strip == name
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

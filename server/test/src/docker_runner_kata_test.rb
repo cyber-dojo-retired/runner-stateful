@@ -16,13 +16,26 @@ class DockerRunnerKataTest < RunnerTestBase
       '',           # not 10 chars
       '123456789',  # not 10 chars
       '123456789AB',# not 10 chars
-      '0123456789G' # not 10 hex-chars
+      '123456789G'  # not 10 hex-chars
     ]
     invalid_ids.each do |invalid_id|
       error = assert_raises {
         new_kata({ kata_id:invalid_id })
       }
       assert error.message.start_with? 'kata_id'
+    end
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test '183',
+  'new_kata with kata_id that already exists raises' do
+    new_kata
+    begin
+      error = assert_raises { new_kata }
+      assert error.message.start_with? 'kata_id'
+    ensure
+      old_kata
     end
   end
 
