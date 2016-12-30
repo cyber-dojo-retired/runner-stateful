@@ -31,14 +31,12 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def new_kata(image_name, kata_id)
-    assert_valid_id(kata_id)
     refute_kata_exists(kata_id)
     pull(image_name) unless pulled?(image_name)
     assert_exec("docker volume create --name #{volume_name(kata_id)}")
   end
 
   def old_kata(kata_id)
-    assert_valid_id(kata_id)
     assert_kata_exists(kata_id)
     assert_exec("docker volume rm #{volume_name(kata_id)}")
   end
@@ -46,6 +44,11 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def new_avatar(image_name, kata_id, avatar_name, starting_files)
+    #assert_valid_id(kata_id)
+    #assert_kata_exists(kata_id)
+    #assert_valid_name(avatar_name)
+    #assert_avatar_exists(kata_id, avatar_name)
+
     cid = create_container(image_name, kata_id, avatar_name)
     begin
       sandbox = sandbox_path(avatar_name)
@@ -242,30 +245,32 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def refute_kata_exists(id)
-    fail error('kata_id') if kata_exists?(id)
+  def refute_kata_exists(kata_id)
+    assert_valid_id(kata_id)
+    fail error('kata_id') if kata_exists?(kata_id)
   end
 
-  def assert_kata_exists(id)
-    fail error('kata_id') unless kata_exists?(id)
+  def assert_kata_exists(kata_id)
+    assert_valid_id(kata_id)
+    fail error('kata_id') unless kata_exists?(kata_id)
   end
 
-  def assert_valid_id(id)
-    fail error('kata_id') unless valid_id?(id)
+  def assert_valid_id(kata_id)
+    fail error('kata_id') unless valid_id?(kata_id)
   end
 
-  def valid_id?(id)
-    id.class.name == 'String' &&
-      id.length == 10 &&
-        id.chars.all? { |char| hex?(char) }
+  def valid_id?(kata_id)
+    kata_id.class.name == 'String' &&
+      kata_id.length == 10 &&
+        kata_id.chars.all? { |char| hex?(char) }
   end
 
   def hex?(char)
     '0123456789ABCDEF'.include?(char)
   end
 
-  def kata_exists?(id)
-    name = volume_name(id)
+  def kata_exists?(kata_id)
+    name = volume_name(kata_id)
     cmd = "docker volume ls --quiet --filter 'name=#{name}'"
     stdout,stderr = assert_exec(cmd)
     stdout.strip == name
