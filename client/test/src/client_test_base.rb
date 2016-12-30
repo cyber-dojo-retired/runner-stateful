@@ -11,21 +11,27 @@ class ClientTestBase < HexMiniTest
     runner.pull(name)
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - -
+
   def new_kata(name = image_name, id = kata_id)
     runner.new_kata(name, id)
   end
 
-  def old_kata(id = kata_id)
-    runner.old_kata(id)
+  def old_kata(name = image_name, id = kata_id)
+    runner.old_kata(name, id)
   end
 
-  def new_avatar(iname = image_name, id = kata_id, aname = avatar_name, f = files)
-    runner.new_avatar(iname, id, aname, f)
+  # - - - - - - - - - - - - - - - - - - - - - - -
+
+  def new_avatar(name = image_name, id = kata_id, avatar = avatar_name, f = files)
+    runner.new_avatar(name, id, avatar, f)
   end
 
-  def old_avatar(id = kata_id, name = avatar_name)
-    runner.old_avatar(id, name)
+  def old_avatar(name = image_name, id = kata_id, avatar = avatar_name)
+    runner.old_avatar(name, id, avatar)
   end
+
+  # - - - - - - - - - - - - - - - - - - - - - - -
 
   def runner_run(changed_files, max_seconds = 10)
     args = []
@@ -48,7 +54,7 @@ class ClientTestBase < HexMiniTest
   def stderr; json['stderr']; end
 
   def image_name; 'cyberdojofoundation/gcc_assert'; end
-  def kata_id; test_id; end
+  def kata_id; test_id + '0' * (10-test_id.length); end
   def avatar_name; 'salmon'; end
   def deleted_filenames; []; end
 

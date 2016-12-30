@@ -9,16 +9,31 @@ class RunTest < ClientTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '42D',
-  'run with arguments not matching started avatar raises no_avatar' do
+  'run with invalid kata_id raises kata_id' do
     args = []
     args << image_name
     args << (kata_id = ':') #bad
-    args << (avatar_name = ':') #bad
+    args << (avatar_name = 'salmon')
     args << (max_seconds = 10)
     args << (deleted_filenames = [])
     args << (changed_files = {})
     error = assert_raises { runner.run(*args) }
-    assert error.message.start_with? 'RunnerService:run:no_avatar'
+    assert error.message.start_with? 'RunnerService:run:kata_id'
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test '3BA',
+  'run with invalid avatar_name raises avatar_name' do
+    args = []
+    args << image_name
+    args << kata_id
+    args << (avatar_name = 'lion')
+    args << (max_seconds = 10)
+    args << (deleted_filenames = [])
+    args << (changed_files = {})
+    error = assert_raises { runner.run(*args) }
+    assert error.message.start_with? 'RunnerService:run:avatar_name'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -7,16 +7,19 @@ class NewAvatarTest < ClientTestBase
   def hex_teardown; old_kata; end
 
   test 'C43',
-  'new_avatar with illegal name raises' do
-    error = assert_raises { new_avatar(image_name, 'a', ':') }
+  'new_avatar with invalid kata_id name raises' do
+    error = assert_raises {
+      new_avatar(image_name, kata_id.reverse, 'salmon')
+    }
     assert error.message.start_with? 'RunnerService:new_avatar'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '26D',
-  'new_avatar with legal name succeeds' do
-    new_avatar(image_name, test_id, 'salmon')
+  'new_avatar sunny-day scenario' do
+    new_avatar
+    old_avatar
   end
 
 end

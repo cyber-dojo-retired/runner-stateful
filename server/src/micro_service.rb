@@ -40,7 +40,11 @@ class MicroService < Sinatra::Base
   end
 
   post '/old_avatar' do
-    poster(__method__, image_name, kata_id, avatar_name)
+    args = []
+    args << image_name
+    args << kata_id
+    args << avatar_name
+    poster(__method__, *args)
   end
 
   # - - - - - - - - - - - - - - - - - - - - -
