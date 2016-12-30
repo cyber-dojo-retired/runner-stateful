@@ -172,4 +172,20 @@ class TestBase < HexMiniTest
   def kata_id; test_id + '0' * (10-test_id.length); end
   def avatar_name; 'salmon'; end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def invalid_kata_ids
+    [
+      nil,          # not string
+      Object.new,   # not string
+      [],           # not string
+      '',           # not 10 chars
+      '123456789',  # not 10 chars
+      '123456789AB',# not 10 chars
+      '123456789G'  # not 10 hex-chars
+    ]
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 end

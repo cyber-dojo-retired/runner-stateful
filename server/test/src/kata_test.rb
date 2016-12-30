@@ -1,5 +1,4 @@
 require_relative 'test_base'
-require_relative 'mock_sheller'
 
 class KataTest < TestBase
 
@@ -9,8 +8,8 @@ class KataTest < TestBase
 
   test 'D7B',
   'new_kata with an invalid kata_id raises' do
-    invalid_ids.each do |invalid_id|
-      assert_raises_kata_id(invalid_id)
+    invalid_kata_ids.each do |invalid_kata_id|
+      assert_raises_kata_id(invalid_kata_id)
     end
   end
 
@@ -30,8 +29,8 @@ class KataTest < TestBase
 
   test 'CED',
   'old_kata with invalid kata_id raises' do
-    invalid_ids.each do |invalid_id|
-      assert_raises_kata_id(invalid_id)
+    invalid_kata_ids.each do |invalid_kata_id|
+      assert_raises_kata_id(invalid_kata_id)
     end
   end
 
@@ -58,16 +57,14 @@ class KataTest < TestBase
 
   private
 
-  def invalid_ids
-    [
-      nil,          # not string
-      Object.new,   # not string
-      [],           # not string
-      '',           # not 10 chars
-      '123456789',  # not 10 chars
-      '123456789AB',# not 10 chars
-      '123456789G'  # not 10 hex-chars
-    ]
+  def volume_exists?
+    cmd = [
+      'docker volume ls',
+      '--quiet',
+      "--filter 'name=#{volume_name}'"
+    ].join(space)
+    stdout,_ = assert_exec(cmd)
+    stdout.strip == volume_name
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -77,18 +74,6 @@ class KataTest < TestBase
       new_kata( { kata_id:id })
     }
     assert error.message.start_with? 'kata_id'
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def volume_exists?
-    cmd = [
-      'docker volume ls',
-      '--quiet',
-      "--filter 'name=#{volume_name}'"
-    ].join(space)
-    stdout,_ = assert_exec(cmd)
-    stdout.strip == volume_name
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
