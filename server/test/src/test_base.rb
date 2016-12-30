@@ -31,59 +31,63 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def new_kata(options = {})
-    options[:kata_id   ] = kata_id     unless options.key? :kata_id
-    kata_id    = options[:kata_id   ]
-    runner.new_kata(kata_id)
+  def new_kata(args_hash = {})
+    args = defaulted_args(__method__, args_hash)
+    runner.new_kata(*args)
   end
 
-  def old_kata(options = {})
-    options[:kata_id] = kata_id unless options.key? :kata_id
-    kata_id = options[:kata_id]
-    runner.old_kata(kata_id)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def new_avatar(options = {})
-    options[:image_name ] = @image_name unless options.key? :image_name
-    options[:kata_id    ] = kata_id     unless options.key? :kata_id
-    options[:avatar_name] = avatar_name unless options.key? :avatar_name
-    image_name  = options[:image_name ]
-    kata_id     = options[:kata_id    ]
-    avatar_name = options[:avatar_name]
-    runner.new_avatar(image_name, kata_id, avatar_name, files)
-  end
-
-  def old_avatar(options = {})
-    options[:image_name ] = @image_name unless options.key? :image_name
-    options[:kata_id    ] = kata_id     unless options.key? :kata_id
-    options[:avatar_name] = avatar_name unless options.key? :avatar_name
-    image_name  = options[:image_name ]
-    kata_id     = options[:kata_id    ]
-    avatar_name = options[:avatar_name]
-    runner.old_avatar(image_name, kata_id, avatar_name)
+  def old_kata(args_hash = {})
+    args = defaulted_args(__method__, args_hash)
+    runner.old_kata(*args)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def runner_run(options = {})
+  def new_avatar(args_hash = {})
+    args = defaulted_args(__method__, args_hash)
+    args << files
+    runner.new_avatar(*args)
+  end
+
+  def old_avatar(args_hash = {})
+    args = defaulted_args(__method__, args_hash)
+    runner.old_avatar(*args)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def runner_run(args_hash = {})
     # don't call this run() as it clashes with MiniTest
-    options[:image_name       ] = @image_name unless options.key? :image_name
-    options[:kata_id          ] = kata_id     unless options.key? :kata_id
-    options[:avatar_name      ] = avatar_name unless options.key? :avatar_name
-    options[:deleted_filenames] = []          unless options.key? :deleted_filenames
-    options[:changed_files    ] = files       unless options.key? :changed_files
-    options[:max_seconds      ] = 10          unless options.key? :max_seconds
-    args = []
-    args << options[:image_name]
-    args << options[:kata_id]
-    args << options[:avatar_name]
-    args << options[:deleted_filenames]
-    args << options[:changed_files]
-    args << options[:max_seconds]
+    args = defaulted_args(__method__, args_hash)
     @sss = runner.run(*args)
     [stdout,stderr,status]
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def defaulted_args(method, args_hash)
+    method = method.to_s
+    args = []
+    unless method.include? 'kata'
+      args_hash[:image_name ] = @image_name unless args_hash.key? :image_name
+      args << args_hash[:image_name ]
+    end
+
+    args_hash[:kata_id] = kata_id unless args_hash.key? :kata_id
+    args << args_hash[:kata_id]
+    return args if method.include?('kata')
+
+    args_hash[:avatar_name] = avatar_name unless args_hash.key? :avatar_name
+    args << args_hash[:avatar_name]
+    return args if method.include?('avatar')
+
+    args_hash[:deleted_filenames] = []    unless args_hash.key? :deleted_filenames
+    args_hash[:changed_files    ] = files unless args_hash.key? :changed_files
+    args_hash[:max_seconds      ] = 10    unless args_hash.key? :max_seconds
+    args << args_hash[:deleted_filenames]
+    args << args_hash[:changed_files]
+    args << args_hash[:max_seconds]
+    args
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
