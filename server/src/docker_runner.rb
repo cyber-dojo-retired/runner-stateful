@@ -50,9 +50,6 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def new_avatar(image_name, kata_id, avatar_name, starting_files)
-    assert_valid_id(kata_id)
-    assert_kata_exists(kata_id)
-    assert_valid_name(avatar_name)
     cid = create_container(image_name, kata_id, avatar_name)
     begin
       refute_avatar_exists(cid, avatar_name)
@@ -71,9 +68,6 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def old_avatar(image_name, kata_id, avatar_name)
-    assert_valid_id(kata_id)
-    assert_kata_exists(kata_id)
-    assert_valid_name(avatar_name)
     cid = create_container(image_name, kata_id, avatar_name)
     begin
       assert_avatar_exists(cid, avatar_name)
@@ -86,9 +80,6 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run(image_name, kata_id, avatar_name, deleted_filenames, changed_files, max_seconds)
-    assert_valid_id(kata_id)
-    assert_kata_exists(kata_id)
-    assert_valid_name(avatar_name)
     cid = create_container(image_name, kata_id, avatar_name)
     begin
       assert_avatar_exists(cid, avatar_name)
@@ -127,12 +118,16 @@ class DockerRunner
   include StringTruncater
 
   def create_container(image_name, kata_id, avatar_name)
-    # Volume mounts the avatar's volume
+    # Volume mounts the kata's volume
     #     [docker run ... --volume=V:/sandboxes:rw  ...]
-    # Volume V is assumed to exist via an earlier new_kata() call.
-    # If volume V does _not_ exist the [docker run] will nevertheless
+    # Volume V must exist via an earlier new_kata() call.
+    # If volume V does _not_ exist the [docker run] would nevertheless
     # succeed, create the container, and create a /sandboxes/ folder in it!
     # https://github.com/docker/docker/issues/13121
+    # Hence the call to docker run is guarded by argument checks.
+    assert_valid_id(kata_id)
+    assert_kata_exists(kata_id)
+    assert_valid_name(avatar_name)
     sandbox = sandbox_path(avatar_name)
     args = [
       '--detach',                          # get the cid
