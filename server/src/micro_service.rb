@@ -1,7 +1,7 @@
 require 'sinatra/base'
 require 'json'
 
-require_relative 'docker_runner'
+require_relative 'docker_volume_runner'
 require_relative 'externals'
 
 class MicroService < Sinatra::Base
@@ -18,9 +18,17 @@ class MicroService < Sinatra::Base
     poster(__method__, image_name)
   end
 
+  # - - - - - - - - - - - - - - - - - - - - -
+
   post '/new_kata' do
     poster(__method__, image_name, kata_id)
   end
+
+  post '/old_kata' do
+    poster(__method__, image_name, kata_id)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - -
 
   post '/new_avatar' do
     args = []
@@ -30,6 +38,12 @@ class MicroService < Sinatra::Base
     args << starting_files
     poster(__method__, *args)
   end
+
+  post '/old_avatar' do
+    poster(__method__, image_name, kata_id, avatar_name)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - -
 
   post '/run' do
     args = []
@@ -42,13 +56,6 @@ class MicroService < Sinatra::Base
     poster(__method__, *args)
   end
 
-  post '/old_avatar' do
-    poster(__method__, kata_id, avatar_name)
-  end
-
-  post '/old_kata' do
-    poster(__method__, kata_id)
-  end
 
   private
 
@@ -62,7 +69,7 @@ class MicroService < Sinatra::Base
 
   def storer_json(prefix, caller, *args)
     name = caller.to_s[prefix.length .. -1]
-    runner = DockerRunner.new(self)
+    runner = DockerVolumeRunner.new(self)
     { name => runner.send(name, *args) }.to_json
   rescue Exception => e
     log << "EXCEPTION: #{e.class.name} #{e.to_s}"

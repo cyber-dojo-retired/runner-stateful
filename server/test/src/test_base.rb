@@ -1,7 +1,7 @@
-require 'json'
 require_relative '../hex_mini_test'
-require_relative '../../src/docker_runner'
+require_relative '../../src/docker_volume_runner'
 require_relative '../../src/externals'
+require 'json'
 
 class TestBase < HexMiniTest
 
@@ -19,7 +19,7 @@ class TestBase < HexMiniTest
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   include Externals
-  def runner; @runner ||= DockerRunner.new(self); end
+  def runner; @runner ||= DockerVolumeRunner.new(self); end
 
   def pulled?(name = @image_name)
     runner.pulled?(name)

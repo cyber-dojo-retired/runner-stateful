@@ -2,10 +2,11 @@ require_relative 'all_avatars_names'
 require_relative 'nearest_external'
 require_relative 'string_cleaner'
 require_relative 'string_truncater'
-
 require 'timeout'
 
-class DockerRunner
+# Uses a single docker-volume per kata
+
+class DockerVolumeRunner
 
   def initialize(parent)
     @parent = parent

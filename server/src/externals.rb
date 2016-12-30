@@ -1,12 +1,12 @@
-require_relative 'external_disk_writer'
-require_relative 'external_sheller'
-require_relative 'external_stdout_logger'
+require_relative 'disk_writer'
+require_relative 'sheller'
+require_relative 'stdout_logger'
 
 module Externals
 
-  def shell; @shell ||= ExternalSheller.new(self); end
-  def  disk;  @disk ||= ExternalDiskWriter.new(self); end
-  def   log;   @log ||= ExternalStdoutLogger.new(self); end
+  def shell; @shell ||= Sheller.new(self); end
+  def  disk;  @disk ||= DiskWriter.new(self); end
+  def   log;   @log ||= StdoutLogger.new(self); end
 
 end
 

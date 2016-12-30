@@ -1,7 +1,7 @@
 require_relative 'nearest_external'
 require 'open3'
 
-class ExternalSheller
+class Sheller
 
   def initialize(parent)
     @parent = parent

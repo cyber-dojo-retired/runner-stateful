@@ -9,22 +9,22 @@ class ExternalsTest < TestBase
   # - - - - - - - - - - - - - - - - -
 
   test '920',
-  'default disk is ExternalDiskWriter' do
-    assert_equal 'ExternalDiskWriter', disk.class.name
+  'default disk is DiskWriter' do
+    assert_equal 'DiskWriter', disk.class.name
   end
 
   # - - - - - - - - - - - - - - - - -
 
   test '3EC',
-  'default log is ExternalStdoutLogger' do
-    assert_equal 'ExternalStdoutLogger', log.class.name
+  'default log is StdoutLogger' do
+    assert_equal 'StdoutLogger', log.class.name
   end
 
   # - - - - - - - - - - - - - - - - -
 
   test '1B1',
-  'default shell is ExternalSheller' do
-    assert_equal 'ExternalSheller', shell.class.name
+  'default shell is Sheller' do
+    assert_equal 'Sheller', shell.class.name
   end
 
 end
