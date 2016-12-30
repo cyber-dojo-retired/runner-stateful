@@ -3,9 +3,11 @@ require_relative 'client_test_base'
 class NewAvatarTest < ClientTestBase
 
   def self.hex_prefix; '4F725'; end
+  def hex_setup; new_kata; end
+  def hex_teardown; old_kata; end
 
   test 'C43',
-  'new_avatar with illegal volume name raises' do
+  'new_avatar with illegal name raises' do
     error = assert_raises { new_avatar(image_name, 'a', ':') }
     assert error.message.start_with? 'RunnerService:new_avatar'
   end
@@ -14,11 +16,7 @@ class NewAvatarTest < ClientTestBase
 
   test '26D',
   'new_avatar with legal name succeeds' do
-    begin
-      new_avatar(image_name, test_id, 'salmon')
-    ensure
-      old_avatar(test_id, 'salmon')
-    end
+    new_avatar(image_name, test_id, 'salmon')
   end
 
 end

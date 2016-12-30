@@ -158,7 +158,7 @@ class RunnerTestBase < HexMiniTest
   end
 
   def sandbox(name = 'salmon')
-    runner.sandbox(name)
+    runner.sandbox_path(name)
   end
 
   def success; runner.success; end

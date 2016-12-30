@@ -32,28 +32,25 @@ class DockerRunner
 
   def new_kata(image_name, kata_id)
     pull(image_name) unless pulled?(image_name)
-    @kata_id = kata_id
-    assert_exec("docker volume create --name #{volume_name}")
+    assert_exec("docker volume create --name #{volume_name(kata_id)}")
   end
 
   def old_kata(kata_id)
-    @kata_id = kata_id
-    assert_exec("docker volume rm #{volume_name}")
+    assert_exec("docker volume rm #{volume_name(kata_id)}")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def new_avatar(image_name, kata_id, avatar_name, starting_files)
-    @image_name = image_name
-    @kata_id = kata_id
-    @avatar_name = avatar_name
-    cid = create_container
+    cid = create_container(image_name, kata_id, avatar_name)
     begin
+      sandbox = sandbox_path(avatar_name)
       cmd = "mkdir #{sandbox}"
       assert_docker_exec(cid, cmd)
-      cmd = "chown #{user_id}:#{group} #{sandbox}"
+      uid = user_id(avatar_name)
+      cmd = "chown #{uid}:#{group} #{sandbox}"
       assert_docker_exec(cid, cmd)
-      change_files(cid, starting_files)
+      change_files(cid, avatar_name, starting_files)
     ensure
       remove_container(cid)
     end
@@ -65,17 +62,16 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run(image_name, kata_id, avatar_name, deleted_filenames, changed_files, max_seconds)
-    @image_name = image_name
-    @kata_id = kata_id
-    @avatar_name = avatar_name
-    cmd = "docker volume ls --quiet --filter 'name=#{volume_name}'"
+    name = volume_name(kata_id)
+    cmd = "docker volume ls --quiet --filter 'name=#{name}'"
     stdout,stderr = assert_exec(cmd)
-    fail ArgumentError.new('no_kata') unless stdout.strip == volume_name
-    cid = create_container
+    fail ArgumentError.new('no_kata') unless stdout.strip == name
+
+    cid = create_container(image_name, kata_id, avatar_name)
     begin
-      delete_files(cid, deleted_filenames)
-      change_files(cid, changed_files)
-      stdout,stderr,status = run_cyber_dojo_sh(cid, max_seconds)
+      delete_files(cid, avatar_name, deleted_filenames)
+      change_files(cid, avatar_name, changed_files)
+      stdout,stderr,status = run_cyber_dojo_sh(cid, avatar_name, max_seconds)
       stdout = truncated(cleaned(stdout))
       stderr = truncated(cleaned(stderr))
       { stdout:stdout, stderr:stderr, status:status }
@@ -86,16 +82,16 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def user_id(name = @avatar_name)
-    40000 + all_avatars_names.index(name)
+  def user_id(avatar_name)
+    40000 + all_avatars_names.index(avatar_name)
   end
 
   def group
     'nogroup'
   end
 
-  def sandbox(name = @avatar_name)
-    "#{sandboxes_root}/#{name}"
+  def sandbox_path(avatar_name)
+    "#{sandboxes_root}/#{avatar_name}"
   end
 
   def success; shell.success; end
@@ -107,31 +103,33 @@ class DockerRunner
   include StringCleaner
   include StringTruncater
 
-  def create_container
+  def create_container(image_name, kata_id, avatar_name)
     # Volume mounts the avatar's volume
     #     [docker run ... --volume=V:/sandboxes:rw  ...]
     # Volume V is assumed to exist via an earlier new_kata() call.
     # If volume V does _not_ exist the [docker run] will nevertheless
     # succeed, create the container, and create a /sandboxes/ folder in it!
     # https://github.com/docker/docker/issues/13121
+    sandbox = sandbox_path(avatar_name)
     args = [
       '--detach',                          # get the cid
       '--interactive',                     # later execs
       '--net=none',                        # security - no network
       '--pids-limit=64',                   # security - no fork bombs
       '--security-opt=no-new-privileges',  # security - no escalation
-      "--env CYBER_DOJO_KATA_ID=#{@kata_id}",
-      "--env CYBER_DOJO_AVATAR_NAME=#{@avatar_name}",
+      "--env CYBER_DOJO_KATA_ID=#{kata_id}",
+      "--env CYBER_DOJO_AVATAR_NAME=#{avatar_name}",
       "--env CYBER_DOJO_SANDBOX=#{sandbox}",
       '--user=root',
-      "--volume=#{volume_name}:/#{sandboxes_root}:rw"
+      "--volume=#{volume_name(kata_id)}:/#{sandboxes_root}:rw"
     ].join(space)
-    cid = assert_exec("docker run #{args} #{@image_name} sh")[0].strip
+    cid = assert_exec("docker run #{args} #{image_name} sh")[0].strip
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def delete_files(cid, filenames)
+  def delete_files(cid, avatar_name, filenames)
+    sandbox = sandbox_path(avatar_name)
     filenames.each do |filename|
       assert_docker_exec(cid, "rm #{sandbox}/#{filename}")
     end
@@ -139,7 +137,8 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def change_files(cid, files)
+  def change_files(cid, avatar_name, files)
+    sandbox = sandbox_path(avatar_name)
     Dir.mktmpdir('runner') do |tmp_dir|
       files.each do |filename, content|
         host_filename = tmp_dir + '/' + filename
@@ -148,18 +147,21 @@ class DockerRunner
       end
       assert_exec("docker cp #{tmp_dir}/. #{cid}:#{sandbox}")
     end
+    uid = user_id(avatar_name)
     files.keys.each do |filename|
-      cmd = "chown #{user_id}:#{group} #{sandbox}/#{filename}"
+      cmd = "chown #{uid}:#{group} #{sandbox}/#{filename}"
       assert_docker_exec(cid, cmd)
     end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def run_cyber_dojo_sh(cid, max_seconds)
+  def run_cyber_dojo_sh(cid, avatar_name, max_seconds)
+    uid = user_id(avatar_name)
+    sandbox = sandbox_path(avatar_name)
     cmd = [
       'docker exec',
-      "--user=#{user_id}",
+      "--user=#{uid}",
       '--interactive',
       cid,
       "sh -c 'cd #{sandbox} && ./cyber-dojo.sh'"
@@ -221,8 +223,8 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def volume_name
-    "cyber_dojo_#{@kata_id}"
+  def volume_name(kata_id)
+    [ 'cyber', 'dojo', kata_id ].join('_')
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
