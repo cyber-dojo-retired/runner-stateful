@@ -145,8 +145,10 @@ class DockerRunnerMockShellerTest < RunnerTestBase
       'REPOSITORY     TAG    IMAGE ID     CREATED    SIZE',
       "#{image_name}  latest 28683e525ad3 9 days ago 95.97 MB"
     ].join("\n")
-    shell.mock_exec('docker images', stdout, '', success)
-    shell.mock_exec("docker volume create --name #{volume_name}", '', '', success)
+    cmd = 'docker images'
+    shell.mock_exec(cmd, stdout, '', success)
+    cmd = "docker volume create --name #{volume_name}"
+    shell.mock_exec(cmd, '', '', success)
     runner.new_kata(image_name, kata_id)
   end
 
@@ -158,7 +160,8 @@ class DockerRunnerMockShellerTest < RunnerTestBase
   "when there is no volume, run() returns 'no_kata' error status",
   'enabling the web server to seamlessly transition a pre-runner',
   "server's kata to the new runner" do
-    shell.mock_exec("docker volume ls --quiet --filter 'name=#{volume_name}'", '', '', success)
+    cmd = "docker volume ls --quiet --filter 'name=#{volume_name}'"
+    shell.mock_exec(cmd, '', '', success)
     args = []
     args << 'cdf/gcc_assert'
     args << kata_id
