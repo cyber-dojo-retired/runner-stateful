@@ -31,6 +31,8 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def new_kata(image_name, kata_id)
+    assert_valid_id(kata_id)
+
     pull(image_name) unless pulled?(image_name)
     assert_exec("docker volume create --name #{volume_name(kata_id)}")
   end
@@ -97,7 +99,7 @@ class DockerRunner
   def success; shell.success; end
   def timed_out; 'timed_out'; end
 
-  private
+  private # ==========================================================
 
   include AllAvatarsNames
   include StringCleaner
@@ -254,9 +256,30 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def space; ' '; end
+  def assert_valid_id(id)
+    fail error('kata_id') unless valid_id?(id)
+  end
+
+  def valid_id?(id)
+    id.class.name == 'String' &&
+      id.length == 10 &&
+        id.chars.all? { |char| hex?(char) }
+  end
+
+  def hex?(char)
+    '0123456789ABCDEF'.include?(char)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def error(message)
+    ArgumentError.new(message)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def sandboxes_root; '/sandboxes'; end
+  def space; ' '; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
