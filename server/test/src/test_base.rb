@@ -68,12 +68,10 @@ class TestBase < HexMiniTest
   def defaulted_args(method, args_hash)
     method = method.to_s
     args = []
-    unless method.include? 'kata'
-      args_hash[:image_name ] = @image_name unless args_hash.key? :image_name
-      args << args_hash[:image_name ]
-    end
 
-    args_hash[:kata_id] = kata_id unless args_hash.key? :kata_id
+    args_hash[:image_name ] = @image_name unless args_hash.key? :image_name
+    args_hash[:kata_id    ] = kata_id     unless args_hash.key? :kata_id
+    args << args_hash[:image_name ]
     args << args_hash[:kata_id]
     return args if method.include?('kata')
 

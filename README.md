@@ -32,6 +32,7 @@ Tells the runner-service to pull the given image.
 Tells the runner-service a kata with the given id and image_name has been set up.
 Must be called before new_avatar.
 - parameters
+  * image_name, eg 'cyberdojofoundation/gcc_assert'
   * kata_id, eg '15B9AD6C42'
 
 - - - -
@@ -39,6 +40,7 @@ Must be called before new_avatar.
 # old_kata
 Tells the runner-service the kata with the given id has been torn down.
 - parameters
+  * image_name, eg 'cyberdojofoundation/gcc_assert'
   * kata_id, eg '15B9AD6C42'
 
 - - - -

@@ -31,7 +31,7 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def new_kata(kata_id)
+  def new_kata(_image_name, kata_id)
     assert_valid_id(kata_id)
     refute_kata_exists(kata_id)
     assert_exec("docker volume create --name #{volume_name(kata_id)}")
@@ -39,7 +39,7 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def old_kata(kata_id)
+  def old_kata(_image_name, kata_id)
     assert_valid_id(kata_id)
     assert_kata_exists(kata_id)
     assert_exec("docker volume rm #{volume_name(kata_id)}")
