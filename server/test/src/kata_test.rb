@@ -75,9 +75,9 @@ class KataTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_raises_kata_id(id)
+  def assert_raises_kata_id(kata_id)
     error = assert_raises(ArgumentError) {
-      new_kata( { kata_id:id })
+      new_kata( { kata_id:kata_id })
     }
     assert error.message.start_with? 'kata_id'
   end

@@ -69,15 +69,21 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def runner_run(changed_files, max_seconds = 10, deleted_filenames = [])
+  def runner_run(options = {})
     # don't call this run() as it clashes with MiniTest
+    options[:image_name       ] = @image_name unless options.key? :image_name
+    options[:kata_id          ] = kata_id     unless options.key? :kata_id
+    options[:avatar_name      ] = avatar_name unless options.key? :avatar_name
+    options[:deleted_filenames] = []          unless options.key? :deleted_filenames
+    options[:changed_files    ] = files       unless options.key? :changed_files
+    options[:max_seconds      ] = 10          unless options.key? :max_seconds
     args = []
-    args << @image_name
-    args << kata_id
-    args << avatar_name
-    args << deleted_filenames
-    args << changed_files
-    args << max_seconds
+    args << options[:image_name]
+    args << options[:kata_id]
+    args << options[:avatar_name]
+    args << options[:deleted_filenames]
+    args << options[:changed_files]
+    args << options[:max_seconds]
     @sss = runner.run(*args)
     [stdout,stderr,status]
   end
@@ -100,23 +106,25 @@ class TestBase < HexMiniTest
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_cyber_dojo_sh_no_stderr(script)
-    assert_run_succeeds_no_stderr({ 'cyber-dojo.sh' => script })
+    assert_run_succeeds_no_stderr({
+      changed_files: { 'cyber-dojo.sh' => script }
+    })
   end
 
-  def assert_run_succeeds_no_stderr(*args)
-    stdout,stderr = assert_run_succeeds(*args)
+  def assert_run_succeeds_no_stderr(options)
+    stdout,stderr = assert_run_succeeds(options)
     assert_equal '', stderr, stdout
     stdout
   end
 
-  def assert_run_succeeds(*args)
-    stdout,stderr,status = runner_run(*args)
+  def assert_run_succeeds(options)
+    stdout,stderr,status = runner_run(options)
     assert_equal success, status, [stdout,stderr]
     [stdout,stderr]
   end
 
-  def assert_run_times_out(*args)
-    stdout,stderr,status = runner_run(*args)
+  def assert_run_times_out(options)
+    stdout,stderr,status = runner_run(options)
     assert_equal timed_out, status, [stdout,stderr]
     [stdout,stderr]
   end

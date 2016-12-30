@@ -21,7 +21,11 @@ class TimeoutTest < TestBase
       '    return 6 * 7;',
       '}'
     ].join("\n")
-    stdout,stderr = assert_run_times_out(gcc_assert_files, max_seconds = 2)
+    options = {
+      changed_files:gcc_assert_files,
+      max_seconds:2
+    }
+    stdout,stderr = assert_run_times_out(options)
     assert_equal '', stdout
     assert_equal '', stderr
   end
@@ -43,7 +47,11 @@ class TimeoutTest < TestBase
       '    return 6 * 7;',
       '}'
     ].join("\n")
-    stdout,stderr = assert_run_times_out(gcc_assert_files, max_seconds = 2)
+    options = {
+      changed_files:gcc_assert_files,
+      max_seconds:2
+    }
+    stdout,stderr = assert_run_times_out(options)
     assert_equal '', stdout
     assert_equal '', stderr
   end
