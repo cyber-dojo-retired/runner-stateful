@@ -32,7 +32,6 @@ Tells the runner-service to pull the given image.
 Tells the runner-service a kata with the given id and image_name has been set up.
 Must be called before new_avatar.
 - parameters
-  * image_name, eg 'cyberdojofoundation/gcc_assert'
   * kata_id, eg '15B9AD6C42'
 
 - - - -
@@ -58,6 +57,7 @@ Must be called before run.
 # old_avatar
 Tells the runner-service the given avatar has left the given kata.
 - parameters
+  * image_name, eg 'cyberdojofoundation/gcc_assert'
   * kata_id, eg '15B9AD6C42'
   * avatar_name, eg 'salmon'
 
@@ -77,15 +77,15 @@ Tells the runner-service the given avatar has left the given kata.
 - returns eg
 ```
     { "run": {
-      "status":integer,
-      "stdout":...,
-      "stderr":...
+        "status":integer,
+        "stdout":...,
+        "stderr":...
     } -> run completed in max_seconds
 
     { "run": {
-      "status":"timed_out",
-      "stdout":"",
-      "stderr":""
+        "status":"timed_out",
+        "stdout":"",
+        "stderr":""
     } -> did not complete in max_seconds
 ```
 
