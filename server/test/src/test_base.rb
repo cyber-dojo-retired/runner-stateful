@@ -33,22 +33,35 @@ class TestBase < HexMiniTest
 
   def new_kata(options = {})
     options[:image_name] = @image_name unless options.key? :image_name
-    options[:kata_id]    = kata_id     unless options.key? :kata_id
-    runner.new_kata(options[:image_name], options[:kata_id])
+    options[:kata_id   ] = kata_id     unless options.key? :kata_id
+    image_name = options[:image_name]
+    kata_id    = options[:kata_id   ]
+    runner.new_kata(image_name, kata_id)
   end
 
   def old_kata(options = {})
     options[:kata_id] = kata_id unless options.key? :kata_id
-    runner.old_kata(options[:kata_id])
+    kata_id = options[:kata_id]
+    runner.old_kata(kata_id)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def new_avatar
-    runner.new_avatar(@image_name, kata_id, avatar_name, files)
+  def new_avatar(options = {})
+    options[:image_name ] = @image_name unless options.key? :image_name
+    options[:kata_id    ] = kata_id     unless options.key? :kata_id
+    options[:avatar_name] = avatar_name unless options.key? :avatar_name
+    image_name  = options[:image_name ]
+    kata_id     = options[:kata_id    ]
+    avatar_name = options[:avatar_name]
+    runner.new_avatar(image_name, kata_id, avatar_name, files)
   end
 
-  def old_avatar
+  def old_avatar(options = {})
+    options[:kata_id    ] = kata_id     unless options.key? :kata_id
+    options[:avatar_name] = avatar_name unless options.key? :avatar_name
+    kata_id     = options[:kata_id    ]
+    avatar_name = options[:avatar_name]
     runner.old_avatar(kata_id, avatar_name)
   end
 
