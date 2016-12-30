@@ -81,45 +81,29 @@ class AvatarTest < TestBase
   private
 
   def assert_new_avatar_raises_kata_id(kata_id, avatar_name)
-    error = assert_raises(ArgumentError) {
-      new_avatar({
-            kata_id:kata_id,
-        avatar_name:avatar_name
-      })
-    }
-    assert error.message.start_with?('kata_id'), error.message
+    assert_raises_method_message(:new_avatar, 'kata_id', kata_id, avatar_name)
   end
 
   def assert_new_avatar_raises_avatar_name(kata_id, avatar_name)
-    error = assert_raises(ArgumentError) {
-      new_avatar({
-            kata_id:kata_id,
-        avatar_name:avatar_name
-      })
-    }
-    assert error.message.start_with?('avatar_name'), error.message
+    assert_raises_method_message(:new_avatar, 'avatar_name', kata_id, avatar_name)
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   def assert_old_avatar_raises_kata_id(kata_id, avatar_name)
-    error = assert_raises(ArgumentError) {
-      old_avatar({
-            kata_id:kata_id,
-        avatar_name:avatar_name
-      })
-    }
-    assert error.message.start_with?('kata_id'), error.message
+    assert_raises_method_message(:old_avatar, 'kata_id', kata_id, avatar_name)
   end
 
   def assert_old_avatar_raises_avatar_name(kata_id, avatar_name)
+    assert_raises_method_message(:old_avatar, 'avatar_name', kata_id, avatar_name)
+  end
+
+  def assert_raises_method_message(method, message, kata_id, avatar_name)
     error = assert_raises(ArgumentError) {
-      old_avatar({
+      self.send(method, {
             kata_id:kata_id,
         avatar_name:avatar_name
       })
     }
-    assert error.message.start_with?('avatar_name'), error.message
+    assert error.message.start_with?(message), error.message
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
