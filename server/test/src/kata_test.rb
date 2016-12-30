@@ -6,6 +6,17 @@ class KataTest < TestBase
 
   def hex_setup; @image_name = 'cyberdojofoundation/gcc_assert'; end
 
+  test 'DBC',
+  'before new_kata volume does not exist,',
+  'after new_kata it does,',
+  'after old_kata it does not' do
+    refute volume_exists?
+    new_kata
+    assert volume_exists?
+    old_kata
+    refute volume_exists?
+  end
+
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
   # new_kata
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -13,7 +24,7 @@ class KataTest < TestBase
   test 'D7B',
   'new_kata with an invalid kata_id raises' do
     invalid_kata_ids.each do |invalid_kata_id|
-      assert_raises_kata_id(invalid_kata_id)
+      assert_new_kata_raises(invalid_kata_id)
     end
   end
 
@@ -23,7 +34,7 @@ class KataTest < TestBase
   'new_kata with kata_id that already exists raises' do
     new_kata
     begin
-      assert_raises_kata_id(kata_id)
+      assert_new_kata_raises(kata_id)
     ensure
       old_kata
     end
@@ -36,7 +47,7 @@ class KataTest < TestBase
   test 'CED',
   'old_kata with invalid kata_id raises' do
     invalid_kata_ids.each do |invalid_kata_id|
-      assert_raises_kata_id(invalid_kata_id)
+      assert_old_kata_raises(invalid_kata_id)
     end
   end
 
@@ -44,21 +55,9 @@ class KataTest < TestBase
 
   test '0A2',
   'old_kata with valid kata_id that does not exist raises' do
-    error = assert_raises { old_kata }
-    assert error.message.start_with? 'kata_id'
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test 'DBC',
-  'before new_kata volume does not exist,',
-  'after new_kata it does,',
-  'after old_kata it does not' do
-    refute volume_exists?
-    new_kata
-    assert volume_exists?
-    old_kata
-    refute volume_exists?
+    invalid_kata_ids.each do |invalid_kata_id|
+      assert_old_kata_raises(invalid_kata_id)
+    end
   end
 
   private
@@ -75,9 +74,16 @@ class KataTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_raises_kata_id(kata_id)
+  def assert_new_kata_raises(kata_id)
     error = assert_raises(ArgumentError) {
       new_kata( { kata_id:kata_id })
+    }
+    assert error.message.start_with?('kata_id'), error.message
+  end
+
+  def assert_old_kata_raises(kata_id)
+    error = assert_raises(ArgumentError) {
+      old_kata( { kata_id:kata_id })
     }
     assert error.message.start_with?('kata_id'), error.message
   end

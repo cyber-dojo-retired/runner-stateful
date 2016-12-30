@@ -32,11 +32,9 @@ class TestBase < HexMiniTest
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def new_kata(options = {})
-    options[:image_name] = @image_name unless options.key? :image_name
     options[:kata_id   ] = kata_id     unless options.key? :kata_id
-    image_name = options[:image_name]
     kata_id    = options[:kata_id   ]
-    runner.new_kata(image_name, kata_id)
+    runner.new_kata(kata_id)
   end
 
   def old_kata(options = {})

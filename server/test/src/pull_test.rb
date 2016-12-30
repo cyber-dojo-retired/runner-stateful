@@ -1,12 +1,11 @@
 require_relative 'test_base'
 require_relative 'mock_sheller'
 
-class RunMockShellerTest < TestBase
+class PullTest < TestBase
 
   def self.hex_prefix; '0D5'; end
 
   def shell; @shell ||= MockSheller.new(nil); end
-
   def hex_teardown; shell.teardown; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -79,84 +78,7 @@ class RunMockShellerTest < TestBase
     pull('cdf/ruby_mini_test')
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # new_kata
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test 'AED',
-  'when image_name is invalid, then new_kata(image_name, kata_id) raises' do
-    mock_kata_volume_does_not_exist
-    mock_docker_images_prints_gcc_assert
-
-    bad_image_name = '123/123'
-    runner.logging_off
-
-    stdout = [
-      "Using default tag: latest",
-      "Pulling repository docker.io/#{bad_image_name}"
-    ].join("\n")
-    stderr = "Error: image #{bad_image_name}:latest not found"
-    shell.mock_exec("docker pull #{bad_image_name}", stdout, stderr, 1)
-
-    assert_raises { runner.new_kata(bad_image_name, kata_id) }
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test '36C',
-  'when image_name is valid and has not been pulled',
-  'then new_kata(image_name, kata_id) pulls it',
-  "and creates kata's volume" do
-    mock_kata_volume_does_not_exist
-    mock_docker_images_prints_gcc_assert
-    mock_docker_pull_cdf_ruby_mini_test
-    mock_docker_volume_create
-    runner.new_kata('cdf/ruby_mini_test', kata_id)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test 'DFA',
-  'when image_name is valid has been pulled',
-  'then new_kata(image_name, kata_id) does not pull it',
-  "and creates kata's volume" do
-    mock_kata_volume_does_not_exist
-    mock_docker_images_prints_gcc_assert
-    mock_docker_volume_create
-    runner.new_kata('cdf/gcc_assert', kata_id)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # run
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test 'E92',
-  "when there is no volume, run() returns 'kata_id' error status",
-  'enabling the web server to seamlessly transition a pre-runner',
-  "server's kata to the new runner" do
-    cmd = "docker volume ls --quiet --filter 'name=#{volume_name}'"
-    shell.mock_exec(cmd, '', '', success)
-    args = []
-    args << 'cdf/gcc_assert'
-    args << kata_id
-    args << avatar_name
-    args << (deleted_filenames=[])
-    args << (changed_files={})
-    args << (max_seconds=10)
-    error = assert_raises { runner.run(*args) }
-    assert_equal 'kata_id', error.message
-  end
-
   private
-
-  def volume_name
-    'cyber_dojo_' + kata_id
-  end
-
-  def mock_kata_volume_does_not_exist
-    cmd = "docker volume ls --quiet --filter 'name=#{volume_name}'"
-    shell.mock_exec(cmd, '', '', success)
-  end
 
   def mock_docker_images_prints_gcc_assert
     stdout = [
@@ -169,11 +91,6 @@ class RunMockShellerTest < TestBase
   def mock_docker_pull_cdf_ruby_mini_test
     image_name = 'cdf/ruby_mini_test'
     shell.mock_exec("docker pull #{image_name}", '', '', success)
-  end
-
-  def mock_docker_volume_create
-    cmd = "docker volume create --name #{volume_name}"
-    shell.mock_exec(cmd, volume_name, '', success)
   end
 
 end

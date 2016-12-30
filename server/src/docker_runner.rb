@@ -31,10 +31,9 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def new_kata(image_name, kata_id)
+  def new_kata(kata_id)
     assert_valid_id(kata_id)
     refute_kata_exists(kata_id)
-    pull(image_name) unless pulled?(image_name)
     assert_exec("docker volume create --name #{volume_name(kata_id)}")
   end
 
