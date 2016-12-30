@@ -32,13 +32,13 @@ class RunnerTestBase < HexMiniTest
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def new_kata(options = {})
-    options[:image_name] ||= @image_name
-    options[:kata_id] ||= kata_id
+    options[:image_name] = @image_name unless options.key? :image_name
+    options[:kata_id]    = kata_id     unless options.key? :kata_id
     runner.new_kata(options[:image_name], options[:kata_id])
   end
 
   def old_kata(options = {})
-    options[:kata_id] ||= kata_id
+    options[:kata_id] = kata_id unless options.key? :kata_id
     runner.old_kata(options[:kata_id])
   end
 
