@@ -1,6 +1,6 @@
-require_relative 'runner_test_base'
+require_relative 'test_base'
 
-class ExternalDiskWriterTest < RunnerTestBase
+class DiskWriterTest < TestBase
 
   def self.hex_prefix; 'FDF13'; end
 

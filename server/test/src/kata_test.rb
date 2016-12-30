@@ -1,7 +1,7 @@
-require_relative 'runner_test_base'
+require_relative 'test_base'
 require_relative 'mock_sheller'
 
-class DockerRunnerKataTest < RunnerTestBase
+class KataTest < TestBase
 
   def self.hex_prefix; 'FB0D4'; end
 

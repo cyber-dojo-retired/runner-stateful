@@ -1,7 +1,7 @@
-require_relative 'runner_test_base'
+require_relative 'test_base'
 require_relative 'mock_sheller'
 
-class MockShellerTest < RunnerTestBase
+class MockShellerTest < TestBase
 
   def self.hex_prefix; 'F03'; end
 

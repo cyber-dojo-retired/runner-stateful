@@ -1,7 +1,7 @@
-require_relative 'runner_test_base'
+require_relative 'test_base'
 require_relative 'mock_sheller'
 
-class DockerRunnerMockShellerTest < RunnerTestBase
+class RunMockShellerTest < TestBase
 
   def self.hex_prefix; '0D5'; end
 

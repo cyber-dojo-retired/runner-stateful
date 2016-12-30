@@ -1,6 +1,6 @@
-require_relative 'runner_test_base'
+require_relative 'test_base'
 
-class ExternalsTest < RunnerTestBase
+class ExternalsTest < TestBase
 
   include Externals
 

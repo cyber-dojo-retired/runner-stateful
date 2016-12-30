@@ -1,4 +1,4 @@
-require_relative 'runner_test_base'
+require_relative 'test_base'
 
 class DummyDisk
   def initialize(who); @who = who; end
@@ -47,7 +47,7 @@ end
 
 # - - - - - - - - - - - - - - - - - - - - - - - -
 
-class TestNearestExternal < RunnerTestBase
+class TestNearestExternal < TestBase
 
   def self.hex_prefix; '9D4'; end
 

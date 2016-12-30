@@ -1,6 +1,6 @@
-require_relative 'runner_test_base'
+require_relative 'test_base'
 
-class DockerRunnerTimeoutTest < RunnerTestBase
+class TimeoutTest < TestBase
 
   def self.hex_prefix; '45B57'; end
   def hex_setup; kata_setup; end

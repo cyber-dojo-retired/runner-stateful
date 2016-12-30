@@ -3,7 +3,7 @@ require_relative '../hex_mini_test'
 require_relative '../../src/docker_runner'
 require_relative '../../src/externals'
 
-class RunnerTestBase < HexMiniTest
+class TestBase < HexMiniTest
 
   def kata_setup
     @image_name = image_for_test

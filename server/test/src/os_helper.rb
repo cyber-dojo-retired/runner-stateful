@@ -1,6 +1,6 @@
 require_relative '../../src/all_avatars_names'
 
-module DockerRunnerOsHelper
+module OsHelper
 
   module_function
 

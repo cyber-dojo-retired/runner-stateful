@@ -1,7 +1,7 @@
-require_relative 'runner_test_base'
+require_relative 'test_base'
 require_relative '../../src/string_truncater'
 
-class StringTruncaterTest < RunnerTestBase
+class StringTruncaterTest < TestBase
 
   include StringTruncater
 

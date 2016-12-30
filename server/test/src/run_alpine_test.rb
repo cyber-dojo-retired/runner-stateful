@@ -1,9 +1,9 @@
-require_relative 'runner_test_base'
-require_relative 'docker_runner_os_helper'
+require_relative 'test_base'
+require_relative 'os_helper'
 
-class DockerRunnerRunAlpineTest < RunnerTestBase
+class RunAlpineTest < TestBase
 
-  include DockerRunnerOsHelper
+  include OsHelper
 
   def self.hex_prefix; '4D778'; end
   def hex_setup; kata_setup; end

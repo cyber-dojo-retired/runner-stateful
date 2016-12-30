@@ -1,6 +1,6 @@
-require_relative 'runner_test_base'
+require_relative 'test_base'
 
-class DockerRunnerLanguageTest < RunnerTestBase
+class LanguageTest < TestBase
 
   def self.hex_prefix; '9D930'; end
   def hex_setup; kata_setup; end
