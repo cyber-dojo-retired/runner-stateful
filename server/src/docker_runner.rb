@@ -44,7 +44,6 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def new_avatar(image_name, kata_id, avatar_name, starting_files)
-    #assert_valid_id(kata_id)
     #assert_kata_exists(kata_id)
     #assert_valid_name(avatar_name)
     #assert_avatar_exists(kata_id, avatar_name)
