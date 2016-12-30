@@ -31,12 +31,14 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def new_kata(image_name, kata_id)
+    assert_valid_id(kata_id)
     refute_kata_exists(kata_id)
     pull(image_name) unless pulled?(image_name)
     assert_exec("docker volume create --name #{volume_name(kata_id)}")
   end
 
   def old_kata(kata_id)
+    assert_valid_id(kata_id)
     assert_kata_exists(kata_id)
     assert_exec("docker volume rm #{volume_name(kata_id)}")
   end
@@ -44,12 +46,12 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def new_avatar(image_name, kata_id, avatar_name, starting_files)
-    #assert_kata_exists(kata_id)
-    #assert_valid_name(avatar_name)
-    #assert_avatar_exists(kata_id, avatar_name)
-
+    assert_valid_id(kata_id)
+    assert_kata_exists(kata_id)
     cid = create_container(image_name, kata_id, avatar_name)
     begin
+      assert_valid_name(avatar_name)
+      refute_avatar_exists(cid, avatar_name)
       sandbox = sandbox_path(avatar_name)
       cmd = "mkdir #{sandbox}"
       assert_docker_exec(cid, cmd)
@@ -244,16 +246,6 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def refute_kata_exists(kata_id)
-    assert_valid_id(kata_id)
-    fail error('kata_id') if kata_exists?(kata_id)
-  end
-
-  def assert_kata_exists(kata_id)
-    assert_valid_id(kata_id)
-    fail error('kata_id') unless kata_exists?(kata_id)
-  end
-
   def assert_valid_id(kata_id)
     fail error('kata_id') unless valid_id?(kata_id)
   end
@@ -268,11 +260,44 @@ class DockerRunner
     '0123456789ABCDEF'.include?(char)
   end
 
+  def refute_kata_exists(kata_id)
+    fail error('kata_id') if kata_exists?(kata_id)
+  end
+
+  def assert_kata_exists(kata_id)
+    fail error('kata_id') unless kata_exists?(kata_id)
+  end
+
   def kata_exists?(kata_id)
     name = volume_name(kata_id)
     cmd = "docker volume ls --quiet --filter 'name=#{name}'"
     stdout,stderr = assert_exec(cmd)
     stdout.strip == name
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def assert_valid_name(avatar_name)
+    fail error('avatar_name') unless valid_avatar?(avatar_name)
+  end
+
+  def valid_avatar?(avatar_name)
+    all_avatars_names.include?(avatar_name)
+  end
+
+  def refute_avatar_exists(cid, avatar_name)
+    fail error('avatar_name') if avatar_exists?(cid, avatar_name)
+  end
+
+  def assert_avatar_exists(cid, avatar_name)
+    fail error('avatar_name') unless avatar_exists?(cid, avatar_name)
+  end
+
+  def avatar_exists?(cid, avatar_name)
+    sandbox = sandbox_path(avatar_name)
+    cmd = "docker exec #{cid} sh -c '[ -d #{sandbox} ]'"
+    _stdout,_stderr,status = exec(cmd, logging = false)
+    status == success
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

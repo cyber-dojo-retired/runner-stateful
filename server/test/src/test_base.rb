@@ -140,7 +140,7 @@ class TestBase < HexMiniTest
       '[Alpine]'        => 'gcc_assert',
       '[Ubuntu]'        => 'clangpp_assert'
     }
-    row = rows.detect { |key,name| test_name.start_with? key }
+    row = rows.detect { |key,_| test_name.start_with? key }
     fail 'cannot find image_name from test_name' if row.nil?
     'cyberdojofoundation/' + row[1]
   end
