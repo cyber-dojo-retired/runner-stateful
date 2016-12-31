@@ -7,10 +7,10 @@ alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
 
 # cyberdojo/runner docker image
 
-- A micro-service for [cyber-dojo](http://cyber-dojo.org).
-- Runs avatar's tests in a docker container.
+- A micro-service for [cyber-dojo](http://cyber-dojo.org)
 - A **cyberdojo/runner** docker container runs on port **4557**.
-- It's API is as follows:
+- Runs avatar's tests in a docker container.
+- API:
   * All methods return a json object with a single key.
   * If successful, the key equals the method's name.
   * If unsuccessful, the key equals "exception".
@@ -19,18 +19,23 @@ alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
 
 # pulled
 Asks the runner-service if the given image has been pulled.
-- parameters
-  * image_name, eg 'cyberdojofoundation/gcc_assert'
-- returns
-  * { "pulled":true   } -> image_name has been pulled
-  * { "pulled":false  } -> image_name has not been pulled
+- parameter
+  * image_name, eg "cyberdojofoundation/gcc_assert"
+- returns true if the image has been pulled.
+```
+  { "pulled":true   }
+```
+- returns false if the image has not been pulled.
+```
+  { "pulled":false  }
+```
 
 - - - -
 
 # pull
 Tells the runner-service to pull the given image.
-- parameters
-  * image_name, eg 'cyberdojofoundation/gcc_assert'
+- parameter
+  * image_name, eg "cyberdojofoundation/gcc_assert"
 
 - - - -
 
@@ -83,7 +88,7 @@ Tells the runner-service the given avatar has left the given kata.
   * kata_id,           eg "15B9AD6C42"
   * avatar_name,       eg "salmon"
   * deleted_filenames, eg [ "hiker.h", ... ]
-  * changed_files,     eg { "fizz_buzz.h" => "#include...", ... }
+  * changed_files,     eg { "fizz_buzz.h": "#include...", ... }
   * max_seconds,       eg "10"
 - returns an integer status if the run completed in max_seconds, eg
 ```
