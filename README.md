@@ -13,12 +13,18 @@ It's API is as follows:
 
 - - - -
 
+- If successful, all methods return a json object with a single key equal to the
+name of the method.
+- If unsuccessful, all methods return a json object with a single 'exception' key.
+
+- - - -
+
 # pulled
 Asks the runner-service if the given image has been pulled.
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
 - returns
-  * { "pulled":true  } -> image_name has been pulled
+  * { "pulled":true   } -> image_name has been pulled
   * { "pulled":false  } -> image_name has not been pulled
 
 - - - -
@@ -35,8 +41,8 @@ Tells the runner-service the kata with the given id
 and image_name has been set up.
 Must be called before new_avatar.
 - parameters
-  * image_name, eg 'cyberdojofoundation/gcc_assert'
-  * kata_id, eg '15B9AD6C42'
+  * image_name, eg "cyberdojofoundation/gcc_assert"
+  * kata_id, eg "15B9AD6C42"
 
 - - - -
 
@@ -44,8 +50,8 @@ Must be called before new_avatar.
 Tells the runner-service the kata with the given id
 and image_name has been torn down.
 - parameters
-  * image_name, eg 'cyberdojofoundation/gcc_assert'
-  * kata_id, eg '15B9AD6C42'
+  * image_name, eg "cyberdojofoundation/gcc_assert"
+  * kata_id, eg "15B9AD6C42"
 
 - - - -
 
@@ -54,19 +60,19 @@ Tells the runner-service the given avatar has entered
 the given kata with the given starting files.
 Must be called before run.
 - parameters
-  * image_name, eg 'cyberdojofoundation/gcc_assert'
-  * kata_id, eg '15B9AD6C42'
-  * avatar_name, eg 'salmon'
-  * starting_files, eg { 'fizz_buzz.h' => '#include', ... }
+  * image_name, eg "cyberdojofoundation/gcc_assert"
+  * kata_id, eg "15B9AD6C42"
+  * avatar_name, eg "salmon"
+  * starting_files, eg { "fizz_buzz.h" => "#include...", ... }
 
 - - - -
 
 # old_avatar
 Tells the runner-service the given avatar has left the given kata.
 - parameters
-  * image_name, eg 'cyberdojofoundation/gcc_assert'
-  * kata_id, eg '15B9AD6C42'
-  * avatar_name, eg 'salmon'
+  * image_name, eg "cyberdojofoundation/gcc_assert"
+  * kata_id, eg "15B9AD6C42"
+  * avatar_name, eg "salmon"
 
 - - - -
 
@@ -75,33 +81,28 @@ Tells the runner-service the given avatar has left the given kata.
   * removing the deleted_filenames
   * saving changed_files
 - parameters
-  * image_name, eg 'cyberdojofoundation/gcc_assert'
-  * kata_id, eg '15B9AD6C42'
-  * avatar_name, eg 'salmon'
-  * deleted_filenames, eg [ 'hiker.h', ... ]
-  * changed_files, eg { 'fizz_buzz.h' => '#include', ... }
-  * max_seconds, eg '10'
-- returns eg
+  * image_name, eg "cyberdojofoundation/gcc_assert"
+  * kata_id, eg "15B9AD6C42"
+  * avatar_name, eg "salmon"
+  * deleted_filenames, eg [ "hiker.h", ... ]
+  * changed_files, eg { "fizz_buzz.h" => "#include...", ... }
+  * max_seconds, eg "10"
+- returns an integer status if the run completed in max_seconds, eg
 ```
     { "run": {
-        "status":integer,
-        "stdout":...,
-        "stderr":...
-    } -> run completed in max_seconds
-
+        "status":0,
+        "stdout":"All tests passed\n",
+        "stderr":""
+    }
+```
+- returns the status string "timed_out" if the run did not complete in max_seconds, eg
+```
     { "run": {
         "status":"timed_out",
         "stdout":"",
         "stderr":""
-    } -> did not complete in max_seconds
+    }
 ```
-
-- - - -
-
-- If successful, all methods return a json object with a single key equal to the
-name of the method.
-- If unsuccessful, all methods return a json object with a single 'exception' key.
-
 
 - - - -
 - - - -
