@@ -20,9 +20,7 @@ class KataTest < TestBase
 
   test '2F2',
   'new_kata with invalid kata_id raises' do
-    error = assert_raises {
-      new_kata(image_name, Object.new)
-    }
+    error = assert_raises { new_kata({ kata_id:Object.new }) }
     assert_equal 'RunnerService:new_kata:kata_id:invalid', error.message
   end
 
@@ -32,9 +30,7 @@ class KataTest < TestBase
   'new_kata with kata_id that already exists raises' do
     new_kata
     begin
-      error = assert_raises {
-        new_kata
-      }
+      error = assert_raises { new_kata }
       assert_equal 'RunnerService:new_kata:kata_id:exists', error.message
     ensure
       old_kata
@@ -47,9 +43,7 @@ class KataTest < TestBase
 
   test 'BA3',
   'old_kata with invalid kata_id raises' do
-    error = assert_raises {
-      old_kata(image_name, Object.new)
-    }
+    error = assert_raises { old_kata({ kata_id:Object.new }) }
     assert_equal 'RunnerService:old_kata:kata_id:invalid', error.message
   end
 
@@ -57,9 +51,7 @@ class KataTest < TestBase
 
   test '0B7',
   'old_kata with kata_id that does not exist raises' do
-    error = assert_raises {
-      old_kata(image_name, kata_id)
-    }
+    error = assert_raises { old_kata }
     assert_equal 'RunnerService:old_kata:kata_id:!exists', error.message
   end
 

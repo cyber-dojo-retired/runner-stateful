@@ -3,32 +3,60 @@ require_relative '../../src/runner_service'
 
 class TestBase < HexMiniTest
 
-  def pulled?(name = image_name)
-    runner.pulled?(name)
+  def pulled?(args_hash = {})
+    args_hash[:image_name] = image_name unless args_hash.key? :image_name
+    runner.pulled?(args_hash[:image_name])
   end
 
-  def pull(name = image_name)
-    runner.pull(name)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - -
-
-  def new_kata(name = image_name, id = kata_id)
-    runner.new_kata(name, id)
-  end
-
-  def old_kata(name = image_name, id = kata_id)
-    runner.old_kata(name, id)
+  def pull(args_hash = {})
+    args_hash[:image_name] = image_name unless args_hash.key? :image_name
+    runner.pull(args_hash[:image_name])
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - -
 
-  def new_avatar(name = image_name, id = kata_id, avatar = avatar_name, f = files)
-    runner.new_avatar(name, id, avatar, f)
+  def new_kata(args_hash = {})
+    args_hash[:image_name] = image_name unless args_hash.key? :image_name
+    args_hash[:kata_id] = kata_id unless args_hash.key? :kata_id
+    args = []
+    args << args_hash[:image_name]
+    args << args_hash[:kata_id]
+    runner.new_kata(*args)
   end
 
-  def old_avatar(name = image_name, id = kata_id, avatar = avatar_name)
-    runner.old_avatar(name, id, avatar)
+  def old_kata(args_hash = {})
+    args_hash[:image_name] = image_name unless args_hash.key? :image_name
+    args_hash[:kata_id] = kata_id unless args_hash.key? :kata_id
+    args = []
+    args << args_hash[:image_name]
+    args << args_hash[:kata_id]
+    runner.old_kata(*args)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - -
+
+  def new_avatar(args_hash = {})
+    args_hash[:image_name] = image_name unless args_hash.key? :image_name
+    args_hash[:kata_id] = kata_id unless args_hash.key? :kata_id
+    args_hash[:avatar_name] = avatar_name unless args_hash.key? :avatar_name
+    args_hash[:starting_files] = files unless args_hash.key? :starting_files
+    args = []
+    args << args_hash[:image_name]
+    args << args_hash[:kata_id]
+    args << args_hash[:avatar_name]
+    args << args_hash[:starting_files]
+    runner.new_avatar(*args)
+  end
+
+  def old_avatar(args_hash = {})
+    args_hash[:image_name] = image_name unless args_hash.key? :image_name
+    args_hash[:kata_id] = kata_id unless args_hash.key? :kata_id
+    args_hash[:avatar_name] = avatar_name unless args_hash.key? :avatar_name
+    args = []
+    args << args_hash[:image_name]
+    args << args_hash[:kata_id]
+    args << args_hash[:avatar_name]
+    runner.old_avatar(*args)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - -
