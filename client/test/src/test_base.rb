@@ -3,60 +3,32 @@ require_relative '../../src/runner_service'
 
 class TestBase < HexMiniTest
 
-  def pulled?(args_hash = {})
-    args_hash[:image_name] = image_name unless args_hash.key? :image_name
-    runner.pulled?(args_hash[:image_name])
+  def pulled?(named_args = {})
+    runner.pulled?(*defaulted_args(__method__, named_args))
   end
 
-  def pull(args_hash = {})
-    args_hash[:image_name] = image_name unless args_hash.key? :image_name
-    runner.pull(args_hash[:image_name])
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - -
-
-  def new_kata(args_hash = {})
-    args_hash[:image_name] = image_name unless args_hash.key? :image_name
-    args_hash[:kata_id] = kata_id unless args_hash.key? :kata_id
-    args = []
-    args << args_hash[:image_name]
-    args << args_hash[:kata_id]
-    runner.new_kata(*args)
-  end
-
-  def old_kata(args_hash = {})
-    args_hash[:image_name] = image_name unless args_hash.key? :image_name
-    args_hash[:kata_id] = kata_id unless args_hash.key? :kata_id
-    args = []
-    args << args_hash[:image_name]
-    args << args_hash[:kata_id]
-    runner.old_kata(*args)
+  def pull(named_args = {})
+    runner.pull(*defaulted_args(__method__, named_args))
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - -
 
-  def new_avatar(args_hash = {})
-    args_hash[:image_name] = image_name unless args_hash.key? :image_name
-    args_hash[:kata_id] = kata_id unless args_hash.key? :kata_id
-    args_hash[:avatar_name] = avatar_name unless args_hash.key? :avatar_name
-    args_hash[:starting_files] = files unless args_hash.key? :starting_files
-    args = []
-    args << args_hash[:image_name]
-    args << args_hash[:kata_id]
-    args << args_hash[:avatar_name]
-    args << args_hash[:starting_files]
-    runner.new_avatar(*args)
+  def new_kata(named_args = {})
+    runner.new_kata(*defaulted_args(__method__, named_args))
   end
 
-  def old_avatar(args_hash = {})
-    args_hash[:image_name] = image_name unless args_hash.key? :image_name
-    args_hash[:kata_id] = kata_id unless args_hash.key? :kata_id
-    args_hash[:avatar_name] = avatar_name unless args_hash.key? :avatar_name
-    args = []
-    args << args_hash[:image_name]
-    args << args_hash[:kata_id]
-    args << args_hash[:avatar_name]
-    runner.old_avatar(*args)
+  def old_kata(named_args = {})
+    runner.old_kata(*defaulted_args(__method__, named_args))
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - -
+
+  def new_avatar(named_args = {})
+    runner.new_avatar(*defaulted_args(__method__, named_args))
+  end
+
+  def old_avatar(named_args = {})
+    runner.old_avatar(*defaulted_args(__method__, named_args))
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - -
@@ -70,6 +42,32 @@ class TestBase < HexMiniTest
     args << changed_files
     args << max_seconds
     @json = runner.run(*args)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - -
+
+  def defaulted_args(method, named_args)
+    method = method.to_s
+    args = []
+
+    args << defaulted_arg(named_args, :image_name, image_name)
+    return args if method.include?('pull')
+
+    args << defaulted_arg(named_args, :kata_id, kata_id)
+    return args if method.include?('kata')
+
+    args << defaulted_arg(named_args, :avatar_name, avatar_name)
+    return args if method == 'old_avatar'
+
+    args << defaulted_arg(named_args, :starting_files, files)
+    return args if method == 'new_avatar'
+
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - -
+
+  def defaulted_arg(named_args, arg_name, arg_default)
+    named_args.key?(arg_name) ? named_args[arg_name] : arg_default
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - -
