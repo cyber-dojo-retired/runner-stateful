@@ -1,7 +1,9 @@
 
-[![Build Status](https://travis-ci.org/cyber-dojo/runner.svg?branch=master)](https://travis-ci.org/cyber-dojo/runner)
+[![Build Status](https://travis-ci.org/cyber-dojo/runner.svg?branch=master)]
+(https://travis-ci.org/cyber-dojo/runner)
 
-<img src="https://raw.githubusercontent.com/cyber-dojo/nginx/master/images/home_page_logo.png" alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
+<img src="https://raw.githubusercontent.com/cyber-dojo/nginx/master/images/home_page_logo.png"
+alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
 
 # cyberdojo/runner docker image
 
@@ -29,7 +31,8 @@ Tells the runner-service to pull the given image.
 - - - -
 
 # new_kata
-Tells the runner-service a kata with the given id and image_name has been set up.
+Tells the runner-service the kata with the given id
+and image_name has been set up.
 Must be called before new_avatar.
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
@@ -38,7 +41,8 @@ Must be called before new_avatar.
 - - - -
 
 # old_kata
-Tells the runner-service the kata with the given id has been torn down.
+Tells the runner-service the kata with the given id
+and image_name has been torn down.
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
   * kata_id, eg '15B9AD6C42'
@@ -46,7 +50,8 @@ Tells the runner-service the kata with the given id has been torn down.
 - - - -
 
 # new_avatar
-Tells the runner-service the given avatar has entered the given kata with the given starting files.
+Tells the runner-service the given avatar has entered
+the given kata with the given starting files.
 Must be called before run.
 - parameters
   * image_name, eg 'cyberdojofoundation/gcc_assert'
