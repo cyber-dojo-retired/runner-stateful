@@ -18,9 +18,6 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  include Externals
-  def runner; @runner ||= DockerVolumeRunner.new(self); end
-
   def pulled?(name = @image_name)
     runner.pulled?(name)
   end
@@ -31,64 +28,63 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def new_kata(args_hash = {})
-    args = defaulted_args(__method__, args_hash)
-    runner.new_kata(*args)
+  def new_kata(named_args = {})
+    runner.new_kata(*defaulted_args(__method__, named_args))
   end
 
-  def old_kata(args_hash = {})
-    args = defaulted_args(__method__, args_hash)
-    runner.old_kata(*args)
+  def old_kata(named_args = {})
+    runner.old_kata(*defaulted_args(__method__, named_args))
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def new_avatar(args_hash = {})
-    args = defaulted_args(__method__, args_hash)
+  def new_avatar(named_args = {})
+    args = defaulted_args(__method__, named_args)
     args << files
     runner.new_avatar(*args)
   end
 
-  def old_avatar(args_hash = {})
-    args = defaulted_args(__method__, args_hash)
-    runner.old_avatar(*args)
+  def old_avatar(named_args = {})
+    runner.old_avatar(*defaulted_args(__method__, named_args))
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def runner_run(args_hash = {})
+  def runner_run(named_args = {})
     # don't call this run() as it clashes with MiniTest
-    args = defaulted_args(__method__, args_hash)
-    @sss = runner.run(*args)
+    @sss = runner.run(*defaulted_args(__method__, named_args))
     [stdout,stderr,status]
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def defaulted_args(method, args_hash)
+  def defaulted_args(method, named_args)
     method = method.to_s
     args = []
 
-    args_hash[:image_name ] = @image_name unless args_hash.key? :image_name
-    args_hash[:kata_id    ] = kata_id     unless args_hash.key? :kata_id
-    args << args_hash[:image_name ]
-    args << args_hash[:kata_id]
+    named_args[:image_name ] = @image_name unless named_args.key? :image_name
+    named_args[:kata_id    ] = kata_id     unless named_args.key? :kata_id
+    args << named_args[:image_name ]
+    args << named_args[:kata_id]
     return args if method.include?('kata')
 
-    args_hash[:avatar_name] = avatar_name unless args_hash.key? :avatar_name
-    args << args_hash[:avatar_name]
+    named_args[:avatar_name] = avatar_name unless named_args.key? :avatar_name
+    args << named_args[:avatar_name]
     return args if method.include?('avatar')
 
-    args_hash[:deleted_filenames] = []    unless args_hash.key? :deleted_filenames
-    args_hash[:changed_files    ] = files unless args_hash.key? :changed_files
-    args_hash[:max_seconds      ] = 10    unless args_hash.key? :max_seconds
-    args << args_hash[:deleted_filenames]
-    args << args_hash[:changed_files]
-    args << args_hash[:max_seconds]
+    named_args[:deleted_filenames] = []    unless named_args.key? :deleted_filenames
+    named_args[:changed_files    ] = files unless named_args.key? :changed_files
+    named_args[:max_seconds      ] = 10    unless named_args.key? :max_seconds
+    args << named_args[:deleted_filenames]
+    args << named_args[:changed_files]
+    args << named_args[:max_seconds]
     args
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  include Externals
+  def runner; @runner ||= DockerVolumeRunner.new(self); end
 
   def sss; @sss; end
 
