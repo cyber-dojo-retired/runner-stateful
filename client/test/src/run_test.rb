@@ -12,7 +12,7 @@ class RunTest < TestBase
 
   test '42D',
   'run with invalid kata_id raises' do
-    error = assert_raises { runner_run({ kata_id:Object.new }) }
+    error = assert_raises { sss_run({ kata_id:Object.new }) }
     assert_equal 'RunnerService:run:kata_id:invalid', error.message
   end
 
@@ -20,7 +20,7 @@ class RunTest < TestBase
 
   test '3BA',
   'run with invalid avatar_name raises avatar_name' do
-    error = assert_raises { runner_run({ avatar_name:'rod_father' }) }
+    error = assert_raises { sss_run({ avatar_name:'rod_father' }) }
     assert_equal 'RunnerService:run:avatar_name:invalid', error.message
   end
 
@@ -30,9 +30,9 @@ class RunTest < TestBase
 
   test '348',
   'red-traffic-light' do
-    runner_run(files)
+    sss_run(files)
     assert_stdout "makefile:14: recipe for target 'test.output' failed\n"
-    assert stderr.start_with?('Assertion failed: answer() == 42'), json.to_s
+    assert stderr.start_with?('Assertion failed: answer() == 42'), sss.to_s
     assert_status 2
   end
 
@@ -41,7 +41,7 @@ class RunTest < TestBase
   test '16F',
   'green-traffic-light' do
     file_sub('hiker.c', '6 * 9', '6 * 7')
-    runner_run(files)
+    sss_run(files)
     assert_stdout "All tests passed\n"
     assert_stderr ''
     assert_status 0
@@ -52,12 +52,12 @@ class RunTest < TestBase
   test '295',
   'amber-traffic-light' do
     file_sub('hiker.c', '6 * 9', '6 * 9sss')
-    runner_run(files)
+    sss_run(files)
     lines = [
       "invalid suffix \"sss\" on integer constant",
       'return 6 * 9sss'
     ]
-    lines.each { |line| assert stderr.include?(line), json.to_s }
+    lines.each { |line| assert stderr.include?(line), sss.to_s }
     assert_stdout "makefile:17: recipe for target 'test' failed\n"
     assert_status 2
   end
@@ -67,7 +67,7 @@ class RunTest < TestBase
   test 'E6F',
   'timed-out-traffic-light' do
     file_sub('hiker.c', 'return', "for(;;);\nreturn")
-    runner_run({ changed_files:files, max_seconds:3 })
+    sss_run({ changed_files:files, max_seconds:3 })
     assert_stdout ''
     assert_stderr ''
     assert_timed_out
@@ -85,12 +85,12 @@ class RunTest < TestBase
       "fold -w #{five_K_plus_1}",
       'head -n 1'
     ].join('|')
-    runner_run({
+    sss_run({
       changed_files: {
         'cyber-dojo.sh': "seq 2 | xargs -I{} sh -c '#{command}'"
       }
     })
-    assert stdout.end_with? 'output truncated by cyber-dojo', json.to_s
+    assert stdout.end_with? 'output truncated by cyber-dojo', sss.to_s
     assert_stderr ''
     assert_status 0
   end

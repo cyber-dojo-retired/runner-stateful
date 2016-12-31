@@ -33,8 +33,9 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - -
 
-  def runner_run(named_args = {})
-    @json = runner.run(*defaulted_args(__method__, named_args))
+  def sss_run(named_args = {})
+    # don't call this run() as it clashes with MiniTest
+    @sss = runner.run(*defaulted_args(__method__, named_args))
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - -
@@ -63,7 +64,7 @@ class TestBase < HexMiniTest
     args << defaulted_arg(named_args, :deleted_filenames, [])
     args << defaulted_arg(named_args, :changed_files, files)
     args << defaulted_arg(named_args, :max_seconds, 10)
-    return args if method == 'runner_run'
+    return args if method == 'sss_run'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - -
@@ -76,10 +77,10 @@ class TestBase < HexMiniTest
 
   def runner; RunnerService.new; end
 
-  def json; @json; end
-  def status; json['status']; end
-  def stdout; json['stdout']; end
-  def stderr; json['stderr']; end
+  def sss; @sss; end
+  def status; sss['status']; end
+  def stdout; sss['stdout']; end
+  def stderr; sss['stderr']; end
 
   def files; @files ||= read_files; end
   def read_files
@@ -98,13 +99,13 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_success; assert_equal success, status, json.to_s; end
-  def refute_success; refute_equal success, status, json.to_s; end
+  def assert_success; assert_equal success, status, sss.to_s; end
+  def refute_success; refute_equal success, status, sss.to_s; end
 
-  def assert_timed_out; assert_equal timed_out, status, json.to_s; end
+  def assert_timed_out; assert_equal timed_out, status, sss.to_s; end
 
-  def assert_stdout(expected); assert_equal expected, stdout, json.to_s; end
-  def assert_stderr(expected); assert_equal expected, stderr, json.to_s; end
-  def assert_status(expected); assert_equal expected, status, json.to_s; end
+  def assert_stdout(expected); assert_equal expected, stdout, sss.to_s; end
+  def assert_stderr(expected); assert_equal expected, stderr, sss.to_s; end
+  def assert_status(expected); assert_equal expected, status, sss.to_s; end
 
 end

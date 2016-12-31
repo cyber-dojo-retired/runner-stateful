@@ -39,9 +39,7 @@ class TestBase < HexMiniTest
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def new_avatar(named_args = {})
-    args = defaulted_args(__method__, named_args)
-    args << files
-    runner.new_avatar(*args)
+    runner.new_avatar(*defaulted_args(__method__, named_args))
   end
 
   def old_avatar(named_args = {})
@@ -50,7 +48,7 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def runner_run(named_args = {})
+  def sss_run(named_args = {})
     # don't call this run() as it clashes with MiniTest
     @sss = runner.run(*defaulted_args(__method__, named_args))
     [stdout,stderr,status]
@@ -62,24 +60,33 @@ class TestBase < HexMiniTest
     method = method.to_s
     args = []
 
-    named_args[:image_name ] = @image_name unless named_args.key? :image_name
-    named_args[:kata_id    ] = kata_id     unless named_args.key? :kata_id
-    args << named_args[:image_name ]
-    args << named_args[:kata_id]
-    return args if method.include?('kata')
+    default_image_name = @image_name
+    default_kata_id = test_id + '0' * (10-test_id.length)
+    args << defaulted_arg(named_args, :image_name, default_image_name)
+    args << defaulted_arg(named_args, :kata_id, default_kata_id)
+    return args if ['new_kata','old_kata'].include?(method)
 
-    named_args[:avatar_name] = avatar_name unless named_args.key? :avatar_name
-    args << named_args[:avatar_name]
-    return args if method.include?('avatar')
+    default_avatar_name = 'salmon'
+    args << defaulted_arg(named_args, :avatar_name, default_avatar_name)
+    return args if method == 'old_avatar'
 
-    named_args[:deleted_filenames] = []    unless named_args.key? :deleted_filenames
-    named_args[:changed_files    ] = files unless named_args.key? :changed_files
-    named_args[:max_seconds      ] = 10    unless named_args.key? :max_seconds
-    args << named_args[:deleted_filenames]
-    args << named_args[:changed_files]
-    args << named_args[:max_seconds]
-    args
+    if method == 'new_avatar'
+      args << defaulted_arg(named_args, :starting_files, files)
+      return args
+    end
+
+    args << defaulted_arg(named_args, :deleted_filenames, [])
+    args << defaulted_arg(named_args, :changed_files, files)
+    args << defaulted_arg(named_args, :max_seconds, 10)
+    return args if method == 'sss_run'
   end
+
+  def defaulted_arg(named_args, arg_name, arg_default)
+    named_args.key?(arg_name) ? named_args[arg_name] : arg_default
+  end
+
+  def kata_id; test_id + '0' * (10-test_id.length); end
+  def avatar_name; 'salmon'; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -114,13 +121,13 @@ class TestBase < HexMiniTest
   end
 
   def assert_run_succeeds(options)
-    stdout,stderr,status = runner_run(options)
+    stdout,stderr,status = sss_run(options)
     assert_equal success, status, [stdout,stderr]
     [stdout,stderr]
   end
 
   def assert_run_times_out(options)
-    stdout,stderr,status = runner_run(options)
+    stdout,stderr,status = sss_run(options)
     assert_equal timed_out, status, [stdout,stderr]
     [stdout,stderr]
   end
@@ -185,11 +192,6 @@ class TestBase < HexMiniTest
 
   def success; runner.success; end
   def timed_out; runner.timed_out; end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def kata_id; test_id + '0' * (10-test_id.length); end
-  def avatar_name; 'salmon'; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

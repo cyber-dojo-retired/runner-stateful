@@ -10,7 +10,7 @@ class LanguageTest < TestBase
 
   test '182',
   '[C#,NUnit] runs (it sets HOME to location of sandbox in cyber-dojo.sh)' do
-    runner_run({
+    sss_run({
       changed_files: files('csharp_nunit')
     })
     assert_stdout_include('Tests run: 1, Errors: 0, Failures: 1, Inconclusive: 0')
@@ -22,7 +22,7 @@ class LanguageTest < TestBase
 
   test 'C87',
   '[C#,Moq] runs (it sets HOME to location of sandbox in cyber-dojo.sh)' do
-    runner_run({
+    sss_run({
       changed_files: files('csharp_moq')
     })
     assert_stdout_include('Tests run: 1, Errors: 0, Failures: 1, Inconclusive: 0')
@@ -34,7 +34,7 @@ class LanguageTest < TestBase
 
   test '76D',
   '[gcc,assert] runs' do
-    runner_run({
+    sss_run({
       changed_files: files('gcc_assert')
     })
     assert_stdout "makefile:14: recipe for target 'test.output' failed\n"
@@ -46,7 +46,7 @@ class LanguageTest < TestBase
 
   test '358',
   '[Java,Cucumber] runs' do
-    runner_run({
+    sss_run({
       changed_files: files('java_cucumber')
     })
     assert_stdout_include '1 Scenarios (1 failed)'

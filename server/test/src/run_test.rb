@@ -49,7 +49,7 @@ class RunTest < TestBase
 
   def assert_raises_kata_id(kata_id)
     error = assert_raises(ArgumentError) {
-      runner_run( { kata_id:kata_id })
+      sss_run( { kata_id:kata_id })
     }
     assert error.message.start_with?('kata_id'), error.message
   end
@@ -58,7 +58,7 @@ class RunTest < TestBase
 
   def assert_raises_avatar_name(kata_id, avatar_name)
     error = assert_raises(ArgumentError) {
-      runner_run( {
+      sss_run( {
             kata_id:kata_id,
         avatar_name:avatar_name
       })
