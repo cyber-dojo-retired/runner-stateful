@@ -79,7 +79,7 @@ Tells the runner-service the given avatar has left the given kata.
 - - - -
 
 # run
-- Runs cyber-dojo.sh for the given avatar in the given kata, after:
+Asks the runner-server to run cyber-dojo.sh, for the given avatar, in the given kata, after:
   * removing the deleted_filenames
   * saving changed_files
 - parameters
