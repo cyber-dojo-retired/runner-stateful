@@ -17,7 +17,7 @@ class AvatarTest < TestBase
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
-  # negative test cases
+  # negative test cases: new_avatar
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '48A',
@@ -53,6 +53,8 @@ class AvatarTest < TestBase
     end
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+  # negative test cases: old_avatar
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '70F',

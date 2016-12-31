@@ -15,9 +15,52 @@ class KataTest < TestBase
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
-  # negative test cases
+  # negative test cases: new_kata
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
-  #...
+  test '2F2',
+  'new_kata with invalid kata_id raises' do
+    error = assert_raises {
+      new_kata(image_name, Object.new)
+    }
+    assert_equal 'RunnerService:new_kata:kata_id:invalid', error.message
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test '590',
+  'new_kata with kata_id that already exists raises' do
+    new_kata
+    begin
+      error = assert_raises {
+        new_kata
+      }
+      assert_equal 'RunnerService:new_kata:kata_id:exists', error.message
+    ensure
+      old_kata
+    end
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+  # negative test cases: old_kata
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test 'BA3',
+  'old_kata with invalid kata_id raises' do
+    error = assert_raises {
+      old_kata(image_name, Object.new)
+    }
+    assert_equal 'RunnerService:old_kata:kata_id:invalid', error.message
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test '0B7',
+  'old_kata with kata_id that does not exist raises' do
+    error = assert_raises {
+      old_kata(image_name, kata_id)
+    }
+    assert_equal 'RunnerService:old_kata:kata_id:!exists', error.message
+  end
 
 end
