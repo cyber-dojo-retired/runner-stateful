@@ -8,7 +8,6 @@ alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
 # cyberdojo/runner docker image
 
 - A micro-service for [cyber-dojo](http://cyber-dojo.org)
-- A **cyberdojo/runner** docker container runs on port **4557**.
 - Runs avatar's tests in a docker container.
 - API:
   * All methods return a json object with a single key.
