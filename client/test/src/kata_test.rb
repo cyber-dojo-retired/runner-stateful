@@ -4,10 +4,20 @@ class KataTest < TestBase
 
   def self.hex_prefix; 'D2E7E'; end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+  # positive test cases
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
   test 'C7A',
-  "when image_name is valid new_kata(image_name, kata_id) succeeds" do
+  'new_kata/old_kata' do
     new_kata
     old_kata
   end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+  # negative test cases
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  #...
 
 end

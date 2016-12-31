@@ -7,9 +7,11 @@ class RunTest < TestBase
   def hex_teardown; old_avatar; old_kata; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # negative test cases
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '42D',
-  'run with invalid kata_id raises kata_id' do
+  'run with invalid kata_id raises' do
     args = []
     args << image_name
     args << (kata_id = ':') #bad
@@ -18,7 +20,7 @@ class RunTest < TestBase
     args << (deleted_filenames = [])
     args << (changed_files = {})
     error = assert_raises { runner.run(*args) }
-    assert error.message.start_with? 'RunnerService:run:kata_id'
+    assert_equal 'RunnerService:run:kata_id:invalid', error.message
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -28,14 +30,16 @@ class RunTest < TestBase
     args = []
     args << image_name
     args << kata_id
-    args << (avatar_name = 'lion')
+    args << (avatar_name = 'rodfather')
     args << (max_seconds = 10)
     args << (deleted_filenames = [])
     args << (changed_files = {})
     error = assert_raises { runner.run(*args) }
-    assert error.message.start_with? 'RunnerService:run:avatar_name'
+    assert_equal 'RunnerService:run:avatar_name:invalid', error.message
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # positive test cases
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '348',
@@ -77,7 +81,7 @@ class RunTest < TestBase
   test 'E6F',
   'timed-out-traffic-light' do
     file_sub('hiker.c', 'return', "for(;;);\nreturn")
-    runner_run(files, 3)
+    runner_run(files, max_seconds=3)
     assert_stdout ''
     assert_stderr ''
     assert_timed_out
