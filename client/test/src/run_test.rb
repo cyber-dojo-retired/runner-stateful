@@ -12,14 +12,7 @@ class RunTest < TestBase
 
   test '42D',
   'run with invalid kata_id raises' do
-    args = []
-    args << image_name
-    args << (kata_id = ':') #bad
-    args << (avatar_name = 'salmon')
-    args << (max_seconds = 10)
-    args << (deleted_filenames = [])
-    args << (changed_files = {})
-    error = assert_raises { runner.run(*args) }
+    error = assert_raises { runner_run({ kata_id:Object.new }) }
     assert_equal 'RunnerService:run:kata_id:invalid', error.message
   end
 
@@ -27,14 +20,7 @@ class RunTest < TestBase
 
   test '3BA',
   'run with invalid avatar_name raises avatar_name' do
-    args = []
-    args << image_name
-    args << kata_id
-    args << (avatar_name = 'rodfather')
-    args << (max_seconds = 10)
-    args << (deleted_filenames = [])
-    args << (changed_files = {})
-    error = assert_raises { runner.run(*args) }
+    error = assert_raises { runner_run({ avatar_name:'rod_father' }) }
     assert_equal 'RunnerService:run:avatar_name:invalid', error.message
   end
 
@@ -81,7 +67,7 @@ class RunTest < TestBase
   test 'E6F',
   'timed-out-traffic-light' do
     file_sub('hiker.c', 'return', "for(;;);\nreturn")
-    runner_run(files, max_seconds=3)
+    runner_run({ changed_files:files, max_seconds:3 })
     assert_stdout ''
     assert_stderr ''
     assert_timed_out
@@ -99,7 +85,11 @@ class RunTest < TestBase
       "fold -w #{five_K_plus_1}",
       'head -n 1'
     ].join('|')
-    runner_run({ 'cyber-dojo.sh' => "seq 2 | xargs -I{} sh -c '#{command}'" })
+    runner_run({
+      changed_files: {
+        'cyber-dojo.sh': "seq 2 | xargs -I{} sh -c '#{command}'"
+      }
+    })
     assert stdout.end_with? 'output truncated by cyber-dojo', json.to_s
     assert_stderr ''
     assert_status 0

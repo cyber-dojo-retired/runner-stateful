@@ -30,7 +30,7 @@ class AvatarTest < TestBase
 
   test 'C43',
   'new_avatar with kata_id that does not exist name raises' do
-    error = assert_raises { new_avatar({ kata_id:kata_id.reverse }) }
+    error = assert_raises { new_avatar({ kata_id:'6E070B323A' }) }
     assert_equal 'RunnerService:new_avatar:kata_id:!exists', error.message
   end
 
@@ -61,7 +61,7 @@ class AvatarTest < TestBase
 
   test '45E',
   'old_avatar with kata_id that does not exist raises' do
-    error = assert_raises { old_avatar({ kata_id:kata_id.reverse }) }
+    error = assert_raises { old_avatar({ kata_id:'B8D2EA7DF1' }) }
     assert_equal 'RunnerService:old_avatar:kata_id:!exists', error.message
   end
 

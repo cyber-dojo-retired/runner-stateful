@@ -33,15 +33,8 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - -
 
-  def runner_run(changed_files, max_seconds = 10)
-    args = []
-    args << image_name
-    args << kata_id
-    args << avatar_name
-    args << deleted_filenames
-    args << changed_files
-    args << max_seconds
-    @json = runner.run(*args)
+  def runner_run(named_args = {})
+    @json = runner.run(*defaulted_args(__method__, named_args))
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - -
@@ -50,18 +43,27 @@ class TestBase < HexMiniTest
     method = method.to_s
     args = []
 
-    args << defaulted_arg(named_args, :image_name, image_name)
+    default_image_name = 'cyberdojofoundation/gcc_assert'
+    args << defaulted_arg(named_args, :image_name, default_image_name)
     return args if method.include?('pull')
 
-    args << defaulted_arg(named_args, :kata_id, kata_id)
-    return args if method.include?('kata')
+    default_kata_id = test_id + '0' * (10-test_id.length)
+    args << defaulted_arg(named_args, :kata_id, default_kata_id)
+    return args if ['new_kata','old_kata'].include?(method)
 
-    args << defaulted_arg(named_args, :avatar_name, avatar_name)
+    default_avatar_name = 'salmon'
+    args << defaulted_arg(named_args, :avatar_name, default_avatar_name)
     return args if method == 'old_avatar'
 
-    args << defaulted_arg(named_args, :starting_files, files)
-    return args if method == 'new_avatar'
+    if method == 'new_avatar'
+      args << defaulted_arg(named_args, :starting_files, files)
+      return args
+    end
 
+    args << defaulted_arg(named_args, :deleted_filenames, [])
+    args << defaulted_arg(named_args, :changed_files, files)
+    args << defaulted_arg(named_args, :max_seconds, 10)
+    return args if method == 'runner_run'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - -
@@ -78,11 +80,6 @@ class TestBase < HexMiniTest
   def status; json['status']; end
   def stdout; json['stdout']; end
   def stderr; json['stderr']; end
-
-  def image_name; 'cyberdojofoundation/gcc_assert'; end
-  def kata_id; test_id + '0' * (10-test_id.length); end
-  def avatar_name; 'salmon'; end
-  def deleted_filenames; []; end
 
   def files; @files ||= read_files; end
   def read_files
