@@ -1,6 +1,6 @@
-require_relative 'client_test_base'
+require_relative 'test_base'
 
-class PullTest < ClientTestBase
+class PullTest < TestBase
 
   def self.hex_prefix; '4CD0A'; end
 

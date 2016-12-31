@@ -1,10 +1,18 @@
-require_relative 'client_test_base'
+require_relative 'test_base'
 
-class NewAvatarTest < ClientTestBase
+class AvatarTest < TestBase
 
   def self.hex_prefix; '4F725'; end
   def hex_setup; new_kata; end
   def hex_teardown; old_kata; end
+
+  test '26D',
+  'new_avatar/old_avatar sunny-day scenario' do
+    new_avatar
+    old_avatar
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'C43',
   'new_avatar with invalid kata_id name raises' do
@@ -16,10 +24,10 @@ class NewAvatarTest < ClientTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '26D',
-  'new_avatar sunny-day scenario' do
-    new_avatar
-    old_avatar
+  test '70F',
+  'old_avatar with illegal volume name raises' do
+    error = assert_raises { old_avatar('a', ':') }
+    assert error.message.start_with? 'RunnerService:old_avatar'
   end
 
 end

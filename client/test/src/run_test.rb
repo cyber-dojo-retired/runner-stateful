@@ -1,10 +1,10 @@
-require_relative 'client_test_base'
+require_relative 'test_base'
 
-class RunTest < ClientTestBase
+class RunTest < TestBase
 
   def self.hex_prefix; '201BCEF'; end
   def hex_setup; new_kata; new_avatar; end
-  def hex_teardown; old_kata; end
+  def hex_teardown; old_avatar; old_kata; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -96,7 +96,7 @@ class RunTest < ClientTestBase
       'head -n 1'
     ].join('|')
     runner_run({ 'cyber-dojo.sh' => "seq 2 | xargs -I{} sh -c '#{command}'" })
-    assert stdout.end_with? 'output truncated by cyber-dojo server', json.to_s
+    assert stdout.end_with? 'output truncated by cyber-dojo', json.to_s
     assert_stderr ''
     assert_status 0
   end

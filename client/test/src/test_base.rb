@@ -1,7 +1,7 @@
 require_relative '../hex_mini_test'
 require_relative '../../src/runner_service'
 
-class ClientTestBase < HexMiniTest
+class TestBase < HexMiniTest
 
   def pulled?(name = image_name)
     runner.pulled?(name)

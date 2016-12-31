@@ -34,7 +34,7 @@ class StringTruncaterTest < TestBase
   test 'A48',
   'string of greater than 10k is truncated and truncated-message is appended' do
     s = '@' * (max_length)
-    message = 'output truncated by cyber-dojo server'
+    message = 'output truncated by cyber-dojo'
     assert_equal s + "\n" + message, truncated(s + 'x')
   end
 
