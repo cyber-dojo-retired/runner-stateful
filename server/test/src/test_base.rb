@@ -209,16 +209,4 @@ class TestBase < HexMiniTest
     ]
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def assert_raises_method_message(method, message, kata_id, avatar_name)
-    error = assert_raises(ArgumentError) {
-      self.send(method, {
-            kata_id:kata_id,
-        avatar_name:avatar_name
-      })
-    }
-    assert error.message.start_with?(message), error.message
-  end
-
 end

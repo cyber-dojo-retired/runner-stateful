@@ -24,7 +24,7 @@ class KataTest < TestBase
   test 'D7B',
   'new_kata with an invalid kata_id raises' do
     invalid_kata_ids.each do |invalid_kata_id|
-      assert_new_kata_raises(invalid_kata_id)
+      assert_method_raises(invalid_kata_id, :new_kata, 'invalid')
     end
   end
 
@@ -34,7 +34,7 @@ class KataTest < TestBase
   'new_kata with kata_id that already exists raises' do
     new_kata
     begin
-      assert_new_kata_raises(kata_id)
+      assert_method_raises(kata_id, :new_kata, 'exists')
     ensure
       old_kata
     end
@@ -47,7 +47,7 @@ class KataTest < TestBase
   test 'CED',
   'old_kata with invalid kata_id raises' do
     invalid_kata_ids.each do |invalid_kata_id|
-      assert_old_kata_raises(invalid_kata_id)
+      assert_method_raises(invalid_kata_id, :old_kata, 'invalid')
     end
   end
 
@@ -55,9 +55,7 @@ class KataTest < TestBase
 
   test '0A2',
   'old_kata with valid kata_id that does not exist raises' do
-    invalid_kata_ids.each do |invalid_kata_id|
-      assert_old_kata_raises(invalid_kata_id)
-    end
+    assert_method_raises(kata_id, :old_kata, '!exists')
   end
 
   private
@@ -74,18 +72,11 @@ class KataTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_new_kata_raises(kata_id)
+  def assert_method_raises(kata_id, method, message)
     error = assert_raises(ArgumentError) {
-      new_kata( { kata_id:kata_id })
+      self.send(method, { kata_id:kata_id })
     }
-    assert error.message.start_with?('kata_id'), error.message
-  end
-
-  def assert_old_kata_raises(kata_id)
-    error = assert_raises(ArgumentError) {
-      old_kata( { kata_id:kata_id })
-    }
-    assert error.message.start_with?('kata_id'), error.message
+    assert_equal 'kata_id:'+message, error.message
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
