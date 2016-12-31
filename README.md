@@ -7,15 +7,13 @@ alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
 
 # cyberdojo/runner docker image
 
-A micro-service for [cyber-dojo](http://cyber-dojo.org).
-A **cyberdojo/runner** docker container runs sinatra on port 4557.
-It's API is as follows:
-
-- - - -
-
-- If successful, all methods return a json object with a single key equal to the
-name of the method.
-- If unsuccessful, all methods return a json object with a single 'exception' key.
+- A micro-service for [cyber-dojo](http://cyber-dojo.org).
+- Runs avatar's tests in a docker container.
+- A **cyberdojo/runner** docker container runs on port **4557**.
+- It's API is as follows:
+  * All methods return a json object with a single key.
+  * If successful, the key equals the method's name.
+  * If unsuccessful, the key equals "exception".
 
 - - - -
 
@@ -42,7 +40,7 @@ and image_name has been set up.
 Must be called before new_avatar.
 - parameters
   * image_name, eg "cyberdojofoundation/gcc_assert"
-  * kata_id, eg "15B9AD6C42"
+  * kata_id,    eg "15B9AD6C42"
 
 - - - -
 
@@ -51,7 +49,7 @@ Tells the runner-service the kata with the given id
 and image_name has been torn down.
 - parameters
   * image_name, eg "cyberdojofoundation/gcc_assert"
-  * kata_id, eg "15B9AD6C42"
+  * kata_id,    eg "15B9AD6C42"
 
 - - - -
 
@@ -60,18 +58,18 @@ Tells the runner-service the given avatar has entered
 the given kata with the given starting files.
 Must be called before run.
 - parameters
-  * image_name, eg "cyberdojofoundation/gcc_assert"
-  * kata_id, eg "15B9AD6C42"
-  * avatar_name, eg "salmon"
-  * starting_files, eg { "fizz_buzz.h" => "#include...", ... }
+  * image_name,     eg "cyberdojofoundation/gcc_assert"
+  * kata_id,        eg "15B9AD6C42"
+  * avatar_name,    eg "salmon"
+  * starting_files, eg { "fizz_buzz.h" : "#include...", ... }
 
 - - - -
 
 # old_avatar
 Tells the runner-service the given avatar has left the given kata.
 - parameters
-  * image_name, eg "cyberdojofoundation/gcc_assert"
-  * kata_id, eg "15B9AD6C42"
+  * image_name,  eg "cyberdojofoundation/gcc_assert"
+  * kata_id,     eg "15B9AD6C42"
   * avatar_name, eg "salmon"
 
 - - - -
@@ -81,26 +79,26 @@ Tells the runner-service the given avatar has left the given kata.
   * removing the deleted_filenames
   * saving changed_files
 - parameters
-  * image_name, eg "cyberdojofoundation/gcc_assert"
-  * kata_id, eg "15B9AD6C42"
-  * avatar_name, eg "salmon"
+  * image_name,        eg "cyberdojofoundation/gcc_assert"
+  * kata_id,           eg "15B9AD6C42"
+  * avatar_name,       eg "salmon"
   * deleted_filenames, eg [ "hiker.h", ... ]
-  * changed_files, eg { "fizz_buzz.h" => "#include...", ... }
-  * max_seconds, eg "10"
+  * changed_files,     eg { "fizz_buzz.h" => "#include...", ... }
+  * max_seconds,       eg "10"
 - returns an integer status if the run completed in max_seconds, eg
 ```
     { "run": {
-        "status":0,
-        "stdout":"All tests passed\n",
-        "stderr":""
+        "status": 0,
+        "stdout": "All tests passed\n",
+        "stderr": ""
     }
 ```
 - returns the status string "timed_out" if the run did not complete in max_seconds, eg
 ```
     { "run": {
-        "status":"timed_out",
-        "stdout":"",
-        "stderr":""
+        "status": "timed_out",
+        "stdout": "",
+        "stderr": ""
     }
 ```
 
