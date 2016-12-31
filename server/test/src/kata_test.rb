@@ -6,6 +6,10 @@ class KataTest < TestBase
 
   def hex_setup; @image_name = 'cyberdojofoundation/gcc_assert'; end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # positive test case
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   test 'DBC',
   'before new_kata volume does not exist,',
   'after new_kata it does,',
@@ -18,14 +22,12 @@ class KataTest < TestBase
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # new_kata
+  # negative test cases: new_kata
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'D7B',
   'new_kata with an invalid kata_id raises' do
-    invalid_kata_ids.each do |invalid_kata_id|
-      assert_method_raises(invalid_kata_id, :new_kata, 'invalid')
-    end
+    assert_method_raises(:new_kata, invalid_kata_ids, 'invalid')
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -34,28 +36,26 @@ class KataTest < TestBase
   'new_kata with kata_id that already exists raises' do
     new_kata
     begin
-      assert_method_raises(kata_id, :new_kata, 'exists')
+      assert_method_raises(:new_kata, kata_id, 'exists')
     ensure
       old_kata
     end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # old_kata
+  # negative test cases: old_kata
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'CED',
   'old_kata with invalid kata_id raises' do
-    invalid_kata_ids.each do |invalid_kata_id|
-      assert_method_raises(invalid_kata_id, :old_kata, 'invalid')
-    end
+    assert_method_raises(:old_kata, invalid_kata_ids, 'invalid')
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '0A2',
   'old_kata with valid kata_id that does not exist raises' do
-    assert_method_raises(kata_id, :old_kata, '!exists')
+    assert_method_raises(:old_kata, kata_id, '!exists')
   end
 
   private
@@ -72,11 +72,13 @@ class KataTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_method_raises(kata_id, method, message)
-    error = assert_raises(ArgumentError) {
-      self.send(method, { kata_id:kata_id })
-    }
-    assert_equal 'kata_id:'+message, error.message
+  def assert_method_raises(method, kata_ids, message)
+    [*kata_ids].each do |kata_id|
+      error = assert_raises(ArgumentError) {
+        self.send(method, { kata_id:kata_id })
+      }
+      assert_equal 'kata_id:'+message, error.message
+    end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -

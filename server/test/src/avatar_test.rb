@@ -62,9 +62,7 @@ class AvatarTest < TestBase
 
   test 'B20',
   'new_avatar with an invalid kata_id raises' do
-    invalid_kata_ids.each do |invalid_kata_id|
-      assert_method_raises(invalid_kata_id, 'salmon', :new_avatar, 'kata_id:invalid')
-    end
+    assert_method_raises(:new_avatar, invalid_kata_ids, 'salmon', 'kata_id:invalid')
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -72,16 +70,14 @@ class AvatarTest < TestBase
   test '7C4',
   'new_avatar with non-existent kata_id raises' do
     kata_id = '42CF187311'
-    assert_method_raises(kata_id, 'salmon', :new_avatar, 'kata_id:!exists')
+    assert_method_raises(:new_avatar, kata_id, 'salmon', 'kata_id:!exists')
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '35D',
   'new_avatar with existing kata_id but invalid avatar_name raises' do
-    invalid_avatar_names.each do |invalid_avatar_name|
-      assert_method_raises(kata_id, invalid_avatar_name, :new_avatar, 'avatar_name:invalid')
-    end
+    assert_method_raises(:new_avatar, kata_id, invalid_avatar_names, 'avatar_name:invalid')
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -89,7 +85,7 @@ class AvatarTest < TestBase
   test '119',
   'new_avatar with existing kata_id but avatar_name that already exists raises' do
     new_avatar({ avatar_name:'salmon' })
-    assert_method_raises(kata_id, 'salmon', :new_avatar, 'avatar_name:exists')
+    assert_method_raises(:new_avatar, kata_id, 'salmon', 'avatar_name:exists')
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -98,9 +94,7 @@ class AvatarTest < TestBase
 
   test '2A8',
   'old_avatar with invalid kata_id raises' do
-    invalid_kata_ids.each do |invalid_kata_id|
-      assert_method_raises(invalid_kata_id, 'salmon', :old_avatar, 'kata_id:invalid')
-    end
+    assert_method_raises(:old_avatar, invalid_kata_ids, 'salmon', 'kata_id:invalid')
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -108,35 +102,37 @@ class AvatarTest < TestBase
   test 'E35',
   'old_avatar with non-existent kata_id raises' do
     kata_id = '92BB3FE5B6'
-    assert_method_raises(kata_id, 'salmon', :old_avatar, 'kata_id:!exists')
+    assert_method_raises(:old_avatar, kata_id, 'salmon', 'kata_id:!exists')
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'E5D',
   'old_avatar with existing kata_id but invalid avatar_name raises' do
-    invalid_avatar_names.each do |invalid_avatar_name|
-      assert_method_raises(kata_id, invalid_avatar_name, :old_avatar, 'avatar_name:invalid')
-    end
+    assert_method_raises(:old_avatar, kata_id, invalid_avatar_names, 'avatar_name:invalid')
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'D6F',
   'old_avatar with existing kata_id but avatar_name that does not exist raises' do
-    assert_method_raises(kata_id, 'salmon', :old_avatar, 'avatar_name:!exists')
+    assert_method_raises(:old_avatar, kata_id, 'salmon', 'avatar_name:!exists')
   end
 
   private
 
-  def assert_method_raises(kata_id, avatar_name, method, message)
-    error = assert_raises(ArgumentError) {
-      self.send(method, {
-            kata_id:kata_id,
-        avatar_name:avatar_name
-      })
-    }
-    assert_equal message, error.message
+  def assert_method_raises(method, kata_ids, avatar_names, message)
+    [*kata_ids].each do |kata_id|
+      [*avatar_names].each do |avatar_name|
+        error = assert_raises(ArgumentError) {
+          self.send(method, {
+                kata_id:kata_id,
+            avatar_name:avatar_name
+          })
+        }
+      assert_equal message, error.message
+      end
+    end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
