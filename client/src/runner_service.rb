@@ -4,10 +4,6 @@ require 'net/http'
 class RunnerService
 
   def pulled?(image_name)
-    pulled(image_name)
-  end
-
-  def pulled(image_name)
     get(__method__, image_name)
   end
 
