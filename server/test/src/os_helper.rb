@@ -132,7 +132,7 @@ module OsHelper
     new_filename = 'fizz_buzz.h'
     new_file_content = '#ifndef...'
     named_args = { changed_files:{ new_filename => new_file_content } }
-    ls_stdout = assert_run_succeeds_no_stderr(named_args
+    ls_stdout = assert_run_succeeds_no_stderr(named_args)
     after = ls_parse(ls_stdout)
     after_filenames = after.keys
 
