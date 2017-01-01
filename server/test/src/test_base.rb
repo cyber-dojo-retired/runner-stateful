@@ -125,20 +125,20 @@ class TestBase < HexMiniTest
     })
   end
 
-  def assert_run_succeeds_no_stderr(options)
-    stdout,stderr = assert_run_succeeds(options)
+  def assert_run_succeeds_no_stderr(named_args)
+    stdout,stderr = assert_run_succeeds(named_args)
     assert_equal '', stderr, stdout
     stdout
   end
 
-  def assert_run_succeeds(options)
-    stdout,stderr,status = sss_run(options)
+  def assert_run_succeeds(named_args)
+    stdout,stderr,status = sss_run(named_args)
     assert_equal success, status, [stdout,stderr]
     [stdout,stderr]
   end
 
-  def assert_run_times_out(options)
-    stdout,stderr,status = sss_run(options)
+  def assert_run_times_out(named_args)
+    stdout,stderr,status = sss_run(named_args)
     assert_equal timed_out, status, [stdout,stderr]
     [stdout,stderr]
   end
