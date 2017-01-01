@@ -3,6 +3,12 @@ require_relative '../../src/runner_service'
 
 class TestBase < HexMiniTest
 
+  def runner
+    RunnerService.new
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - -
+
   def pulled?(named_args = {})
     runner.pulled?(*defaulted_args(__method__, named_args))
   end
@@ -38,6 +44,14 @@ class TestBase < HexMiniTest
     @sss = runner.run(*defaulted_args(__method__, named_args))
   end
 
+  def sss
+    @sss
+  end
+
+  def status; sss['status']; end
+  def stdout; sss['stdout']; end
+  def stderr; sss['stderr']; end
+
   # - - - - - - - - - - - - - - - - - - - - - - -
 
   def defaulted_args(method, named_args)
@@ -67,22 +81,16 @@ class TestBase < HexMiniTest
     return args if method == 'sss_run'
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - -
-
   def defaulted_arg(named_args, arg_name, arg_default)
     named_args.key?(arg_name) ? named_args[arg_name] : arg_default
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - -
 
-  def runner; RunnerService.new; end
+  def files
+    @files ||= read_files
+  end
 
-  def sss; @sss; end
-  def status; sss['status']; end
-  def stdout; sss['stdout']; end
-  def stderr; sss['stderr']; end
-
-  def files; @files ||= read_files; end
   def read_files
     filenames =%w( hiker.c hiker.h hiker.tests.c cyber-dojo.sh makefile )
     Hash[filenames.collect { |filename|
@@ -94,9 +102,6 @@ class TestBase < HexMiniTest
     files[name] = files[name].sub(from, to)
   end
 
-  def success; 0; end
-  def timed_out; 'timed_out'; end
-
   # - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_success; assert_equal success, status, sss.to_s; end
@@ -107,5 +112,10 @@ class TestBase < HexMiniTest
   def assert_stdout(expected); assert_equal expected, stdout, sss.to_s; end
   def assert_stderr(expected); assert_equal expected, stderr, sss.to_s; end
   def assert_status(expected); assert_equal expected, status, sss.to_s; end
+
+  # - - - - - - - - - - - - - - - - - - - - - - -
+
+  def success; 0; end
+  def timed_out; 'timed_out'; end
 
 end
