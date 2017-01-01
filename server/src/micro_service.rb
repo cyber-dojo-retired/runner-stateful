@@ -20,6 +20,10 @@ class MicroService < Sinatra::Base
 
   # - - - - - - - - - - - - - - - - - - - - -
 
+  get '/kata_exists?' do
+    getter(__method__, image_name, kata_id)
+  end
+
   post '/new_kata' do
     poster(__method__, image_name, kata_id)
   end
@@ -29,6 +33,14 @@ class MicroService < Sinatra::Base
   end
 
   # - - - - - - - - - - - - - - - - - - - - -
+
+  get '/avatar_exists?' do
+    args = []
+    args << image_name
+    args << kata_id
+    args << avatar_name
+    getter(__method__, *args)
+  end
 
   post '/new_avatar' do
     args = []

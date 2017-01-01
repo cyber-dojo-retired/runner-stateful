@@ -12,8 +12,11 @@ class AvatarTest < TestBase
 
   test '26D',
   'new_avatar/old_avatar' do
+    refute avatar_exists?
     new_avatar
+    assert avatar_exists?
     old_avatar
+    #refute avatar_exists?
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -

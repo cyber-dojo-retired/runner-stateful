@@ -5,13 +5,16 @@ class KataTest < TestBase
   def self.hex_prefix; 'D2E7E'; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
-  # positive test cases
+  # positive test case
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'C7A',
   'new_kata/old_kata' do
+    refute kata_exists?
     new_kata
+    assert kata_exists?
     old_kata
+    refute kata_exists?
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
