@@ -73,8 +73,10 @@ class MicroService < Sinatra::Base
 
   def storer_json(prefix, caller, *args)
     name = caller.to_s[prefix.length .. -1]
+    qname = name
+    qname += '?' if name == 'pulled'
     runner = DockerVolumeRunner.new(self)
-    { name => runner.send(name, *args) }.to_json
+    { name => runner.send(qname, *args) }.to_json
   rescue Exception => e
     log << "EXCEPTION: #{e.class.name} #{e.to_s}"
     { 'exception' => e.message }.to_json
@@ -90,10 +92,9 @@ class MicroService < Sinatra::Base
     }
   end
 
-  request_args :image_name, :kata_id, :avatar_name
-  request_args :starting_files
-  request_args :deleted_filenames
-  request_args :changed_files
+  request_args :image_name
+  request_args :kata_id, :avatar_name
+  request_args :starting_files, :deleted_filenames, :changed_files
   request_args :max_seconds
 
   def args

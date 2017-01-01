@@ -21,8 +21,6 @@ class DockerVolumeRunner
   # pull
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def pulled(image_name); pulled?(image_name); end
-
   def pulled?(image_name)
     image_names.include?(image_name)
   end
