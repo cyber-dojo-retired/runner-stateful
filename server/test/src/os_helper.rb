@@ -91,28 +91,28 @@ module OsHelper
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def unchanged_files_test
-    options = { changed_files:ls_starting_files }
-    before_ls = assert_run_succeeds_no_stderr(options)
-    options = { changed_files:{} }
-    after_ls = assert_run_succeeds_no_stderr(options)
+    named_args = { changed_files:ls_starting_files }
+    before_ls = assert_run_succeeds_no_stderr(named_args)
+    named_args = { changed_files:{} }
+    after_ls = assert_run_succeeds_no_stderr(named_args)
     assert_equal before_ls, after_ls
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def deleted_files_test
-    options = { changed_files:ls_starting_files }
-    ls_stdout = assert_run_succeeds_no_stderr(options)
+    named_args = { changed_files:ls_starting_files }
+    ls_stdout = assert_run_succeeds_no_stderr(named_args)
     before = ls_parse(ls_stdout)
     before_filenames = before.keys
 
     deleted_filenames = ['hello.txt']
-    options = {
+    named_args = {
       changed_files:{},
       max_seconds:10,
       deleted_filenames:deleted_filenames
     }
-    ls_stdout = assert_run_succeeds_no_stderr(options)
+    ls_stdout = assert_run_succeeds_no_stderr(named_args)
     after = ls_parse(ls_stdout)
     after_filenames = after.keys
 
@@ -124,15 +124,15 @@ module OsHelper
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def new_files_test
-    options = { changed_files:ls_starting_files }
-    ls_stdout = assert_run_succeeds_no_stderr(options)
+    named_args = { changed_files:ls_starting_files }
+    ls_stdout = assert_run_succeeds_no_stderr(named_args)
     before = ls_parse(ls_stdout)
     before_filenames = before.keys
 
     new_filename = 'fizz_buzz.h'
     new_file_content = '#ifndef...'
-    options = { changed_files:{ new_filename => new_file_content } }
-    ls_stdout = assert_run_succeeds_no_stderr(options)
+    named_args = { changed_files:{ new_filename => new_file_content } }
+    ls_stdout = assert_run_succeeds_no_stderr(named_args
     after = ls_parse(ls_stdout)
     after_filenames = after.keys
 
@@ -149,16 +149,16 @@ module OsHelper
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def changed_file_test
-    options = { changed_files:ls_starting_files }
-    ls_stdout = assert_run_succeeds_no_stderr(options)
+    named_args = { changed_files:ls_starting_files }
+    ls_stdout = assert_run_succeeds_no_stderr(named_args)
     before = ls_parse(ls_stdout)
 
     sleep 2
 
     hello_txt = ls_starting_files['hello.txt']
     extra = "\ngreetings"
-    options = { changed_files:{ 'hello.txt' => hello_txt + extra } }
-    ls_stdout = assert_run_succeeds_no_stderr(options)
+    named_args = { changed_files:{ 'hello.txt' => hello_txt + extra } }
+    ls_stdout = assert_run_succeeds_no_stderr(named_args)
     after = ls_parse(ls_stdout)
 
     assert_equal before.keys, after.keys
