@@ -111,10 +111,8 @@ the kata with the given kata_id.
 - - - -
 
 # run
-For the avatar with the given avatar_name, in the kata with the given kata_id:
-  * removes the deleted_filenames
-  * saves changed_files
-  * runs cyber-dojo.sh
+For the avatar with the given avatar_name, in the kata with the given kata_id,
+removes the deleted_filenames, saves changed_files, runs cyber-dojo.sh
 - parameters
 ```
   image_name         eg "cyberdojofoundation/gcc_assert"
@@ -127,12 +125,12 @@ For the avatar with the given avatar_name, in the kata with the given kata_id:
                         }
   max_seconds        eg "10"
 ```
-- returns an integer status if the run completed in max_seconds, eg
+- returns an integer status, stdout, and stderr, if the run completed in max_seconds, eg
 ```
     { "run": {
-        "status": 0,
-        "stdout": "All tests passed\n",
-        "stderr": ""
+        "status": 2,
+        "stdout": "makefile:17: recipe for target 'test' failed\n",
+        "stderr": "invalid suffix sss on integer constant"
     }
 ```
 - returns the string status "timed_out" if the run did not complete in max_seconds, eg
