@@ -16,20 +16,18 @@ alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
 
 - - - -
 
-# pulled
+# pulled?
 Asks the runner-service if the given image has been pulled.
 - parameter
   * image_name, eg "cyberdojofoundation/gcc_assert"
-- returns true if the image has been pulled.
+- returns true if it has.
 ```
-  { "pulled":true   }
+  { "pulled?":true   }
 ```
-- returns false if the image has not been pulled.
+- returns false if it hasn't.
 ```
-  { "pulled":false  }
+  { "pulled?":false  }
 ```
-
-- - - -
 
 # pull
 Tells the runner-service to pull the given image.
@@ -38,24 +36,52 @@ Tells the runner-service to pull the given image.
 
 - - - -
 
+# kata_exists?
+Asks the runner-service if the kata with the given kata_id exists.
+- parameters
+  * image_name, eg "cyberdojofoundation/gcc_assert"
+  * kata_id,    eg "15B9AD6C42"
+- returns true if it does.
+```
+  { "kata_exists?":true   }
+```
+- returns false if it doesn't.
+```
+  { "kata_exists?":false  }
+```
+
 # new_kata
-Tells the runner-service the kata with the given id
-and image_name has been set up.
+Tells the runner-service the kata with the given kata_id has been set up.
 Must be called before new_avatar.
 - parameters
   * image_name, eg "cyberdojofoundation/gcc_assert"
   * kata_id,    eg "15B9AD6C42"
 
-- - - -
-
 # old_kata
-Tells the runner-service the kata with the given id
-and image_name has been torn down.
+Tells the runner-service the kata with the given kata_id has been torn down.
 - parameters
   * image_name, eg "cyberdojofoundation/gcc_assert"
   * kata_id,    eg "15B9AD6C42"
 
 - - - -
+
+# avatar_exists?
+Asks the runner-service if the avatar with the given avatar_name
+has entered the kata with the given kata_id.
+- parameters
+```
+  * image_name     eg "cyberdojofoundation/gcc_assert"
+  * kata_id        eg "15B9AD6C42"
+  * avatar_name    eg "salmon"
+```
+- returns true if it does.
+```
+  { "avatar_exists?":true   }
+```
+- returns false if it doesn't.
+```
+  { "avatar_exists?":false  }
+```
 
 # new_avatar
 Tells the runner-service the given avatar has entered
@@ -66,8 +92,6 @@ Must be called before run.
   * kata_id,        eg "15B9AD6C42"
   * avatar_name,    eg "salmon"
   * starting_files, eg { "fizz_buzz.h" : "#include...", ... }
-
-- - - -
 
 # old_avatar
 Tells the runner-service the given avatar has left the given kata.
