@@ -10,6 +10,7 @@ alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
 - A micro-service for [cyber-dojo](http://cyber-dojo.org)
 - Runs avatar's tests in a docker container.
 - API:
+  * All methods receive their arguments in a json hash.
   * All methods return a json object with a single key.
   * If successful, the key equals the method's name.
   * If unsuccessful, the key equals "exception".
@@ -18,9 +19,9 @@ alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
 
 # pulled?
 Asks whether the image with the given image_name has been pulled.
-- parameter
+- parameter, eg
 ```
-  image_name   eg "cyberdojofoundation/gcc_assert"
+  { "image_name": "cyberdojofoundation/gcc_assert" }
 ```
 - returns true if it has, false if it hasn't.
 ```
@@ -30,19 +31,20 @@ Asks whether the image with the given image_name has been pulled.
 
 # pull
 Pull the image with the given image_name.
-- parameter
+- parameter, eg
 ```
-  image_name   eg "cyberdojofoundation/gcc_assert"
+  { "image_name": "cyberdojofoundation/gcc_assert" }
 ```
 
 - - - -
 
 # kata_exists?
 Asks whether the kata with the given kata_id exists.
-- parameters
+- parameters, eg
 ```
-  image_name   eg "cyberdojofoundation/gcc_assert"
-  kata_id      eg "15B9AD6C42"
+  { "image_name": "cyberdojofoundation/gcc_assert",
+       "kata_id": "15B9AD6C42"
+  }
 ```
 - returns true if it does, false if it doesn't.
 ```
@@ -53,17 +55,19 @@ Asks whether the kata with the given kata_id exists.
 # new_kata
 The kata with the given kata_id has been set up.
 Must be called before new_avatar.
-- parameters
+- parameters, eg
 ```
-  image_name    eg "cyberdojofoundation/gcc_assert"
-  kata_id       eg "15B9AD6C42"
+  { "image_name": "cyberdojofoundation/gcc_assert",
+       "kata_id": "15B9AD6C42"
+  }
 ```
 # old_kata
 The kata with the given kata_id has been torn down.
-- parameters
+- parameters, eg
 ```
-  image_name    eg "cyberdojofoundation/gcc_assert"
-  kata_id       eg "15B9AD6C42"
+  { "image_name": "cyberdojofoundation/gcc_assert",
+       "kata_id": "15B9AD6C42"
+  }
 ```
 
 - - - -
@@ -71,11 +75,12 @@ The kata with the given kata_id has been torn down.
 # avatar_exists?
 Asks whether the avatar with the given avatar_name
 has entered the kata with the given kata_id.
-- parameters
+- parameters, eg
 ```
-  image_name    eg "cyberdojofoundation/gcc_assert"
-  kata_id       eg "15B9AD6C42"
-  avatar_name   eg "salmon"
+  {  "image_name": "cyberdojofoundation/gcc_assert",
+        "kata_id": "15B9AD6C42",
+    "avatar_name": "salmon"
+  }
 ```
 - returns true if it does, false if it doesn't
 ```
@@ -87,25 +92,27 @@ has entered the kata with the given kata_id.
 The avatar with the given avatar_name has entered the
 kata with the given kata with the given starting files.
 Must be called before run.
-- parameters
+- parameters, eg
 ```
-  image_name      eg "cyberdojofoundation/gcc_assert"
-  kata_id         eg "15B9AD6C42"
-  avatar_name     eg "salmon"
-  starting_files  eg { "hiker.h": "#ifndef HIKER_INCLUDED...",
-                       "hiker.c": "#include...",
-                       ...
-                     }
+  {     "image_name": "cyberdojofoundation/gcc_assert",
+           "kata_id": "15B9AD6C42",
+       "avatar_name": "salmon",
+    "starting_files": { "hiker.h": "#ifndef HIKER_INCLUDED...",
+                        "hiker.c": "#include...",
+                        ...
+                       }
+  }
 ```
 
 # old_avatar
 The avatar with the given avatar_name_ has left
 the kata with the given kata_id.
-- parameters
+- parameters, eg
 ```
-  image_name   eg "cyberdojofoundation/gcc_assert"
-  kata_id      eg "15B9AD6C42"
-  avatar_name  eg "salmon"
+  {  "image_name": "cyberdojofoundation/gcc_assert",
+        "kata_id": "15B9AD6C42",
+    "avatar_name": "salmon"
+  }
 ```
 
 - - - -
@@ -113,17 +120,18 @@ the kata with the given kata_id.
 # run
 For the avatar with the given avatar_name, in the kata with the given kata_id,
 removes the deleted_filenames, saves changed_files, runs cyber-dojo.sh
-- parameters
+- parameters, eg
 ```
-  image_name         eg "cyberdojofoundation/gcc_assert"
-  kata_id            eg "15B9AD6C42"
-  avatar_name        eg "salmon"
-  deleted_filenames  eg [ "hiker.h", "hiker.c", ... ]
-  changed_files      eg { "fizz_buzz.h": "#ifndef FIZZ_BUZZ_INCLUDED...",
-                          "fizz_buzz.c": "#include...",
-                          ...
-                        }
-  max_seconds        eg "10"
+  {        "image_name": "cyberdojofoundation/gcc_assert",
+              "kata_id": "15B9AD6C42",
+          "avatar_name": "salmon",
+    "deleted_filenames": [ "hiker.h", "hiker.c", ... ],
+        "changed_files": { "fizz_buzz.h": "#ifndef FIZZ_BUZZ_INCLUDED...",
+                           "fizz_buzz.c": "#include...",
+                           ...
+                         },
+          "max_seconds": 10
+  }
 ```
 - returns an integer status, stdout, and stderr, if the run completed in max_seconds, eg
 ```
@@ -135,11 +143,7 @@ removes the deleted_filenames, saves changed_files, runs cyber-dojo.sh
 ```
 - returns the string status "timed_out" if the run did not complete in max_seconds, eg
 ```
-    { "run": {
-        "status": "timed_out",
-        "stdout": "",
-        "stderr": ""
-    }
+    { "run": { "status": "timed_out" } }
 ```
 
 - - - -
