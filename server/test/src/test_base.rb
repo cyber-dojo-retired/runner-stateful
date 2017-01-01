@@ -101,7 +101,7 @@ class TestBase < HexMiniTest
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   include Externals
-  def runner; @runner ||= DockerVolumeRunner.new(self); end
+  def runner; DockerVolumeRunner.new(self); end
 
   def sss; @sss; end
 
