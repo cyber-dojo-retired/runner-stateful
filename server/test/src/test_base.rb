@@ -28,6 +28,10 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  def kata_exists?(named_args = {})
+    runner.kata_exists?(*defaulted_args(__method__, named_args))
+  end
+
   def new_kata(named_args = {})
     runner.new_kata(*defaulted_args(__method__, named_args))
   end
@@ -37,6 +41,12 @@ class TestBase < HexMiniTest
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+=begin
+  def avatar_exists?(named_args = {})
+    runner.avatar_exists?(*defaulted_args(__method__, named_args))
+  end
+=end
 
   def new_avatar(named_args = {})
     runner.new_avatar(*defaulted_args(__method__, named_args))
@@ -64,7 +74,7 @@ class TestBase < HexMiniTest
     default_kata_id = test_id + '0' * (10-test_id.length)
     args << defaulted_arg(named_args, :image_name, default_image_name)
     args << defaulted_arg(named_args, :kata_id, default_kata_id)
-    return args if ['new_kata','old_kata'].include?(method)
+    return args if ['kata_exists?','new_kata','old_kata'].include?(method)
 
     default_avatar_name = 'salmon'
     args << defaulted_arg(named_args, :avatar_name, default_avatar_name)

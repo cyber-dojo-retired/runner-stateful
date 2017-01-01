@@ -11,14 +11,23 @@ class KataTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'DBC',
-  'before new_kata volume does not exist,',
-  'after new_kata it does,',
-  'after old_kata it does not' do
-    refute volume_exists?
+  'before new_kata kata does not exist,',
+  'after new_kata it does exist,',
+  'after old_kata it does not exist' do
+    refute kata_exists?
     new_kata
-    assert volume_exists?
+    assert kata_exists?
     old_kata
-    refute volume_exists?
+    refute kata_exists?
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # negative test cases: kata_exists
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test 'E9E',
+  'kata_exists with an invalid kata_id raises' do
+    assert_method_raises(:kata_exists?, invalid_kata_ids, 'invalid')
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -60,18 +69,6 @@ class KataTest < TestBase
 
   private
 
-  def volume_exists?
-    cmd = [
-      'docker volume ls',
-      '--quiet',
-      "--filter 'name=#{volume_name}'"
-    ].join(space)
-    stdout,_ = assert_exec(cmd)
-    stdout.strip == volume_name
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   def assert_method_raises(method, kata_ids, message)
     [*kata_ids].each do |kata_id|
       error = assert_raises(ArgumentError) {
@@ -80,10 +77,5 @@ class KataTest < TestBase
       assert_equal 'kata_id:'+message, error.message
     end
   end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def volume_name; [ 'cyber', 'dojo', kata_id ].join('_'); end
-  def space; ' '; end
 
 end

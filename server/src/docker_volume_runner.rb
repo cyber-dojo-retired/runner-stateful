@@ -18,6 +18,8 @@ class DockerVolumeRunner
   def logging_off; @logging = false; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # pull
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def pulled(image_name); pulled?(image_name); end
 
@@ -30,24 +32,37 @@ class DockerVolumeRunner
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # kata
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def new_kata(_image_name, kata_id)
+  def kata_exists?(_image_name, kata_id)
     assert_valid_id(kata_id)
-    refute_kata_exists(kata_id)
+    name = volume_name(kata_id)
+    cmd = "docker volume ls --quiet --filter 'name=#{name}'"
+    stdout,stderr = assert_exec(cmd)
+    stdout.strip == name
+  end
+
+  def new_kata(image_name, kata_id)
+    refute_kata_exists(image_name, kata_id)
     assert_exec("docker volume create --name #{volume_name(kata_id)}")
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def old_kata(_image_name, kata_id)
-    assert_valid_id(kata_id)
-    assert_kata_exists(kata_id)
+  def old_kata(image_name, kata_id)
+    assert_kata_exists(image_name, kata_id)
     assert_exec("docker volume rm #{volume_name(kata_id)}")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # avatar
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def avatar_exists?(cid, avatar_name)
+    sandbox = sandbox_path(avatar_name)
+    cmd = "docker exec #{cid} sh -c '[ -d #{sandbox} ]'"
+    _stdout,_stderr,status = exec(cmd, logging = false)
+    status == success
+  end
 
   def new_avatar(image_name, kata_id, avatar_name, starting_files)
     cid = create_container(image_name, kata_id, avatar_name)
@@ -65,8 +80,6 @@ class DockerVolumeRunner
     end
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   def old_avatar(image_name, kata_id, avatar_name)
     cid = create_container(image_name, kata_id, avatar_name)
     begin
@@ -77,6 +90,7 @@ class DockerVolumeRunner
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # run
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run(image_name, kata_id, avatar_name, deleted_filenames, changed_files, max_seconds)
@@ -126,7 +140,7 @@ class DockerVolumeRunner
     # https://github.com/docker/docker/issues/13121
     # Hence the call to docker run is guarded by argument checks.
     assert_valid_id(kata_id)
-    assert_kata_exists(kata_id)
+    assert_kata_exists(image_name, kata_id)
     assert_valid_name(avatar_name)
     sandbox = sandbox_path(avatar_name)
     args = [
@@ -270,19 +284,12 @@ class DockerVolumeRunner
     '0123456789ABCDEF'.include?(char)
   end
 
-  def refute_kata_exists(kata_id)
-    fail error('kata_id:exists') if kata_exists?(kata_id)
+  def refute_kata_exists(image_name, kata_id)
+    fail error('kata_id:exists') if kata_exists?(image_name, kata_id)
   end
 
-  def assert_kata_exists(kata_id)
-    fail error('kata_id:!exists') unless kata_exists?(kata_id)
-  end
-
-  def kata_exists?(kata_id)
-    name = volume_name(kata_id)
-    cmd = "docker volume ls --quiet --filter 'name=#{name}'"
-    stdout,stderr = assert_exec(cmd)
-    stdout.strip == name
+  def assert_kata_exists(image_name, kata_id)
+    fail error('kata_id:!exists') unless kata_exists?(image_name, kata_id)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -301,13 +308,6 @@ class DockerVolumeRunner
 
   def assert_avatar_exists(cid, avatar_name)
     fail error('avatar_name:!exists') unless avatar_exists?(cid, avatar_name)
-  end
-
-  def avatar_exists?(cid, avatar_name)
-    sandbox = sandbox_path(avatar_name)
-    cmd = "docker exec #{cid} sh -c '[ -d #{sandbox} ]'"
-    _stdout,_stderr,status = exec(cmd, logging = false)
-    status == success
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
