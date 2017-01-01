@@ -57,11 +57,13 @@ class DockerVolumeRunner
   # avatar
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def avatar_exists?(cid, avatar_name)
-    sandbox = sandbox_path(avatar_name)
-    cmd = "docker exec #{cid} sh -c '[ -d #{sandbox} ]'"
-    _stdout,_stderr,status = exec(cmd, logging = false)
-    status == success
+  def avatar_exists?(image_name, kata_id, avatar_name)
+    cid = create_container(image_name, kata_id, avatar_name)
+    begin
+      avatar_exists_cid?(cid, avatar_name)
+    ensure
+      remove_container(cid)
+    end
   end
 
   def new_avatar(image_name, kata_id, avatar_name, starting_files)
@@ -74,7 +76,7 @@ class DockerVolumeRunner
       uid = user_id(avatar_name)
       cmd = "chown #{uid}:#{group} #{sandbox}"
       assert_docker_exec(cid, cmd)
-      change_files(cid, avatar_name, starting_files)
+      write_files(cid, avatar_name, starting_files)
     ensure
       remove_container(cid)
     end
@@ -98,7 +100,7 @@ class DockerVolumeRunner
     begin
       assert_avatar_exists(cid, avatar_name)
       delete_files(cid, avatar_name, deleted_filenames)
-      change_files(cid, avatar_name, changed_files)
+      write_files(cid, avatar_name, changed_files)
       stdout,stderr,status = run_cyber_dojo_sh(cid, avatar_name, max_seconds)
       stdout = truncated(cleaned(stdout))
       stderr = truncated(cleaned(stderr))
@@ -108,6 +110,8 @@ class DockerVolumeRunner
     end
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # properties
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def user_id(avatar_name)
@@ -122,12 +126,16 @@ class DockerVolumeRunner
     "#{sandboxes_root}/#{avatar_name}"
   end
 
-  def success; shell.success; end
-  def timed_out; 'timed_out'; end
+  def success
+    shell.success
+  end
+
+  def timed_out
+    'timed_out'
+  end
 
   private # ==========================================================
 
-  include AllAvatarsNames
   include StringCleaner
   include StringTruncater
 
@@ -169,7 +177,7 @@ class DockerVolumeRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def change_files(cid, avatar_name, files)
+  def write_files(cid, avatar_name, files)
     sandbox = sandbox_path(avatar_name)
     Dir.mktmpdir('runner') do |tmp_dir|
       files.each do |filename, content|
@@ -245,22 +253,6 @@ class DockerVolumeRunner
     log << "Failed:remove_container(#{cid})" unless removed
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def image_names
-    lines = assert_exec('docker images')[0].split("\n")
-    lines.shift # REPOSITORY TAG IMAGE ID CREATED SIZE
-    lines.collect { |line| line.split[0] }
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def volume_name(kata_id)
-    [ 'cyber', 'dojo', kata_id ].join('_')
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   def container_dead?(cid)
     cmd = "docker inspect --format='{{ .State.Running }}' #{cid}"
     _,stderr,status = exec(cmd, logging = false)
@@ -298,16 +290,30 @@ class DockerVolumeRunner
     fail error('avatar_name:invalid') unless valid_avatar?(avatar_name)
   end
 
+  include AllAvatarsNames
   def valid_avatar?(avatar_name)
     all_avatars_names.include?(avatar_name)
   end
 
   def refute_avatar_exists(cid, avatar_name)
-    fail error('avatar_name:exists') if avatar_exists?(cid, avatar_name)
+    fail error('avatar_name:exists') if avatar_exists_cid?(cid, avatar_name)
   end
 
   def assert_avatar_exists(cid, avatar_name)
-    fail error('avatar_name:!exists') unless avatar_exists?(cid, avatar_name)
+    fail error('avatar_name:!exists') unless avatar_exists_cid?(cid, avatar_name)
+  end
+
+  def avatar_exists_cid?(cid, avatar_name)
+    sandbox = sandbox_path(avatar_name)
+    cmd = "docker exec #{cid} sh -c '[ -d #{sandbox} ]'"
+    _stdout,_stderr,status = exec(cmd, logging = false)
+    status == success
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def error(message)
+    ArgumentError.new(message)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -328,8 +334,16 @@ class DockerVolumeRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def error(message)
-    ArgumentError.new(message)
+  def image_names
+    lines = assert_exec('docker images')[0].split("\n")
+    lines.shift # REPOSITORY TAG IMAGE ID CREATED SIZE
+    lines.collect { |line| line.split[0] }
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def volume_name(kata_id)
+    [ 'cyber', 'dojo', kata_id ].join('_')
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

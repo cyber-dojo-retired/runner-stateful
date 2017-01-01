@@ -18,43 +18,13 @@ class AvatarTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '75E',
-  "before new_avatar it's sandbox does not exist",
-  "after new_avatar it's sandbox does exist" do
-    refute avatar_exists?('lion')
-    new_avatar({ avatar_name:'lion' })
-    assert avatar_exists?('lion')
-    old_avatar({ avatar_name:'lion' })
+  "before new_avatar avatar does not exist",
+  "after new_avatar it does exist" do
+    refute avatar_exists?
+    new_avatar
+    assert avatar_exists?
+    old_avatar
   end
-
-  def avatar_exists?(avatar_name)
-    sandbox = runner.sandbox_path(avatar_name)
-    cid = create_container
-    begin
-      cmd = "docker exec #{cid} sh -c '[ -d #{sandbox} ]'"
-      _stdout,_stderr,status = shell.exec(cmd, logging = false)
-      status == success
-    ensure
-      rm_container(cid)
-    end
-  end
-
-  def create_container
-    args = [
-      '--detach',
-      '--interactive',
-      '--net=none',
-      '--user=root',
-      "--volume=#{volume_name}:/sandboxes:rw"
-    ].join(space)
-    cid = assert_exec("docker run #{args} #{@image_name} sh")[0].strip
-  end
-
-  def rm_container(cid)
-    assert_exec("docker rm --force #{cid}")
-  end
-
-  def volume_name; [ 'cyber', 'dojo', kata_id ].join('_'); end
-  def space; ' '; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
   # negative tests cases: new_avatar

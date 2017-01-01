@@ -42,11 +42,9 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-=begin
   def avatar_exists?(named_args = {})
     runner.avatar_exists?(*defaulted_args(__method__, named_args))
   end
-=end
 
   def new_avatar(named_args = {})
     runner.new_avatar(*defaulted_args(__method__, named_args))
@@ -78,7 +76,7 @@ class TestBase < HexMiniTest
 
     default_avatar_name = 'salmon'
     args << defaulted_arg(named_args, :avatar_name, default_avatar_name)
-    return args if method == 'old_avatar'
+    return args if ['avatar_exists?','old_avatar'].include?(method)
 
     if method == 'new_avatar'
       args << defaulted_arg(named_args, :starting_files, files)
@@ -140,16 +138,6 @@ class TestBase < HexMiniTest
     stdout,stderr,status = sss_run(options)
     assert_equal timed_out, status, [stdout,stderr]
     [stdout,stderr]
-  end
-
-  def assert_exec(cmd)
-    stdout,stderr,status = exec(cmd)
-    assert_equal success, status, [stdout,stderr]
-    [stdout,stderr]
-  end
-
-  def exec(cmd, logging = true)
-    shell.exec(cmd, logging)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
