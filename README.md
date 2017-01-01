@@ -17,102 +17,114 @@ alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
 - - - -
 
 # pulled?
-Asks the runner-service if the given image has been pulled.
+Asks whether the given image has been pulled.
 - parameter
-  * image_name, eg "cyberdojofoundation/gcc_assert"
-- returns true if it has.
 ```
-  { "pulled?":true   }
+  image_name   eg "cyberdojofoundation/gcc_assert"
 ```
-- returns false if it hasn't.
+- returns true if it has, false if it hasn't.
 ```
-  { "pulled?":false  }
+  { "pulled?": true   }
+  { "pulled?": false  }
 ```
 
 # pull
-Tells the runner-service to pull the given image.
+Pull the given image.
 - parameter
-  * image_name, eg "cyberdojofoundation/gcc_assert"
+```
+  image_name   eg "cyberdojofoundation/gcc_assert"
+```
 
 - - - -
 
 # kata_exists?
-Asks the runner-service if the kata with the given kata_id exists.
+Asks whether the kata with the given kata_id exists.
 - parameters
-  * image_name, eg "cyberdojofoundation/gcc_assert"
-  * kata_id,    eg "15B9AD6C42"
-- returns true if it does.
 ```
-  { "kata_exists?":true   }
+  image_name   eg "cyberdojofoundation/gcc_assert"
+  kata_id      eg "15B9AD6C42"
 ```
-- returns false if it doesn't.
+- returns true if it does, false if it doesn't.
 ```
-  { "kata_exists?":false  }
+  { "kata_exists?": true   }
+  { "kata_exists?": false  }
 ```
 
 # new_kata
-Tells the runner-service the kata with the given kata_id has been set up.
+The kata with the given kata_id has been set up.
 Must be called before new_avatar.
 - parameters
-  * image_name, eg "cyberdojofoundation/gcc_assert"
-  * kata_id,    eg "15B9AD6C42"
-
+```
+  image_name    eg "cyberdojofoundation/gcc_assert"
+  kata_id       eg "15B9AD6C42"
+```
 # old_kata
-Tells the runner-service the kata with the given kata_id has been torn down.
+The kata with the given kata_id has been torn down.
 - parameters
-  * image_name, eg "cyberdojofoundation/gcc_assert"
-  * kata_id,    eg "15B9AD6C42"
+```
+  image_name    eg "cyberdojofoundation/gcc_assert"
+  kata_id       eg "15B9AD6C42"
+```
 
 - - - -
 
 # avatar_exists?
-Asks the runner-service if the avatar with the given avatar_name
+Asks whether the avatar with the given avatar_name
 has entered the kata with the given kata_id.
 - parameters
 ```
-  * image_name     eg "cyberdojofoundation/gcc_assert"
-  * kata_id        eg "15B9AD6C42"
-  * avatar_name    eg "salmon"
+  image_name    eg "cyberdojofoundation/gcc_assert"
+  kata_id       eg "15B9AD6C42"
+  avatar_name   eg "salmon"
 ```
-- returns true if it does.
+- returns true if it does, false if it doesn't
 ```
-  { "avatar_exists?":true   }
-```
-- returns false if it doesn't.
-```
-  { "avatar_exists?":false  }
+  { "avatar_exists?": true   }
+  { "avatar_exists?": false  }
 ```
 
 # new_avatar
-Tells the runner-service the given avatar has entered
-the given kata with the given starting files.
+The given avatar has entered the given kata with the given starting files.
 Must be called before run.
 - parameters
-  * image_name,     eg "cyberdojofoundation/gcc_assert"
-  * kata_id,        eg "15B9AD6C42"
-  * avatar_name,    eg "salmon"
-  * starting_files, eg { "fizz_buzz.h" : "#include...", ... }
+```
+  image_name      eg "cyberdojofoundation/gcc_assert"
+  kata_id         eg "15B9AD6C42"
+  avatar_name     eg "salmon"
+  starting_files  eg { "hiker.h": "#ifndef HIKER_INCLUDED...",
+                       "hiker.c": "#include...",
+                       ...
+                     }
+```
 
 # old_avatar
-Tells the runner-service the given avatar has left the given kata.
+The given avatar has left the given kata.
 - parameters
-  * image_name,  eg "cyberdojofoundation/gcc_assert"
-  * kata_id,     eg "15B9AD6C42"
-  * avatar_name, eg "salmon"
+```
+  image_name   eg "cyberdojofoundation/gcc_assert"
+  kata_id      eg "15B9AD6C42"
+  avatar_name  eg "salmon"
+```
 
 - - - -
 
 # run
-Asks the runner-server to run cyber-dojo.sh, for the given avatar, in the given kata, after:
-  * removing the deleted_filenames
-  * saving changed_files
+For the avatar with the given avatar_name, in the kata with the given kata_id:
+  * removes the deleted_filenames
+  * saves changed_files
+  * runs cyber-dojo.sh
 - parameters
-  * image_name,        eg "cyberdojofoundation/gcc_assert"
-  * kata_id,           eg "15B9AD6C42"
-  * avatar_name,       eg "salmon"
-  * deleted_filenames, eg [ "hiker.h", ... ]
-  * changed_files,     eg { "fizz_buzz.h": "#include...", ... }
-  * max_seconds,       eg "10"
+```
+  image_name         eg "cyberdojofoundation/gcc_assert"
+  kata_id            eg "15B9AD6C42"
+  avatar_name        eg "salmon"
+  deleted_filenames  eg [ "hiker.h", "hiker.c", ... ]
+  changed_files      eg { "fizz_buzz.h": "#ifndef FIZZ_BUZZ_INCLUDED...",
+                          "fizz_buzz.c": "#include...",
+                          ...
+                        }
+  max_seconds        eg "10"
+```
 - returns an integer status if the run completed in max_seconds, eg
 ```
     { "run": {
@@ -121,7 +133,7 @@ Asks the runner-server to run cyber-dojo.sh, for the given avatar, in the given 
         "stderr": ""
     }
 ```
-- returns the status string "timed_out" if the run did not complete in max_seconds, eg
+- returns the string status "timed_out" if the run did not complete in max_seconds, eg
 ```
     { "run": {
         "status": "timed_out",
