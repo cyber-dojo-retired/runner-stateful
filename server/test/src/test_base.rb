@@ -6,7 +6,7 @@ require 'json'
 class TestBase < HexMiniTest
 
   def kata_setup
-    @image_name = image_for_test
+    set_image_name image_for_test
     new_kata
     new_avatar
   end
@@ -68,8 +68,7 @@ class TestBase < HexMiniTest
     method = method.to_s
     args = []
 
-    default_image_name = @image_name
-    args << defaulted_arg(named_args, :image_name, default_image_name)
+    args << defaulted_arg(named_args, :image_name, image_name)
     return args if ['pulled?','pull'].include?(method)
 
     default_kata_id = test_id + '0' * (10-test_id.length)
@@ -95,6 +94,8 @@ class TestBase < HexMiniTest
     named_args.key?(arg_name) ? named_args[arg_name] : arg_default
   end
 
+  def set_image_name(image_name); @image_name = image_name; end
+  def image_name; @image_name; end
   def kata_id; test_id + '0' * (10-test_id.length); end
   def avatar_name; 'salmon'; end
 
@@ -163,14 +164,14 @@ class TestBase < HexMiniTest
   end
 
   def language_dir_from_image_name
-    fail '@image_name.nil? so cannot set language_dir' if @image_name.nil?
-    @image_name.split('/')[1]
+    fail 'image_name.nil? so cannot set language_dir' if image_name.nil?
+    image_name.split('/')[1]
   end
 
   def load_files(language_dir)
     dir = "/app/start_files/#{language_dir}"
     json = JSON.parse(IO.read("#{dir}/manifest.json"))
-    @image_name = json['image_name']
+    set_image_name json['image_name']
     Hash[json['visible_filenames'].collect { |filename|
       [filename, IO.read("#{dir}/#{filename}")]
     }]

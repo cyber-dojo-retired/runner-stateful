@@ -4,7 +4,11 @@ class RunTest < TestBase
 
   def self.hex_prefix; '58410'; end
 
-  def hex_setup; @image_name = 'cyberdojofoundation/gcc_assert'; end
+  def hex_setup
+    set_image_name 'cyberdojofoundation/gcc_assert'
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'D7B',
   'run with an invalid kata_id raises' do

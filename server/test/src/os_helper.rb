@@ -52,10 +52,10 @@ module OsHelper
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def new_avatar_starting_files_test
-    # kata_setup has already called new_avatar() which has setup
-    # a salmon with the starting-files associated with @image_name
-    # So I create a new avatar with known starting-files
-    # kata_teardown calls old_avatar and old_kata
+    # kata_setup has already called new_avatar() which
+    # has setup a salmon. So I create a new avatar with
+    # known ls-starting-files. Note that kata_teardown
+    # calls old_avatar and old_kata
     new_avatar({ avatar_name:'lion', starting_files:ls_starting_files })
     begin
       sss_run({ avatar_name:'lion', changed_files:{} })

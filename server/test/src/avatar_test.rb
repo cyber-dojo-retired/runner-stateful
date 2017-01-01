@@ -5,7 +5,7 @@ class AvatarTest < TestBase
   def self.hex_prefix; '20A7A'; end
 
   def hex_setup
-    @image_name = 'cyberdojofoundation/gcc_assert'
+    set_image_name 'cyberdojofoundation/gcc_assert'
     new_kata
   end
 

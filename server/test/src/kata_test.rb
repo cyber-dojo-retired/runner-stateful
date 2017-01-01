@@ -4,7 +4,9 @@ class KataTest < TestBase
 
   def self.hex_prefix; 'FB0D4'; end
 
-  def hex_setup; @image_name = 'cyberdojofoundation/gcc_assert'; end
+  def hex_setup
+    set_image_name 'cyberdojofoundation/gcc_assert'
+  end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
   # positive test case
