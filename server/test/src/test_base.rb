@@ -18,12 +18,12 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def pulled?(name = @image_name)
-    runner.pulled?(name)
+  def pulled?(named_args = {})
+    runner.pulled?(*defaulted_args(__method__, named_args))
   end
 
-  def pull(name = @image_name)
-    runner.pull(name)
+  def pull(named_args = {})
+    runner.pull(*defaulted_args(__method__, named_args))
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -69,8 +69,10 @@ class TestBase < HexMiniTest
     args = []
 
     default_image_name = @image_name
-    default_kata_id = test_id + '0' * (10-test_id.length)
     args << defaulted_arg(named_args, :image_name, default_image_name)
+    return args if ['pulled?','pull'].include?(method)
+
+    default_kata_id = test_id + '0' * (10-test_id.length)
     args << defaulted_arg(named_args, :kata_id, default_kata_id)
     return args if ['kata_exists?','new_kata','old_kata'].include?(method)
 

@@ -16,7 +16,7 @@ class PullTest < TestBase
   'when image_name is invalid, pulled?(image_name) does not raise and result is false' do
     mock_docker_images_prints_gcc_assert
     runner.logging_off
-    refute pulled?('123/123')
+    refute pulled?({ image_name:'123/123' })
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -24,7 +24,7 @@ class PullTest < TestBase
   test '9C3',
   'when image_name is valid but not in [docker images], pulled?(image_name) is false' do
     mock_docker_images_prints_gcc_assert
-    refute pulled?('cdf/ruby_mini_test')
+    refute pulled?({ image_name:'cdf/ruby_mini_test' })
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -32,7 +32,7 @@ class PullTest < TestBase
   test 'A44',
   'when image_name is valid and in [docker images], pulled?(image_name) is true' do
     mock_docker_images_prints_gcc_assert
-    assert pulled?('cdf/gcc_assert')
+    assert pulled?({ image_name:'cdf/gcc_assert' })
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -52,7 +52,7 @@ class PullTest < TestBase
       'dial tcp: lookup index.docker.io on 10.0.2.3:53: no such host'
     ].join(' ')
     shell.mock_exec("docker pull #{image_name}", stdout, stderr, 1)
-    assert_raises { pull(image_name) }
+    assert_raises { pull({ image_name:image_name }) }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -67,7 +67,7 @@ class PullTest < TestBase
     stderr = "Error: image #{image_name}:latest not found"
     shell.mock_exec("docker pull #{image_name}", stdout, stderr, 1)
     runner.logging_off
-    assert_raises { pull(image_name) }
+    assert_raises { pull({ image_name:image_name }) }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -75,7 +75,7 @@ class PullTest < TestBase
   test '91C',
   'when image_name is valid, pull(image_name) issues unconditional docker-pull' do
     mock_docker_pull_cdf_ruby_mini_test
-    pull('cdf/ruby_mini_test')
+    pull({ image_name:'cdf/ruby_mini_test' })
   end
 
   private
