@@ -13,7 +13,7 @@ class RunTest < TestBase
   test 'D7B',
   'run with an invalid kata_id raises' do
     invalid_kata_ids.each do |invalid_kata_id|
-      assert_raises_kata_id(invalid_kata_id)
+      assert_raises_kata_id(invalid_kata_id, 'invalid')
     end
   end
 
@@ -22,7 +22,7 @@ class RunTest < TestBase
   test '1DC',
   'run with valid kata_id that does not exist raises' do
     kata_id = '0C67EC0416'
-    assert_raises_kata_id(kata_id)
+    assert_raises_kata_id(kata_id, '!exists')
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -31,7 +31,7 @@ class RunTest < TestBase
   'run with kata_id that exists but invalid avatar_name raises' do
     new_kata
     begin
-      assert_raises_avatar_name(kata_id, 'scissors')
+      assert_raises_avatar_name(kata_id, 'scissors', 'invalid')
     ensure
       old_kata
     end
@@ -43,7 +43,7 @@ class RunTest < TestBase
   'run with kata_id that exists and valid avatar_name that does not exist yet raises' do
     new_kata
     begin
-      assert_raises_avatar_name(kata_id, 'salmon')
+      assert_raises_avatar_name(kata_id, 'salmon', '!exists')
     ensure
       old_kata
     end
@@ -51,23 +51,23 @@ class RunTest < TestBase
 
   private
 
-  def assert_raises_kata_id(kata_id)
+  def assert_raises_kata_id(kata_id, message)
     error = assert_raises(ArgumentError) {
       sss_run( { kata_id:kata_id })
     }
-    assert error.message.start_with?('kata_id'), error.message
+    assert_equal "kata_id:#{message}", error.message
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_raises_avatar_name(kata_id, avatar_name)
+  def assert_raises_avatar_name(kata_id, avatar_name, message)
     error = assert_raises(ArgumentError) {
       sss_run( {
             kata_id:kata_id,
         avatar_name:avatar_name
       })
     }
-    assert error.message.start_with?('avatar_name'), error.message
+    assert_equal "avatar_name:#{message}", error.message
   end
 
 end
