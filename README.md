@@ -17,7 +17,7 @@ alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
 - - - -
 
 # pulled?
-Asks whether the given image has been pulled.
+Asks whether the image with the given image_name has been pulled.
 - parameter
 ```
   image_name   eg "cyberdojofoundation/gcc_assert"
@@ -29,7 +29,7 @@ Asks whether the given image has been pulled.
 ```
 
 # pull
-Pull the given image.
+Pull the image with the given image_name.
 - parameter
 ```
   image_name   eg "cyberdojofoundation/gcc_assert"
@@ -84,7 +84,8 @@ has entered the kata with the given kata_id.
 ```
 
 # new_avatar
-The given avatar has entered the given kata with the given starting files.
+The avatar with the given avatar_name has entered the
+kata with the given kata with the given starting files.
 Must be called before run.
 - parameters
 ```
@@ -98,7 +99,8 @@ Must be called before run.
 ```
 
 # old_avatar
-The given avatar has left the given kata.
+The avatar with the given avatar_name_ has left
+the kata with the given kata_id.
 - parameters
 ```
   image_name   eg "cyberdojofoundation/gcc_assert"
