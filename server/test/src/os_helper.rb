@@ -55,36 +55,31 @@ module OsHelper
     # kata_setup has already called new_avatar() which has setup
     # a salmon with the starting-files associated with @image_name
     # So I create a new avatar with known starting-files
-    # kata_teardown calls old_kata which deletes all the avatar's volumes.
-    runner.new_avatar(@image_name, kata_id, 'lion', ls_starting_files)
-    args = []
-    args << @image_name
-    args << kata_id
-    args << 'lion'
-    args << (deleted_filenames=[])
-    args << (changed_files={})
-    args << (max_seconds=10)
-    sss = runner.run(*args)
-    ls_stdout = sss[:stdout]
-    stderr = sss[:stderr]
-    status = sss[:status]
-    assert_equal success, status
-    assert_equal '', stderr
-    ls_files = ls_parse(ls_stdout)
-    assert_equal ls_starting_files.keys.sort, ls_files.keys.sort
-    lion_uid = user_id('lion')
-    assert_equal_atts('empty.txt',     '-rw-r--r--', lion_uid, group,  0, ls_files)
-    assert_equal_atts('cyber-dojo.sh', '-rwxr-xr-x', lion_uid, group, 29, ls_files)
-    assert_equal_atts('hello.txt',     '-rw-r--r--', lion_uid, group, 11, ls_files)
-    assert_equal_atts('hello.sh',      '-rwxr-xr-x', lion_uid, group, 16, ls_files)
+    # kata_teardown calls old_avatar and old_kata
+    new_avatar({ avatar_name:'lion', starting_files:ls_starting_files })
+    begin
+      sss_run({ avatar_name:'lion', changed_files:{} })
+      assert_equal success, status
+      assert_equal '', stderr
+      ls_stdout = stdout
+      ls_files = ls_parse(ls_stdout)
+      assert_equal ls_starting_files.keys.sort, ls_files.keys.sort
+      lion_uid = user_id('lion')
+      assert_equal_atts('empty.txt',     '-rw-r--r--', lion_uid, group,  0, ls_files)
+      assert_equal_atts('cyber-dojo.sh', '-rwxr-xr-x', lion_uid, group, 29, ls_files)
+      assert_equal_atts('hello.txt',     '-rw-r--r--', lion_uid, group, 11, ls_files)
+      assert_equal_atts('hello.sh',      '-rwxr-xr-x', lion_uid, group, 16, ls_files)
+    ensure
+      old_avatar({ avatar_name:'lion' })
+    end
   end
 
   def assert_equal_atts(filename, permissions, user, group, size, ls_files)
     atts = ls_files[filename]
     refute_nil atts, filename
-    assert_equal user, atts[:user], { filename => atts }
+    assert_equal user,  atts[:user ], { filename => atts }
     assert_equal group, atts[:group], { filename => atts }
-    assert_equal size, atts[:size], { filename => atts }
+    assert_equal size,  atts[:size ], { filename => atts }
     assert_equal permissions, atts[:permissions], { filename => atts }
   end
 
@@ -109,7 +104,6 @@ module OsHelper
     deleted_filenames = ['hello.txt']
     named_args = {
       changed_files:{},
-      max_seconds:10,
       deleted_filenames:deleted_filenames
     }
     ls_stdout = assert_run_succeeds_no_stderr(named_args)
@@ -140,8 +134,8 @@ module OsHelper
     assert_equal [ new_filename ], actual_new_filenames
     attr = after[new_filename]
     assert_equal '-rw-r--r--', attr[:permissions]
-    assert_equal user_id, attr[:user]
-    assert_equal group, attr[:group]
+    assert_equal user_id,      attr[:user]
+    assert_equal group,        attr[:group]
     assert_equal new_file_content.size, attr[:size]
     before.each { |filename, attr| assert_equal after[filename], attr }
   end
