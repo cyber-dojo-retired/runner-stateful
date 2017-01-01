@@ -181,7 +181,7 @@ module OsHelper
   private
 
   def ls_starting_files
-    @ls_starting_files ||= {
+    {
       'cyber-dojo.sh' => ls_cmd,
       'empty.txt'     => '',
       'hello.txt'     => 'hello world',
