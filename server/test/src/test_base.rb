@@ -191,8 +191,8 @@ class TestBase < HexMiniTest
     runner.sandbox_path(name)
   end
 
-  def success; runner.success; end
-  def timed_out; runner.timed_out; end
+  def success; shell.success; end
+  def timed_out; 'timed_out'; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

@@ -124,14 +124,6 @@ class DockerVolumeRunner
     "#{sandboxes_root}/#{avatar_name}"
   end
 
-  def success
-    shell.success
-  end
-
-  def timed_out
-    'timed_out'
-  end
-
   private # ==========================================================
 
   include StringCleaner
@@ -222,7 +214,7 @@ class DockerVolumeRunner
     rescue Timeout::Error
       Process.kill(-9, pid)
       Process.detach(pid)
-      ['', '', timed_out]
+      ['', '', 'timed_out']
     ensure
       w_stdout.close unless w_stdout.closed?
       w_stderr.close unless w_stderr.closed?
@@ -374,6 +366,7 @@ class DockerVolumeRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def sandboxes_root; '/sandboxes'; end
+  def success; shell.success; end
   def space; ' '; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
