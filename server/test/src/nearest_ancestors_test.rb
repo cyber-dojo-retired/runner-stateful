@@ -15,7 +15,7 @@ end
 # - - - - - - - - - - - - - - - - - - - - - - - -
 
 class Anna
-  def disk; @disk ||= DummyDisk.new('anna'); end
+  def disk;  @disk  ||=  DummyDisk.new('anna'); end
   def store; @store ||= DummyStore.new('anna'); end
 end
 
@@ -32,22 +32,22 @@ end
 class Ellie
   def initialize(natalie); @parent = natalie; end
   attr_reader :parent
-  def uses_disk; disk.read; end
-  def uses_store; store.save; end
-  def uses_log; log.write; end
+  def uses_disk ;  disk.read ; end
+  def uses_store; store.save ; end
+  def uses_log  ;   log.write; end
 
   private
 
-  include NearestExternal
+  include NearestAncestors
 
-  def disk; nearest_external(:disk); end
-  def store; nearest_external(:store); end
-  def log; nearest_external(:log); end
+  def disk ; nearest_ancestors(:disk ); end
+  def store; nearest_ancestors(:store); end
+  def log  ; nearest_ancestors(:log  ); end
 end
 
 # - - - - - - - - - - - - - - - - - - - - - - - -
 
-class TestNearestExternal < TestBase
+class TestNearestAncestors < TestBase
 
   def self.hex_prefix; '9D4'; end
 

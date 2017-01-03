@@ -15,7 +15,7 @@ end
 #
 # 1. include Externals in your top-level scope.
 #
-#    require_relative './externals'
+#    require_relative 'externals'
 #    class MicroService < Sinatra::Base
 #      ...
 #      private
@@ -25,9 +25,9 @@ end
 #    end
 #
 # 2. All child objects have access to their parent
-#    and gain access to the externals via nearest_external()
+#    and gain access to the externals via nearest_ancestors()
 #
-#    require_relative './nearest_external'
+#    require_relative 'nearest_ancestors'
 #    class DockerRunner
 #      def initialize(parent)
 #        @parent = parent
@@ -35,8 +35,8 @@ end
 #      attr_reader :parent
 #      ...
 #      private
-#      include NearestExternal
-#      def log; nearest_external(:log); end
+#      include NearestAncestors
+#      def log; nearest_ancestors(:log); end
 #      ...
 #    end
 #

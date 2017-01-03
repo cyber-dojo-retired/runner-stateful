@@ -1,11 +1,16 @@
 
-module NearestExternal
+module NearestAncestors
 
-  def nearest_external(symbol, my = self)
+  def nearest_ancestors(symbol, my = self)
     loop {
-      fail "#{my.class.name} does not have a parent" unless my.respond_to? :parent
+      unless my.respond_to? :parent
+        message = "#{my.class.name} does not have a parent"
+        fail message
+      end
       my = my.parent
-      return my.send(symbol) if my.respond_to? symbol
+      if my.respond_to? symbol
+        return my.send(symbol)
+      end
     }
   end
 

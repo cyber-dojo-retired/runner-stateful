@@ -1,5 +1,5 @@
 require_relative 'all_avatars_names'
-require_relative 'nearest_external'
+require_relative 'nearest_ancestors'
 require_relative 'string_cleaner'
 require_relative 'string_truncater'
 require 'timeout'
@@ -363,9 +363,9 @@ class DockerVolumeRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  include NearestExternal
-  def shell; nearest_external(:shell); end
-  def  disk; nearest_external(:disk);  end
-  def   log; nearest_external(:log);   end
+  include NearestAncestors
+  def shell; nearest_ancestors(:shell); end
+  def  disk; nearest_ancestors(:disk ); end
+  def   log; nearest_ancestors(:log  ); end
 
 end

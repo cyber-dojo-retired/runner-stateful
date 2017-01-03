@@ -1,4 +1,4 @@
-require_relative 'nearest_external'
+require_relative 'nearest_ancestors'
 require 'open3'
 
 class Sheller
@@ -34,8 +34,8 @@ class Sheller
 
   private
 
-  include NearestExternal
-  def log; nearest_external(:log); end
+  include NearestAncestors
+  def log; nearest_ancestors(:log); end
 
   def line; '-' * 40; end
 end
