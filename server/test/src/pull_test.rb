@@ -81,11 +81,9 @@ class PullTest < TestBase
   private
 
   def mock_docker_images_prints_gcc_assert
-    stdout = [
-      'REPOSITORY     TAG    IMAGE ID     CREATED    SIZE',
-      'cdf/gcc_assert latest 28683e525ad3 9 days ago 95.97 MB'
-    ].join("\n")
-    shell.mock_exec('docker images', stdout, '', success)
+    stdout = 'cdf/gcc_assert'
+    cmd = 'docker images --format "{{.Repository}}:{{.Tag}}"'
+    shell.mock_exec(cmd, stdout, '', success)
   end
 
   def mock_docker_pull_cdf_ruby_mini_test

@@ -69,11 +69,11 @@ class DockerVolumeRunner
     begin
       refute_avatar_exists(cid, avatar_name)
       sandbox = sandbox_path(avatar_name)
-      cmd = "mkdir #{sandbox}"
-      assert_docker_exec(cid, cmd)
+      mkdir = "mkdir #{sandbox}"
+      assert_docker_exec(cid, mkdir)
       uid = user_id(avatar_name)
-      cmd = "chown #{uid}:#{group} #{sandbox}"
-      assert_docker_exec(cid, cmd)
+      chown = "chown #{uid}:#{group} #{sandbox}"
+      assert_docker_exec(cid, chown)
       write_files(cid, avatar_name, starting_files)
     ensure
       remove_container(cid)
@@ -169,7 +169,8 @@ class DockerVolumeRunner
   def delete_files(cid, avatar_name, filenames)
     sandbox = sandbox_path(avatar_name)
     filenames.each do |filename|
-      assert_docker_exec(cid, "rm #{sandbox}/#{filename}")
+      rm = "rm #{sandbox}/#{filename}"
+      assert_docker_exec(cid, rm)
     end
   end
 
@@ -181,14 +182,17 @@ class DockerVolumeRunner
       files.each do |filename, content|
         host_filename = tmp_dir + '/' + filename
         disk.write(host_filename, content)
-        assert_exec("chmod +x #{host_filename}") if filename.end_with?('.sh')
+        if filename.end_with?('.sh')
+          assert_exec("chmod +x #{host_filename}")
+        end
       end
-      assert_exec("docker cp #{tmp_dir}/. #{cid}:#{sandbox}")
+      cp = "docker cp #{tmp_dir}/. #{cid}:#{sandbox}"
+      assert_exec(cp)
     end
     uid = user_id(avatar_name)
     files.keys.each do |filename|
-      cmd = "chown #{uid}:#{group} #{sandbox}/#{filename}"
-      assert_docker_exec(cid, cmd)
+      chown = "chown #{uid}:#{group} #{sandbox}/#{filename}"
+      assert_docker_exec(cid, chown)
     end
   end
 
@@ -262,7 +266,7 @@ class DockerVolumeRunner
 
   def assert_valid_id(kata_id)
     unless valid_id?(kata_id)
-      fail error('kata_id:invalid')
+      fail_kata_id('invalid')
     end
   end
 
@@ -278,13 +282,13 @@ class DockerVolumeRunner
 
   def refute_kata_exists(image_name, kata_id)
     if kata_exists?(image_name, kata_id)
-      fail error('kata_id:exists')
+      fail_kata_id('exists')
     end
   end
 
   def assert_kata_exists(image_name, kata_id)
     unless kata_exists?(image_name, kata_id)
-      fail error('kata_id:!exists')
+      fail_kata_id('!exists')
     end
   end
 
@@ -292,7 +296,7 @@ class DockerVolumeRunner
 
   def assert_valid_name(avatar_name)
     unless valid_avatar?(avatar_name)
-      fail error('avatar_name:invalid')
+      fail_avatar_name('invalid')
     end
   end
 
@@ -303,13 +307,13 @@ class DockerVolumeRunner
 
   def refute_avatar_exists(cid, avatar_name)
     if avatar_exists_cid?(cid, avatar_name)
-      fail error('avatar_name:exists')
+      fail_avatar_name('exists')
     end
   end
 
   def assert_avatar_exists(cid, avatar_name)
     unless avatar_exists_cid?(cid, avatar_name)
-      fail error('avatar_name:!exists')
+      fail_avatar_name('!exists')
     end
   end
 
@@ -322,7 +326,15 @@ class DockerVolumeRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def error(message)
+  def fail_kata_id(message)
+    fail argument("kata_id:#{message}")
+  end
+
+  def fail_avatar_name(message)
+    fail argument("avatar_name:#{message}")
+  end
+
+  def argument(message)
     ArgumentError.new(message)
   end
 
@@ -334,7 +346,9 @@ class DockerVolumeRunner
 
   def assert_exec(cmd)
     stdout,stderr,status = exec(cmd)
-    fail StandardError.new(cmd) unless status == success
+    unless status == success
+      fail StandardError.new(cmd)
+    end
     [stdout,stderr]
   end
 
@@ -345,9 +359,10 @@ class DockerVolumeRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def image_names
-    lines = assert_exec('docker images')[0].split("\n")
-    lines.shift # REPOSITORY TAG IMAGE ID CREATED SIZE
-    lines.collect { |line| line.split[0] }
+    cmd = 'docker images --format "{{.Repository}}:{{.Tag}}"'
+    stdout = assert_exec(cmd)[0]
+    names = stdout.split("\n")
+    names.uniq - ['<none']
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
