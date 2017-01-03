@@ -82,12 +82,39 @@ class AvatarTest < TestBase
     assert_method_raises(:old_avatar, kata_id, invalid_avatar_names, 'avatar_name:invalid')
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   test 'D6F',
   'old_avatar with existing kata_id but avatar_name that does not exist raises' do
     assert_method_raises(:old_avatar, kata_id, 'salmon', 'avatar_name:!exists')
   end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # negative test case: user_id
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test 'A10',
+  'user_id with invalid avatar_name raises' do
+    invalid_avatar_names.each do |invalid_avatar_name|
+      error = assert_raises(ArgumentError) {
+        runner.user_id(invalid_avatar_name)
+      }
+      assert_equal 'avatar_name:invalid', error.message
+    end
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # negative test case: user_id
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test '0C8',
+  'sandbox_path with invalid avatar_name raises' do
+    invalid_avatar_names.each do |invalid_avatar_name|
+      error = assert_raises(ArgumentError) {
+        runner.sandbox_path(invalid_avatar_name)
+      }
+      assert_equal 'avatar_name:invalid', error.message
+    end
+  end
+
 
   private
 

@@ -113,6 +113,7 @@ class DockerVolumeRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def user_id(avatar_name)
+    assert_valid_name(avatar_name)
     40000 + all_avatars_names.index(avatar_name)
   end
 
@@ -121,6 +122,7 @@ class DockerVolumeRunner
   end
 
   def sandbox_path(avatar_name)
+    assert_valid_name(avatar_name)
     "#{sandboxes_root}/#{avatar_name}"
   end
 
