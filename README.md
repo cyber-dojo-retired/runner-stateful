@@ -10,7 +10,7 @@ alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
 - A micro-service for [cyber-dojo](http://cyber-dojo.org)
 - Runs avatar's tests in a docker container.
 - API:
-  * All methods receive their arguments in a json hash.
+  * All methods receive their arguments in a json object.
   * All methods return a json object with a single key.
   * If successful, the key equals the method's name.
   * If unsuccessful, the key equals "exception".
