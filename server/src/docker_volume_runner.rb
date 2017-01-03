@@ -261,7 +261,9 @@ class DockerVolumeRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_valid_id(kata_id)
-    fail error('kata_id:invalid') unless valid_id?(kata_id)
+    unless valid_id?(kata_id)
+      fail error('kata_id:invalid')
+    end
   end
 
   def valid_id?(kata_id)
@@ -275,17 +277,23 @@ class DockerVolumeRunner
   end
 
   def refute_kata_exists(image_name, kata_id)
-    fail error('kata_id:exists') if kata_exists?(image_name, kata_id)
+    if kata_exists?(image_name, kata_id)
+      fail error('kata_id:exists')
+    end
   end
 
   def assert_kata_exists(image_name, kata_id)
-    fail error('kata_id:!exists') unless kata_exists?(image_name, kata_id)
+    unless kata_exists?(image_name, kata_id)
+      fail error('kata_id:!exists')
+    end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_valid_name(avatar_name)
-    fail error('avatar_name:invalid') unless valid_avatar?(avatar_name)
+    unless valid_avatar?(avatar_name)
+      fail error('avatar_name:invalid')
+    end
   end
 
   include AllAvatarsNames
@@ -294,11 +302,15 @@ class DockerVolumeRunner
   end
 
   def refute_avatar_exists(cid, avatar_name)
-    fail error('avatar_name:exists') if avatar_exists_cid?(cid, avatar_name)
+    if avatar_exists_cid?(cid, avatar_name)
+      fail error('avatar_name:exists')
+    end
   end
 
   def assert_avatar_exists(cid, avatar_name)
-    fail error('avatar_name:!exists') unless avatar_exists_cid?(cid, avatar_name)
+    unless avatar_exists_cid?(cid, avatar_name)
+      fail error('avatar_name:!exists')
+    end
   end
 
   def avatar_exists_cid?(cid, avatar_name)
