@@ -356,7 +356,7 @@ class DockerVolumeRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def image_names
-    cmd = 'docker images --format "{{.Repository}}:{{.Tag}}"'
+    cmd = 'docker images --format "{{.Repository}}"'
     stdout = assert_exec(cmd)[0]
     names = stdout.split("\n")
     names.uniq - ['<none']

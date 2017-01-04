@@ -82,7 +82,7 @@ class PullTest < TestBase
 
   def mock_docker_images_prints_gcc_assert
     stdout = 'cdf/gcc_assert'
-    cmd = 'docker images --format "{{.Repository}}:{{.Tag}}"'
+    cmd = 'docker images --format "{{.Repository}}"'
     shell.mock_exec(cmd, stdout, '', success)
   end
 
