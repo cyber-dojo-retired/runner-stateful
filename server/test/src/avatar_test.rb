@@ -24,6 +24,7 @@ class AvatarTest < TestBase
     new_avatar
     assert avatar_exists?
     old_avatar
+    refute avatar_exists?
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -

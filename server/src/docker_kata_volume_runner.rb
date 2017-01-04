@@ -97,6 +97,9 @@ class DockerKataVolumeRunner
     cid = create_container(image_name, kata_id, avatar_name)
     begin
       assert_avatar_exists(cid, avatar_name)
+      sandbox = sandbox_path(avatar_name)
+      rm = "rm -rf #{sandbox}"
+      assert_docker_exec(cid, rm)
     ensure
       remove_container(cid)
     end
