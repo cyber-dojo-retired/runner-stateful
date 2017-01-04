@@ -172,7 +172,6 @@ class DockerVolumeRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def write_files(cid, avatar_name, files)
-    sandbox = sandbox_path(avatar_name)
     Dir.mktmpdir('runner') do |tmp_dir|
       files.each do |filename, content|
         host_filename = tmp_dir + '/' + filename
@@ -181,15 +180,26 @@ class DockerVolumeRunner
           assert_exec("chmod +x #{host_filename}")
         end
       end
-      # The /. appended to tmp_dir is needed.
-      # See https://docs.docker.com/engine/reference/commandline/cp/
-      cp = "docker cp #{tmp_dir}/. #{cid}:#{sandbox}"
-      assert_exec(cp)
-    end
-    uid = user_id(avatar_name)
-    files.keys.each do |filename|
-      chown = "chown #{uid}:#{group} #{sandbox}/#{filename}"
-      assert_docker_exec(cid, chown)
+      uid = user_id(avatar_name)
+      sandbox = sandbox_path(avatar_name)
+      cmd = [
+        'tar',
+          "--owner=#{uid}",   # force ownership
+          "--group=#{group}", # force group
+          '-cf',              # create a new archive
+          '-',                # write archive to stdout
+          '-C',               # change to...
+          "#{tmp_dir}",       # this dir
+          '.',                # and archive it
+          '|',                # pipe archive...
+          "docker exec -i #{cid}",  # into docker container
+            'tar',
+            '-xf',            # extract archive
+            '-',              # reading archive from stdin
+            '-C',             # change to...
+            sandbox           # this dir and extract
+      ].join(space)
+      assert_exec(cmd)
     end
   end
 
@@ -346,6 +356,10 @@ class DockerVolumeRunner
     unless status == success
       fail StandardError.new(cmd)
     end
+#log << "assert_exec(#{cmd})"
+#log << "status:#{status}:"
+#log << "stdout:#{stdout}:"
+#log << "stderr:#{stderr}:"
     [stdout,stderr]
   end
 
