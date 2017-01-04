@@ -1,12 +1,14 @@
 require_relative 'disk_writer'
+require_relative 'docker_kata_volume_runner'
 require_relative 'sheller'
 require_relative 'stdout_logger'
 
 module Externals
 
-  def shell; @shell ||= Sheller.new(self); end
-  def  disk;  @disk ||= DiskWriter.new(self); end
-  def   log;   @log ||= StdoutLogger.new(self); end
+  def runner; @runner ||= DockerKataVolumeRunner.new(self); end
+  def  shell;  @shell ||= Sheller.new(self); end
+  def   disk;   @disk ||= DiskWriter.new(self); end
+  def    log;    @log ||= StdoutLogger.new(self); end
 
 end
 
@@ -20,7 +22,6 @@ end
 #      ...
 #      private
 #      include Externals
-#      def runner; DockerRunner.new(self); end
 #      ...
 #    end
 #
@@ -28,7 +29,7 @@ end
 #    and gain access to the externals via nearest_ancestors()
 #
 #    require_relative 'nearest_ancestors'
-#    class DockerRunner
+#    class DockerKataVolumeRunner
 #      def initialize(parent)
 #        @parent = parent
 #      end
@@ -40,8 +41,8 @@ end
 #      ...
 #    end
 #
-# 3. In tests you can simply set the external directly.
-#    Note that Externals.log uses ||=
+# 3. In tests you can simply set the externals directly.
+#    Eg Externals.log uses ||=
 #
 #    class ExampleTest < MiniTest::Test
 #      def test_something

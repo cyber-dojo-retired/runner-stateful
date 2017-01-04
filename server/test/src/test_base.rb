@@ -1,5 +1,4 @@
 require_relative '../hex_mini_test'
-require_relative '../../src/docker_kata_volume_runner'
 require_relative '../../src/externals'
 require 'json'
 
@@ -102,7 +101,6 @@ class TestBase < HexMiniTest
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   include Externals
-  def runner; DockerKataVolumeRunner.new(self); end
 
   def sss; @sss; end
 
