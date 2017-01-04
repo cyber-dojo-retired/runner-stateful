@@ -1,12 +1,12 @@
 require_relative 'disk_writer'
 require_relative 'docker_kata_volume_runner'
-require_relative 'sheller'
+require_relative 'bash_sheller'
 require_relative 'stdout_logger'
 
 module Externals
 
   def runner; @runner ||= DockerKataVolumeRunner.new(self); end
-  def  shell;  @shell ||= Sheller.new(self); end
+  def  shell;  @shell ||= BashSheller.new(self); end
   def   disk;   @disk ||= DiskWriter.new(self); end
   def    log;    @log ||= StdoutLogger.new(self); end
 
