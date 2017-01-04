@@ -156,6 +156,7 @@ class DockerKataVolumeRunner
     assert_valid_id(kata_id)
     assert_kata_exists(image_name, kata_id)
     assert_valid_name(avatar_name)
+    sandbox = sandbox_path(avatar_name)
     args = [
       '--detach',                          # get the cid
       '--interactive',                     # later execs
@@ -164,6 +165,7 @@ class DockerKataVolumeRunner
       '--security-opt=no-new-privileges',  # security - no escalation
       "--env CYBER_DOJO_KATA_ID=#{kata_id}",
       "--env CYBER_DOJO_AVATAR_NAME=#{avatar_name}",
+      "--env CYBER_DOJO_SANDBOX=#{sandbox}",
       '--user=root',
       "--volumes-from=#{sandboxes_data_only_container_name(kata_id)}:rw"
     ].join(space)
