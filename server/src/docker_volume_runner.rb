@@ -43,12 +43,16 @@ class DockerVolumeRunner
 
   def new_kata(image_name, kata_id)
     refute_kata_exists(image_name, kata_id)
-    assert_exec("docker volume create --name #{volume_name(kata_id)}")
+    name = volume_name(kata_id)
+    cmd = "docker volume create --name #{name}"
+    assert_exec(cmd)
   end
 
   def old_kata(image_name, kata_id)
     assert_kata_exists(image_name, kata_id)
-    assert_exec("docker volume rm #{volume_name(kata_id)}")
+    name = volume_name(kata_id)
+    cmd = "docker volume rm #{name}"
+    assert_exec(cmd)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
