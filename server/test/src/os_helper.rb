@@ -11,8 +11,6 @@ module OsHelper
     assert_equal kata_id, stdout.strip
     stdout = assert_cyber_dojo_sh_no_stderr 'printenv CYBER_DOJO_AVATAR_NAME'
     assert_equal avatar_name, stdout.strip
-    stdout = assert_cyber_dojo_sh_no_stderr 'printenv CYBER_DOJO_SANDBOX'
-    assert_equal sandbox, stdout.strip
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -

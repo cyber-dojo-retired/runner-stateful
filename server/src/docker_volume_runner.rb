@@ -35,23 +35,29 @@ class DockerVolumeRunner
 
   def kata_exists?(_image_name, kata_id)
     assert_valid_id(kata_id)
-    name = volume_name(kata_id)
-    cmd = "docker volume ls --quiet --filter 'name=#{name}'"
+    name = sandboxes_data_only_container_name(kata_id)
+    cmd = "docker ps --quiet --all --filter name=#{name}"
     stdout,stderr = assert_exec(cmd)
-    stdout.strip == name
+    stdout.strip != ''
   end
 
   def new_kata(image_name, kata_id)
     refute_kata_exists(image_name, kata_id)
-    name = volume_name(kata_id)
-    cmd = "docker volume create --name #{name}"
+    name = sandboxes_data_only_container_name(kata_id)
+    cmd = [
+      'docker run',
+        "--volume #{sandboxes_root}",
+        "--name=#{name}",
+        image_name,
+        '/bin/true'
+    ].join(space)
     assert_exec(cmd)
   end
 
   def old_kata(image_name, kata_id)
     assert_kata_exists(image_name, kata_id)
-    name = volume_name(kata_id)
-    cmd = "docker volume rm #{name}"
+    name = sandboxes_data_only_container_name(kata_id)
+    cmd = "docker rm --volumes #{name}"
     assert_exec(cmd)
   end
 
@@ -147,7 +153,6 @@ class DockerVolumeRunner
     assert_valid_id(kata_id)
     assert_kata_exists(image_name, kata_id)
     assert_valid_name(avatar_name)
-    sandbox = sandbox_path(avatar_name)
     args = [
       '--detach',                          # get the cid
       '--interactive',                     # later execs
@@ -156,9 +161,8 @@ class DockerVolumeRunner
       '--security-opt=no-new-privileges',  # security - no escalation
       "--env CYBER_DOJO_KATA_ID=#{kata_id}",
       "--env CYBER_DOJO_AVATAR_NAME=#{avatar_name}",
-      "--env CYBER_DOJO_SANDBOX=#{sandbox}",
       '--user=root',
-      "--volume=#{volume_name(kata_id)}:#{sandboxes_root}:rw"
+      "--volumes-from=#{sandboxes_data_only_container_name(kata_id)}:rw"
     ].join(space)
     cid = assert_exec("docker run #{args} #{image_name} sh")[0].strip
   end
@@ -210,12 +214,8 @@ class DockerVolumeRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run_cyber_dojo_sh(cid, avatar_name, max_seconds)
-    # The [chmod 755] is required to ensure each avatar's
-    # sandbox's permissions are [rwxr-xr-x]
-    # I thought this would be "sticky" and remain 755 if
-    # set in new_avatar() but it appears not. This is no
-    # doubt something to do with the /sandboxes root dir
-    # being volume mounted.
+    # I thought doing [chmod 755] in new_avatar() would
+    # be "sticky" and remain 755 but it appears not...
     uid = user_id(avatar_name)
     sandbox = sandbox_path(avatar_name)
     cmd = [
@@ -384,7 +384,7 @@ class DockerVolumeRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def volume_name(kata_id)
+  def sandboxes_data_only_container_name(kata_id)
     [ 'cyber', 'dojo', kata_id ].join('_')
   end
 
