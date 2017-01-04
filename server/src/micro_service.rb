@@ -1,8 +1,7 @@
+require_relative 'docker_kata_volume_runner'
+require_relative 'externals'
 require 'sinatra/base'
 require 'json'
-
-require_relative 'docker_volume_runner'
-require_relative 'externals'
 
 class MicroService < Sinatra::Base
 
@@ -85,7 +84,7 @@ class MicroService < Sinatra::Base
 
   def storer_json(prefix, caller, *args)
     name = caller.to_s[prefix.length .. -1]
-    runner = DockerVolumeRunner.new(self)
+    runner = DockerKataVolumeRunner.new(self)
     { name => runner.send(name, *args) }.to_json
   rescue Exception => e
     log << "EXCEPTION: #{e.class.name} #{e.to_s}"

@@ -4,9 +4,12 @@ require_relative 'string_cleaner'
 require_relative 'string_truncater'
 require 'timeout'
 
-# Uses a single docker-volume per kata
+# new_kata()  creates a docker-volume inside
+#             a data-only container
+# run()       remounts the data-only-container into a new
+#             run-container then removes the run-container
 
-class DockerVolumeRunner
+class DockerKataVolumeRunner
 
   def initialize(parent)
     @parent = parent
