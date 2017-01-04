@@ -206,6 +206,12 @@ class DockerVolumeRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run_cyber_dojo_sh(cid, avatar_name, max_seconds)
+    # The [chmod 755] is required to ensure each avatar's
+    # sandbox's permissions are [rwxr-xr-x]
+    # I thought this would be "sticky" and remain 755 if
+    # set in new_avatar() but it appears not. This is no
+    # doubt something to do with the /sandboxes root dir
+    # being volume mounted.
     uid = user_id(avatar_name)
     sandbox = sandbox_path(avatar_name)
     cmd = [
@@ -213,7 +219,7 @@ class DockerVolumeRunner
       "--user=#{uid}",
       '--interactive',
       cid,
-      "sh -c 'cd #{sandbox} && ./cyber-dojo.sh'"
+      "sh -c 'cd #{sandbox} && chmod 755 . && ./cyber-dojo.sh'"
     ].join(space)
     r_stdout, w_stdout = IO.pipe
     r_stderr, w_stderr = IO.pipe
@@ -356,10 +362,6 @@ class DockerVolumeRunner
     unless status == success
       fail StandardError.new(cmd)
     end
-#log << "assert_exec(#{cmd})"
-#log << "status:#{status}:"
-#log << "stdout:#{stdout}:"
-#log << "stderr:#{stderr}:"
     [stdout,stderr]
   end
 

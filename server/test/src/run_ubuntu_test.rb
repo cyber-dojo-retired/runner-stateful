@@ -41,7 +41,7 @@ class RunUbuntuTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '0CA',
-  '[Ubuntu] new_avatar has its own sandbox with ownership/permissions set' do
+  '[Ubuntu] new_avatar has its own sandbox with owner/group/permissions set' do
     new_avatar_sandbox_setup_test
   end
 

@@ -63,7 +63,7 @@ class RunAlpineTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '0C9',
-  '[Alpine] new_avatar has its own sandbox with ownership/permissions set' do
+  '[Alpine] new_avatar has its own sandbox with owner/group/permissions set' do
     new_avatar_sandbox_setup_test
   end
 
