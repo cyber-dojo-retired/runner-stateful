@@ -180,6 +180,8 @@ class DockerVolumeRunner
           assert_exec("chmod +x #{host_filename}")
         end
       end
+      # The /. appended to tmp_dir is needed.
+      # See https://docs.docker.com/engine/reference/commandline/cp/
       cp = "docker cp #{tmp_dir}/. #{cid}:#{sandbox}"
       assert_exec(cp)
     end
