@@ -199,21 +199,22 @@ class DockerKataVolumeRunner
       uid = user_id(avatar_name)
       sandbox = sandbox_path(avatar_name)
       cmd = [
-        'tar',
+          'tar',              # Tar Pipe
           "--owner=#{uid}",   # force ownership
           "--group=#{group}", # force group
           '-cf',              # create a new archive
           '-',                # write archive to stdout
           '-C',               # change to...
-          "#{tmp_dir}",       # this dir
-          '.',                # and archive it
-          '|',                # pipe archive...
-          "docker exec -i #{cid}",  # into docker container
-            'tar',
+          "#{tmp_dir}",       # ...this dir
+          '.',                # ...and archive it
+          '|',                # pipe stdout to...
+          'docker exec',      # docker
+            "-i #{cid}",      # container
+            'tar',            #
             '-xf',            # extract archive
-            '-',              # reading archive from stdin
+            '-',              # read archive from stdin
             '-C',             # change to...
-            sandbox           # this dir and extract
+            sandbox           # ...this dir and extract
       ].join(space)
       assert_exec(cmd)
     end
