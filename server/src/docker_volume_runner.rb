@@ -132,13 +132,14 @@ class DockerVolumeRunner
   include StringTruncater
 
   def create_container(image_name, kata_id, avatar_name)
-    # Volume mounts the kata's volume
+    # The [docker run] must be guarded by argument checks
+    # because it volume mounts the kata's volume
     #     [docker run ... --volume=V:/sandboxes:rw  ...]
-    # Volume V must exist via an earlier new_kata() call.
-    # If volume V does _not_ exist the [docker run] would nevertheless
-    # succeed, create the container, and create a /sandboxes/ folder in it!
-    # https://github.com/docker/docker/issues/13121
-    # Hence the call to docker run is guarded by argument checks.
+    # Volume V must exist via an earlier new_kata() call
+    # because if volume V does _not_ exist the [docker run]
+    # would nevertheless succeed, create the container,
+    # and create a (temporary) /sandboxes/ folder in it!
+    # See https://github.com/docker/docker/issues/13121
     assert_valid_id(kata_id)
     assert_kata_exists(image_name, kata_id)
     assert_valid_name(avatar_name)
