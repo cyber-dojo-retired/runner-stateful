@@ -114,6 +114,28 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # run
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Does *not* cope with infinite loops in the code/tests.
+  # run_cyber_dojo_sh does this
+  #
+  #   pid = Process.spawn('docker exec ...', pgroup:true, out:w_stdout, err:w_stderr)
+  #   begin
+  #     Timeout::timeout(max_seconds) do
+  #       ...
+  #     end
+  #   rescue Timeout::Error
+  #     Process.kill(-9, pid)
+  #     ...
+  #   end
+  #
+  # But killing a [docker exec] does not cause the kill signal to propogate
+  # to the processes exec'd inside the container.
+  # See https://github.com/docker/docker/issues/9098
+  #
+  # I think the easiest way to get round this is to create a
+  # 'feeder' script inside the kata-container which runs as root and
+  # does the 10-second timeout around the call to cyber-dojo.sh which
+  # is sudo'd as the avatar. Then get Ruby to run this feeder script.
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run(_image_name, kata_id, avatar_name, deleted_filenames, changed_files, max_seconds)
     assert_kata_exists(kata_id)

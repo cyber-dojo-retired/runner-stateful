@@ -108,6 +108,10 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # run
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Run copes with infinite loops in the code/tests by removing
+  # the container which kills all processes running inside
+  # the container (thanks to tini when on an Alpine image)
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run(image_name, kata_id, avatar_name, deleted_filenames, changed_files, max_seconds)
     cid = create_container(image_name, kata_id, avatar_name)
