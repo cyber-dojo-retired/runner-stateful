@@ -108,8 +108,8 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # run
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # Run copes with infinite loops in the code/tests by removing
-  # the container which kills all processes running inside
+  # Copes with infinite loops in the code/tests by removing
+  # the container - which kills all processes running inside
   # the container (thanks to tini when on an Alpine image)
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -234,7 +234,7 @@ class DockerRunner
     sandbox = sandbox_path(avatar_name)
     cmd = [
       'docker exec',
-      "--user=#{uid}",
+      "--user=#{uid}:#{group}",
       '--interactive',
       cid,
       "sh -c 'cd #{sandbox} && chmod 755 . && ./cyber-dojo.sh'"
@@ -323,6 +323,10 @@ class DockerRunner
     end
   end
 
+  def fail_kata_id(message)
+    fail bad_argument("kata_id:#{message}")
+  end
+
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_valid_name(avatar_name)
@@ -355,17 +359,13 @@ class DockerRunner
     status == success
   end
 
+  def fail_avatar_name(message)
+    fail bad_argument("avatar_name:#{message}")
+  end
+
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def fail_kata_id(message)
-    fail argument("kata_id:#{message}")
-  end
-
-  def fail_avatar_name(message)
-    fail argument("avatar_name:#{message}")
-  end
-
-  def argument(message)
+  def bad_argument(message)
     ArgumentError.new(message)
   end
 

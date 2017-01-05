@@ -1,6 +1,6 @@
 require_relative 'disk_writer'
-require_relative 'docker_kata_container_runner'
-#require_relative 'docker_kata_volume_runner'
+#require_relative 'docker_kata_container_runner'
+require_relative 'docker_kata_volume_runner'
 require_relative 'bash_sheller'
 require_relative 'stdout_logger'
 
