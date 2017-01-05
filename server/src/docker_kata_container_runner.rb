@@ -7,7 +7,7 @@ require 'timeout'
 # new_kata()  creates a docker-volume inside
 #             a container with a cmd of sleep 1d
 # run()       docker exec's directly into the container
-#             container and does not remove the run-container
+#             and does not then remove the container.
 
 class DockerRunner
 
@@ -197,26 +197,31 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run_cyber_dojo_sh(kata_id, avatar_name, max_seconds)
-    cid = container_name(kata_id)
-
-    #"--env CYBER_DOJO_KATA_ID=#{kata_id}",
-    #"--env CYBER_DOJO_AVATAR_NAME=#{avatar_name}",
-
     # I thought doing [chmod 755] in new_avatar() would
     # be "sticky" and remain 755 but it appears not...
+    cid = container_name(kata_id)
     uid = user_id(avatar_name)
     sandbox = sandbox_path(avatar_name)
+
     cmd = [
+      "export CYBER_DOJO_KATA_ID=#{kata_id}",
+      "export CYBER_DOJO_AVATAR_NAME=#{avatar_name}",
+      "cd #{sandbox}",
+      'chmod 755 .',
+      './cyber-dojo.sh'
+    ].join('&&')
+
+    exec = [
       'docker exec',
       "--user=#{uid}",
       '--interactive',
       cid,
-      "sh -c 'cd #{sandbox} && chmod 755 . && ./cyber-dojo.sh'"
+      "sh -c '#{cmd}'"
     ].join(space)
 
     r_stdout, w_stdout = IO.pipe
     r_stderr, w_stderr = IO.pipe
-    pid = Process.spawn(cmd, pgroup:true, out:w_stdout, err:w_stderr)
+    pid = Process.spawn(exec, pgroup:true, out:w_stdout, err:w_stderr)
     begin
       Timeout::timeout(max_seconds) do
         Process.waitpid(pid)
