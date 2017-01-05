@@ -27,7 +27,7 @@ class RunAlpineTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '582',
-  '[Alpine] has group used for dir/file permissions' do
+  '[Alpine] has group used for dir/file ownership' do
     assert_group_exists
   end
 
@@ -70,7 +70,7 @@ class RunAlpineTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '1FB',
-  '[Alpine] new_avatar has starting-files in its sandbox with ownership/permissions set' do
+  '[Alpine] new_avatar has starting-files in its sandbox with owner/group/permissions set' do
     new_avatar_starting_files_test
   end
 
@@ -92,7 +92,7 @@ class RunAlpineTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '232',
-  '[Alpine] new files are added with ownership/permissions',
+  '[Alpine] new files are added with owner/group/permissions',
   'and all previous files are unchanged' do
     new_files_test
   end

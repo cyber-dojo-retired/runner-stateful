@@ -34,7 +34,7 @@ class RunUbuntuTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '583',
-  '[Ubuntu] has group used for dir/file permissions' do
+  '[Ubuntu] has group used for dir/file ownership' do
     assert_group_exists
   end
 
@@ -48,7 +48,7 @@ class RunUbuntuTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '1FC',
-  '[Ubuntu] new_avatar has starting-files in its sandbox with ownership/permissions set' do
+  '[Ubuntu] new_avatar has starting-files in its sandbox with owner/group/permissions set' do
     new_avatar_starting_files_test
   end
 
@@ -69,7 +69,7 @@ class RunUbuntuTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '233',
-  '[Ubuntu] new files are added with ownership/permissions and all previous files are unchanged' do
+  '[Ubuntu] new files are added with owner/group/permissions and all previous files are unchanged' do
     new_files_test
   end
 
