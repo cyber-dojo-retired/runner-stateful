@@ -213,7 +213,7 @@ class DockerRunner
 
     exec = [
       'docker exec',
-      "--user=#{uid}",
+      "--user=#{uid}:#{group}",
       '--interactive',
       cid,
       "sh -c '#{cmd}'"
