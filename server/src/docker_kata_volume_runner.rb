@@ -7,9 +7,9 @@ require 'timeout'
 # new_kata()  creates a docker-volume inside
 #             a data-only container
 # run()       remounts the data-only-container into a new
-#             run-container then removes the run-container
+#             container then removes the run-container
 
-class DockerKataVolumeRunner
+class DockerRunner
 
   def initialize(parent)
     @parent = parent
@@ -40,7 +40,7 @@ class DockerKataVolumeRunner
     assert_valid_id(kata_id)
     name = sandboxes_data_only_container_name(kata_id)
     cmd = "docker ps --quiet --all --filter name=#{name}"
-    stdout,stderr = assert_exec(cmd)
+    stdout,_ = assert_exec(cmd)
     stdout.strip != ''
   end
 
@@ -172,7 +172,8 @@ class DockerKataVolumeRunner
       '--user=root',
       "--volumes-from=#{sandboxes_data_only_container_name(kata_id)}:rw"
     ].join(space)
-    cid = assert_exec("docker run #{args} #{image_name} sh")[0].strip
+    stdout,_,_ = assert_exec("docker run #{args} #{image_name} sh")
+    cid = stdout.strip
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -346,7 +347,7 @@ class DockerKataVolumeRunner
   def avatar_exists_cid?(cid, avatar_name)
     sandbox = sandbox_path(avatar_name)
     cmd = "docker exec #{cid} sh -c '[ -d #{sandbox} ]'"
-    _stdout,_stderr,status = exec(cmd, logging = false)
+    _,_,status = exec(cmd, logging = false)
     status == success
   end
 
@@ -386,7 +387,7 @@ class DockerKataVolumeRunner
 
   def image_names
     cmd = 'docker images --format "{{.Repository}}"'
-    stdout = assert_exec(cmd)[0]
+    stdout,_ = assert_exec(cmd)
     names = stdout.split("\n")
     names.uniq - ['<none']
   end
