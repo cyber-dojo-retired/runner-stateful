@@ -91,13 +91,14 @@ class DockerRunner
     assert_kata_exists(kata_id)
     refute_avatar_exists(kata_id, avatar_name)
 
-    name = container_name(kata_id)
     sandbox = sandbox_path(avatar_name)
     mkdir = "mkdir #{sandbox}"
-    assert_docker_exec(name, mkdir)
+    assert_docker_exec(kata_id, mkdir)
+
     uid = user_id(avatar_name)
     chown = "chown #{uid}:#{group} #{sandbox}"
-    assert_docker_exec(name, chown)
+    assert_docker_exec(kata_id, chown)
+
     write_files(kata_id, avatar_name, starting_files)
   end
 
@@ -105,10 +106,9 @@ class DockerRunner
     assert_kata_exists(kata_id)
     assert_avatar_exists(kata_id, avatar_name)
 
-    name = container_name(kata_id)
     sandbox = sandbox_path(avatar_name)
     rm = "rm -rf #{sandbox}"
-    assert_docker_exec(name, rm)
+    assert_docker_exec(kata_id, rm)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -151,11 +151,10 @@ class DockerRunner
   include StringTruncater
 
   def delete_files(kata_id, avatar_name, filenames)
-    cid = container_name(kata_id)
     sandbox = sandbox_path(avatar_name)
     filenames.each do |filename|
       rm = "rm #{sandbox}/#{filename}"
-      assert_docker_exec(cid, rm)
+      assert_docker_exec(kata_id, rm)
     end
   end
 
@@ -275,7 +274,7 @@ class DockerRunner
   end
 
   def fail_kata_id(message)
-    fail argument("kata_id:#{message}")
+    fail bad_argument("kata_id:#{message}")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -306,12 +305,13 @@ class DockerRunner
   end
 
   def fail_avatar_name(message)
-    fail argument("avatar_name:#{message}")
+    fail bad_argument("avatar_name:#{message}")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_docker_exec(cid, cmd)
+  def assert_docker_exec(kata_id, cmd)
+    cid = container_name(kata_id)
     assert_exec("docker exec #{cid} sh -c '#{cmd}'")
   end
 
@@ -344,7 +344,7 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def argument(message)
+  def bad_argument(message)
     ArgumentError.new(message)
   end
 
