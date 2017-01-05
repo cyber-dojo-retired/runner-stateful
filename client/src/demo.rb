@@ -34,8 +34,8 @@ class Demo < Sinatra::Base
     duration = timed { sss = run(times_out, 3) }
     html += pre('run', duration, sss, 'LightGray')
 
-    runner.old_avatar(kata_id, avatar_name)
-    runner.old_kata(kata_id)
+    runner.old_avatar(image_name, kata_id, avatar_name)
+    runner.old_kata(image_name, kata_id)
 
     html += '</div>'
   end
