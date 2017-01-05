@@ -46,7 +46,6 @@ class DockerRunner
   end
 
   def new_kata(image_name, kata_id)
-    assert_valid_id(kata_id)
     refute_kata_exists(kata_id)
 
     name = container_name(kata_id)
@@ -66,7 +65,6 @@ class DockerRunner
   end
 
   def old_kata(image_name, kata_id)
-    assert_valid_id(kata_id)
     assert_kata_exists(kata_id)
 
     name = container_name(kata_id)
@@ -79,7 +77,6 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def avatar_exists?(_image_name, kata_id, avatar_name)
-    assert_valid_id(kata_id)
     assert_kata_exists(kata_id)
     assert_valid_name(avatar_name)
 
@@ -91,9 +88,7 @@ class DockerRunner
   end
 
   def new_avatar(_image_name, kata_id, avatar_name, starting_files)
-    assert_valid_id(kata_id)
     assert_kata_exists(kata_id)
-    assert_valid_name(avatar_name)
     refute_avatar_exists(kata_id, avatar_name)
 
     name = container_name(kata_id)
@@ -107,9 +102,7 @@ class DockerRunner
   end
 
   def old_avatar(_image_name, kata_id, avatar_name)
-    assert_valid_id(kata_id)
     assert_kata_exists(kata_id)
-    assert_valid_name(avatar_name)
     assert_avatar_exists(kata_id, avatar_name)
 
     name = container_name(kata_id)
@@ -123,9 +116,7 @@ class DockerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run(_image_name, kata_id, avatar_name, deleted_filenames, changed_files, max_seconds)
-    assert_valid_id(kata_id)
     assert_kata_exists(kata_id)
-    assert_valid_name(avatar_name)
     assert_avatar_exists(kata_id, avatar_name)
 
     delete_files(kata_id, avatar_name, deleted_filenames)
@@ -248,6 +239,20 @@ class DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  def refute_kata_exists(kata_id)
+    assert_valid_id(kata_id)
+    if kata_exists?(nil, kata_id)
+      fail_kata_id('exists')
+    end
+  end
+
+  def assert_kata_exists(kata_id)
+    assert_valid_id(kata_id)
+    unless kata_exists?(nil, kata_id)
+      fail_kata_id('!exists')
+    end
+  end
+
   def assert_valid_id(kata_id)
     unless valid_id?(kata_id)
       fail_kata_id('invalid')
@@ -264,19 +269,25 @@ class DockerRunner
     '0123456789ABCDEF'.include?(char)
   end
 
-  def refute_kata_exists(kata_id)
-    if kata_exists?(nil, kata_id)
-      fail_kata_id('exists')
-    end
-  end
-
-  def assert_kata_exists(kata_id)
-    unless kata_exists?(nil, kata_id)
-      fail_kata_id('!exists')
-    end
+  def fail_kata_id(message)
+    fail argument("kata_id:#{message}")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def refute_avatar_exists(kata_id, avatar_name)
+    assert_valid_name(avatar_name)
+    if avatar_exists?(nil, kata_id, avatar_name)
+      fail_avatar_name('exists')
+    end
+  end
+
+  def assert_avatar_exists(kata_id, avatar_name)
+    assert_valid_name(avatar_name)
+    unless avatar_exists?(nil, kata_id, avatar_name)
+      fail_avatar_name('!exists')
+    end
+  end
 
   def assert_valid_name(avatar_name)
     unless valid_avatar?(avatar_name)
@@ -289,30 +300,8 @@ class DockerRunner
     all_avatars_names.include?(avatar_name)
   end
 
-  def refute_avatar_exists(kata_id, avatar_name)
-    if avatar_exists?(nil, kata_id, avatar_name)
-      fail_avatar_name('exists')
-    end
-  end
-
-  def assert_avatar_exists(kata_id, avatar_name)
-    unless avatar_exists?(nil, kata_id, avatar_name)
-      fail_avatar_name('!exists')
-    end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def fail_kata_id(message)
-    fail argument("kata_id:#{message}")
-  end
-
   def fail_avatar_name(message)
     fail argument("avatar_name:#{message}")
-  end
-
-  def argument(message)
-    ArgumentError.new(message)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -346,6 +335,12 @@ class DockerRunner
 
   def container_name(kata_id)
     [ 'cyber', 'dojo', kata_id ].join('_')
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def argument(message)
+    ArgumentError.new(message)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
