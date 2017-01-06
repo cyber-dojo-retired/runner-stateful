@@ -7,7 +7,7 @@ require 'timeout'
 # new_kata()  creates a docker-volume inside
 #             a data-only container
 # run()       remounts the data-only-container into a new
-#             container then removes the run-container
+#             container, then removes the run-container
 
 class DockerKataVolumeRunner
 
@@ -108,9 +108,9 @@ class DockerKataVolumeRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # run
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # Copes with infinite loops in the code/tests by removing
-  # the container - which kills all processes running inside
-  # the container (thanks to tini when on an Alpine image)
+  # Copes with infinite loops (eg) in the avatar's code/tests by
+  # removing the container - which obviously kills all processes
+  # running inside the container.
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run(image_name, kata_id, avatar_name, deleted_filenames, changed_files, max_seconds)
@@ -241,6 +241,7 @@ class DockerKataVolumeRunner
     ].join(space)
     r_stdout, w_stdout = IO.pipe
     r_stderr, w_stderr = IO.pipe
+    # Run cyber-dojo.sh inside a new process inside the container.
     pid = Process.spawn(cmd, pgroup:true, out:w_stdout, err:w_stderr)
     begin
       Timeout::timeout(max_seconds) do
@@ -251,6 +252,10 @@ class DockerKataVolumeRunner
         [r_stdout.read, r_stderr.read, status]
       end
     rescue Timeout::Error
+      # Kill the [docker exec] spawned process. This does _not_
+      # kill the cyber-dojo.sh process inside the exec'd docker
+      # container (remove_container() in run() does that).
+      # See https://github.com/docker/docker/issues/9098
       Process.kill(-9, pid)
       Process.detach(pid)
       ['', '', 'timed_out']
@@ -270,9 +275,6 @@ class DockerKataVolumeRunner
     # An 'immediately' following old_avatar()'s [docker volume rm]
     # might fail since the container is not quite dead yet.
     # This is unlikely to happen in real use but quite likely in tests.
-    # I considered making old_avatar() check the container was dead.
-    #   pro) remove_container will never do a sleep (delaying a run)
-    #   con) would mean storing the cid in the volume somewhere
     # For now I'm waiting max 2 seconds for the container to die.
     # Note: no delay if container_dead? is true 1st time.
     # Note: 0.04s delay if the container_dead? is true 2nd time.
