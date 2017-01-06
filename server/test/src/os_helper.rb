@@ -15,7 +15,7 @@ module OsHelper
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def refute_user_ids_exist
+  def refute_avatar_users_exist
     etc_passwd = assert_docker_exec 'cat /etc/passwd'
     all_avatars_names.each do |name|
       uid = runner.user_id(name).to_s
@@ -24,7 +24,7 @@ module OsHelper
   end
 
   def assert_group_exists
-    stdout = assert_cyber_dojo_sh_no_stderr "getent group #{group}"
+    stdout = assert_docker_exec "getent group #{group}"
     assert stdout.start_with?(group), stdout
   end
 

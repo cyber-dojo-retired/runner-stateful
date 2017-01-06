@@ -28,7 +28,14 @@ class RunUbuntuKataTest < TestBase
 
   test '268',
   "[Ubuntu] none of the 64 avatar's uid's are already taken" do
-    refute_user_ids_exist
+    refute_avatar_users_exist
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test '583',
+  '[Ubuntu] has group used for dir/file ownership' do
+    assert_group_exists
   end
 
 end

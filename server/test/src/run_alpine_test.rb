@@ -12,35 +12,6 @@ class RunAlpineTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '582',
-  '[Alpine] has group used for dir/file ownership' do
-    assert_group_exists
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test '214',
-  '[Alpine] container must have tini installed to do zombie reaping' do
-    stdout = assert_cyber_dojo_sh_no_stderr 'ps'
-    lines = stdout.strip.split("\n")
-    # PID   USER     TIME   COMMAND
-    #   1   root     0:00   sh
-    #  25   40045    0:00   sh -c ./cyber-dojo.sh
-    #   |   |        |      |  |  |
-    #   0   1        2      3  4  5 ...
-    lines.shift
-    procs = Hash[lines.collect { |line|
-      atts = line.split
-      pid = atts[0].to_i
-      cmd = atts[3..-1].join(' ')
-      [pid,cmd]
-    }]
-    refute_nil procs[1], 'no process at pid 1!'
-    assert procs[1].include?('/sbin/tini'), 'no tini at pid 1'
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   test '997',
   '[Alpine] container has access to cyber-dojo env-vars' do
     kata_id_env_vars_test

@@ -18,13 +18,6 @@ class RunUbuntuTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '583',
-  '[Ubuntu] has group used for dir/file ownership' do
-    assert_group_exists
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   test '0CA',
   '[Ubuntu] new_avatar has its own sandbox with owner/group/permissions set' do
     new_avatar_sandbox_setup_test
