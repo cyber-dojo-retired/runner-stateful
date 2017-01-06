@@ -20,5 +20,6 @@ services:
     image: cyberdojo/runner
     container_name: runner_server
     environment: [ CYBER_DOJO_RUNNER_CLASS=DockerKataContainerRunner ]
+    #environment: [ CYBER_DOJO_RUNNER_CLASS=DockerKataVolumeRunner ]
     user: root
     volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
