@@ -91,13 +91,8 @@ class DockerKataContainerRunner
     assert_kata_exists(kata_id)
     refute_avatar_exists(kata_id, avatar_name)
 
-    sandbox = sandbox_path(avatar_name)
-    mkdir = "mkdir #{sandbox}"
-    assert_docker_exec(kata_id, mkdir)
-
-    uid = user_id(avatar_name)
-    chown = "chown #{uid}:#{group} #{sandbox}"
-    assert_docker_exec(kata_id, chown)
+    adduser = adduser_cmd(kata_id, avatar_name)
+    assert_docker_exec(kata_id, adduser)
 
     write_files(kata_id, avatar_name, starting_files)
   end
@@ -127,7 +122,7 @@ class DockerKataContainerRunner
   #     ...
   #   end
   #
-  # But killing a [docker exec] does not cause the kill signal to propogate
+  # But killing a [docker exec] does not cause the kill signal to propagate
   # to the processes exec'd inside the container.
   # See https://github.com/docker/docker/issues/9098
   #
@@ -234,7 +229,7 @@ class DockerKataContainerRunner
 
     exec = [
       'docker exec',
-      "--user=#{uid}:#{group}",
+      '--user=root',
       '--interactive',
       cid,
       "sh -c '#{cmd}'"
@@ -261,6 +256,53 @@ class DockerKataContainerRunner
       r_stdout.close
       r_stderr.close
     end
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def adduser_cmd(kata_id, avatar_name)
+    if alpine?(kata_id)
+      return alpine_adduser_cmd(avatar_name)
+    end
+    if ubuntu?(kata_id)
+      return ubuntu_adduser_cmd(avatar_name)
+    end
+  end
+
+  def alpine_adduser_cmd(avatar_name)
+    sandbox = sandbox_path(avatar_name)
+    uid = user_id(avatar_name)
+    [ 'adduser',
+        '-D',                  # disabled password
+        "-h #{sandbox}",       # home dir
+        "-u #{uid}",
+        avatar_name
+    ].join(space)
+  end
+
+  def ubuntu_adduser_cmd(avatar_name)
+    sandbox = sandbox_path(avatar_name)
+    uid = user_id(avatar_name)
+    [ 'adduser',
+        '--disabled-password',
+        "--home #{sandbox}",
+        "--uid #{uid}",
+        '--gecos ""',          # don't ask for details
+        avatar_name
+    ].join(space)
+  end
+
+  def alpine?(kata_id)
+    etc_issue(kata_id).include?('Alpine')
+  end
+
+  def ubuntu?(kata_id)
+    etc_issue(kata_id).include?('Ubuntu')
+  end
+
+  def etc_issue(kata_id)
+    stdout,_ = assert_docker_exec(kata_id, 'cat /etc/issue')
+    stdout
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -385,27 +427,4 @@ class DockerKataContainerRunner
 end
 
 =begin
-def create_user_cmd(avatar_name)
-    if alpine?
-      return [
-        'adduser',
-        '-D',                          # passwordless access
-        "-h #{sandbox(avatar_name)}",  # home dir
-        avatar_name
-      ].join(space = ' ')
-    end
-    if ubuntu?
-      return [
-        'adduser',
-        "--home #{sandbox(avatar_name)}",   # home dir
-        '--disabled-password',              # passwordless access
-        "--gecos \"\" #{avatar_name}"       # don't ask for details
-      ].join(space =' ')
-    end
-    # nil
-  end
-
-  def alpine?; etc_issue.include?('Alpine'); end
-  def ubuntu?; etc_issue.include?('Ubuntu'); end
-  def etc_issue; assert_docker_exec(cid, 'cat /etc/issue')[0]; end
 =end

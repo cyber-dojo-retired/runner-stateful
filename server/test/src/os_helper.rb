@@ -15,6 +15,7 @@ module OsHelper
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+=begin
   def refute_user_ids_exist
     etc_passwd = assert_cyber_dojo_sh_no_stderr 'cat /etc/passwd'
     all_avatars_names.each do |name|
@@ -22,6 +23,7 @@ module OsHelper
       refute etc_passwd.include?(uid), "#{name}:#{uid}"
     end
   end
+=end
 
   def assert_group_exists
     stdout = assert_cyber_dojo_sh_no_stderr "getent group #{group}"
