@@ -9,7 +9,7 @@ require 'timeout'
 # run()       docker exec's directly into the container
 #             and does not then remove the container.
 
-class DockerRunner
+class DockerKataContainerRunner
 
   def initialize(parent)
     @parent = parent

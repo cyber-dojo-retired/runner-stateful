@@ -1,14 +1,8 @@
-def runner_class
-  ENV['CYBER_DOJO_RUNNER_CLASS']
-end
+def runner_class; ENV['CYBER_DOJO_RUNNER_CLASS']; end
+require_relative 'snake_caser'
+require_relative SnakeCaser::snake_cased(runner_class)
 
 require_relative 'disk_writer'
-if runner_class == 'DockerKataContainerRunner'
-  require_relative 'docker_kata_container_runner'
-end
-if runner_class == 'DockerKataVolumeRunner'
-  require_relative 'docker_kata_volume_runner'
-end
 require_relative 'bash_sheller'
 require_relative 'stdout_logger'
 
