@@ -60,4 +60,14 @@ class RunAlpineKataTest < TestBase
     assert_group_exists
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test '3B1',
+  '[Alpine] after new_kata timeout script is in /usr/bin' do
+    src = assert_docker_exec('cat /usr/bin/timeout_cyber_dojo.sh')
+    lines = src.split("\n")
+    assert_equal '#!/bin/bash', lines[0]
+    assert_equal 'AVATAR=$1', lines[1]
+  end
+
 end

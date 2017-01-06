@@ -50,18 +50,26 @@ class DockerKataContainerRunner
 
     name = container_name(kata_id)
     args = [
+      '--detach',
+      "--env CYBER_DOJO_KATA_ID=#{kata_id}",
       '--interactive',                     # later execs
+      "--name=#{name}",
       '--net=none',                        # security - no network
       '--pids-limit=64',                   # security - no fork bombs
       '--security-opt=no-new-privileges',  # security - no escalation
-      '--detach',
-      "--env CYBER_DOJO_KATA_ID=#{kata_id}",
       '--user=root',
       "--volume #{sandboxes_root}",
-      "--name=#{name}"
     ].join(space)
     cmd = "docker run #{args} #{image_name} sh -c 'sleep 1d'"
     assert_exec(cmd)
+
+    my_dir = File.expand_path(File.dirname(__FILE__))
+    docker_cp = [
+      'docker cp',
+      "#{my_dir}/timeout_cyber_dojo.sh",
+      "#{name}:/usr/local/bin"
+    ].join(space)
+    assert_exec(docker_cp)
   end
 
   def old_kata(image_name, kata_id)
@@ -93,7 +101,6 @@ class DockerKataContainerRunner
 
     adduser = adduser_cmd(kata_id, avatar_name)
     assert_docker_exec(kata_id, adduser)
-
     write_files(kata_id, avatar_name, starting_files)
   end
 
@@ -108,28 +115,6 @@ class DockerKataContainerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # run
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # Does *not* cope with infinite loops in the code/tests.
-  # run_cyber_dojo_sh does this
-  #
-  #   pid = Process.spawn('docker exec ...', pgroup:true, out:w_stdout, err:w_stderr)
-  #   begin
-  #     Timeout::timeout(max_seconds) do
-  #       ...
-  #     end
-  #   rescue Timeout::Error
-  #     Process.kill(-9, pid)
-  #     ...
-  #   end
-  #
-  # But killing a [docker exec] does not cause the kill signal to propagate
-  # to the processes exec'd inside the container.
-  # See https://github.com/docker/docker/issues/9098
-  #
-  # I think the easiest way to get round this is to create a
-  # 'feeder' script inside the kata-container which runs as root and
-  # does the 10-second timeout around the call to cyber-dojo.sh which
-  # is sudo'd as the avatar. Then get Ruby to run this feeder script.
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run(_image_name, kata_id, avatar_name, deleted_filenames, changed_files, max_seconds)
@@ -216,15 +201,9 @@ class DockerKataContainerRunner
     # I thought doing [chmod 755] in new_avatar() would
     # be "sticky" and remain 755 but it appears not...
     cid = container_name(kata_id)
-    uid = user_id(avatar_name)
-    sandbox = sandbox_path(avatar_name)
-
     cmd = [
-      "export CYBER_DOJO_KATA_ID=#{kata_id}",
-      "export CYBER_DOJO_AVATAR_NAME=#{avatar_name}",
-      "cd #{sandbox}",
-      'chmod 755 .',
-      './cyber-dojo.sh'
+      #'chmod 755 .',
+      "/usr/local/bin/timeout_cyber_dojo.sh #{kata_id} #{avatar_name}"
     ].join('&&')
 
     exec = [
@@ -232,7 +211,7 @@ class DockerKataContainerRunner
       '--user=root',
       '--interactive',
       cid,
-      "sh -c '#{cmd}'"
+      "sh #{cmd}"
     ].join(space)
 
     r_stdout, w_stdout = IO.pipe
@@ -244,7 +223,9 @@ class DockerKataContainerRunner
         status = $?.exitstatus
         w_stdout.close
         w_stderr.close
-        [r_stdout.read, r_stderr.read, status]
+        stdout = r_stdout.read
+        stderr = r_stderr.read
+        [stdout, stderr, status]
       end
     rescue Timeout::Error
       Process.kill(-9, pid)
@@ -425,6 +406,3 @@ class DockerKataContainerRunner
   def  disk; nearest_ancestors(:disk ); end
 
 end
-
-=begin
-=end

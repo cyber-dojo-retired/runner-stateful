@@ -118,11 +118,10 @@ class TestBase < HexMiniTest
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_cyber_dojo_sh_no_stderr(script, named_args={})
-    named_args[:changed_files] = { 'cyber-dojo.sh' => script }
+    named_args[:changed_files] = {
+      'cyber-dojo.sh' => "#!/usr/bin/env sh\n#{script}"
+    }
     assert_run_succeeds_no_stderr(named_args)
-    #{
-    #  changed_files: { 'cyber-dojo.sh' => script }
-    #})
   end
 
   def assert_run_succeeds_no_stderr(named_args)
