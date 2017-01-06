@@ -208,4 +208,30 @@ class TestBase < HexMiniTest
     ]
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def assert_docker_exec_no_stderr(cmd)
+    cid = container_name
+    stdout,stderr = assert_exec("docker exec #{cid} sh -c '#{cmd}'")
+    assert_equal '', stderr, stdout
+    stdout
+  end
+
+  def assert_exec(cmd)
+    stdout,stderr,status = exec(cmd)
+    unless status == success
+      fail StandardError.new(cmd)
+    end
+    [stdout,stderr]
+  end
+
+  def exec(cmd, logging = @logging)
+    shell.exec(cmd, logging)
+  end
+
+  def container_name
+    [ 'cyber', 'dojo', kata_id ].join('_')
+  end
+
 end

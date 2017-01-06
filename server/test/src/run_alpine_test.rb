@@ -12,23 +12,6 @@ class RunAlpineTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test 'CA0',
-  '[Alpine] image is indeed based on Alpine' do
-    stdout = assert_cyber_dojo_sh_no_stderr 'cat /etc/issue'
-    assert stdout.include?('Alpine'), stdout
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-=begin  # broken because sss_run() needs avatar to exist
-  test '267',
-  "[Alpine] none of the 64 avatar's uid's are already taken" do
-    refute_user_ids_exist
-  end
-=end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   test '582',
   '[Alpine] has group used for dir/file ownership' do
     assert_group_exists

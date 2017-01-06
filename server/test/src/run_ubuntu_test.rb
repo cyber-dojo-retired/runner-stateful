@@ -18,23 +18,6 @@ class RunUbuntuTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test 'CA1',
-  '[Ubuntu] image is indeed based on Ubuntu' do
-    stdout = assert_cyber_dojo_sh_no_stderr 'cat /etc/issue'
-    assert stdout.include?('Ubuntu'), stdout
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-=begin # broken because sss_run() needs avatar to exist
-  test '268',
-  "[Ubuntu] none of the 64 avatar's uid's are already taken" do
-    refute_user_ids_exist
-  end
-=end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   test '583',
   '[Ubuntu] has group used for dir/file ownership' do
     assert_group_exists
