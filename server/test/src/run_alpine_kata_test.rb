@@ -63,11 +63,14 @@ class RunAlpineKataTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '3B1',
-  '[Alpine] after new_kata timeout script is in /usr/bin' do
-    src = assert_docker_exec('cat /usr/bin/timeout_cyber_dojo.sh')
+  '[Alpine] after new_kata timeout script is in /usr/local/bin' do
+    src = assert_docker_exec('cat /usr/local/bin/timeout_cyber_dojo.sh')
     lines = src.split("\n")
-    assert_equal '#!/bin/bash', lines[0]
-    assert_equal 'AVATAR=$1', lines[1]
+    assert_equal '#!/usr/bin/env sh', lines[0]
+    assert_equal '# NB: Alpine images do not have bash', lines[1]
+    assert_equal '', lines[2]
+    assert_equal 'KATA_ID=$1', lines[3]
+    assert_equal 'AVATAR=$2', lines[4]
   end
 
 end

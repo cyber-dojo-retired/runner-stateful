@@ -38,4 +38,17 @@ class RunUbuntuKataTest < TestBase
     assert_group_exists
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test '3B2',
+  '[Ubuntu] after new_kata timeout script is in /usr/local/bin' do
+    src = assert_docker_exec('cat /usr/local/bin/timeout_cyber_dojo.sh')
+    lines = src.split("\n")
+    assert_equal '#!/usr/bin/env sh', lines[0]
+    assert_equal '# NB: Alpine images do not have bash', lines[1]
+    assert_equal '', lines[2]
+    assert_equal 'KATA_ID=$1', lines[3]
+    assert_equal 'AVATAR=$2', lines[4]
+  end
+
 end
