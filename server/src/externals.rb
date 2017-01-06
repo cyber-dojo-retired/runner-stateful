@@ -1,12 +1,21 @@
+def runner_class
+  ENV['CYBER_DOJO_RUNNER_CLASS']
+end
+
 require_relative 'disk_writer'
-#require_relative 'docker_kata_container_runner'
-require_relative 'docker_kata_volume_runner'
+if runner_class == 'DockerKataContainerRunner'
+  require_relative 'docker_kata_container_runner'
+end
+if runner_class == 'DockerKataVolumeRunner'
+  require_relative 'docker_kata_volume_runner'
+end
 require_relative 'bash_sheller'
 require_relative 'stdout_logger'
 
 module Externals
 
-  def runner; @runner ||= DockerRunner.new(self); end
+  def runner; @runner ||= Object.const_get(runner_class).new(self); end
+
   def  shell;  @shell ||=  BashSheller.new(self); end
   def   disk;   @disk ||=   DiskWriter.new(self); end
   def    log;    @log ||= StdoutLogger.new(self); end

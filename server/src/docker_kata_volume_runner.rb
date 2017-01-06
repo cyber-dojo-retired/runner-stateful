@@ -9,7 +9,7 @@ require 'timeout'
 # run()       remounts the data-only-container into a new
 #             container then removes the run-container
 
-class DockerRunner
+class DockerKataVolumeRunner
 
   def initialize(parent)
     @parent = parent
