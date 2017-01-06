@@ -20,7 +20,7 @@ class RunUbuntuKataTest < TestBase
 
   test 'CA1',
   '[Ubuntu] image is indeed based on Ubuntu' do
-    etc_issue = assert_docker_exec_no_stderr 'cat /etc/issue'
+    etc_issue = assert_docker_exec 'cat /etc/issue'
     assert etc_issue.include?('Ubuntu'), etc_issue
   end
 

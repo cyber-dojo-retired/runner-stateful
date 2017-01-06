@@ -20,7 +20,7 @@ class RunAlpineKataTest < TestBase
 
   test 'CA0',
   '[Alpine] image is indeed based on Alpine' do
-    etc_issue = assert_docker_exec_no_stderr 'cat /etc/issue'
+    etc_issue = assert_docker_exec 'cat /etc/issue'
     assert etc_issue.include?('Alpine'), etc_issue
   end
 

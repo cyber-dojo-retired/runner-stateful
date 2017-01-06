@@ -25,29 +25,35 @@ class KataContainerTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   kc_test '5F9',
-  '[Alpine] after new_avatar there is an avatar-user' do
-    cheetah_arg = { avatar_name:'cheetah' }
-    new_avatar(cheetah_arg)
+  '[Alpine] after new_avatar(salmon)',
+  'there is a linux user called salmon inside the kata container' do
+    new_avatar(salmon)
     begin
-      stdout = assert_cyber_dojo_sh_no_stderr 'su - cheetah -c whoami', cheetah_arg
-      assert_equal 'cheetah', stdout.strip
+      whoami = assert_docker_exec 'su - salmon -c whoami'
+      assert_equal 'salmon', whoami.strip
     ensure
-      old_avatar({ avatar_name:'cheetah' })
+      old_avatar(salmon)
     end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   kc_test '2A8',
-  '[Ubuntu] after new_avatar there is an avatar-user' do
-    cheetah_arg = { avatar_name:'cheetah' }
-    new_avatar(cheetah_arg)
+  '[Ubuntu] after new_avatar(salmon)',
+  'there is a linux user called salmon inside the kata container' do
+    new_avatar(salmon)
     begin
-      stdout = assert_cyber_dojo_sh_no_stderr 'su - cheetah -c whoami', cheetah_arg
-      assert_equal 'cheetah', stdout.strip
+      whoami = assert_docker_exec 'su - salmon -c whoami'
+      assert_equal 'salmon', whoami.strip
     ensure
-      old_avatar({ avatar_name:'cheetah' })
+      old_avatar(salmon)
     end
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def salmon
+    { avatar_name:'salmon' }
   end
 
 

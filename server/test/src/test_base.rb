@@ -211,7 +211,7 @@ class TestBase < HexMiniTest
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_docker_exec_no_stderr(cmd)
+  def assert_docker_exec(cmd)
     cid = container_name
     stdout,stderr = assert_exec("docker exec #{cid} sh -c '#{cmd}'")
     assert_equal '', stderr, stdout
