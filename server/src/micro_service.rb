@@ -10,7 +10,7 @@ class MicroService < Sinatra::Base
   # They would be used if the runner-service implementation
   # switches from being volume-based to container-based.
 
-  get '/pulled' do
+  get '/pulled?' do
     getter(__method__, image_name)
   end
 
