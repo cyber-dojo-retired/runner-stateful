@@ -5,21 +5,48 @@ KATA_ID=$1
 AVATAR=$2
 MAX_SECONDS=$3
 
+alpine_kill_tree() # This does not work
+{
+  local pid=${1} child
+  for child in $(pgrep -P ${pid});
+  do
+      alpine_kill_tree ${child}
+  done
+  [ ${pid} -ne $$ ] && kill -kill ${pid}
+}
+
+# - - - - - - - - - - - - - - - - - - - - -
+
+ubuntu_kill_tree() # This works
+{
+    local pid=${1} child
+    for child in $(pgrep -P ${pid});
+    do
+        ubuntu_kill_tree ${child}
+    done
+    [ ${pid} -ne $$ ] && kill -kill ${pid}
+}
+
+# - - - - - - - - - - - - - - - - - - - - -
+
 export CYBER_DOJO_KATA_ID=${KATA_ID}
 export CYBER_DOJO_AVATAR_NAME=${AVATAR}
 
 cd /sandboxes/${AVATAR}
 
-# Timeout's not tested yet.
-
 grep -q -c Alpine /etc/issue
 if [ $? -eq 0 ]; then
   su ${AVATAR} -p -c "timeout -s TERM -t ${MAX_SECONDS} ./cyber-dojo.sh"
-  exit $?
+  status=$?
+  alpine_kill_tree $$
+  exit ${status}
 fi
 
 grep -q -c Ubuntu /etc/issue
 if [ $? -eq 0 ]; then
   su ${AVATAR} -p -c "timeout -s TERM ${MAX_SECONDS}s ./cyber-dojo.sh"
-  exit $?
+  status=$?
+  ubuntu_kill_tree $$
+  exit ${status}
 fi
+
