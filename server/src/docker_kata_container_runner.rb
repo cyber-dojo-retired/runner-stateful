@@ -4,10 +4,21 @@ require_relative 'string_cleaner'
 require_relative 'string_truncater'
 require 'timeout'
 
-# new_kata()  creates a docker-volume inside
-#             a container with a cmd of sleep 1d
-# run()       docker exec's directly into the container
-#             and does not then remove the container.
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Uses one long-lived container per kata and then
+# [docker exec]'ing a new process inside the
+# kata's container for each avatar's run().
+#
+# Positives:
+#   o) opens the way to avatars having shared state.
+#   o) reduces run() execution time
+#      eg on gcc_assert ~ 0.4s -> 0.3s.
+#
+# Negatives:
+#   o) the cyber-dojo.sh process is not running as
+#      pid-1. A pid-1 process is a robust way of
+#      killing an entire process tree.
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 class DockerKataContainerRunner
 
@@ -231,6 +242,10 @@ class DockerKataContainerRunner
         [stdout, stderr, status]
       end
     rescue Timeout::Error
+      # Kill the [docker exec] spawned process. This does _not_
+      # kill the cyber-dojo.sh process inside the exec'd docker
+      # container (remove_container() in run() does that).
+      # See https://github.com/docker/docker/issues/9098
       Process.kill(-9, pid)
       Process.detach(pid)
       ['', '', 'timed_out']

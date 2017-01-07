@@ -4,10 +4,18 @@ require_relative 'string_cleaner'
 require_relative 'string_truncater'
 require 'timeout'
 
-# new_kata()  creates a docker-volume inside
-#             a data-only container
-# run()       remounts the data-only-container into a new
-#             container, then removes the run-container
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Uses a new container per run().
+#
+# Positives:
+#   o) the cyber-dojo.sh process is running as pid-1
+#      which is a robust way of ensuring the entire
+#      process tree is killed.
+#
+# Negatives:
+#   o) increased run() time (compared to one container per kata)
+#   o) no possibility of avatars having shared state.
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 class DockerKataVolumeRunner
 
@@ -249,7 +257,9 @@ class DockerKataVolumeRunner
         status = $?.exitstatus
         w_stdout.close
         w_stderr.close
-        [r_stdout.read, r_stderr.read, status]
+        stdout = r_stdout.read
+        stderr = r_stderr.read
+        [stdout, stderr, status]
       end
     rescue Timeout::Error
       # Kill the [docker exec] spawned process. This does _not_
