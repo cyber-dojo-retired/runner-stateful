@@ -31,8 +31,9 @@ ubuntu_kill_tree() # This works
 
 export CYBER_DOJO_KATA_ID=${KATA_ID}
 export CYBER_DOJO_AVATAR_NAME=${AVATAR}
+export CYBER_DOJO_SANDBOX=/sandboxes/${AVATAR}
 
-cd /sandboxes/${AVATAR}
+cd ${CYBER_DOJO_SANDBOX}
 
 grep -q -c Alpine /etc/issue
 if [ $? -eq 0 ]; then
