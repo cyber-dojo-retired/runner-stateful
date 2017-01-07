@@ -203,8 +203,11 @@ class DockerKataContainerRunner
     cid = container_name(kata_id)
     cmd = [
       #'chmod 755 .',
-      "/usr/local/bin/timeout_cyber_dojo.sh #{kata_id} #{avatar_name}"
-    ].join('&&')
+      '/usr/local/bin/timeout_cyber_dojo.sh',
+      kata_id,
+      avatar_name,
+      max_seconds
+    ].join(space)
 
     exec = [
       'docker exec',
