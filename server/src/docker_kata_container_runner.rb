@@ -54,9 +54,9 @@ class DockerKataContainerRunner
       "--env CYBER_DOJO_KATA_ID=#{kata_id}",
       '--interactive',                     # later execs
       "--name=#{name}",
-      '--net=none',                        # security - no network
-      '--pids-limit=64',                   # security - no fork bombs
-      '--security-opt=no-new-privileges',  # security - no escalation
+      '--net=none',                        # security
+      '--pids-limit=256',                  # security
+      '--security-opt=no-new-privileges',  # security
       '--user=root',
       "--volume #{sandboxes_root}",
     ].join(space)
