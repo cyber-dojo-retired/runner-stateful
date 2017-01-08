@@ -193,7 +193,6 @@ class DockerKataContainerRunner
         host_filename = tmp_dir + '/' + filename
         disk.write(host_filename, content)
       end
-      uid = user_id(avatar_name)
       cid = container_name(kata_id)
       sandbox = sandbox_path(avatar_name)
 
@@ -201,6 +200,8 @@ class DockerKataContainerRunner
       # Dropped tar-pipe as it is changing the permissions of the
       # avatar's sandboxes/lion (eg) directory....
       # Revisit? when sandboxes/lion is not home dir of avatar
+
+      uid = user_id(avatar_name)
 
       cmd = [
         'tar',                # Tar Pipe
@@ -234,7 +235,6 @@ class DockerKataContainerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run_cyber_dojo_sh(kata_id, avatar_name, max_seconds)
-    cid = container_name(kata_id)
     cmd = [
       '/usr/local/bin/timeout_cyber_dojo.sh',
       kata_id,
@@ -242,17 +242,13 @@ class DockerKataContainerRunner
       max_seconds
     ].join(space)
 
-    exec = [
-      'docker exec',
-      '--user=root',
-      '--interactive',
-      cid,
-      "sh #{cmd}"
-    ].join(space)
-
     r_stdout, w_stdout = IO.pipe
     r_stderr, w_stderr = IO.pipe
-    pid = Process.spawn(exec, pgroup:true, out:w_stdout, err:w_stderr)
+    pid = Process.spawn(docker_cmd(kata_id, cmd), {
+      pgroup:true,
+         out:w_stdout,
+         err:w_stderr
+    })
     begin
       Timeout::timeout(max_seconds) do
         Process.waitpid(pid)
@@ -314,12 +310,12 @@ class DockerKataContainerRunner
     sandbox = sandbox_path(avatar_name)
     uid = user_id(avatar_name)
     [ 'adduser',
-        '-D',                  # dont assign a password
-        "-h #{sandbox}",       # home dir
-        '-s /bin/sh',          # shell
-        "-u #{uid}",
+        '-D',             # dont assign a password
         "-G #{group}",
+        "-h #{sandbox}",  # home dir
         '-k /etc/skel',
+        '-s /bin/sh',     # shell
+        "-u #{uid}",
         avatar_name
     ].join(space)
   end
@@ -329,10 +325,10 @@ class DockerKataContainerRunner
     uid = user_id(avatar_name)
     [ 'adduser',
         '--disabled-password',
-        "--home #{sandbox}",
-        "--uid #{uid}",
-        "--ingroup #{group}",
         '--gecos ""',          # don't ask for details
+        "--home #{sandbox}",   # home dir
+        "--ingroup #{group}",
+        "--uid #{uid}",
         avatar_name
     ].join(space)
   end
@@ -398,29 +394,6 @@ class DockerKataContainerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_docker_exec(kata_id, cmd)
-    assert_exec(docker_cmd(kata_id, cmd))
-  end
-
-  def assert_exec(cmd)
-    stdout,stderr,status = exec(cmd)
-    unless status == success
-      fail_command(cmd)
-    end
-    [stdout,stderr]
-  end
-
-  def exec(cmd, logging = @logging)
-    shell.exec(cmd, logging)
-  end
-
-  def docker_cmd(kata_id, cmd)
-    cid = container_name(kata_id)
-    "docker exec #{cid} sh -c '#{cmd}'"
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   def fail_kata_id(message)
     fail bad_argument("kata_id:#{message}")
   end
@@ -459,6 +432,29 @@ class DockerKataContainerRunner
     stdout,_ = assert_exec(cmd)
     names = stdout.split("\n")
     names.uniq - ['<none']
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def assert_docker_exec(kata_id, cmd)
+    assert_exec(docker_cmd(kata_id, cmd))
+  end
+
+  def assert_exec(cmd)
+    stdout,stderr,status = exec(cmd)
+    unless status == success
+      fail_command(cmd)
+    end
+    [stdout,stderr]
+  end
+
+  def exec(cmd, logging = @logging)
+    shell.exec(cmd, logging)
+  end
+
+  def docker_cmd(kata_id, cmd)
+    cid = container_name(kata_id)
+    "docker exec #{cid} sh -c '#{cmd}'"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
