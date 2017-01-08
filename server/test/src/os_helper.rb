@@ -7,10 +7,17 @@ module OsHelper
   include AllAvatarsNames
 
   def kata_id_env_vars_test
-    stdout = assert_cyber_dojo_sh_no_stderr 'printenv CYBER_DOJO_KATA_ID'
-    assert_equal kata_id, stdout.strip
-    stdout = assert_cyber_dojo_sh_no_stderr 'printenv CYBER_DOJO_AVATAR_NAME'
-    assert_equal avatar_name, stdout.strip
+    printenv_cmd = 'printenv CYBER_DOJO_KATA_ID'
+    env_kata_id = assert_cyber_dojo_sh_no_stderr printenv_cmd
+    assert_equal kata_id, env_kata_id.strip
+
+    printenv_cmd = 'printenv CYBER_DOJO_AVATAR_NAME'
+    env_avatar_name = assert_cyber_dojo_sh_no_stderr printenv_cmd
+    assert_equal avatar_name, env_avatar_name.strip
+
+    printenv_cmd = 'printenv CYBER_DOJO_SANDBOX'
+    env_sandbox = assert_cyber_dojo_sh_no_stderr printenv_cmd
+    assert_equal sandbox, env_sandbox.strip
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
