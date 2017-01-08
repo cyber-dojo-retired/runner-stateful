@@ -207,31 +207,33 @@ class DockerKataContainerRunner
       cid = container_name(kata_id)
       sandbox = sandbox_path(avatar_name)
 
-      # Dropped tar-pipe as it was changing the permissions of the
-      # avatar's home directory....
+=begin
+      # Dropped tar-pipe as it is changing the permissions of the
+      # avatar's sandboxes/lion (eg) directory....
+      # Revisit? when sandboxes/lion is not home dir of avatar
 
-      #cmd = [
-      #  'tar',                # Tar Pipe
-      #    "--owner=#{uid}",   # force ownership
-      #    "--group=#{group}", # force group
-      #    '-cf',              # create a new archive
-      #    '-',                # write archive to stdout
-      #    '-C',               # change to...
-      #    "#{tmp_dir}",       # ...this dir
-      #    '.',                # ...and archive it
-      #    '| docker exec',    # pipe stdout to docker
-      #      "-i #{cid}",      # container
-      #      'tar',            #
-      #      '-xf',            # extract archive
-      #      '-',              # read archive from stdin
-      #      '-C',             # after changing to
-      #      sandbox           # this dir
-      #].join(space)
-      #assert_exec(cmd)
+      cmd = [
+        'tar',                # Tar Pipe
+          "--owner=#{uid}",   # force ownership
+          "--group=#{group}", # force group
+          '-cf',              # create a new archive
+          '-',                # write archive to stdout
+          '-C',               # change to...
+          "#{tmp_dir}",       # ...this dir
+          '.',                # ...and archive it
+          '| docker exec',    # pipe stdout to docker
+            "-i #{cid}",      # container
+            'tar',            #
+            '-xf',            # extract archive
+            '-',              # read archive from stdin
+            '-C',             # after changing to
+            sandbox           # this dir
+      ].join(space)
+      assert_exec(cmd)
+=end
 
       docker_cp = "docker cp #{tmp_dir}/. #{cid}:/#{sandbox}"
       assert_exec(docker_cp)
-
       files.keys.each do |filename|
         chown = "chown #{avatar_name}:#{group} #{sandbox}/#{filename}"
         assert_docker_exec(kata_id, chown)
