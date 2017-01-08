@@ -3,14 +3,9 @@ runner_server:
 ==============
 
 o) validate microservice parameters?
-   - kata_id = 10 hex chars
-     runner could see see katas/ dir (readonly) for full validation.
-   - avatar_name = one of the known 64 animals
    - max_seconds = integer (with max of 15 seconds?)
    - deleted_filenames (what chars are illegal in linux filename?)
    - changed_files
-
-o) Should new_kata() do a pull? Is it needed for fork?
 
 o) external_sheller: only ever one command in...
    cd_exec(path, *commands)
