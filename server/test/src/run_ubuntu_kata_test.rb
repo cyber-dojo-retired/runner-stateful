@@ -42,13 +42,10 @@ class RunUbuntuKataTest < TestBase
 
   test '3B2',
   '[Ubuntu] after new_kata the timeout script is in /usr/local/bin' do
-    src = assert_docker_exec('cat /usr/local/bin/timeout_cyber_dojo.sh')
-    lines = src.split("\n")
-    assert_equal '#!/usr/bin/env sh', lines[0]
-    assert_equal '', lines[2]
-    assert_equal 'KATA_ID=$1', lines[3]
-    assert_equal 'AVATAR=$2', lines[4]
-    assert_equal 'MAX_SECONDS=$3', lines[5]
+    filename = 'timeout_cyber_dojo.sh'
+    src = assert_docker_exec("cat /usr/local/bin/#{filename}")
+    local_src = IO.read("/app/src/#{filename}")
+    assert_equal local_src, src
   end
 
 end
