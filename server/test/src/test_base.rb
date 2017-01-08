@@ -223,7 +223,7 @@ class TestBase < HexMiniTest
   end
 
   def container_name
-    [ 'cyber', 'dojo', kata_id ].join('_')
+    [ 'cyber', 'dojo', 'kata', kata_id ].join('_')
   end
 
 end

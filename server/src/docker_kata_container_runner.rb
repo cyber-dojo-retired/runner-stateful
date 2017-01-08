@@ -460,7 +460,8 @@ class DockerKataContainerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def container_name(kata_id)
-    [ 'cyber', 'dojo', kata_id ].join('_')
+    # service containers use -hyphens so don't use -hypens
+    [ 'cyber', 'dojo', 'kata', kata_id ].join('_')
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

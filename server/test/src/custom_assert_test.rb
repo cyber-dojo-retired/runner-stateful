@@ -28,7 +28,8 @@ class CustomAssertTest < TestBase
   test '434',
   '[Alpine] bad assert_docker_exec raises' do
     error = assert_raises { assert_docker_exec 'xxxx' }
-    expected = "docker exec cyber_dojo_7D42843400 sh -c 'xxxx'"
+    cid = container_name
+    expected = "docker exec #{cid} sh -c 'xxxx'"
     assert_equal expected, error.message
   end
 
