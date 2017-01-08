@@ -75,9 +75,9 @@ module OsHelper
       assert_equal ls_starting_files.keys.sort, ls_files.keys.sort
       lion_uid = user_id('lion')
       assert_equal_atts('empty.txt',     '-rw-r--r--', lion_uid, group,  0, ls_files)
-      assert_equal_atts('cyber-dojo.sh', '-rwxr-xr-x', lion_uid, group, 29, ls_files)
+      assert_equal_atts('cyber-dojo.sh', '-rw-r--r--', lion_uid, group, 29, ls_files)
       assert_equal_atts('hello.txt',     '-rw-r--r--', lion_uid, group, 11, ls_files)
-      assert_equal_atts('hello.sh',      '-rwxr-xr-x', lion_uid, group, 16, ls_files)
+      assert_equal_atts('hello.sh',      '-rw-r--r--', lion_uid, group, 16, ls_files)
     ensure
       old_avatar({ avatar_name:'lion' })
     end
