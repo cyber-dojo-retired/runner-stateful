@@ -56,6 +56,8 @@ class DockerKataContainerRunner
     stdout.strip != ''
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   def new_kata(image_name, kata_id)
     refute_kata_exists(kata_id)
 
@@ -96,8 +98,9 @@ class DockerKataContainerRunner
       mkdir_etc_skel = "mkdir -m 755 /etc/skel"
       assert_docker_exec(kata_id, mkdir_etc_skel)
     end
-
   end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def old_kata(image_name, kata_id)
     assert_kata_exists(kata_id)
@@ -122,6 +125,8 @@ class DockerKataContainerRunner
     status == success
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   def new_avatar(_image_name, kata_id, avatar_name, starting_files)
     assert_kata_exists(kata_id)
     refute_avatar_exists(kata_id, avatar_name)
@@ -131,6 +136,8 @@ class DockerKataContainerRunner
 
     write_files(kata_id, avatar_name, starting_files)
   end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def old_avatar(_image_name, kata_id, avatar_name)
     assert_kata_exists(kata_id)
