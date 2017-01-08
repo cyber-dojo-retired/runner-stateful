@@ -130,8 +130,8 @@ class DockerKataContainerRunner
     assert_kata_exists(kata_id)
     refute_avatar_exists(kata_id, avatar_name)
 
-    adduser = adduser_cmd(kata_id, avatar_name)
-    assert_docker_exec(kata_id, adduser)
+    add_user = add_user_cmd(kata_id, avatar_name)
+    assert_docker_exec(kata_id, add_user)
 
     write_files(kata_id, avatar_name, starting_files)
   end
@@ -142,14 +142,8 @@ class DockerKataContainerRunner
     assert_kata_exists(kata_id)
     assert_avatar_exists(kata_id, avatar_name)
 
-    if alpine? kata_id
-      del_user = "deluser --remove-home #{avatar_name}"
-      assert_docker_exec(kata_id, del_user)
-    end
-    if ubuntu? kata_id
-      user_del = "userdel --remove #{avatar_name}"
-      assert_docker_exec(kata_id, user_del)
-    end
+    del_user = del_user_cmd(kata_id, avatar_name)
+    assert_docker_exec(kata_id, del_user)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -295,16 +289,27 @@ class DockerKataContainerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def adduser_cmd(kata_id, avatar_name)
+  def add_user_cmd(kata_id, avatar_name)
     if alpine?(kata_id)
-      return alpine_adduser_cmd(avatar_name)
+      return alpine_add_user_cmd(avatar_name)
     end
     if ubuntu?(kata_id)
-      return ubuntu_adduser_cmd(avatar_name)
+      return ubuntu_add_user_cmd(avatar_name)
     end
   end
 
-  def alpine_adduser_cmd(avatar_name)
+  def del_user_cmd(kata_id, avatar_name)
+    if alpine? kata_id
+      return "deluser --remove-home #{avatar_name}"
+    end
+    if ubuntu? kata_id
+      return "userdel --remove #{avatar_name}"
+    end
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def alpine_add_user_cmd(avatar_name)
     sandbox = sandbox_path(avatar_name)
     uid = user_id(avatar_name)
     [ 'adduser',
@@ -318,7 +323,7 @@ class DockerKataContainerRunner
     ].join(space)
   end
 
-  def ubuntu_adduser_cmd(avatar_name)
+  def ubuntu_add_user_cmd(avatar_name)
     sandbox = sandbox_path(avatar_name)
     uid = user_id(avatar_name)
     [ 'adduser',
@@ -329,19 +334,6 @@ class DockerKataContainerRunner
         '--gecos ""',          # don't ask for details
         avatar_name
     ].join(space)
-  end
-
-  def alpine?(kata_id)
-    etc_issue(kata_id).include?('Alpine')
-  end
-
-  def ubuntu?(kata_id)
-    etc_issue(kata_id).include?('Ubuntu')
-  end
-
-  def etc_issue(kata_id)
-    stdout,_ = assert_docker_exec(kata_id, 'cat /etc/issue')
-    stdout
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -428,6 +420,21 @@ class DockerKataContainerRunner
 
   def exec(cmd, logging = @logging)
     shell.exec(cmd, logging)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def alpine?(kata_id)
+    etc_issue(kata_id).include?('Alpine')
+  end
+
+  def ubuntu?(kata_id)
+    etc_issue(kata_id).include?('Ubuntu')
+  end
+
+  def etc_issue(kata_id)
+    stdout,_ = assert_docker_exec(kata_id, 'cat /etc/issue')
+    stdout
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
