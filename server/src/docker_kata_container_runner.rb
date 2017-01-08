@@ -62,7 +62,6 @@ class DockerKataContainerRunner
     name = container_name(kata_id)
     args = [
       '--detach',
-      "--env CYBER_DOJO_KATA_ID=#{kata_id}",
       '--interactive',                     # later execs
       "--name=#{name}",
       '--net=none',                        # security
@@ -236,11 +235,8 @@ class DockerKataContainerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run_cyber_dojo_sh(kata_id, avatar_name, max_seconds)
-    # I thought doing [chmod 755] in new_avatar() would
-    # be "sticky" and remain 755 but it appears not...
     cid = container_name(kata_id)
     cmd = [
-      #'chmod 755 .',
       '/usr/local/bin/timeout_cyber_dojo.sh',
       kata_id,
       avatar_name,
