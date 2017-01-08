@@ -178,9 +178,6 @@ class DockerKataContainerRunner
       files.each do |filename, content|
         host_filename = tmp_dir + '/' + filename
         disk.write(host_filename, content)
-        if filename.end_with?('.sh')
-          assert_exec("chmod +x #{host_filename}")
-        end
       end
       uid = user_id(avatar_name)
       cid = container_name(kata_id)
