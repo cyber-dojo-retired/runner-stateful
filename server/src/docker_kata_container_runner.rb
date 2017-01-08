@@ -196,8 +196,8 @@ class DockerKataContainerRunner
             'tar',            #
             '-xf',            # extract archive
             '-',              # read archive from stdin
-            '-C',             # change to...
-            sandbox           # ...this dir and extract
+            '-C',             # after changing to
+            sandbox           # this dir
       ].join(space)
       assert_exec(cmd)
     end
