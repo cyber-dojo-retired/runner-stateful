@@ -81,6 +81,23 @@ class DockerKataContainerRunner
       "#{name}:/usr/local/bin"
     ].join(space)
     assert_exec(docker_cp)
+
+    # create cyber-dojo group
+    if alpine? kata_id
+      addgroup = 'addgroup -g 5000 cyber-dojo'
+      assert_docker_exec(kata_id, addgroup)
+    end
+    if ubuntu? kata_id
+      addgroup = 'addgroup --gid 5000 cyber-dojo'
+      assert_docker_exec(kata_id, addgroup)
+    end
+
+    # setup /etc/skel in Alpine
+    if alpine? kata_id
+      mkdir_etc_skel = "mkdir -m 755 /etc/skel"
+      assert_docker_exec(kata_id, mkdir_etc_skel)
+    end
+
   end
 
   def old_kata(image_name, kata_id)
@@ -112,6 +129,11 @@ class DockerKataContainerRunner
 
     adduser = adduser_cmd(kata_id, avatar_name)
     assert_docker_exec(kata_id, adduser)
+
+    # This is causing the avatar's home dir's permissions to
+    # change from d|rwx|r-s|r-x
+    #          to d|rwx|---|---
+
     write_files(kata_id, avatar_name, starting_files)
   end
 
@@ -150,7 +172,7 @@ class DockerKataContainerRunner
   end
 
   def group
-    'nogroup'
+    'cyber-dojo'
   end
 
   def sandbox_path(avatar_name)
@@ -182,24 +204,32 @@ class DockerKataContainerRunner
       uid = user_id(avatar_name)
       cid = container_name(kata_id)
       sandbox = sandbox_path(avatar_name)
-      cmd = [
-        'tar',                # Tar Pipe
-          "--owner=#{uid}",   # force ownership
-          "--group=#{group}", # force group
-          '-cf',              # create a new archive
-          '-',                # write archive to stdout
-          '-C',               # change to...
-          "#{tmp_dir}",       # ...this dir
-          '.',                # ...and archive it
-          '| docker exec',    # pipe stdout to docker
-            "-i #{cid}",      # container
-            'tar',            #
-            '-xf',            # extract archive
-            '-',              # read archive from stdin
-            '-C',             # after changing to
-            sandbox           # this dir
-      ].join(space)
-      assert_exec(cmd)
+
+      # Dropped tar-pipe as it was changing the permissions of the
+      # avatar's home directory....
+
+      #cmd = [
+      #  'tar',                # Tar Pipe
+      #    "--owner=#{uid}",   # force ownership
+      #    "--group=#{group}", # force group
+      #    '-cf',              # create a new archive
+      #    '-',                # write archive to stdout
+      #    '-C',               # change to...
+      #    "#{tmp_dir}",       # ...this dir
+      #    '.',                # ...and archive it
+      #    '| docker exec',    # pipe stdout to docker
+      #      "-i #{cid}",      # container
+      #      'tar',            #
+      #      '-xf',            # extract archive
+      #      '-',              # read archive from stdin
+      #      '-C',             # after changing to
+      #      sandbox           # this dir
+      #].join(space)
+      #assert_exec(cmd)
+
+      docker_cp = "docker cp #{tmp_dir}/. #{cid}:/#{sandbox}"
+      assert_exec(docker_cp)
+
     end
   end
 
@@ -272,6 +302,8 @@ class DockerKataContainerRunner
         '-D',                  # disabled password
         "-h #{sandbox}",       # home dir
         "-u #{uid}",
+        "-G #{group}",
+        '-k /etc/skel',
         avatar_name
     ].join(space)
   end
@@ -283,6 +315,7 @@ class DockerKataContainerRunner
         '--disabled-password',
         "--home #{sandbox}",
         "--uid #{uid}",
+        "--ingroup #{group}",
         '--gecos ""',          # don't ask for details
         avatar_name
     ].join(space)

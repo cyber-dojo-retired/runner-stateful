@@ -29,8 +29,8 @@ class KataContainerTest < TestBase
   'there is a linux user called salmon inside the kata container' do
     new_avatar(salmon)
     begin
-      whoami = assert_docker_exec 'su - salmon -c whoami'
-      assert_equal 'salmon', whoami.strip
+      uid = assert_docker_exec('id -u salmon').strip
+      assert_equal user_id('salmon'), uid
     ensure
       old_avatar(salmon)
     end
@@ -43,8 +43,8 @@ class KataContainerTest < TestBase
   'there is a linux user called salmon inside the kata container' do
     new_avatar(salmon)
     begin
-      whoami = assert_docker_exec 'su - salmon -c whoami'
-      assert_equal 'salmon', whoami.strip
+      uid = assert_docker_exec('id -u salmon').strip
+      assert_equal user_id('salmon'), uid
     ensure
       old_avatar(salmon)
     end
