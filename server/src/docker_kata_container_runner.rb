@@ -95,7 +95,7 @@ class DockerKataContainerRunner
 
     # setup /etc/skel in Alpine
     if alpine? kata_id
-      mkdir_etc_skel = "mkdir -m 755 /etc/skel"
+      mkdir_etc_skel = 'mkdir -m 755 /etc/skel'
       assert_docker_exec(kata_id, mkdir_etc_skel)
     end
   end
@@ -118,9 +118,8 @@ class DockerKataContainerRunner
     assert_kata_exists(kata_id)
     assert_valid_name(avatar_name)
 
-    name = container_name(kata_id)
-    id = "docker exec #{name} sh -c 'id #{avatar_name}'"
-    _,_,status = exec(id, logging = false)
+    id = "id #{avatar_name}"
+    _,_,status = docker_exec(kata_id, id, logging = false)
     status == success
   end
 
@@ -406,8 +405,16 @@ class DockerKataContainerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_docker_exec(kata_id, cmd)
+    stdout,stderr,status = docker_exec(kata_id, cmd)
+    unless status == success
+      fail StandardError.new(cmd)
+    end
+    [stdout,stderr]
+  end
+
+  def docker_exec(kata_id, cmd, logging = @logging)
     cid = container_name(kata_id)
-    assert_exec("docker exec #{cid} sh -c '#{cmd}'")
+    exec("docker exec #{cid} sh -c '#{cmd}'", logging)
   end
 
   def assert_exec(cmd)
