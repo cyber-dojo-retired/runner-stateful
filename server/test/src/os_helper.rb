@@ -201,10 +201,10 @@ module OsHelper
   def ls_cmd;
     # Works on Ubuntu and Alpine
     'stat -c "%n %A %u %G %s %z" *'
-    # hiker.h  -rw-r--r--  40045  nogroup 136  2016-06-05 07:03:14.000000000
-    # |        |           |      |       |    |          |
-    # filename permissions user   group   size date       time
-    # 0        1           2      3       4    5          6
+    # hiker.h  -rw-r--r--  40045  cyber-dojo 136  2016-06-05 07:03:14.000000000
+    # |        |           |      |          |    |          |
+    # filename permissions user   group      size date       time
+    # 0        1           2      3          4    5          6
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -

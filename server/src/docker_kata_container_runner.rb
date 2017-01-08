@@ -130,10 +130,6 @@ class DockerKataContainerRunner
     adduser = adduser_cmd(kata_id, avatar_name)
     assert_docker_exec(kata_id, adduser)
 
-    # This is causing the avatar's home dir's permissions to
-    # change from d|rwx|r-s|r-x
-    #          to d|rwx|---|---
-
     write_files(kata_id, avatar_name, starting_files)
   end
 
@@ -230,6 +226,10 @@ class DockerKataContainerRunner
       docker_cp = "docker cp #{tmp_dir}/. #{cid}:/#{sandbox}"
       assert_exec(docker_cp)
 
+      files.keys.each do |filename|
+        chown = "chown #{avatar_name}:#{group} #{sandbox}/#{filename}"
+        assert_docker_exec(kata_id, chown)
+      end
     end
   end
 
@@ -299,8 +299,9 @@ class DockerKataContainerRunner
     sandbox = sandbox_path(avatar_name)
     uid = user_id(avatar_name)
     [ 'adduser',
-        '-D',                  # disabled password
+        '-D',                  # dont assign a password
         "-h #{sandbox}",       # home dir
+        '-s /bin/sh',          # don't want /sbin/halt
         "-u #{uid}",
         "-G #{group}",
         '-k /etc/skel',
