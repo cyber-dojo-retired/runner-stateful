@@ -119,9 +119,8 @@ class DockerKataContainerRunner
     assert_valid_name(avatar_name)
 
     name = container_name(kata_id)
-    sandbox = sandbox_path(avatar_name)
-    cmd = "docker exec #{name} sh -c '[ -d #{sandbox} ]'"
-    _,_,status = exec(cmd, logging = false)
+    id = "docker exec #{name} sh -c 'id #{avatar_name}'"
+    _,_,status = exec(id, logging = false)
     status == success
   end
 
@@ -143,9 +142,14 @@ class DockerKataContainerRunner
     assert_kata_exists(kata_id)
     assert_avatar_exists(kata_id, avatar_name)
 
-    sandbox = sandbox_path(avatar_name)
-    rm = "rm -rf #{sandbox}"
-    assert_docker_exec(kata_id, rm)
+    if alpine? kata_id
+      del_user = "deluser --remove-home #{avatar_name}"
+      assert_docker_exec(kata_id, del_user)
+    end
+    if ubuntu? kata_id
+      user_del = "userdel --remove #{avatar_name}"
+      assert_docker_exec(kata_id, user_del)
+    end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
