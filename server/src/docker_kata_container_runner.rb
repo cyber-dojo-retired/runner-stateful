@@ -83,15 +83,8 @@ class DockerKataContainerRunner
     ].join(space)
     assert_exec(docker_cp)
 
-    # create cyber-dojo group
-    if alpine? kata_id
-      addgroup = 'addgroup -g 5000 cyber-dojo'
-      assert_docker_exec(kata_id, addgroup)
-    end
-    if ubuntu? kata_id
-      addgroup = 'addgroup --gid 5000 cyber-dojo'
-      assert_docker_exec(kata_id, addgroup)
-    end
+    add_group = add_group_cmd(kata_id)
+    assert_docker_exec(kata_id, add_group)
 
     # setup /etc/skel in Alpine
     if alpine? kata_id
@@ -288,6 +281,15 @@ class DockerKataContainerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  def add_group_cmd(kata_id)
+    if alpine? kata_id
+      return 'addgroup -g 5000 cyber-dojo'
+    end
+    if ubuntu? kata_id
+      return 'addgroup --gid 5000 cyber-dojo'
+    end
+  end
+
   def add_user_cmd(kata_id, avatar_name)
     if alpine?(kata_id)
       return alpine_add_user_cmd(avatar_name)
@@ -314,7 +316,7 @@ class DockerKataContainerRunner
     [ 'adduser',
         '-D',                  # dont assign a password
         "-h #{sandbox}",       # home dir
-        '-s /bin/sh',          # don't want /sbin/halt
+        '-s /bin/sh',          # shell
         "-u #{uid}",
         "-G #{group}",
         '-k /etc/skel',
