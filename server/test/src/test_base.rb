@@ -117,21 +117,16 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_cyber_dojo_sh_no_stderr(script, named_args={})
+  def assert_cyber_dojo_sh(script, named_args={})
     named_args[:changed_files] = { 'cyber-dojo.sh' => script }
-    assert_run_succeeds_no_stderr(named_args)
-  end
-
-  def assert_run_succeeds_no_stderr(named_args)
-    stdout,stderr = assert_run_succeeds(named_args)
-    assert_equal '', stderr, stdout
-    stdout
+    assert_run_succeeds(named_args)
   end
 
   def assert_run_succeeds(named_args)
     stdout,stderr,status = sss_run(named_args)
     assert_equal success, status, [stdout,stderr]
-    [stdout,stderr]
+    assert_equal '', stderr, stdout
+    stdout
   end
 
   def assert_run_times_out(named_args)

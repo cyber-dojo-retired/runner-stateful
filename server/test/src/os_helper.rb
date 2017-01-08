@@ -8,15 +8,15 @@ module OsHelper
 
   def kata_id_env_vars_test
     printenv_cmd = 'printenv CYBER_DOJO_KATA_ID'
-    env_kata_id = assert_cyber_dojo_sh_no_stderr printenv_cmd
+    env_kata_id = assert_cyber_dojo_sh printenv_cmd
     assert_equal kata_id, env_kata_id.strip
 
     printenv_cmd = 'printenv CYBER_DOJO_AVATAR_NAME'
-    env_avatar_name = assert_cyber_dojo_sh_no_stderr printenv_cmd
+    env_avatar_name = assert_cyber_dojo_sh printenv_cmd
     assert_equal avatar_name, env_avatar_name.strip
 
     printenv_cmd = 'printenv CYBER_DOJO_SANDBOX'
-    env_sandbox = assert_cyber_dojo_sh_no_stderr printenv_cmd
+    env_sandbox = assert_cyber_dojo_sh printenv_cmd
     assert_equal sandbox, env_sandbox.strip
   end
 
@@ -46,12 +46,12 @@ module OsHelper
     refute_equal '', ls
 
     # sandbox's is owned by avatar
-    stat_user = assert_docker_exec "stat -c '%u' #{sandbox}"
-    assert_equal user_id, stat_user.strip
+    stat_user = assert_docker_exec("stat -c '%u' #{sandbox}").strip
+    assert_equal user_id, stat_user
 
     # sandbox's group is set
-    stat_group = assert_docker_exec "stat -c '%G' #{sandbox}"
-    assert_equal group, stat_group.strip
+    stat_group = assert_docker_exec("stat -c '%G' #{sandbox}").strip
+    assert_equal group, stat_group
 
     # sandbox's permissions are set
     stat_perms = assert_docker_exec("stat -c '%A' #{sandbox}").strip
@@ -100,9 +100,9 @@ module OsHelper
 
   def unchanged_files_test
     named_args = { changed_files:ls_starting_files }
-    before_ls = assert_run_succeeds_no_stderr(named_args)
+    before_ls = assert_run_succeeds(named_args)
     named_args = { changed_files:{} }
-    after_ls = assert_run_succeeds_no_stderr(named_args)
+    after_ls = assert_run_succeeds(named_args)
     assert_equal before_ls, after_ls
   end
 
@@ -110,7 +110,7 @@ module OsHelper
 
   def deleted_files_test
     named_args = { changed_files:ls_starting_files }
-    ls_stdout = assert_run_succeeds_no_stderr(named_args)
+    ls_stdout = assert_run_succeeds(named_args)
     before = ls_parse(ls_stdout)
     before_filenames = before.keys
 
@@ -119,7 +119,7 @@ module OsHelper
       changed_files:{},
       deleted_filenames:deleted_filenames
     }
-    ls_stdout = assert_run_succeeds_no_stderr(named_args)
+    ls_stdout = assert_run_succeeds(named_args)
     after = ls_parse(ls_stdout)
     after_filenames = after.keys
 
@@ -132,14 +132,14 @@ module OsHelper
 
   def new_files_test
     named_args = { changed_files:ls_starting_files }
-    ls_stdout = assert_run_succeeds_no_stderr(named_args)
+    ls_stdout = assert_run_succeeds(named_args)
     before = ls_parse(ls_stdout)
     before_filenames = before.keys
 
     new_filename = 'fizz_buzz.h'
     new_file_content = '#ifndef...'
     named_args = { changed_files:{ new_filename => new_file_content } }
-    ls_stdout = assert_run_succeeds_no_stderr(named_args)
+    ls_stdout = assert_run_succeeds(named_args)
     after = ls_parse(ls_stdout)
     after_filenames = after.keys
 
@@ -157,7 +157,7 @@ module OsHelper
 
   def changed_file_test
     named_args = { changed_files:ls_starting_files }
-    ls_stdout = assert_run_succeeds_no_stderr(named_args)
+    ls_stdout = assert_run_succeeds(named_args)
     before = ls_parse(ls_stdout)
 
     sleep 2
@@ -165,7 +165,7 @@ module OsHelper
     hello_txt = ls_starting_files['hello.txt']
     extra = "\ngreetings"
     named_args = { changed_files:{ 'hello.txt' => hello_txt + extra } }
-    ls_stdout = assert_run_succeeds_no_stderr(named_args)
+    ls_stdout = assert_run_succeeds(named_args)
     after = ls_parse(ls_stdout)
 
     assert_equal before.keys, after.keys
