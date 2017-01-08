@@ -118,8 +118,8 @@ class DockerKataContainerRunner
     assert_kata_exists(kata_id)
     assert_valid_name(avatar_name)
 
-    id = "id #{avatar_name}"
-    _,_,status = docker_exec(kata_id, id, logging = false)
+    id_cmd = docker_cmd(kata_id, "id #{avatar_name}")
+    _,_,status = exec(id_cmd, logging = false)
     status == success
   end
 
@@ -367,10 +367,6 @@ class DockerKataContainerRunner
     '0123456789ABCDEF'.include?(char)
   end
 
-  def fail_kata_id(message)
-    fail bad_argument("kata_id:#{message}")
-  end
-
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def refute_avatar_exists(kata_id, avatar_name)
@@ -398,35 +394,45 @@ class DockerKataContainerRunner
     all_avatars_names.include?(avatar_name)
   end
 
-  def fail_avatar_name(message)
-    fail bad_argument("avatar_name:#{message}")
-  end
-
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_docker_exec(kata_id, cmd)
-    stdout,stderr,status = docker_exec(kata_id, cmd)
-    unless status == success
-      fail StandardError.new(cmd)
-    end
-    [stdout,stderr]
-  end
-
-  def docker_exec(kata_id, cmd, logging = @logging)
-    cid = container_name(kata_id)
-    exec("docker exec #{cid} sh -c '#{cmd}'", logging)
+    assert_exec(docker_cmd(kata_id, cmd))
   end
 
   def assert_exec(cmd)
     stdout,stderr,status = exec(cmd)
     unless status == success
-      fail StandardError.new(cmd)
+      fail_command(cmd)
     end
     [stdout,stderr]
   end
 
   def exec(cmd, logging = @logging)
     shell.exec(cmd, logging)
+  end
+
+  def docker_cmd(kata_id, cmd)
+    cid = container_name(kata_id)
+    "docker exec #{cid} sh -c '#{cmd}'"
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def fail_kata_id(message)
+    fail bad_argument("kata_id:#{message}")
+  end
+
+  def fail_avatar_name(message)
+    fail bad_argument("avatar_name:#{message}")
+  end
+
+  def fail_command(message)
+    fail bad_argument("command:#{message}")
+  end
+
+  def bad_argument(message)
+    ArgumentError.new(message)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -457,12 +463,6 @@ class DockerKataContainerRunner
 
   def container_name(kata_id)
     [ 'cyber', 'dojo', kata_id ].join('_')
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def bad_argument(message)
-    ArgumentError.new(message)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
