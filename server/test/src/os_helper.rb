@@ -32,19 +32,23 @@ module OsHelper
 
   def new_avatar_sandbox_setup_test
     # sandbox exists
-    assert_cyber_dojo_sh_no_stderr "[ -d #{sandbox} ]"
+    assert_docker_exec "[ -d #{sandbox} ]"
+
     # sandbox is not empty
-    stdout = assert_cyber_dojo_sh_no_stderr "ls -A #{sandbox}"
-    refute_equal '', stdout
+    ls = assert_docker_exec "ls -A #{sandbox}"
+    refute_equal '', ls
+
     # sandbox's is owned by avatar
-    stdout = assert_cyber_dojo_sh_no_stderr "stat -c '%u' #{sandbox}"
-    assert_equal user_id, stdout.strip
+    stat_user = assert_docker_exec "stat -c '%u' #{sandbox}"
+    assert_equal user_id, stat_user.strip
+
     # sandbox's group is set
-    stdout = assert_cyber_dojo_sh_no_stderr "stat -c '%G' #{sandbox}"
-    assert_equal group, stdout.strip
+    stat_group = assert_docker_exec "stat -c '%G' #{sandbox}"
+    assert_equal group, stat_group.strip
+
     # sandbox's permissions are set
-    stdout = assert_cyber_dojo_sh_no_stderr "stat -c '%A' #{sandbox}"
-    assert_equal 'drwxr-xr-x', stdout.strip
+    stat_perms = assert_docker_exec "stat -c '%A' #{sandbox}"
+    assert_equal 'drwxr-xr-x', stat_perms.strip
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
