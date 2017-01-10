@@ -199,7 +199,8 @@ class DockerKataContainerRunner
 =begin
       # Dropped tar-pipe as it is changing the permissions of the
       # avatar's sandboxes/lion (eg) directory....
-      # Revisit? when sandboxes/lion is not home dir of avatar
+      # Revisit this when sandboxes/lion is not home dir
+      # of avatar and there is no volume.
 
       uid = user_id(avatar_name)
 
