@@ -50,8 +50,9 @@ class MicroService < Sinatra::Base
   # - - - - - - - - - - - - - - - - - - - - -
 
   post '/run' do
-    args = [ image_name, kata_id, avatar_name ]
-    args += [ deleted_filenames, changed_files, max_seconds ]
+    args  = [ image_name, kata_id, avatar_name ]
+    args += [ deleted_filenames, changed_files ]
+    args += [ max_seconds ]
     poster(__method__, *args)
   end
 
@@ -84,8 +85,8 @@ class MicroService < Sinatra::Base
   end
 
   request_args :image_name
-  request_args :kata_id, :avatar_name
-  request_args :starting_files, :deleted_filenames, :changed_files
+  request_args :kata_id, :avatar_names, :starting_files
+  request_args :deleted_filenames, :changed_files
   request_args :max_seconds
 
   def args
