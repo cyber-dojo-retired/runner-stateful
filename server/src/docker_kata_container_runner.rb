@@ -261,10 +261,13 @@ class DockerKataContainerRunner
         [stdout, stderr, status]
       end
     rescue Timeout::Error
-      # Kill the [docker exec] spawned process. This does _not_
-      # kill the cyber-dojo.sh process inside the exec'd docker
-      # container (remove_container() in run() does that).
+      # Kill the [docker exec] processes running on the host.
+      # This does __not__ kill the cyber-dojo.sh process
+      # running __inside__ the docker container.
       # See https://github.com/docker/docker/issues/9098
+      # The processes __inside__ the docker container are killed
+      # by /usr/local/bin/timeout_cyber_dojo.sh
+      # See new_kata() above.
       Process.kill(-9, pid)
       Process.detach(pid)
       ['', '', 'timed_out']
