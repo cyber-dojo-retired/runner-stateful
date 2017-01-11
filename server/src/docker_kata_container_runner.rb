@@ -224,7 +224,7 @@ class DockerKataContainerRunner
       assert_exec(cmd)
 =end
 
-      docker_cp = "docker cp #{tmp_dir}/. #{cid}:/#{sandbox}"
+      docker_cp = "docker cp #{tmp_dir}/. #{cid}:#{sandbox}"
       assert_exec(docker_cp)
       files.keys.each do |filename|
         chown = "chown #{avatar_name}:#{group} #{sandbox}/#{filename}"
