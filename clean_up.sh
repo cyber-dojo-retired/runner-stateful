@@ -1,8 +1,8 @@
 #!/bin/bash
 
-docker rm --force --volumes $(docker ps --quiet --filter 'name=cyber_dojo_')
+docker rm --force $(docker ps --quiet --filter 'name=cyber_dojo_kata')
 
 # collector can do this
 # - - - - - - - - - - -
 # pids=$(docker ps --quiet --filter 'status=exited' --filter 'name=cyber_dojo_kata_')
-# echo ${pids} | xargs docker rm --force --volumes
+# echo ${pids} | xargs docker rm --force
