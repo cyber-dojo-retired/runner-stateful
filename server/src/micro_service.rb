@@ -84,8 +84,8 @@ class MicroService < Sinatra::Base
     }
   end
 
-  request_args :image_name
-  request_args :kata_id, :avatar_names, :starting_files
+  request_args :image_name, :kata_id, :avatar_names
+  request_args :avatar_name, :starting_files
   request_args :deleted_filenames, :changed_files
   request_args :max_seconds
 
