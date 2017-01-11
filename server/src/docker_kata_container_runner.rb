@@ -71,7 +71,7 @@ class DockerKataContainerRunner
       '--security-opt=no-new-privileges',  # security
       '--user=root',
     ].join(space)
-    cmd = "docker run #{args} #{image_name} sh -c 'sleep 1d'"
+    cmd = "docker run #{args} #{image_name} sh -c 'sleep 3h'"
     assert_exec(cmd)
 
     my_dir = File.expand_path(File.dirname(__FILE__))
