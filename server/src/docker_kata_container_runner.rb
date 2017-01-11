@@ -87,12 +87,6 @@ class DockerKataContainerRunner
 
     mkdir = "mkdir -m 755 #{sandboxes_root}"
     assert_docker_exec(kata_id, mkdir)
-
-    # setup /etc/skel in Alpine
-    if alpine? kata_id
-      mkdir_etc_skel = 'mkdir -m 755 /etc/skel'
-      assert_docker_exec(kata_id, mkdir_etc_skel)
-    end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -204,35 +198,6 @@ class DockerKataContainerRunner
       end
       cid = container_name(kata_id)
       sandbox = sandbox_path(avatar_name)
-
-=begin
-      # Dropped tar-pipe as it is changing the permissions of the
-      # avatar's sandboxes/lion (eg) directory....
-      # Revisit this when sandboxes/lion is not home dir
-      # of avatar and there is no volume.
-
-      uid = user_id(avatar_name)
-
-      cmd = [
-        'tar',                # Tar Pipe
-          "--owner=#{uid}",   # force ownership
-          "--group=#{group}", # force group
-          '-cf',              # create a new archive
-          '-',                # write archive to stdout
-          '-C',               # change to...
-          "#{tmp_dir}",       # ...this dir
-          '.',                # ...and archive it
-          '| docker exec',    # pipe stdout to docker
-            "-i #{cid}",      # container
-            'tar',            #
-            '-xf',            # extract archive
-            '-',              # read archive from stdin
-            '-C',             # after changing to
-            sandbox           # this dir
-      ].join(space)
-      assert_exec(cmd)
-=end
-
       docker_cp = "docker cp #{tmp_dir}/. #{cid}:#{sandbox}"
       assert_exec(docker_cp)
       files.keys.each do |filename|
@@ -326,7 +291,6 @@ class DockerKataContainerRunner
         '-D',             # dont assign a password
         "-G #{group}",
         "-h #{home}",     # home dir
-        '-k /etc/skel',
         '-s /bin/sh',     # shell
         "-u #{uid}",
         avatar_name
