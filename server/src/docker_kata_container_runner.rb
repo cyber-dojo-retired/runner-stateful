@@ -95,7 +95,7 @@ class DockerKataContainerRunner
     assert_kata_exists(kata_id)
 
     name = container_name(kata_id)
-    cmd = "docker rm --force --volumes #{name}"
+    cmd = "docker rm --force #{name}"
     assert_exec(cmd)
   end
 
