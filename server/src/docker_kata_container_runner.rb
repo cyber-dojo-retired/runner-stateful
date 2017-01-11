@@ -123,10 +123,8 @@ class DockerKataContainerRunner
 
     sandbox = sandbox_path(avatar_name)
     mkdir = "mkdir -m 755 #{sandbox}"
-    assert_docker_exec(kata_id, mkdir)
-
     chown = "chown #{avatar_name}:#{group} #{sandbox}"
-    assert_docker_exec(kata_id, chown)
+    assert_docker_exec(kata_id, [ mkdir, chown ].join('&&'))
 
     write_files(kata_id, avatar_name, starting_files)
   end
