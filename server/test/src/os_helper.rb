@@ -8,16 +8,16 @@ module OsHelper
 
   def kata_id_env_vars_test
     printenv_cmd = 'printenv CYBER_DOJO_KATA_ID'
-    env_kata_id = assert_cyber_dojo_sh printenv_cmd
-    assert_equal kata_id, env_kata_id.strip
+    env_kata_id = assert_cyber_dojo_sh(printenv_cmd).strip
+    assert_equal kata_id, env_kata_id
 
     printenv_cmd = 'printenv CYBER_DOJO_AVATAR_NAME'
-    env_avatar_name = assert_cyber_dojo_sh printenv_cmd
-    assert_equal avatar_name, env_avatar_name.strip
+    env_avatar_name = assert_cyber_dojo_sh(printenv_cmd).strip
+    assert_equal avatar_name, env_avatar_name
 
     printenv_cmd = 'printenv CYBER_DOJO_SANDBOX'
-    env_sandbox = assert_cyber_dojo_sh printenv_cmd
-    assert_equal sandbox, env_sandbox.strip
+    env_sandbox = assert_cyber_dojo_sh(printenv_cmd).strip
+    assert_equal sandbox, env_sandbox
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -33,6 +33,16 @@ module OsHelper
   def assert_group_exists
     stdout = assert_docker_exec "getent group #{group}"
     assert stdout.start_with?(group), stdout
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def new_avatar_home_test
+    home = assert_cyber_dojo_sh('printenv HOME').strip
+    assert_equal "/home/#{avatar_name}", home
+
+    cd_home_pwd = assert_cyber_dojo_sh('cd ~ && pwd').strip
+    assert_equal "/home/#{avatar_name}", cd_home_pwd
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -

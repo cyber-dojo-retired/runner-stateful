@@ -19,6 +19,13 @@ class RunAlpineTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  test '2A0',
+  '[Alpine] new_avatar has HOME set off /home' do
+    new_avatar_home_test
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   test '0C9',
   '[Alpine] new_avatar has its own sandbox with owner/group/permissions set' do
     new_avatar_sandbox_setup_test
