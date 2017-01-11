@@ -70,7 +70,6 @@ class DockerKataContainerRunner
       '--pids-limit=256',                  # security
       '--security-opt=no-new-privileges',  # security
       '--user=root',
-      "--volume #{sandboxes_root}",
     ].join(space)
     cmd = "docker run #{args} #{image_name} sh -c 'sleep 1d'"
     assert_exec(cmd)
@@ -85,6 +84,9 @@ class DockerKataContainerRunner
 
     add_group = add_group_cmd(kata_id)
     assert_docker_exec(kata_id, add_group)
+
+    mkdir = "mkdir -m 755 #{sandboxes_root}"
+    assert_docker_exec(kata_id, mkdir)
 
     # setup /etc/skel in Alpine
     if alpine? kata_id
@@ -124,6 +126,13 @@ class DockerKataContainerRunner
 
     add_user = add_user_cmd(kata_id, avatar_name)
     assert_docker_exec(kata_id, add_user)
+
+    sandbox = sandbox_path(avatar_name)
+    mkdir = "mkdir -m 755 #{sandbox}"
+    assert_docker_exec(kata_id, mkdir)
+
+    chown = "chown #{avatar_name}:#{group} #{sandbox}"
+    assert_docker_exec(kata_id, chown)
 
     write_files(kata_id, avatar_name, starting_files)
   end
@@ -311,12 +320,12 @@ class DockerKataContainerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def alpine_add_user_cmd(avatar_name)
-    sandbox = sandbox_path(avatar_name)
+    home = home_path(avatar_name)
     uid = user_id(avatar_name)
     [ 'adduser',
         '-D',             # dont assign a password
         "-G #{group}",
-        "-h #{sandbox}",  # home dir
+        "-h #{home}",     # home dir
         '-k /etc/skel',
         '-s /bin/sh',     # shell
         "-u #{uid}",
@@ -325,12 +334,12 @@ class DockerKataContainerRunner
   end
 
   def ubuntu_add_user_cmd(avatar_name)
-    sandbox = sandbox_path(avatar_name)
+    home = home_path(avatar_name)
     uid = user_id(avatar_name)
     [ 'adduser',
         '--disabled-password',
         '--gecos ""',          # don't ask for details
-        "--home #{sandbox}",   # home dir
+        "--home #{home}",      # home dir
         "--ingroup #{group}",
         "--uid #{uid}",
         avatar_name
@@ -462,6 +471,10 @@ class DockerKataContainerRunner
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def home_path(avatar_name)
+    "/home/#{avatar_name}"
+  end
 
   def container_name(kata_id)
     # service containers use -hyphens so don't use -hypens

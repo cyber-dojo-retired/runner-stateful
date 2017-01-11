@@ -55,11 +55,7 @@ module OsHelper
 
     # sandbox's permissions are set
     stat_perms = assert_docker_exec("stat -c '%A' #{sandbox}").strip
-
-    alpine_perm = 'drwxr-sr-x'
-    ubuntu_perm = 'drwxr-xr-x'
-    assert [alpine_perm, ubuntu_perm].include?(stat_perms), stat_perms
-
+    assert_equal 'drwxr-xr-x', stat_perms
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
