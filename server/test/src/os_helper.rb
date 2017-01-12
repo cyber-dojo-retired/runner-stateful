@@ -23,7 +23,7 @@ module OsHelper
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def refute_avatar_users_exist
-    etc_passwd = assert_docker_exec 'cat /etc/passwd'
+    etc_passwd = assert_docker_run 'cat /etc/passwd'
     all_avatars_names.each do |name|
       uid = runner.user_id(name).to_s
       refute etc_passwd.include?(uid), "#{name}:#{uid}"

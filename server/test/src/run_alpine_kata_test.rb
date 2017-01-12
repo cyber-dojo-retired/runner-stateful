@@ -20,7 +20,7 @@ class RunAlpineKataTest < TestBase
 
   test 'CA0',
   '[Alpine] image is indeed based on Alpine' do
-    etc_issue = assert_docker_exec 'cat /etc/issue'
+    etc_issue = assert_docker_run 'cat /etc/issue'
     assert etc_issue.include?('Alpine'), etc_issue
   end
 
@@ -58,16 +58,6 @@ class RunAlpineKataTest < TestBase
   test '582',
   '[Alpine] has group used for dir/file ownership' do
     assert_group_exists
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test '3B1',
-  '[Alpine] after new_kata the timeout script is in /usr/local/bin' do
-    filename = 'timeout_cyber_dojo.sh'
-    src = assert_docker_exec("cat /usr/local/bin/#{filename}")
-    local_src = IO.read("/app/src/#{filename}")
-    assert_equal local_src, src
   end
 
 end

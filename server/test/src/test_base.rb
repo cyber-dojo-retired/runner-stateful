@@ -203,6 +203,19 @@ class TestBase < HexMiniTest
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  def assert_docker_run(cmd)
+    docker_run = [
+      'docker run',
+      '--rm',
+      '--tty',
+      image_name,
+      "sh -c '#{cmd}'"
+    ].join(space = ' ')
+    stdout,stderr = assert_exec(docker_run)
+    assert_equal '', stderr, stdout
+    stdout
+  end
+
   def assert_docker_exec(cmd)
     cid = container_name
     stdout,stderr = assert_exec("docker exec #{cid} sh -c '#{cmd}'")
@@ -213,6 +226,9 @@ class TestBase < HexMiniTest
   def assert_exec(cmd)
     stdout,stderr,status = exec(cmd)
     unless status == success
+      #puts "status=#{status}"
+      #puts "stderr=#{stderr}"
+      #puts "stdout=#{stdout}"
       fail StandardError.new(cmd)
     end
     [stdout,stderr]

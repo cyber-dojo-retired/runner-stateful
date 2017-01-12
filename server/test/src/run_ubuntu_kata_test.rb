@@ -20,7 +20,7 @@ class RunUbuntuKataTest < TestBase
 
   test 'CA1',
   '[Ubuntu] image is indeed based on Ubuntu' do
-    etc_issue = assert_docker_exec 'cat /etc/issue'
+    etc_issue = assert_docker_run 'cat /etc/issue'
     assert etc_issue.include?('Ubuntu'), etc_issue
   end
 
@@ -36,16 +36,6 @@ class RunUbuntuKataTest < TestBase
   test '583',
   '[Ubuntu] has group used for dir/file ownership' do
     assert_group_exists
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test '3B2',
-  '[Ubuntu] after new_kata the timeout script is in /usr/local/bin' do
-    filename = 'timeout_cyber_dojo.sh'
-    src = assert_docker_exec("cat /usr/local/bin/#{filename}")
-    local_src = IO.read("/app/src/#{filename}")
-    assert_equal local_src, src
   end
 
 end
