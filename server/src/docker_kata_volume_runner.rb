@@ -205,9 +205,6 @@ class DockerKataVolumeRunner
       files.each do |filename, content|
         host_filename = tmp_dir + '/' + filename
         disk.write(host_filename, content)
-        if filename.end_with?('.sh')
-          assert_exec("chmod +x #{host_filename}")
-        end
       end
       uid = user_id(avatar_name)
       sandbox = sandbox_path(avatar_name)
@@ -245,7 +242,7 @@ class DockerKataVolumeRunner
       "--user=#{uid}:#{group}",
       '--interactive',
       cid,
-      "sh -c 'cd #{sandbox} && chmod 755 . && ./cyber-dojo.sh'"
+      "sh -c 'cd #{sandbox} && chmod 755 . && sh ./cyber-dojo.sh'"
     ].join(space)
     r_stdout, w_stdout = IO.pipe
     r_stderr, w_stderr = IO.pipe
