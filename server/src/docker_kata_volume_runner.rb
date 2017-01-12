@@ -5,7 +5,8 @@ require_relative 'string_truncater'
 require 'timeout'
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# Uses a new container per run().
+# Uses a new docker container per run().
+# Uses a docker volume per kata.
 #
 # Positives:
 #   o) the cyber-dojo.sh process is running as pid-1
@@ -223,16 +224,17 @@ class DockerKataVolumeRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def delete_files(cid, avatar_name, filenames)
+    return if filenames == []
     sandbox = sandbox_path(avatar_name)
-    filenames.each do |filename|
-      rm = "rm #{sandbox}/#{filename}"
-      assert_docker_exec(cid, rm)
-    end
+    all = filenames.map { |filename| "#{sandbox}/#{filename}" }
+    rm = 'rm ' + all.join(space)
+    assert_docker_exec(cid, rm)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def write_files(cid, avatar_name, files)
+    return if files == {}
     Dir.mktmpdir('runner') do |tmp_dir|
       files.each do |filename, content|
         host_filename = tmp_dir + '/' + filename
@@ -240,25 +242,11 @@ class DockerKataVolumeRunner
       end
       uid = user_id(avatar_name)
       sandbox = sandbox_path(avatar_name)
-      cmd = [
-          'tar',              # Tar Pipe
-          "--owner=#{uid}",   # force ownership
-          "--group=#{gid}",   # force group
-          '-cf',              # create a new archive
-          '-',                # write archive to stdout
-          '-C',               # change to...
-          "#{tmp_dir}",       # ...this dir
-          '.',                # ...and archive it
-          '|',                # pipe stdout to...
-          'docker exec',      # docker
-            "-i #{cid}",      # container
-            'tar',            #
-            '-xf',            # extract archive
-            '-',              # read archive from stdin
-            '-C',             # change to...
-            sandbox           # ...this dir and extract
-      ].join(space)
-      assert_exec(cmd)
+      docker_cp = "docker cp #{tmp_dir}/. #{cid}:#{sandbox}"
+      assert_exec(docker_cp)
+      all = files.keys.map { |filename| "#{sandbox}/#{filename}" }
+      chown = "chown #{uid}:#{gid} " + all.join(space)
+      assert_docker_exec(cid, chown)
     end
   end
 

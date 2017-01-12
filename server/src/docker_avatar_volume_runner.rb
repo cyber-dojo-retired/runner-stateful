@@ -5,11 +5,8 @@ require_relative 'string_truncater'
 require 'timeout'
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-#
-#
-#
-#
-#
+# Uses a new docker container per run().
+# Uses a docker volume per avatar.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 class DockerAvatarVolumeRunner
@@ -214,9 +211,10 @@ class DockerAvatarVolumeRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def image_names
-    lines = assert_exec('docker images')[0].split("\n")
-    lines.shift # REPOSITORY TAG IMAGE ID CREATED SIZE
-    lines.collect { |line| line.split[0] }
+    cmd = 'docker images --format "{{.Repository}}"'
+    stdout,_ = assert_exec(cmd)
+    names = stdout.split("\n")
+    names.uniq - ['<none']
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
