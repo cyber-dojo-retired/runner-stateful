@@ -21,5 +21,6 @@ services:
     container_name: runner_server
     environment: [ CYBER_DOJO_RUNNER_CLASS=DockerKataContainerRunner ]
     #environment: [ CYBER_DOJO_RUNNER_CLASS=DockerKataVolumeRunner ]
+    #environment: [ CYBER_DOJO_RUNNER_CLASS=DockerAvatarVolumeRunner ]
     user: root
     volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
