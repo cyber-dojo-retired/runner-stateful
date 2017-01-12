@@ -28,7 +28,7 @@ class RunAlpineKataTest < TestBase
 
   test '214',
   '[Alpine] container must have tini installed to do zombie reaping' do
-    ps = assert_docker_exec 'ps'
+    ps = assert_docker_run 'ps'
     ps_lines = ps.strip.split("\n")
     # PID   USER     TIME   COMMAND
     #   1   root     0:00   /sbin/tini -- sh -c sleep 1d
