@@ -1,5 +1,5 @@
 require_relative 'all_avatars_names'
-require_relative 'nearest_ancestors'
+require_relative 'docker_runner'
 require_relative 'string_cleaner'
 require_relative 'string_truncater'
 require 'timeout'
@@ -25,21 +25,7 @@ class DockerKataVolumeRunner
     @logging = true
   end
 
-  attr_reader :parent
-
-  def logging_off; @logging = false; end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # pull
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def pulled?(image_name)
-    image_names.include?(image_name)
-  end
-
-  def pull(image_name)
-    assert_exec("docker pull #{image_name}")
-  end
+  include DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # kata
@@ -416,19 +402,6 @@ class DockerKataVolumeRunner
     [stdout,stderr]
   end
 
-  def exec(cmd, logging = @logging)
-    shell.exec(cmd, logging)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def image_names
-    cmd = 'docker images --format "{{.Repository}}"'
-    stdout,_ = assert_exec(cmd)
-    names = stdout.split("\n")
-    names.uniq - ['<none']
-  end
-
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def sandboxes_data_only_container_name(kata_id)
@@ -437,15 +410,7 @@ class DockerKataVolumeRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def sandboxes_root; '/sandboxes'; end
-  def success; shell.success; end
-  def space; ' '; end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   include NearestAncestors
-  def shell; nearest_ancestors(:shell); end
-  def  disk; nearest_ancestors(:disk ); end
-  def   log; nearest_ancestors(:log  ); end
+  def log; nearest_ancestors(:log); end
 
 end

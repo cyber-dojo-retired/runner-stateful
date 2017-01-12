@@ -1,6 +1,5 @@
 require_relative 'all_avatars_names'
 require_relative 'docker_runner'
-require_relative 'nearest_ancestors'
 require_relative 'string_cleaner'
 require_relative 'string_truncater'
 require 'timeout'
@@ -27,10 +26,6 @@ class DockerKataContainerRunner
     @parent = parent
     @logging = true
   end
-
-  attr_reader :parent
-
-  def logging_off; @logging = false; end
 
   include DockerRunner
 
@@ -380,6 +375,17 @@ class DockerKataContainerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  def assert_docker_exec(kata_id, cmd)
+    assert_exec(docker_cmd(kata_id, cmd))
+  end
+
+  def docker_cmd(kata_id, cmd)
+    cid = container_name(kata_id)
+    "docker exec #{cid} sh -c '#{cmd}'"
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   def home_path(avatar_name)
     "/home/#{avatar_name}"
   end
@@ -388,17 +394,5 @@ class DockerKataContainerRunner
     # service containers use -hyphens so don't use -hypens
     'cyber_dojo_kata_' + kata_id
   end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def sandboxes_root; '/sandboxes'; end
-  def success; shell.success; end
-  def space; ' '; end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  include NearestAncestors
-  def shell; nearest_ancestors(:shell); end
-  def  disk; nearest_ancestors(:disk ); end
 
 end

@@ -1,9 +1,10 @@
+require_relative 'nearest_ancestors'
 
 module DockerRunner # mix-in
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # pull
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  attr_reader :parent
+
+  def logging_off; @logging = false; end
 
   def pulled?(image_name)
     image_names.include?(image_name)
@@ -39,15 +40,6 @@ module DockerRunner # mix-in
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_docker_exec(kata_id, cmd)
-    assert_exec(docker_cmd(kata_id, cmd))
-  end
-
-  def docker_cmd(kata_id, cmd)
-    cid = container_name(kata_id)
-    "docker exec #{cid} sh -c '#{cmd}'"
-  end
-
   def assert_exec(cmd)
     stdout,stderr,status = exec(cmd)
     unless status == success
@@ -59,6 +51,18 @@ module DockerRunner # mix-in
   def exec(cmd, logging = @logging)
     shell.exec(cmd, logging)
   end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def sandboxes_root; '/sandboxes'; end
+  def success; shell.success; end
+  def space; ' '; end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  include NearestAncestors
+  def shell; nearest_ancestors(:shell); end
+  def  disk; nearest_ancestors(:disk ); end
 
 end
 
