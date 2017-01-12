@@ -150,8 +150,6 @@ class DockerKataContainerRunner
     delete_files(kata_id, avatar_name, deleted_filenames)
     write_files(kata_id, avatar_name, changed_files)
     stdout,stderr,status = run_cyber_dojo_sh(kata_id, avatar_name, max_seconds)
-    stdout = truncated(cleaned(stdout))
-    stderr = truncated(cleaned(stderr))
     { stdout:stdout, stderr:stderr, status:status }
   end
 
@@ -168,6 +166,10 @@ class DockerKataContainerRunner
     'cyber-dojo'
   end
 
+  def gid
+    5000
+  end
+
   def sandbox_path(avatar_name)
     assert_valid_name(avatar_name)
     "#{sandboxes_root}/#{avatar_name}"
@@ -175,20 +177,18 @@ class DockerKataContainerRunner
 
   private # ==========================================================
 
-  include StringCleaner
-  include StringTruncater
-
   def delete_files(kata_id, avatar_name, filenames)
+    return if filenames == []
     sandbox = sandbox_path(avatar_name)
-    filenames.each do |filename|
-      rm = "rm #{sandbox}/#{filename}"
-      assert_docker_exec(kata_id, rm)
-    end
+    all = filenames.map { |filename| "#{sandbox}/#{filename}" }
+    rm = 'rm ' + all.join(space)
+    assert_docker_exec(kata_id, rm)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def write_files(kata_id, avatar_name, files)
+    return if files == {}
     Dir.mktmpdir('runner') do |tmp_dir|
       files.each do |filename, content|
         host_filename = tmp_dir + '/' + filename
@@ -198,14 +198,16 @@ class DockerKataContainerRunner
       sandbox = sandbox_path(avatar_name)
       docker_cp = "docker cp #{tmp_dir}/. #{cid}:#{sandbox}"
       assert_exec(docker_cp)
-      files.keys.each do |filename|
-        chown = "chown #{avatar_name}:#{group} #{sandbox}/#{filename}"
-        assert_docker_exec(kata_id, chown)
-      end
+      all = files.keys.map { |filename| "#{sandbox}/#{filename}" }
+      chown = "chown #{avatar_name}:#{group} " + all.join(space)
+      assert_docker_exec(kata_id, chown)
     end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  include StringCleaner
+  include StringTruncater
 
   def run_cyber_dojo_sh(kata_id, avatar_name, max_seconds)
     cmd = [
@@ -228,8 +230,8 @@ class DockerKataContainerRunner
         status = $?.exitstatus
         w_stdout.close
         w_stderr.close
-        stdout = r_stdout.read
-        stderr = r_stderr.read
+        stdout = truncated(cleaned(r_stdout.read))
+        stderr = truncated(cleaned(r_stderr.read))
         [stdout, stderr, status]
       end
     rescue Timeout::Error
@@ -255,10 +257,10 @@ class DockerKataContainerRunner
 
   def add_group_cmd(kata_id)
     if alpine? kata_id
-      return 'addgroup -g 5000 cyber-dojo'
+      return "addgroup -g #{gid} cyber-dojo"
     end
     if ubuntu? kata_id
-      return 'addgroup --gid 5000 cyber-dojo'
+      return "addgroup --gid #{gid} cyber-dojo"
     end
   end
 
@@ -440,7 +442,7 @@ class DockerKataContainerRunner
 
   def container_name(kata_id)
     # service containers use -hyphens so don't use -hypens
-    [ 'cyber', 'dojo', 'kata', kata_id ].join('_')
+    'cyber_dojo_kata_' + kata_id
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
