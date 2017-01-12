@@ -144,6 +144,7 @@ class DockerKataVolumeRunner
   end
 
   def group
+    #'cyber-dojo'
     'nogroup'
   end
 
@@ -185,7 +186,39 @@ class DockerKataVolumeRunner
     ].join(space)
     stdout,_,_ = assert_exec("docker run #{args} #{image_name} sh")
     cid = stdout.strip
+
+    #cmd = [
+    #  alpine_add_group_cmd(kata_id),
+    #  alpine_add_user_cmd(avatar_name)
+    #].join('&&')
+    #assert_docker_exec(cid, cmd)
+
+    cid
   end
+
+=begin
+  def alpine_add_group_cmd(kata_id)
+    #if alpine? kata_id
+    "addgroup -g #{gid} cyber-dojo"
+  end
+
+  def alpine_add_user_cmd(avatar_name)
+    home = home_path(avatar_name)
+    uid = user_id(avatar_name)
+    [ 'adduser',
+        '-D',             # dont assign a password
+        "-G #{group}",
+        "-h #{home}",     # home dir
+        '-s /bin/sh',     # shell
+        "-u #{uid}",
+        avatar_name
+    ].join(space)
+  end
+
+  def home_path(avatar_name)
+    "/home/#{avatar_name}"
+  end
+=end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
