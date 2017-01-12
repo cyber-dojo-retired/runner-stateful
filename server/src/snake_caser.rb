@@ -1,5 +1,5 @@
 
-module SnakeCaser
+module SnakeCaser # mix-in
 
   module_function
 

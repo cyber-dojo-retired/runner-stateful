@@ -1,5 +1,5 @@
 
-module NearestAncestors
+module NearestAncestors # mix-in
 
   def nearest_ancestors(symbol, my = self)
     loop {
