@@ -411,7 +411,7 @@ class DockerKataVolumeRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def sandboxes_data_only_container_name(kata_id)
-    [ 'cyber', 'dojo', kata_id ].join('_')
+    'cyber_dojo_' + kata_id
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
