@@ -90,10 +90,10 @@ class DockerKataVolumeRunner
     begin
       refute_avatar_exists(cid, avatar_name)
       sandbox = sandbox_path(avatar_name)
-      mkdir = "mkdir #{sandbox}"
+      mkdir = "mkdir -m 755 #{sandbox}"
       assert_docker_exec(cid, mkdir)
       uid = user_id(avatar_name)
-      chown = "chown #{uid}:#{group} #{sandbox}"
+      chown = "chown #{uid}:#{gid} #{sandbox}"
       assert_docker_exec(cid, chown)
       write_files(cid, avatar_name, starting_files)
     ensure
@@ -128,8 +128,6 @@ class DockerKataVolumeRunner
       delete_files(cid, avatar_name, deleted_filenames)
       write_files(cid, avatar_name, changed_files)
       stdout,stderr,status = run_cyber_dojo_sh(cid, avatar_name, max_seconds)
-      stdout = truncated(cleaned(stdout))
-      stderr = truncated(cleaned(stderr))
       { stdout:stdout, stderr:stderr, status:status }
     ensure
       remove_container(cid)
@@ -149,15 +147,16 @@ class DockerKataVolumeRunner
     'nogroup'
   end
 
+  def gid
+    5000
+  end
+
   def sandbox_path(avatar_name)
     assert_valid_name(avatar_name)
     "#{sandboxes_root}/#{avatar_name}"
   end
 
   private # ==========================================================
-
-  include StringCleaner
-  include StringTruncater
 
   def create_container(image_name, kata_id, avatar_name)
     # The [docker run] must be guarded by argument checks
@@ -211,7 +210,7 @@ class DockerKataVolumeRunner
       cmd = [
           'tar',              # Tar Pipe
           "--owner=#{uid}",   # force ownership
-          "--group=#{group}", # force group
+          "--group=#{gid}",   # force group
           '-cf',              # create a new archive
           '-',                # write archive to stdout
           '-C',               # change to...
@@ -232,6 +231,9 @@ class DockerKataVolumeRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  include StringCleaner
+  include StringTruncater
+
   def run_cyber_dojo_sh(cid, avatar_name, max_seconds)
     # I thought doing [chmod 755] in new_avatar() would
     # be "sticky" and remain 755 but it appears not...
@@ -239,7 +241,7 @@ class DockerKataVolumeRunner
     sandbox = sandbox_path(avatar_name)
     cmd = [
       'docker exec',
-      "--user=#{uid}:#{group}",
+      "--user=#{uid}:#{gid}",
       '--interactive',
       cid,
       "sh -c 'cd #{sandbox} && chmod 755 . && sh ./cyber-dojo.sh'"
@@ -254,8 +256,8 @@ class DockerKataVolumeRunner
         status = $?.exitstatus
         w_stdout.close
         w_stderr.close
-        stdout = r_stdout.read
-        stderr = r_stderr.read
+        stdout = truncated(cleaned(r_stdout.read))
+        stderr = truncated(cleaned(r_stderr.read))
         [stdout, stderr, status]
       end
     rescue Timeout::Error
@@ -332,10 +334,6 @@ class DockerKataVolumeRunner
     end
   end
 
-  def fail_kata_id(message)
-    fail bad_argument("kata_id:#{message}")
-  end
-
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_valid_name(avatar_name)
@@ -368,11 +366,16 @@ class DockerKataVolumeRunner
     status == success
   end
 
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def fail_kata_id(message)
+    fail bad_argument("kata_id:#{message}")
+  end
+
   def fail_avatar_name(message)
     fail bad_argument("avatar_name:#{message}")
   end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def bad_argument(message)
     ArgumentError.new(message)

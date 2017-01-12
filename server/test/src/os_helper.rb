@@ -31,8 +31,12 @@ module OsHelper
   end
 
   def assert_group_exists
-    stdout = assert_docker_exec "getent group #{group}"
-    assert stdout.start_with?(group), stdout
+    stdout = assert_docker_exec("getent group #{group}").strip
+    entries = stdout.split(':')  # cyber-dojo:x:5000
+    getent_group = entries[0]
+    getent_gid = entries[2].to_i
+    assert_equal group, getent_group, stdout
+    assert_equal gid, getent_gid, stdout
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -60,8 +64,8 @@ module OsHelper
     assert_equal user_id, stat_user
 
     # sandbox's group is set
-    stat_group = assert_cyber_dojo_sh("stat -c '%G' #{sandbox}").strip
-    assert_equal group, stat_group
+    stat_gid = assert_cyber_dojo_sh("stat -c '%g' #{sandbox}").strip.to_i
+    assert_equal gid, stat_gid
 
     # sandbox's permissions are set
     stat_perms = assert_cyber_dojo_sh("stat -c '%A' #{sandbox}").strip

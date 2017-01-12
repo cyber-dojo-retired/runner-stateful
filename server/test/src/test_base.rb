@@ -179,6 +179,10 @@ class TestBase < HexMiniTest
     runner.group
   end
 
+  def gid
+    runner.gid
+  end
+
   def sandbox(name = 'salmon')
     runner.sandbox_path(name)
   end
