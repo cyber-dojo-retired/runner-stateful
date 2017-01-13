@@ -1,5 +1,6 @@
 require_relative 'test_base'
 require_relative 'mock_sheller'
+require_relative 'spy_logger'
 
 class PullTest < TestBase
 
@@ -15,7 +16,6 @@ class PullTest < TestBase
   test 'D97',
   'when image_name is invalid, pulled?(image_name) does not raise and result is false' do
     mock_docker_images_prints_gcc_assert
-    runner.logging_off
     refute pulled?({ image_name:'123/123' })
   end
 
@@ -52,6 +52,7 @@ class PullTest < TestBase
       'dial tcp: lookup index.docker.io on 10.0.2.3:53: no such host'
     ].join(' ')
     shell.mock_exec("docker pull #{image_name}", stdout, stderr, 1)
+    @log = SpyLogger.new(self)
     assert_raises { pull({ image_name:image_name }) }
   end
 
@@ -66,7 +67,7 @@ class PullTest < TestBase
     ].join("\n")
     stderr = "Error: image #{image_name}:latest not found"
     shell.mock_exec("docker pull #{image_name}", stdout, stderr, 1)
-    runner.logging_off
+    @log = SpyLogger.new(self)
     assert_raises { pull({ image_name:image_name }) }
   end
 

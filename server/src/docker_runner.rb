@@ -8,8 +8,6 @@ module DockerRunner # mix-in
 
   attr_reader :parent
 
-  def logging_off; @logging = false; end
-
   def pulled?(image_name)
     image_names.include?(image_name)
   end
@@ -186,6 +184,10 @@ module DockerRunner # mix-in
   def assert_exec(cmd)
     stdout,stderr,status = exec(cmd)
     unless status == success
+      log << "cmd:#{cmd}"
+      log << "status:#{status}"
+      log << "stdout:#{stdout}"
+      log << "stderr:#{stderr}"
       fail_command(cmd)
     end
     [stdout,stderr]
@@ -206,6 +208,7 @@ module DockerRunner # mix-in
   include NearestAncestors
   def shell; nearest_ancestors(:shell); end
   def  disk; nearest_ancestors(:disk ); end
+  def   log; nearest_ancestors(:log  ); end
 
 end
 
