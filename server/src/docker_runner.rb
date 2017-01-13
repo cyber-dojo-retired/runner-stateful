@@ -193,8 +193,12 @@ module DockerRunner # mix-in
     [stdout,stderr]
   end
 
-  def exec(cmd, logging = @logging)
-    shell.exec(cmd, logging)
+  def exec(cmd)
+    shell.exec(cmd)
+  end
+
+  def quiet_exec(cmd)
+    shell.exec(cmd, NullLogger.new(self))
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

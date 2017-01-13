@@ -230,16 +230,13 @@ class TestBase < HexMiniTest
   def assert_exec(cmd)
     stdout,stderr,status = exec(cmd)
     unless status == success
-      #puts "status=#{status}"
-      #puts "stderr=#{stderr}"
-      #puts "stdout=#{stdout}"
       fail StandardError.new(cmd)
     end
     [stdout,stderr]
   end
 
-  def exec(cmd, logging = @logging)
-    shell.exec(cmd, logging)
+  def exec(cmd)
+    shell.exec(cmd)
   end
 
   def container_name

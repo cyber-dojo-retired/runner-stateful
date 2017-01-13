@@ -265,7 +265,7 @@ class DockerKataVolumeRunner
 
   def container_dead?(cid)
     cmd = "docker inspect --format='{{ .State.Running }}' #{cid}"
-    _,stderr,status = exec(cmd, logging = false)
+    _,stderr,status = quiet_exec(cmd)
     expected_stderr = "Error: No such image, container or task: #{cid}"
     (status == 1) && (stderr.strip == expected_stderr)
   end
@@ -301,7 +301,7 @@ class DockerKataVolumeRunner
   def avatar_exists_cid?(cid, avatar_name)
     sandbox = sandbox_path(avatar_name)
     cmd = "docker exec #{cid} sh -c '[ -d #{sandbox} ]'"
-    _,_,status = exec(cmd, logging = false)
+    _,_,status = quiet_exec(cmd)
     status == success
   end
 

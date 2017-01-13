@@ -9,16 +9,16 @@ class BashSheller
 
   attr_reader :parent
 
-  def exec(command, logging = true)
+  def exec(command, verbose = log)
     begin
       stdout,stderr,r = Open3.capture3(command)
       status = r.exitstatus
-      if status != success && logging
-        log << line
-        log << "COMMAND:#{command}"
-        log << "STATUS:#{status}"
-        log << "STDOUT:#{stdout}"
-        log << "STDERR:#{stderr}"
+      if status != success
+        verbose << line
+        verbose << "COMMAND:#{command}"
+        verbose << "STATUS:#{status}"
+        verbose << "STDOUT:#{stdout}"
+        verbose << "STDERR:#{stderr}"
       end
       [stdout, stderr, status]
     rescue StandardError => error

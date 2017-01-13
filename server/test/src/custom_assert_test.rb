@@ -56,9 +56,17 @@ class CustomAssertTest < TestBase
     stdout,_ = assert_exec(cmd)
     cid = stdout.strip
     begin
+      @log = SpyLogger.new(self)
       error = assert_raises { assert_docker_exec 'xxxx' }
       expected = "docker exec #{container_name} sh -c 'xxxx'"
       assert_equal expected, error.message
+      assert_equal [
+        line,
+        "COMMAND:#{expected}",
+        'STATUS:127',
+        'STDOUT:',
+        'STDERR:sh: xxxx: not found' + "\n",
+      ], @log.spied
     ensure
       cmd = "docker rm --force --volumes #{cid}"
       assert_exec(cmd)

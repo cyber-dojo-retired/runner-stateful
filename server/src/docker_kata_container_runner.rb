@@ -20,7 +20,6 @@ class DockerKataContainerRunner
 
   def initialize(parent)
     @parent = parent
-    @logging = true
   end
 
   include DockerRunner
@@ -90,7 +89,7 @@ class DockerKataContainerRunner
     assert_valid_name(avatar_name)
 
     id_cmd = docker_cmd(kata_id, "id #{avatar_name}")
-    _,_,status = exec(id_cmd, logging = false)
+    _,_,status = quiet_exec(id_cmd)
     status == success
   end
 
