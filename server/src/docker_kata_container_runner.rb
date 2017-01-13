@@ -210,34 +210,6 @@ class DockerKataContainerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def alpine_add_user_cmd(avatar_name)
-    home = home_path(avatar_name)
-    uid = user_id(avatar_name)
-    [ 'adduser',
-        '-D',             # dont assign a password
-        "-G #{group}",
-        "-h #{home}",     # home dir
-        '-s /bin/sh',     # shell
-        "-u #{uid}",
-        avatar_name
-    ].join(space)
-  end
-
-  def ubuntu_add_user_cmd(avatar_name)
-    home = home_path(avatar_name)
-    uid = user_id(avatar_name)
-    [ 'adduser',
-        '--disabled-password',
-        '--gecos ""',          # don't ask for details
-        "--home #{home}",      # home dir
-        "--ingroup #{group}",
-        "--uid #{uid}",
-        avatar_name
-    ].join(space)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   def alpine?(kata_id)
     etc_issue(kata_id).include?('Alpine')
   end
