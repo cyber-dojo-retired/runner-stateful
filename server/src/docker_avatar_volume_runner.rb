@@ -16,13 +16,18 @@ class DockerAvatarVolumeRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def kata_exists?(image_name, kata_id)
+    assert_valid_id(kata_id)
+    # ??? create a dummy volume?
   end
 
   def new_kata(image_name, kata_id)
-    pull(image_name) unless pulled?(image_name)
+    refute_kata_exists(kata_id)
+    #...
   end
 
   def old_kata(kata_id)
+    assert_kata_exists(kata_id)
+
     volume_names(kata_id).each do |volume_name|
       assert_exec("docker volume rm #{volume_name}")
     end
@@ -31,9 +36,15 @@ class DockerAvatarVolumeRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def avatar_exists?(image_name, kata_id, avatar_name)
+    assert_kata_exists(kata_id)
+    assert_valid_name(avatar_name)
+    # ...
   end
 
   def new_avatar(image_name, kata_id, avatar_name, files)
+    assert_kata_exists(kata_id)
+    refute_avatar_exists(kata_id, avatar_name)
+
     name = volume_name(kata_id, avatar_name)
     assert_exec("docker volume create --name #{name}")
     cid = create_container(image_name, kata_id, avatar_name)
@@ -45,6 +56,9 @@ class DockerAvatarVolumeRunner
   end
 
   def old_avatar(kata_id, avatar_name)
+    assert_kata_exists(kata_id)
+    assert_avatar_exists(kata_id, avatar_name)
+
     name = volume_name(kata_id, avatar_name)
     assert_exec("docker volume rm #{name}")
   end
@@ -52,10 +66,10 @@ class DockerAvatarVolumeRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run(image_name, kata_id, avatar_name, deleted_filenames, changed_files, max_seconds)
-    name = volume_name(kata_id, avatar_name)
-    cmd = "docker volume ls --quiet --filter 'name=#{name}'"
-    stdout,stderr = assert_exec(cmd)
-    fail ArgumentError.new('no_avatar') unless stdout.strip == name
+    #name = volume_name(kata_id, avatar_name)
+    #cmd = "docker volume ls --quiet --filter 'name=#{name}'"
+    #stdout,stderr = assert_exec(cmd)
+    #fail ArgumentError.new('no_avatar') unless stdout.strip == name
     cid = create_container(image_name, kata_id, avatar_name)
     begin
       delete_files(cid, deleted_filenames)
@@ -69,16 +83,19 @@ class DockerAvatarVolumeRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def user; 'nobody'; end
-  def group; 'nogroup'; end
-  def sandbox; '/sandbox'; end
-
-  def success; shell.success; end
-  def timed_out; 'timed_out'; end
+  #def user; 'nobody'; end
+  #def group; 'nogroup'; end
+  #def sandbox; '/sandbox'; end
+  #def success; shell.success; end
+  #def timed_out; 'timed_out'; end
 
   private
 
   def create_container(image_name, kata_id, avatar_name)
+    assert_valid_id(kata_id)
+    assert_kata_exists(image_name, kata_id)
+    assert_valid_name(avatar_name)
+
     # Volume mounts the avatar's volume
     #     [docker run ... --volume=V:/sandbox  ...]
     # Volume V is assumed to exist via an earlier new_avatar() call.
@@ -119,7 +136,6 @@ class DockerAvatarVolumeRunner
       files.each do |filename, content|
         host_filename = tmp_dir + '/' + filename
         disk.write(host_filename, content)
-        assert_exec("chmod +x #{host_filename}") if filename.end_with?('.sh')
       end
       assert_exec("docker cp #{tmp_dir}/. #{cid}:#{sandbox}")
     end
@@ -131,40 +147,15 @@ class DockerAvatarVolumeRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  include StringCleaner
-  include StringTruncater
-
   def run_cyber_dojo_sh(cid, max_seconds)
-    cmd = [
+    docker_cmd = [
       'docker exec',
       "--user=#{user}",
       '--interactive',
       cid,
       "sh -c './cyber-dojo.sh'"
     ].join(space)
-    r_stdout, w_stdout = IO.pipe
-    r_stderr, w_stderr = IO.pipe
-    pid = Process.spawn(cmd, pgroup:true, out:w_stdout, err:w_stderr)
-    begin
-      Timeout::timeout(max_seconds) do
-        Process.waitpid(pid)
-        status = $?.exitstatus
-        w_stdout.close
-        w_stderr.close
-        stdout = truncated(cleaned(r_stdout.read))
-        stderr = truncated(cleaned(r_stderr.read))
-        [stdout, stderr, status]
-      end
-    rescue Timeout::Error
-      Process.kill(-9, pid)
-      Process.detach(pid)
-      ['', '', timed_out]
-    ensure
-      w_stdout.close unless w_stdout.closed?
-      w_stderr.close unless w_stderr.closed?
-      r_stdout.close
-      r_stderr.close
-    end
+    run_timeout(docker_cmd, max_seconds)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -189,15 +180,6 @@ class DockerAvatarVolumeRunner
       tries += 1
     end
     log << "Failed:remove_container(#{cid})" unless removed
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def image_names
-    cmd = 'docker images --format "{{.Repository}}"'
-    stdout,_ = assert_exec(cmd)
-    names = stdout.split("\n")
-    names.uniq - ['<none']
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -232,23 +214,6 @@ class DockerAvatarVolumeRunner
   def assert_docker_exec(cid, cmd)
     assert_exec("docker exec #{cid} sh -c '#{cmd}'")
   end
-
-  def assert_exec(cmd)
-    stdout,stderr,status = exec(cmd)
-    fail StandardError.new(cmd) unless status == success
-    [stdout,stderr]
-  end
-
-  def exec(cmd, logging = @logging)
-    shell.exec(cmd, logging)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  include NearestExternal
-  def shell; nearest_external(:shell); end
-  def  disk; nearest_external(:disk);  end
-  def   log; nearest_external(:log);   end
 
   def space; ' '; end
 
