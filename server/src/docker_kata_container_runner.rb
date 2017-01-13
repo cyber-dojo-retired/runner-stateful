@@ -1,8 +1,4 @@
-require_relative 'all_avatars_names'
 require_relative 'docker_runner'
-require_relative 'string_cleaner'
-require_relative 'string_truncater'
-require 'timeout'
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Uses one long-lived container per kata and then
@@ -139,29 +135,7 @@ class DockerKataContainerRunner
     { stdout:stdout, stderr:stderr, status:status }
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # properties
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def user_id(avatar_name)
-    assert_valid_name(avatar_name)
-    40000 + all_avatars_names.index(avatar_name)
-  end
-
-  def group
-    'cyber-dojo'
-  end
-
-  def gid
-    5000
-  end
-
-  def sandbox_path(avatar_name)
-    assert_valid_name(avatar_name)
-    "#{sandboxes_root}/#{avatar_name}"
-  end
-
-  private # ==========================================================
+  private # = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
   def delete_files(kata_id, avatar_name, filenames)
     return if filenames == []
@@ -192,51 +166,17 @@ class DockerKataContainerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  include StringCleaner
-  include StringTruncater
-
   def run_cyber_dojo_sh(kata_id, avatar_name, max_seconds)
-    cmd = [
+    # The processes __inside__ the docker container are killed
+    # by /usr/local/bin/timeout_cyber_dojo.sh
+    # See new_kata() above.
+    sh_cmd = [
       '/usr/local/bin/timeout_cyber_dojo.sh',
       kata_id,
       avatar_name,
       max_seconds
     ].join(space)
-
-    r_stdout, w_stdout = IO.pipe
-    r_stderr, w_stderr = IO.pipe
-    pid = Process.spawn(docker_cmd(kata_id, cmd), {
-      pgroup:true,
-         out:w_stdout,
-         err:w_stderr
-    })
-    begin
-      Timeout::timeout(max_seconds) do
-        Process.waitpid(pid)
-        status = $?.exitstatus
-        w_stdout.close
-        w_stderr.close
-        stdout = truncated(cleaned(r_stdout.read))
-        stderr = truncated(cleaned(r_stderr.read))
-        [stdout, stderr, status]
-      end
-    rescue Timeout::Error
-      # Kill the [docker exec] processes running on the host.
-      # This does __not__ kill the cyber-dojo.sh process
-      # running __inside__ the docker container.
-      # See https://github.com/docker/docker/issues/9098
-      # The processes __inside__ the docker container are killed
-      # by /usr/local/bin/timeout_cyber_dojo.sh
-      # See new_kata() above.
-      Process.kill(-9, pid)
-      Process.detach(pid)
-      ['', '', 'timed_out']
-    ensure
-      w_stdout.close unless w_stdout.closed?
-      w_stderr.close unless w_stderr.closed?
-      r_stdout.close
-      r_stderr.close
-    end
+    run_timeout(docker_cmd(kata_id, sh_cmd), max_seconds)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -312,22 +252,6 @@ class DockerKataContainerRunner
     end
   end
 
-  def assert_valid_id(kata_id)
-    unless valid_id?(kata_id)
-      fail_kata_id('invalid')
-    end
-  end
-
-  def valid_id?(kata_id)
-    kata_id.class.name == 'String' &&
-      kata_id.length == 10 &&
-        kata_id.chars.all? { |char| hex?(char) }
-  end
-
-  def hex?(char)
-    '0123456789ABCDEF'.include?(char)
-  end
-
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def refute_avatar_exists(kata_id, avatar_name)
@@ -342,35 +266,6 @@ class DockerKataContainerRunner
     unless avatar_exists?(nil, kata_id, avatar_name)
       fail_avatar_name('!exists')
     end
-  end
-
-  def assert_valid_name(avatar_name)
-    unless valid_avatar?(avatar_name)
-      fail_avatar_name('invalid')
-    end
-  end
-
-  include AllAvatarsNames
-  def valid_avatar?(avatar_name)
-    all_avatars_names.include?(avatar_name)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def fail_kata_id(message)
-    fail bad_argument("kata_id:#{message}")
-  end
-
-  def fail_avatar_name(message)
-    fail bad_argument("avatar_name:#{message}")
-  end
-
-  def fail_command(message)
-    fail bad_argument("command:#{message}")
-  end
-
-  def bad_argument(message)
-    ArgumentError.new(message)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
