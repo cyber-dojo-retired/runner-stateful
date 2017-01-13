@@ -25,6 +25,12 @@ module DockerRunner # mix-in
     40000 + all_avatars_names.index(avatar_name)
   end
 
+  def home_path(avatar_name)
+    "/home/#{avatar_name}"
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
   def group
     'cyber-dojo'
   end
@@ -32,6 +38,8 @@ module DockerRunner # mix-in
   def gid
     5000
   end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def sandbox_path(avatar_name)
     assert_valid_name(avatar_name)

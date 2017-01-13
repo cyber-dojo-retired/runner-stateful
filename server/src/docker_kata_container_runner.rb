@@ -296,10 +296,6 @@ class DockerKataContainerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def home_path(avatar_name)
-    "/home/#{avatar_name}"
-  end
-
   def container_name(kata_id)
     # service containers use -hyphens so don't use -hypens
     'cyber_dojo_kata_' + kata_id

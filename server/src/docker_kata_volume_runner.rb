@@ -132,6 +132,7 @@ class DockerKataVolumeRunner
     assert_kata_exists(image_name, kata_id)
     assert_valid_name(avatar_name)
     sandbox = sandbox_path(avatar_name)
+    home = home_path(avatar_name)
     args = [
       '--detach',                          # get the cid
       '--interactive',                     # later execs
@@ -141,6 +142,7 @@ class DockerKataVolumeRunner
       "--env CYBER_DOJO_KATA_ID=#{kata_id}",
       "--env CYBER_DOJO_AVATAR_NAME=#{avatar_name}",
       "--env CYBER_DOJO_SANDBOX=#{sandbox}",
+      "--env HOME=#{home}",
       '--user=root',
       "--volumes-from=#{sandboxes_data_only_container_name(kata_id)}:rw"
     ].join(space)
@@ -149,7 +151,7 @@ class DockerKataVolumeRunner
 
     cmd = [
       add_group_cmd(cid),
-      #alpine_add_user_cmd(cid,avatar_name)
+      add_user_cmd(cid, avatar_name)
     ].join('&&')
     assert_docker_exec(cid, cmd)
 
@@ -169,20 +171,15 @@ class DockerKataVolumeRunner
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  def alpine?(cid)
-    etc_issue(cid).include?('Alpine')
+  def add_user_cmd(cid, avatar_name)
+    if alpine? cid
+      return alpine_add_user_cmd(avatar_name)
+    end
+    if ubuntu? cid
+      return ubuntu_add_user_cmd(avatar_name)
+    end
   end
 
-  def ubuntu?(cid)
-    etc_issue(cid).include?('Ubuntu')
-  end
-
-  def etc_issue(cid)
-    stdout,_ = assert_docker_exec(cid, 'cat /etc/issue')
-    stdout
-  end
-
-=begin
   def alpine_add_user_cmd(avatar_name)
     home = home_path(avatar_name)
     uid = user_id(avatar_name)
@@ -196,10 +193,33 @@ class DockerKataVolumeRunner
     ].join(space)
   end
 
-  def home_path(avatar_name)
-    "/home/#{avatar_name}"
+  def ubuntu_add_user_cmd(avatar_name)
+    home = home_path(avatar_name)
+    uid = user_id(avatar_name)
+    [ 'adduser',
+        '--disabled-password',
+        '--gecos ""',          # don't ask for details
+        "--home #{home}",      # home dir
+        "--ingroup #{group}",
+        "--uid #{uid}",
+        avatar_name
+    ].join(space)
   end
-=end
+
+  # - - - - - - - - - - - - - - - - - - - - - -
+
+  def alpine?(cid)
+    etc_issue(cid).include?('Alpine')
+  end
+
+  def ubuntu?(cid)
+    etc_issue(cid).include?('Ubuntu')
+  end
+
+  def etc_issue(cid)
+    stdout,_ = assert_docker_exec(cid, 'cat /etc/issue')
+    stdout
+  end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -315,14 +335,6 @@ class DockerKataVolumeRunner
 
   def assert_docker_exec(cid, cmd)
     assert_exec("docker exec #{cid} sh -c '#{cmd}'")
-  end
-
-  def assert_exec(cmd)
-    stdout,stderr,status = exec(cmd)
-    unless status == success
-      fail StandardError.new(cmd)
-    end
-    [stdout,stderr]
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
