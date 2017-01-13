@@ -10,6 +10,15 @@ class CustomAssertTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  test '248',
+  '[Alpine] good assert_exec does not raise' do
+    stdout,stderr = assert_exec 'echo Hello'
+    assert_equal 'Hello', stdout.strip
+    assert_equal '', stderr
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   test '249',
   '[Alpine] bad assert_exec raises' do
     @log = SpyLogger.new(self)
@@ -25,12 +34,35 @@ class CustomAssertTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  test '433',
+  '[Alpine] good assert_docker_exec does not raise' do
+    cmd = "docker run -it --detach --name=#{container_name} #{image_name} sh"
+    stdout,_ = assert_exec(cmd)
+    cid = stdout.strip
+    begin
+      stdout = assert_docker_exec 'whoami'
+      assert_equal 'root', stdout.strip
+    ensure
+      cmd = "docker rm --force --volumes #{cid}"
+      assert_exec(cmd)
+    end
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   test '434',
   '[Alpine] bad assert_docker_exec raises' do
-    error = assert_raises { assert_docker_exec 'xxxx' }
-    cid = container_name
-    expected = "docker exec #{cid} sh -c 'xxxx'"
-    assert_equal expected, error.message
+    cmd = "docker run -it --detach --name=#{container_name} #{image_name} sh"
+    stdout,_ = assert_exec(cmd)
+    cid = stdout.strip
+    begin
+      error = assert_raises { assert_docker_exec 'xxxx' }
+      expected = "docker exec #{container_name} sh -c 'xxxx'"
+      assert_equal expected, error.message
+    ensure
+      cmd = "docker rm --force --volumes #{cid}"
+      assert_exec(cmd)
+    end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
