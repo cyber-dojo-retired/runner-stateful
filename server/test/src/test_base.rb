@@ -243,7 +243,7 @@ class TestBase < HexMiniTest
   end
 
   def container_name
-    'cyber_dojo_kata_' + kata_id
+    'cyber_dojo_kata_container_runner_' + kata_id
   end
 
 end

@@ -1,14 +1,13 @@
 #!/bin/bash
 
-# DockerKataContainerRunner
-docker rm --force $(docker ps -all --quiet --filter 'name=cyber_dojo_kata')
+NAME=cyber_dojo_kata_container_runner_
+docker rm --force $(docker ps --all --quiet --filter "name=${NAME}")
 
-# DockerKataVolumeRunner
-docker rm --force --volumes $(docker ps --all --quiet --filter 'name=cyber_dojo_')
+NAME=cyber_dojo_kata_volume_runner_
+docker rm --force --volumes $(docker ps --all --quiet --filter "name=${NAME}")
 
+#avatar_volume_runner_
+#...
 
-
-# collector can do this
-# - - - - - - - - - - -
-# pids=$(docker ps --all --quiet --filter 'status=exited' --filter 'name=cyber_dojo_kata_')
+# pids=$(docker ps --all --quiet --filter 'status=exited' --filter 'name=...')
 # echo ${pids} | xargs docker rm --force

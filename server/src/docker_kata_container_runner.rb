@@ -270,7 +270,7 @@ class DockerKataContainerRunner
 
   def container_name(kata_id)
     # service containers use -hyphens so don't use -hypens
-    'cyber_dojo_kata_' + kata_id
+    'cyber_dojo_kata_container_runner_' + kata_id
   end
 
 end
