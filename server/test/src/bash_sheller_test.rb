@@ -79,12 +79,8 @@ class BashShellerTest < TestBase
 
   # - - - - - - - - - - - - - - - - -
 
-  def shell_exec(command, logging = nil)
-    if logging.nil?
-      @stdout,@stderr,@status = shell.exec(command)
-    else
-      @stdout,@stderr,@status = shell.exec(command, logging)
-    end
+  def shell_exec(command, *args)
+    @stdout,@stderr,@status = shell.exec(command, *args)
   end
 
   def assert_status(expected)
