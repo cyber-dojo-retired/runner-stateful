@@ -18,6 +18,13 @@ class RunUbuntuTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  test '583',
+  '[Ubuntu] has group used for dir/file ownership' do
+    assert_group_exists
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   test '2A1',
   '[Ubuntu] new_avatar has HOME set off /home' do
     new_avatar_home_test

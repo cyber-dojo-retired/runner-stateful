@@ -19,6 +19,13 @@ class RunAlpineTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  test '582',
+  '[Alpine] has group used for dir/file ownership' do
+    assert_group_exists
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   test '2A0',
   '[Alpine] new_avatar has HOME set off /home' do
     new_avatar_home_test

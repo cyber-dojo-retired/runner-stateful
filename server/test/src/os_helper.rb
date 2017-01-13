@@ -31,7 +31,7 @@ module OsHelper
   end
 
   def assert_group_exists
-    stdout = assert_docker_exec("getent group #{group}").strip
+    stdout = assert_cyber_dojo_sh("getent group #{group}").strip
     entries = stdout.split(':')  # cyber-dojo:x:5000
     getent_group = entries[0]
     getent_gid = entries[2].to_i

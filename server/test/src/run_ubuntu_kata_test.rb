@@ -31,11 +31,4 @@ class RunUbuntuKataTest < TestBase
     refute_avatar_users_exist
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test '583',
-  '[Ubuntu] has group used for dir/file ownership' do
-    assert_group_exists
-  end
-
 end
