@@ -1,8 +1,4 @@
-require_relative 'all_avatars_names'
 require_relative 'docker_runner'
-require_relative 'string_cleaner'
-require_relative 'string_truncater'
-require 'timeout'
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Uses a new docker container per run().
@@ -121,38 +117,15 @@ class DockerKataVolumeRunner
     end
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # properties
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def user_id(avatar_name)
-    assert_valid_name(avatar_name)
-    40000 + all_avatars_names.index(avatar_name)
-  end
-
-  def group
-    #'cyber-dojo'
-    'nogroup'
-  end
-
-  def gid
-    5000
-  end
-
-  def sandbox_path(avatar_name)
-    assert_valid_name(avatar_name)
-    "#{sandboxes_root}/#{avatar_name}"
-  end
-
   private # ==========================================================
 
   def create_container(image_name, kata_id, avatar_name)
     # The [docker run] must be guarded by argument checks
     # because it volume mounts the kata's volume
     #     [docker run ... --volume=V:/sandboxes:rw  ...]
-    # Volume V must exist via an earlier new_kata() call
-    # because if volume V does _not_ exist the [docker run]
-    # would nevertheless succeed, create the container,
+    # Volume V must exist via an earlier new_kata() call.
+    # If volume V does _not_ exist the [docker run]
+    # will nevertheless succeed, create the container,
     # and create a (temporary) /sandboxes/ folder in it!
     # See https://github.com/docker/docker/issues/13121
     assert_valid_id(kata_id)
@@ -174,21 +147,42 @@ class DockerKataVolumeRunner
     stdout,_,_ = assert_exec("docker run #{args} #{image_name} sh")
     cid = stdout.strip
 
-    #cmd = [
-    #  alpine_add_group_cmd(kata_id),
-    #  alpine_add_user_cmd(avatar_name)
-    #].join('&&')
-    #assert_docker_exec(cid, cmd)
+    cmd = [
+      add_group_cmd(cid),
+      #alpine_add_user_cmd(cid,avatar_name)
+    ].join('&&')
+    assert_docker_exec(cid, cmd)
 
     cid
   end
 
-=begin
-  def alpine_add_group_cmd(kata_id)
-    #if alpine? kata_id
-    "addgroup -g #{gid} cyber-dojo"
+  # - - - - - - - - - - - - - - - - - - - - - -
+
+  def add_group_cmd(cid)
+    if alpine? cid
+      return alpine_add_group_cmd
+    end
+    if ubuntu? cid
+      return ubuntu_add_group_cmd
+    end
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - -
+
+  def alpine?(cid)
+    etc_issue(cid).include?('Alpine')
+  end
+
+  def ubuntu?(cid)
+    etc_issue(cid).include?('Ubuntu')
+  end
+
+  def etc_issue(cid)
+    stdout,_ = assert_docker_exec(cid, 'cat /etc/issue')
+    stdout
+  end
+
+=begin
   def alpine_add_user_cmd(avatar_name)
     home = home_path(avatar_name)
     uid = user_id(avatar_name)
@@ -238,49 +232,20 @@ class DockerKataVolumeRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  include StringCleaner
-  include StringTruncater
-
   def run_cyber_dojo_sh(cid, avatar_name, max_seconds)
     # I thought doing [chmod 755] in new_avatar() would
     # be "sticky" and remain 755 but it appears not...
     uid = user_id(avatar_name)
     sandbox = sandbox_path(avatar_name)
-    cmd = [
+    docker_cmd = [
       'docker exec',
       "--user=#{uid}:#{gid}",
       '--interactive',
       cid,
       "sh -c 'cd #{sandbox} && chmod 755 . && sh ./cyber-dojo.sh'"
     ].join(space)
-    r_stdout, w_stdout = IO.pipe
-    r_stderr, w_stderr = IO.pipe
-    # Run cyber-dojo.sh inside a new process inside the container.
-    pid = Process.spawn(cmd, pgroup:true, out:w_stdout, err:w_stderr)
-    begin
-      Timeout::timeout(max_seconds) do
-        Process.waitpid(pid)
-        status = $?.exitstatus
-        w_stdout.close
-        w_stderr.close
-        stdout = truncated(cleaned(r_stdout.read))
-        stderr = truncated(cleaned(r_stderr.read))
-        [stdout, stderr, status]
-      end
-    rescue Timeout::Error
-      # Kill the [docker exec] spawned process. This does _not_
-      # kill the cyber-dojo.sh process inside the exec'd docker
-      # container (remove_container() in run() does that).
-      # See https://github.com/docker/docker/issues/9098
-      Process.kill(-9, pid)
-      Process.detach(pid)
-      ['', '', 'timed_out']
-    ensure
-      w_stdout.close unless w_stdout.closed?
-      w_stderr.close unless w_stderr.closed?
-      r_stdout.close
-      r_stderr.close
-    end
+
+    run_timeout(docker_cmd, max_seconds)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -313,22 +278,6 @@ class DockerKataVolumeRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_valid_id(kata_id)
-    unless valid_id?(kata_id)
-      fail_kata_id('invalid')
-    end
-  end
-
-  def valid_id?(kata_id)
-    kata_id.class.name == 'String' &&
-      kata_id.length == 10 &&
-        kata_id.chars.all? { |char| hex?(char) }
-  end
-
-  def hex?(char)
-    '0123456789ABCDEF'.include?(char)
-  end
-
   def refute_kata_exists(image_name, kata_id)
     if kata_exists?(image_name, kata_id)
       fail_kata_id('exists')
@@ -342,17 +291,6 @@ class DockerKataVolumeRunner
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def assert_valid_name(avatar_name)
-    unless valid_avatar?(avatar_name)
-      fail_avatar_name('invalid')
-    end
-  end
-
-  include AllAvatarsNames
-  def valid_avatar?(avatar_name)
-    all_avatars_names.include?(avatar_name)
-  end
 
   def refute_avatar_exists(cid, avatar_name)
     if avatar_exists_cid?(cid, avatar_name)
@@ -371,21 +309,6 @@ class DockerKataVolumeRunner
     cmd = "docker exec #{cid} sh -c '[ -d #{sandbox} ]'"
     _,_,status = exec(cmd, logging = false)
     status == success
-  end
-
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def fail_kata_id(message)
-    fail bad_argument("kata_id:#{message}")
-  end
-
-  def fail_avatar_name(message)
-    fail bad_argument("avatar_name:#{message}")
-  end
-
-  def bad_argument(message)
-    ArgumentError.new(message)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

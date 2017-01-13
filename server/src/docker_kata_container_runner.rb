@@ -183,10 +183,10 @@ class DockerKataContainerRunner
 
   def add_group_cmd(kata_id)
     if alpine? kata_id
-      return "addgroup -g #{gid} cyber-dojo"
+      return alpine_add_group_cmd
     end
     if ubuntu? kata_id
-      return "addgroup --gid #{gid} cyber-dojo"
+      return ubuntu_add_group_cmd
     end
   end
 
@@ -234,6 +234,21 @@ class DockerKataContainerRunner
         "--uid #{uid}",
         avatar_name
     ].join(space)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def alpine?(kata_id)
+    etc_issue(kata_id).include?('Alpine')
+  end
+
+  def ubuntu?(kata_id)
+    etc_issue(kata_id).include?('Ubuntu')
+  end
+
+  def etc_issue(kata_id)
+    stdout,_ = assert_docker_exec(kata_id, 'cat /etc/issue')
+    stdout
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

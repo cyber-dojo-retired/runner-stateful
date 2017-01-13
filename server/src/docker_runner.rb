@@ -88,17 +88,12 @@ module DockerRunner # mix-in
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def alpine?(kata_id)
-    etc_issue(kata_id).include?('Alpine')
+  def alpine_add_group_cmd
+    "addgroup -g #{gid} #{group}"
   end
 
-  def ubuntu?(kata_id)
-    etc_issue(kata_id).include?('Ubuntu')
-  end
-
-  def etc_issue(kata_id)
-    stdout,_ = assert_docker_exec(kata_id, 'cat /etc/issue')
-    stdout
+  def ubuntu_add_group_cmd
+    "addgroup --gid #{gid} #{group}"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
