@@ -235,8 +235,8 @@ class TestBase < HexMiniTest
     [stdout,stderr]
   end
 
-  def exec(cmd)
-    shell.exec(cmd)
+  def exec(cmd, *args)
+    shell.exec(cmd, *args)
   end
 
   def container_name

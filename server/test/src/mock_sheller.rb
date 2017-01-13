@@ -29,7 +29,7 @@ class MockSheller
 
   # - - - - - - - - - - - - - - - - - - - - - - -
 
-  def exec(command, logging = true)
+  def exec(command, _ = nil)
     mocks = read
     mock = mocks.shift
     write(mocks)

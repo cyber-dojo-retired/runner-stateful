@@ -1,8 +1,4 @@
-require_relative 'all_avatars_names'
-require_relative 'nearest_external'
-require_relative 'string_cleaner'
-require_relative 'string_truncater'
-require 'timeout'
+require_relative 'docker_runner'
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Uses a new docker container per run().
@@ -13,22 +9,9 @@ class DockerAvatarVolumeRunner
 
   def initialize(parent)
     @parent = parent
-    @logging = true
   end
 
-  attr_reader :parent
-
-  def logging_off; @logging = false; end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def pulled?(image_name)
-    image_names.include?(image_name)
-  end
-
-  def pull(image_name)
-    assert_exec("docker pull #{image_name}")
-  end
+  include DockerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -239,7 +222,7 @@ class DockerAvatarVolumeRunner
 
   def container_dead?(cid)
     cmd = "docker inspect --format='{{ .State.Running }}' #{cid}"
-    _,stderr,status = exec(cmd, logging = false)
+    _,stderr,status = quiet_exec(cmd)
     expected_stderr = "Error: No such image, container or task: #{cid}"
     (status == 1) && (stderr.strip == expected_stderr)
   end

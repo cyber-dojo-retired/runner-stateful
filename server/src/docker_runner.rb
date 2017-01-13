@@ -2,6 +2,7 @@ require_relative 'all_avatars_names'
 require_relative 'nearest_ancestors'
 require_relative 'string_cleaner'
 require_relative 'string_truncater'
+require_relative 'null_logger'
 require 'timeout'
 
 module DockerRunner # mix-in

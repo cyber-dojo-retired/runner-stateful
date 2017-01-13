@@ -18,7 +18,6 @@ class DockerKataVolumeRunner
 
   def initialize(parent)
     @parent = parent
-    @logging = true
   end
 
   include DockerRunner
