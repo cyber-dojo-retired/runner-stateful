@@ -314,7 +314,7 @@ class DockerKataVolumeRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def sandboxes_data_only_container_name(kata_id)
-    'cyber_dojo_' + kata_id
+    'cyber_dojo_kata_volume_runner_' + kata_id
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
