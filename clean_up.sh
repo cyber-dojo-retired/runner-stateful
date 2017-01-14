@@ -12,7 +12,8 @@ docker rm --force --volumes $(docker ps --all --quiet --filter "name=${NAME}")
 
 # The Avatar-Volume-Runner creates (per avatar) an unnamed
 # volume inside an exited named data-container.
-#...
+NAME=cyber_dojo_avatar_volume_runner_
+docker rm --force --volumes $(docker ps --all --quiet --filter "name=${NAME}")
 
 # pids=$(docker ps --all --quiet --filter 'status=exited' --filter 'name=...')
 # echo ${pids} | xargs docker rm --force

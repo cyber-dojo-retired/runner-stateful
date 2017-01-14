@@ -34,7 +34,7 @@ class DockerAvatarVolumeRunner
     #...
   end
 
-  def old_kata(kata_id)
+  def old_kata(image_name, kata_id)
     assert_kata_exists(kata_id)
 
     volume_names(kata_id).each do |volume_name|
@@ -47,29 +47,42 @@ class DockerAvatarVolumeRunner
   def avatar_exists?(image_name, kata_id, avatar_name)
     assert_kata_exists(kata_id)
     assert_valid_name(avatar_name)
-    # ...
+
+    name = sandboxes_data_only_container_name(kata_id, avatar_name)
+    cmd = "docker ps --quiet --all --filter name=#{name}"
+    stdout,_ = assert_exec(cmd)
+    stdout.strip != ''
   end
 
-  def new_avatar(image_name, kata_id, avatar_name, files)
+  def new_avatar(image_name, kata_id, avatar_name, starting_files)
     assert_kata_exists(kata_id)
     refute_avatar_exists(kata_id, avatar_name)
 
-    name = volume_name(kata_id, avatar_name)
-    assert_exec("docker volume create --name #{name}")
+    name = sandboxes_data_only_container_name(kata_id, avatar_name)
+    cmd = [
+      'docker run',
+        "--volume #{sandboxes_root}",
+        "--name=#{name}",
+        image_name,
+        '/bin/true'
+    ].join(space)
+    assert_exec(cmd)
+
     cid = create_container(image_name, kata_id, avatar_name)
     begin
-      change_files(cid, files)
+      write_files(cid, avatar_name, starting_files)
     ensure
       remove_container(cid)
     end
   end
 
-  def old_avatar(kata_id, avatar_name)
+  def old_avatar(_image_name, kata_id, avatar_name)
     assert_kata_exists(kata_id)
     assert_avatar_exists(kata_id, avatar_name)
 
-    name = volume_name(kata_id, avatar_name)
-    assert_exec("docker volume rm #{name}")
+    name = sandboxes_data_only_container_name(kata_id, avatar_name)
+    cmd = "docker rm --volumes #{name}"
+    assert_exec(cmd)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -81,8 +94,8 @@ class DockerAvatarVolumeRunner
     #fail ArgumentError.new('no_avatar') unless stdout.strip == name
     cid = create_container(image_name, kata_id, avatar_name)
     begin
-      delete_files(cid, deleted_filenames)
-      change_files(cid, changed_files)
+      delete_files(cid, avatar_name, deleted_filenames)
+      write_files(cid, avatar_name, changed_files)
       stdout,stderr,status = run_cyber_dojo_sh(cid, max_seconds)
       { stdout:stdout, stderr:stderr, status:status }
     ensure
@@ -102,7 +115,7 @@ class DockerAvatarVolumeRunner
 
   def create_container(image_name, kata_id, avatar_name)
     assert_valid_id(kata_id)
-    assert_kata_exists(image_name, kata_id)
+    assert_kata_exists(kata_id)
     assert_valid_name(avatar_name)
 
     # Volume mounts the avatar's volume
@@ -111,7 +124,9 @@ class DockerAvatarVolumeRunner
     # If volume V does _not_ exist the [docker run] will nevertheless
     # succeed, create the container, and create a /sandbox folder in it!
     # https://github.com/docker/docker/issues/13121
-    name = volume_name(kata_id, avatar_name)
+    sandbox = sandbox_path(avatar_name)
+    home = home_path(avatar_name)
+    dc_volume = sandboxes_data_only_container_name(kata_id, avatar_name)
     args = [
       '--detach',                          # get the cid
       '--interactive',                     # later execs
@@ -121,36 +136,41 @@ class DockerAvatarVolumeRunner
       "--env CYBER_DOJO_KATA_ID=#{kata_id}",
       "--env CYBER_DOJO_AVATAR_NAME=#{avatar_name}",
       "--env CYBER_DOJO_SANDBOX=#{sandbox}",
+      "--env HOME=#{home}",
       '--user=root',
-      "--volume=#{name}:#{sandbox}:rw",
-      "--workdir=#{sandbox}"
+      "--volumes-from=#{dc_volume}:rw"
     ].join(space)
     cid = assert_exec("docker run #{args} #{image_name} sh")[0].strip
-    assert_docker_exec(cid, "chown #{user}:#{group} #{sandbox}")
+    #assert_docker_exec(cid, "chown #{user}:#{group} #{sandbox}")
     cid
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def delete_files(cid, filenames)
-    filenames.each do |filename|
-      assert_docker_exec(cid, "rm #{sandbox}/#{filename}")
-    end
+  def delete_files(cid, avatar_name, filenames)
+    return if filenames == []
+    sandbox = sandbox_path(avatar_name)
+    all = filenames.map { |filename| "#{sandbox}/#{filename}" }
+    rm = 'rm ' + all.join(space)
+    assert_docker_exec(cid, rm)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def change_files(cid, files)
+  def write_files(cid, avatar_name, files)
+    return if files == {}
     Dir.mktmpdir('runner') do |tmp_dir|
       files.each do |filename, content|
         host_filename = tmp_dir + '/' + filename
         disk.write(host_filename, content)
       end
-      assert_exec("docker cp #{tmp_dir}/. #{cid}:#{sandbox}")
-    end
-    files.keys.each do |filename|
-      cmd = "chown #{user}:#{group} #{sandbox}/#{filename}"
-      assert_docker_exec(cid, cmd)
+      uid = user_id(avatar_name)
+      sandbox = sandbox_path(avatar_name)
+      docker_cp = "docker cp #{tmp_dir}/. #{cid}:#{sandbox}"
+      assert_exec(docker_cp)
+      all = files.keys.map { |filename| "#{sandbox}/#{filename}" }
+      chown = "chown #{uid}:#{gid} " + all.join(space)
+      assert_docker_exec(cid, chown)
     end
   end
 
@@ -194,7 +214,7 @@ class DockerAvatarVolumeRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def volume_names(kata_id)
-    name = "cyber_dojo_#{kata_id}"
+    name = "cyber_dojo_avatar_volume_runner_#{kata_id}"
     docker_volume_ls = [
       'docker volume ls',
       '--quiet',
@@ -206,7 +226,7 @@ class DockerAvatarVolumeRunner
   end
 
   def volume_name(kata_id, avatar_name)
-    "cyber_dojo_#{kata_id}_#{avatar_name}"
+    "cyber_dojo_avatar_volume_runner_#{kata_id}_#{avatar_name}"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -216,6 +236,35 @@ class DockerAvatarVolumeRunner
     _,stderr,status = quiet_exec(cmd)
     expected_stderr = "Error: No such image, container or task: #{cid}"
     (status == 1) && (stderr.strip == expected_stderr)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def assert_kata_exists(kata_id)
+    true
+  end
+
+  def refute_kata_exists(kata_id)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def refute_avatar_exists(kata_id, avatar_name)
+    if avatar_exists?(nil, kata_id, avatar_name)
+      fail_avatar_name('exists')
+    end
+  end
+
+  def assert_avatar_exists(kata_id, avatar_name)
+    unless avatar_exists?(nil, kata_id, avatar_name)
+      fail_avatar_name('!exists')
+    end
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def sandboxes_data_only_container_name(kata_id, avatar_name)
+    'cyber_dojo_avatar_volume_runner_' + kata_id + '_' + avatar_name
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
