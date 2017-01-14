@@ -45,20 +45,22 @@ class DockerAvatarVolumeRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def avatar_exists?(image_name, kata_id, avatar_name)
+    assert_valid_id(kata_id)
     assert_kata_exists(kata_id)
     assert_valid_name(avatar_name)
 
-    name = sandboxes_data_only_container_name(kata_id, avatar_name)
+    name = avatar_volume_container_name(kata_id, avatar_name)
     cmd = "docker ps --quiet --all --filter name=#{name}"
     stdout,_ = assert_exec(cmd)
     stdout.strip != ''
   end
 
   def new_avatar(image_name, kata_id, avatar_name, starting_files)
+    assert_valid_id(kata_id)
     assert_kata_exists(kata_id)
     refute_avatar_exists(kata_id, avatar_name)
 
-    name = sandboxes_data_only_container_name(kata_id, avatar_name)
+    name = avatar_volume_container_name(kata_id, avatar_name)
     cmd = [
       'docker run',
         "--volume #{sandboxes_root}",
@@ -80,7 +82,7 @@ class DockerAvatarVolumeRunner
     assert_kata_exists(kata_id)
     assert_avatar_exists(kata_id, avatar_name)
 
-    name = sandboxes_data_only_container_name(kata_id, avatar_name)
+    name = avatar_volume_container_name(kata_id, avatar_name)
     cmd = "docker rm --volumes #{name}"
     assert_exec(cmd)
   end
@@ -126,7 +128,7 @@ class DockerAvatarVolumeRunner
     # https://github.com/docker/docker/issues/13121
     sandbox = sandbox_path(avatar_name)
     home = home_path(avatar_name)
-    dc_volume = sandboxes_data_only_container_name(kata_id, avatar_name)
+    dc_volume = avatar_volume_container_name(kata_id, avatar_name)
     args = [
       '--detach',                          # get the cid
       '--interactive',                     # later execs
@@ -241,19 +243,18 @@ class DockerAvatarVolumeRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_kata_exists(kata_id)
-    true
+    unless kata_exists?(nil, kata_id)
+      fail_kata_id('!exists')
+    end
   end
 
   def refute_kata_exists(kata_id)
+    if kata_exists?(nil, kata_id)
+      fail_kata_id('exists')
+    end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def refute_avatar_exists(kata_id, avatar_name)
-    if avatar_exists?(nil, kata_id, avatar_name)
-      fail_avatar_name('exists')
-    end
-  end
 
   def assert_avatar_exists(kata_id, avatar_name)
     unless avatar_exists?(nil, kata_id, avatar_name)
@@ -261,9 +262,15 @@ class DockerAvatarVolumeRunner
     end
   end
 
+  def refute_avatar_exists(kata_id, avatar_name)
+    if avatar_exists?(nil, kata_id, avatar_name)
+      fail_avatar_name('exists')
+    end
+  end
+
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def sandboxes_data_only_container_name(kata_id, avatar_name)
+  def avatar_volume_container_name(kata_id, avatar_name)
     'cyber_dojo_avatar_volume_runner_' + kata_id + '_' + avatar_name
   end
 

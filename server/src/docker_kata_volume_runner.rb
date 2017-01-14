@@ -131,6 +131,7 @@ class DockerKataVolumeRunner
     assert_valid_id(kata_id)
     assert_kata_exists(image_name, kata_id)
     assert_valid_name(avatar_name)
+
     sandbox = sandbox_path(avatar_name)
     home = home_path(avatar_name)
     args = [
@@ -272,29 +273,29 @@ class DockerKataVolumeRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def refute_kata_exists(image_name, kata_id)
-    if kata_exists?(image_name, kata_id)
-      fail_kata_id('exists')
-    end
-  end
-
   def assert_kata_exists(image_name, kata_id)
     unless kata_exists?(image_name, kata_id)
       fail_kata_id('!exists')
     end
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def refute_avatar_exists(cid, avatar_name)
-    if avatar_exists_cid?(cid, avatar_name)
-      fail_avatar_name('exists')
+  def refute_kata_exists(image_name, kata_id)
+    if kata_exists?(image_name, kata_id)
+      fail_kata_id('exists')
     end
   end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_avatar_exists(cid, avatar_name)
     unless avatar_exists_cid?(cid, avatar_name)
       fail_avatar_name('!exists')
+    end
+  end
+
+  def refute_avatar_exists(cid, avatar_name)
+    if avatar_exists_cid?(cid, avatar_name)
+      fail_avatar_name('exists')
     end
   end
 

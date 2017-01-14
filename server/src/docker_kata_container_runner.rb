@@ -225,13 +225,6 @@ class DockerKataContainerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def refute_kata_exists(kata_id)
-    assert_valid_id(kata_id)
-    if kata_exists?(nil, kata_id)
-      fail_kata_id('exists')
-    end
-  end
-
   def assert_kata_exists(kata_id)
     assert_valid_id(kata_id)
     unless kata_exists?(nil, kata_id)
@@ -239,19 +232,26 @@ class DockerKataContainerRunner
     end
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def refute_avatar_exists(kata_id, avatar_name)
-    assert_valid_name(avatar_name)
-    if avatar_exists?(nil, kata_id, avatar_name)
-      fail_avatar_name('exists')
+  def refute_kata_exists(kata_id)
+    assert_valid_id(kata_id)
+    if kata_exists?(nil, kata_id)
+      fail_kata_id('exists')
     end
   end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_avatar_exists(kata_id, avatar_name)
     assert_valid_name(avatar_name)
     unless avatar_exists?(nil, kata_id, avatar_name)
       fail_avatar_name('!exists')
+    end
+  end
+
+  def refute_avatar_exists(kata_id, avatar_name)
+    assert_valid_name(avatar_name)
+    if avatar_exists?(nil, kata_id, avatar_name)
+      fail_avatar_name('exists')
     end
   end
 
