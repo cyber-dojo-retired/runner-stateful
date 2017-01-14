@@ -128,7 +128,7 @@ class DockerAvatarVolumeRunner
     # https://github.com/docker/docker/issues/13121
     sandbox = sandbox_path(avatar_name)
     home = home_path(avatar_name)
-    dc_volume = avatar_volume_container_name(kata_id, avatar_name)
+    avcn = avatar_volume_container_name(kata_id, avatar_name)
     args = [
       '--detach',                          # get the cid
       '--interactive',                     # later execs
@@ -140,9 +140,10 @@ class DockerAvatarVolumeRunner
       "--env CYBER_DOJO_SANDBOX=#{sandbox}",
       "--env HOME=#{home}",
       '--user=root',
-      "--volumes-from=#{dc_volume}:rw"
+      "--volumes-from=#{avcn}:rw"
     ].join(space)
-    cid = assert_exec("docker run #{args} #{image_name} sh")[0].strip
+    stdout,_ = assert_exec("docker run #{args} #{image_name} sh")
+    cid = stdout.strip
     #assert_docker_exec(cid, "chown #{user}:#{group} #{sandbox}")
     cid
   end

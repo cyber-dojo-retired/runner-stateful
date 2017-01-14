@@ -29,7 +29,7 @@ class DockerKataVolumeRunner
 
   def kata_exists?(_image_name, kata_id)
     assert_valid_id(kata_id)
-    name = sandboxes_data_only_container_name(kata_id)
+    name = kata_volume_container_name(kata_id)
     cmd = "docker ps --quiet --all --filter name=#{name}"
     stdout,_ = assert_exec(cmd)
     stdout.strip != ''
@@ -37,7 +37,7 @@ class DockerKataVolumeRunner
 
   def new_kata(image_name, kata_id)
     refute_kata_exists(image_name, kata_id)
-    name = sandboxes_data_only_container_name(kata_id)
+    name = kata_volume_container_name(kata_id)
     cmd = [
       'docker run',
         "--volume #{sandboxes_root}",
@@ -50,7 +50,7 @@ class DockerKataVolumeRunner
 
   def old_kata(image_name, kata_id)
     assert_kata_exists(image_name, kata_id)
-    name = sandboxes_data_only_container_name(kata_id)
+    name = kata_volume_container_name(kata_id)
     cmd = "docker rm --volumes #{name}"
     assert_exec(cmd)
   end
@@ -134,6 +134,7 @@ class DockerKataVolumeRunner
 
     sandbox = sandbox_path(avatar_name)
     home = home_path(avatar_name)
+    kvcn = kata_volume_container_name(kata_id)
     args = [
       '--detach',                          # get the cid
       '--interactive',                     # later execs
@@ -145,9 +146,9 @@ class DockerKataVolumeRunner
       "--env CYBER_DOJO_SANDBOX=#{sandbox}",
       "--env HOME=#{home}",
       '--user=root',
-      "--volumes-from=#{sandboxes_data_only_container_name(kata_id)}:rw"
+      "--volumes-from=#{kvcn}:rw"
     ].join(space)
-    stdout,_,_ = assert_exec("docker run #{args} #{image_name} sh")
+    stdout,_ = assert_exec("docker run #{args} #{image_name} sh")
     cid = stdout.strip
 
     cmd = [
@@ -314,7 +315,7 @@ class DockerKataVolumeRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def sandboxes_data_only_container_name(kata_id)
+  def kata_volume_container_name(kata_id)
     'cyber_dojo_kata_volume_runner_' + kata_id
   end
 
