@@ -1,5 +1,6 @@
 require_relative 'docker_runner_container_mix_in'
 require_relative 'docker_runner_volume_mix_in'
+require_relative 'docker_runner_mix_in'
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Uses a new short-lived docker container per run().
@@ -23,6 +24,7 @@ class DockerAvatarVolumeRunner
 
   include DockerRunnerContainerMixIn
   include DockerRunnerVolumeMixIn
+  include DockerRunnerMixIn
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
