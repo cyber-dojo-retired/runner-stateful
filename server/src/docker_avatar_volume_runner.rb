@@ -26,20 +26,32 @@ class DockerAvatarVolumeRunner
 
   def kata_exists?(image_name, kata_id)
     assert_valid_id(kata_id)
-    # ??? create a dummy volume?
+
+    name = kata_volume_container_name(kata_id)
+    cmd = "docker ps --quiet --all --filter name=#{name}"
+    stdout,_ = assert_exec(cmd)
+    stdout.strip != ''
   end
 
   def new_kata(image_name, kata_id)
     refute_kata_exists(kata_id)
-    #...
+
+    name = kata_volume_container_name(kata_id)
+    cmd = [
+      'docker run',
+        "--name=#{name}",
+        image_name,
+        '/bin/true'
+    ].join(space)
+    assert_exec(cmd)
   end
 
   def old_kata(image_name, kata_id)
     assert_kata_exists(kata_id)
 
-    volume_names(kata_id).each do |volume_name|
-      assert_exec("docker volume rm #{volume_name}")
-    end
+    name = kata_volume_container_name(kata_id)
+    cmd = "docker rm --volumes #{name}"
+    assert_exec(cmd)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -270,6 +282,10 @@ class DockerAvatarVolumeRunner
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def kata_volume_container_name(kata_id)
+    'cyber_dojo_avatar_volume_runner_' + kata_id + '_kata'
+  end
 
   def avatar_volume_container_name(kata_id, avatar_name)
     'cyber_dojo_avatar_volume_runner_' + kata_id + '_' + avatar_name

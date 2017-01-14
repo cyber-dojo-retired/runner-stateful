@@ -56,7 +56,11 @@ class AvatarTest < TestBase
   test '119',
   'new_avatar with existing kata_id but avatar_name that already exists raises' do
     new_avatar({ avatar_name:'salmon' })
-    assert_method_raises(:new_avatar, kata_id, 'salmon', 'avatar_name:exists')
+    begin
+      assert_method_raises(:new_avatar, kata_id, 'salmon', 'avatar_name:exists')
+    ensure
+      old_avatar({ avatar_name:'salmon' })
+    end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
