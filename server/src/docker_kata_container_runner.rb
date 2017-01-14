@@ -1,12 +1,13 @@
 require_relative 'docker_runner'
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# Uses one long-lived container per kata and then
-# [docker exec]'ing a new process inside the
-# kata's container for each avatar's run().
+# Uses a new long-lived container per kata.
+# Each avatar's run() [docker exec]s a new process inside
+# the kata's container.
 #
 # Positives:
-#   o) opens the way to avatars having shared state.
+#   o) avatars can share state.
+#   o) opens the way to avatars having sharing processes.
 #   o) reduces run() execution time
 #      eg on gcc_assert ~ 0.4s -> 0.3s.
 #

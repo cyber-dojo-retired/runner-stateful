@@ -179,7 +179,7 @@ and displays their json results and how long they took.
 If the runner-client's IP address is 192.168.99.100 then put
 192.168.99.100:4558 into your browser to see the output.
 - red: tests ran but failed
-- amber: tests did not run (eg syntax error)
+- amber: tests did not run (syntax error)
 - green: tests test and passed
 - grey: tests did not complete (in 3 seconds)
 

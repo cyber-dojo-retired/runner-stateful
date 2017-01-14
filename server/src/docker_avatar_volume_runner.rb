@@ -1,8 +1,17 @@
 require_relative 'docker_runner'
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# Uses a new docker container per run().
-# Uses a docker volume per avatar.
+# Uses a new short-lived docker container per run().
+# Uses a long-lived docker volume per avatar.
+#
+# Positives:
+#   o) the cyber-dojo.sh process is running as pid-1
+#      which is a robust way of ensuring the entire
+#      process tree is killed.
+#
+# Negatives:
+#   o) increased run() time (compared to one container per kata)
+#   o) no possibility of avatars sharing state or processes.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 class DockerAvatarVolumeRunner
