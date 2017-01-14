@@ -5,7 +5,7 @@ require_relative 'string_truncater'
 require_relative 'null_logger'
 require 'timeout'
 
-module DockerRunner # mix-in
+module DockerRunnerContainerMixIn
 
   attr_reader :parent
 

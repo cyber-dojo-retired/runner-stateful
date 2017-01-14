@@ -1,4 +1,4 @@
-require_relative 'docker_runner'
+require_relative 'docker_runner_container_mix_in'
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Uses a new long-lived container per kata.
@@ -23,7 +23,7 @@ class DockerKataContainerRunner
     @parent = parent
   end
 
-  include DockerRunner
+  include DockerRunnerContainerMixIn
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # kata
