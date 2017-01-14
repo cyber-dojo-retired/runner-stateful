@@ -1,4 +1,5 @@
 require_relative 'docker_runner_container_mix_in'
+require_relative 'docker_runner_volume_mix_in'
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Uses a new short-lived docker container per run().
@@ -22,6 +23,7 @@ class DockerKataVolumeRunner
   end
 
   include DockerRunnerContainerMixIn
+  include DockerRunnerVolumeMixIn
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # kata
@@ -162,43 +164,6 @@ class DockerKataVolumeRunner
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  def add_group_cmd(cid)
-    if alpine? cid
-      return alpine_add_group_cmd
-    end
-    if ubuntu? cid
-      return ubuntu_add_group_cmd
-    end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - -
-
-  def add_user_cmd(cid, avatar_name)
-    if alpine? cid
-      return alpine_add_user_cmd(avatar_name)
-    end
-    if ubuntu? cid
-      return ubuntu_add_user_cmd(avatar_name)
-    end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - -
-
-  def alpine?(cid)
-    etc_issue(cid).include?('Alpine')
-  end
-
-  def ubuntu?(cid)
-    etc_issue(cid).include?('Ubuntu')
-  end
-
-  def etc_issue(cid)
-    stdout,_ = assert_docker_exec(cid, 'cat /etc/issue')
-    stdout
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   def delete_files(cid, avatar_name, filenames)
     return if filenames == []
     sandbox = sandbox_path(avatar_name)
@@ -265,6 +230,8 @@ class DockerKataVolumeRunner
     log << "Failed:remove_container(#{cid})" unless removed
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   def container_dead?(cid)
     cmd = "docker inspect --format='{{ .State.Running }}' #{cid}"
     _,stderr,status = quiet_exec(cmd)
@@ -318,10 +285,5 @@ class DockerKataVolumeRunner
   def kata_volume_container_name(kata_id)
     'cyber_dojo_kata_volume_runner_' + kata_id
   end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  include NearestAncestors
-  def log; nearest_ancestors(:log); end
 
 end
