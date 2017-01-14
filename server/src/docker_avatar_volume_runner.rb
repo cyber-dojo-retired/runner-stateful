@@ -84,6 +84,12 @@ class DockerAvatarVolumeRunner
 
     cid = create_container(image_name, kata_id, avatar_name)
     begin
+      sandbox = sandbox_path(avatar_name)
+      mkdir = "mkdir -m 755 #{sandbox}"
+      assert_docker_exec(cid, mkdir)
+      uid = user_id(avatar_name)
+      chown = "chown #{uid}:#{gid} #{sandbox}"
+      assert_docker_exec(cid, chown)
       write_files(cid, avatar_name, starting_files)
     ensure
       remove_container(cid)
@@ -102,36 +108,24 @@ class DockerAvatarVolumeRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run(image_name, kata_id, avatar_name, deleted_filenames, changed_files, max_seconds)
-    #name = volume_name(kata_id, avatar_name)
-    #cmd = "docker volume ls --quiet --filter 'name=#{name}'"
-    #stdout,stderr = assert_exec(cmd)
-    #fail ArgumentError.new('no_avatar') unless stdout.strip == name
+    assert_valid_id(kata_id)
+    assert_kata_exists(kata_id)
+    assert_avatar_exists(kata_id, avatar_name)
+
     cid = create_container(image_name, kata_id, avatar_name)
     begin
       delete_files(cid, avatar_name, deleted_filenames)
       write_files(cid, avatar_name, changed_files)
-      stdout,stderr,status = run_cyber_dojo_sh(cid, max_seconds)
+      stdout,stderr,status = run_cyber_dojo_sh(cid, avatar_name, max_seconds)
       { stdout:stdout, stderr:stderr, status:status }
     ensure
       remove_container(cid)
     end
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  #def user; 'nobody'; end
-  #def group; 'nogroup'; end
-  #def sandbox; '/sandbox'; end
-  #def success; shell.success; end
-  #def timed_out; 'timed_out'; end
-
   private
 
   def create_container(image_name, kata_id, avatar_name)
-    assert_valid_id(kata_id)
-    assert_kata_exists(kata_id)
-    assert_valid_name(avatar_name)
-
     # Volume mounts the avatar's volume
     #     [docker run ... --volume=V:/sandbox  ...]
     # Volume V is assumed to exist via an earlier new_avatar() call.
@@ -156,8 +150,51 @@ class DockerAvatarVolumeRunner
     ].join(space)
     stdout,_ = assert_exec("docker run #{args} #{image_name} sh")
     cid = stdout.strip
-    #assert_docker_exec(cid, "chown #{user}:#{group} #{sandbox}")
+
+    cmd = [
+      add_group_cmd(cid),
+      add_user_cmd(cid, avatar_name)
+    ].join('&&')
+    assert_docker_exec(cid, cmd)
+
     cid
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - -
+
+  def add_group_cmd(cid)
+    if alpine? cid
+      return alpine_add_group_cmd
+    end
+    if ubuntu? cid
+      return ubuntu_add_group_cmd
+    end
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - -
+
+  def add_user_cmd(cid, avatar_name)
+    if alpine? cid
+      return alpine_add_user_cmd(avatar_name)
+    end
+    if ubuntu? cid
+      return ubuntu_add_user_cmd(avatar_name)
+    end
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - -
+
+  def alpine?(cid)
+    etc_issue(cid).include?('Alpine')
+  end
+
+  def ubuntu?(cid)
+    etc_issue(cid).include?('Ubuntu')
+  end
+
+  def etc_issue(cid)
+    stdout,_ = assert_docker_exec(cid, 'cat /etc/issue')
+    stdout
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -191,13 +228,15 @@ class DockerAvatarVolumeRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def run_cyber_dojo_sh(cid, max_seconds)
+  def run_cyber_dojo_sh(cid, avatar_name, max_seconds)
+    uid = user_id(avatar_name)
+    sandbox = sandbox_path(avatar_name)
     docker_cmd = [
       'docker exec',
-      "--user=#{user}",
+      "--user=#{uid}:#{gid}",
       '--interactive',
       cid,
-      "sh -c './cyber-dojo.sh'"
+      "sh -c 'cd #{sandbox} && chmod 755 . && sh ./cyber-dojo.sh'"
     ].join(space)
     run_timeout(docker_cmd, max_seconds)
   end
