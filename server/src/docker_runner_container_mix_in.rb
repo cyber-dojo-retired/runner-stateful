@@ -1,7 +1,4 @@
 require_relative 'all_avatars_names'
-require_relative 'nearest_ancestors'
-require_relative 'null_logger'
-require 'timeout'
 
 module DockerRunnerContainerMixIn
 
@@ -66,38 +63,9 @@ module DockerRunnerContainerMixIn
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_exec(cmd)
-    stdout,stderr,status = exec(cmd)
-    unless status == success
-      log << "cmd:#{cmd}"
-      log << "status:#{status}"
-      log << "stdout:#{stdout}"
-      log << "stderr:#{stderr}"
-      fail_command(cmd)
-    end
-    [stdout,stderr]
-  end
-
-  def exec(cmd)
-    shell.exec(cmd)
-  end
-
-  def quiet_exec(cmd)
-    shell.exec(cmd, NullLogger.new(self))
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   def sandboxes_root; '/sandboxes'; end
   def success; shell.success; end
   def space; ' '; end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  include NearestAncestors
-  def shell; nearest_ancestors(:shell); end
-  def  disk; nearest_ancestors(:disk ); end
-  def   log; nearest_ancestors(:log  ); end
 
 end
 

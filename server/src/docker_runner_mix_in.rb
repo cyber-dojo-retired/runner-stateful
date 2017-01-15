@@ -1,5 +1,8 @@
+require_relative 'nearest_ancestors'
+require_relative 'null_logger'
 require_relative 'string_cleaner'
 require_relative 'string_truncater'
+require 'timeout'
 
 module DockerRunnerMixIn
 
@@ -118,6 +121,35 @@ module DockerRunnerMixIn
         avatar_name
     ].join(space)
   end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def assert_exec(cmd)
+    stdout,stderr,status = exec(cmd)
+    unless status == success
+      log << "cmd:#{cmd}"
+      log << "status:#{status}"
+      log << "stdout:#{stdout}"
+      log << "stderr:#{stderr}"
+      fail_command(cmd)
+    end
+    [stdout,stderr]
+  end
+
+  def exec(cmd)
+    shell.exec(cmd)
+  end
+
+  def quiet_exec(cmd)
+    shell.exec(cmd, NullLogger.new(self))
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  include NearestAncestors
+  def shell; nearest_ancestors(:shell); end
+  def  disk; nearest_ancestors(:disk ); end
+  def   log; nearest_ancestors(:log  ); end
 
 end
 
