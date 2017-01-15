@@ -1,100 +1,157 @@
 
-[![Build Status](https://travis-ci.org/cyber-dojo/runner.svg?branch=master)](https://travis-ci.org/cyber-dojo/runner)
+[![Build Status](https://travis-ci.org/cyber-dojo/runner.svg?branch=master)]
+(https://travis-ci.org/cyber-dojo/runner)
 
-<img src="https://raw.githubusercontent.com/cyber-dojo/nginx/master/images/home_page_logo.png" alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
+<img src="https://raw.githubusercontent.com/cyber-dojo/nginx/master/images/home_page_logo.png"
+alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
 
 # cyberdojo/runner docker image
 
-A micro-service for [cyber-dojo](http://cyber-dojo.org).
-A **cyberdojo/runner** docker container runs sinatra on port 4557.
-It's API is as follows:
+- A micro-service for [cyber-dojo](http://cyber-dojo.org)
+- Runs avatar's tests in a docker container.
+- API:
+  * All methods receive their arguments in a json object.
+  * All methods return a json object with a single key.
+  * If successful, the key equals the method's name.
+  * If unsuccessful, the key equals "exception".
+
+There are three runner implementations in this repo with varying
+speed/sharing/security tradeoffs. They all use the same tests.
+Pick your runner by specifying CYBER_DOJO_RUNNER_CLASS in docker-compose.yml
+  * DockerKavaVolumeRunner
+  * DockerAvatarVolumeRunner
+  * DockerKataContainerRunner
 
 - - - -
 
-# pulled
-Asks the runner-service if the given image has been pulled.
-- parameters
-  * image_name, eg 'cyberdojofoundation/gcc_assert'
-- returns
-  * { "pulled":true  } -> image_name has been pulled
-  * { "pulled":false  } -> image_name has not been pulled
-
-- - - -
+# pulled?
+Asks whether the image with the given image_name has been pulled.
+- parameter, eg
+```
+  { "image_name": "cyberdojofoundation/gcc_assert" }
+```
+- returns true if it has, false if it hasn't.
+```
+  { "pulled?": true   }
+  { "pulled?": false  }
+```
 
 # pull
-Tells the runner-service to pull the given image.
-- parameters
-  * image_name, eg 'cyberdojofoundation/gcc_assert'
+Pull the image with the given image_name.
+- parameter, eg
+```
+  { "image_name": "cyberdojofoundation/gcc_assert" }
+```
 
 - - - -
+
+# kata_exists?
+Asks whether the kata with the given kata_id exists.
+- parameters, eg
+```
+  { "image_name": "cyberdojofoundation/gcc_assert",
+       "kata_id": "15B9AD6C42"
+  }
+```
+- returns true if it does, false if it doesn't.
+```
+  { "kata_exists?": true   }
+  { "kata_exists?": false  }
+```
 
 # new_kata
-Tells the runner-service a kata with the given id and image_name has been set up.
+The kata with the given kata_id has been set up.
 Must be called before new_avatar.
-- parameters
-  * image_name, eg 'cyberdojofoundation/gcc_assert'
-  * kata_id, eg '15B9AD6C42'
-
-- - - -
-
+- parameters, eg
+```
+  { "image_name": "cyberdojofoundation/gcc_assert",
+       "kata_id": "15B9AD6C42"
+  }
+```
 # old_kata
-Tells the runner-service the kata with the given id has been torn down.
-- parameters
-  * kata_id, eg '15B9AD6C42'
+The kata with the given kata_id has been torn down.
+- parameters, eg
+```
+  { "image_name": "cyberdojofoundation/gcc_assert",
+       "kata_id": "15B9AD6C42"
+  }
+```
 
 - - - -
+
+# avatar_exists?
+Asks whether the avatar with the given avatar_name
+has entered the kata with the given kata_id.
+- parameters, eg
+```
+  {  "image_name": "cyberdojofoundation/gcc_assert",
+        "kata_id": "15B9AD6C42",
+    "avatar_name": "salmon"
+  }
+```
+- returns true if it does, false if it doesn't
+```
+  { "avatar_exists?": true   }
+  { "avatar_exists?": false  }
+```
 
 # new_avatar
-Tells the runner-service the given avatar has entered the given kata with the given starting files.
+The avatar with the given avatar_name has entered the
+kata with the given kata with the given starting files.
 Must be called before run.
-- parameters
-  * image_name, eg 'cyberdojofoundation/gcc_assert'
-  * kata_id, eg '15B9AD6C42'
-  * avatar_name, eg 'salmon'
-  * starting_files, eg { 'fizz_buzz.h' => '#include', ... }
-
-- - - -
+- parameters, eg
+```
+  {     "image_name": "cyberdojofoundation/gcc_assert",
+           "kata_id": "15B9AD6C42",
+       "avatar_name": "salmon",
+    "starting_files": { "hiker.h": "#ifndef HIKER_INCLUDED...",
+                        "hiker.c": "#include...",
+                        ...
+                       }
+  }
+```
 
 # old_avatar
-Tells the runner-service the given avatar has left the given kata.
-- parameters
-  * kata_id, eg '15B9AD6C42'
-  * avatar_name, eg 'salmon'
+The avatar with the given avatar_name_ has left
+the kata with the given kata_id.
+- parameters, eg
+```
+  {  "image_name": "cyberdojofoundation/gcc_assert",
+        "kata_id": "15B9AD6C42",
+    "avatar_name": "salmon"
+  }
+```
 
 - - - -
 
 # run
-- Runs cyber-dojo.sh for the given avatar in the given kata, after:
-  * removing the deleted_filenames
-  * saving changed_files
-- parameters
-  * image_name, eg 'cyberdojofoundation/gcc_assert'
-  * kata_id, eg '15B9AD6C42'
-  * avatar_name, eg 'salmon'
-  * deleted_filenames, eg [ 'hiker.h', ... ]
-  * changed_files, eg { 'fizz_buzz.h' => '#include', ... }
-  * max_seconds, eg '10'
-- returns eg
+For the avatar with the given avatar_name, in the kata with the given kata_id,
+removes the deleted_filenames, saves changed_files, runs cyber-dojo.sh
+- parameters, eg
+```
+  {        "image_name": "cyberdojofoundation/gcc_assert",
+              "kata_id": "15B9AD6C42",
+          "avatar_name": "salmon",
+    "deleted_filenames": [ "hiker.h", "hiker.c", ... ],
+        "changed_files": { "fizz_buzz.h": "#ifndef FIZZ_BUZZ_INCLUDED...",
+                           "fizz_buzz.c": "#include...",
+                           ...
+                         },
+          "max_seconds": 10
+  }
+```
+- returns an integer status, stdout, and stderr, if the run completed in max_seconds, eg
 ```
     { "run": {
-      "status":integer,
-      "stdout":...,
-      "stderr":...
-    } -> run completed in max_seconds
-
-    { "run": {
-      "status":"timed_out",
-      "stdout":"",
-      "stderr":""
-    } -> did not complete in max_seconds
+        "status": 2,
+        "stdout": "makefile:17: recipe for target 'test' failed\n",
+        "stderr": "invalid suffix sss on integer constant"
+    }
 ```
-
-- - - -
-
-- If successful, all methods return a json object with a single key equal to the
-name of the method.
-- If unsuccessful, all methods return a json object with a single 'exception' key.
-
+- returns the string status "timed_out" if the run did not complete in max_seconds, eg
+```
+    { "run": { "status": "timed_out" } }
+```
 
 - - - -
 - - - -
@@ -129,7 +186,7 @@ and displays their json results and how long they took.
 If the runner-client's IP address is 192.168.99.100 then put
 192.168.99.100:4558 into your browser to see the output.
 - red: tests ran but failed
-- amber: tests did not run (eg syntax error)
+- amber: tests did not run (syntax error)
 - green: tests test and passed
 - grey: tests did not complete (in 3 seconds)
 

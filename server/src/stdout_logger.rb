@@ -1,5 +1,5 @@
 
-class ExternalStdoutLogger
+class StdoutLogger
 
   def initialize(_parent)
   end

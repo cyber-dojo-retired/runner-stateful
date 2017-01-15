@@ -1,7 +1,7 @@
-require_relative 'runner_test_base'
+require_relative 'test_base'
 require_relative '../../src/string_cleaner'
 
-class StringCleanerTest < RunnerTestBase
+class StringCleanerTest < TestBase
 
   include StringCleaner
 

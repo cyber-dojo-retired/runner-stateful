@@ -1,12 +1,18 @@
-require_relative 'external_disk_writer'
-require_relative 'external_sheller'
-require_relative 'external_stdout_logger'
+def runner_class; ENV['CYBER_DOJO_RUNNER_CLASS']; end
+require_relative 'snake_caser'
+require_relative SnakeCaser::snake_cased(runner_class)
+
+require_relative 'disk_writer'
+require_relative 'bash_sheller'
+require_relative 'stdout_logger'
 
 module Externals
 
-  def shell; @shell ||= ExternalSheller.new(self); end
-  def  disk;  @disk ||= ExternalDiskWriter.new(self); end
-  def   log;   @log ||= ExternalStdoutLogger.new(self); end
+  def runner; @runner ||= Object.const_get(runner_class).new(self); end
+
+  def  shell;  @shell ||=  BashSheller.new(self); end
+  def   disk;   @disk ||=   DiskWriter.new(self); end
+  def    log;    @log ||= StdoutLogger.new(self); end
 
 end
 
@@ -15,19 +21,18 @@ end
 #
 # 1. include Externals in your top-level scope.
 #
-#    require_relative './externals'
+#    require_relative 'externals'
 #    class MicroService < Sinatra::Base
 #      ...
 #      private
 #      include Externals
-#      def runner; DockerRunner.new(self); end
 #      ...
 #    end
 #
 # 2. All child objects have access to their parent
-#    and gain access to the externals via nearest_external()
+#    and gain access to the externals via nearest_ancestors()
 #
-#    require_relative './nearest_external'
+#    require_relative 'nearest_ancestors'
 #    class DockerRunner
 #      def initialize(parent)
 #        @parent = parent
@@ -35,13 +40,13 @@ end
 #      attr_reader :parent
 #      ...
 #      private
-#      include NearestExternal
-#      def log; nearest_external(:log); end
+#      include NearestAncestors
+#      def log; nearest_ancestors(:log); end
 #      ...
 #    end
 #
-# 3. In tests you can simply set the external directly.
-#    Note that Externals.log uses ||=
+# 3. In tests you can simply set the externals directly.
+#    Eg Externals.log uses ||=
 #
 #    class ExampleTest < MiniTest::Test
 #      def test_something

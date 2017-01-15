@@ -1,5 +1,5 @@
 
-module StringTruncater
+module StringTruncater # mix-in
 
   module_function
 
@@ -10,7 +10,7 @@ module StringTruncater
     if s.length > max_length
       s = s.slice(0, max_length)
       s += "\n"
-      s += "output truncated by cyber-dojo server"
+      s += 'output truncated by cyber-dojo'
     end
     s
   end

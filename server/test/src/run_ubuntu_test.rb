@@ -1,9 +1,9 @@
-require_relative 'runner_test_base'
-require_relative 'docker_runner_os_helper'
+require_relative 'test_base'
+require_relative 'os_helper'
 
-class DockerRunnerOSUbuntuTest < RunnerTestBase
+class RunUbuntuTest < TestBase
 
-  include DockerRunnerOsHelper
+  include OsHelper
 
   def self.hex_prefix; '5A631'; end
   def hex_setup; kata_setup; end
@@ -18,25 +18,29 @@ class DockerRunnerOSUbuntuTest < RunnerTestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test 'CA1',
-  '[Ubuntu] image is indeed Alpine and has user:nobody and group:nogroup' do
-    stdout = assert_cyber_dojo_sh_no_stderr 'cat /etc/issue'
-    assert stdout.include?('Ubuntu'), stdout
-    assert_user_exists
+  test '583',
+  '[Ubuntu] has group used for dir/file ownership' do
     assert_group_exists
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  test '2A1',
+  '[Ubuntu] new_avatar has HOME set off /home' do
+    new_avatar_home_test
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   test '0CA',
-  '[Ubuntu] new_avatar has sandbox with ownership/permissions set' do
+  '[Ubuntu] new_avatar has its own sandbox with owner/group/permissions set' do
     new_avatar_sandbox_setup_test
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '1FC',
-  '[Ubuntu] new_avatar has starting-files in sandbox with ownership/permissions set' do
+  '[Ubuntu] new_avatar has starting-files in its sandbox with owner/group/permissions set' do
     new_avatar_starting_files_test
   end
 
@@ -57,7 +61,7 @@ class DockerRunnerOSUbuntuTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '233',
-  '[Ubuntu] new files are added with ownership/permissions and all previous files are unchanged' do
+  '[Ubuntu] new files are added with owner/group/permissions and all previous files are unchanged' do
     new_files_test
   end
 

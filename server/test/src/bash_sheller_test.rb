@@ -1,7 +1,7 @@
-require_relative 'runner_test_base'
+require_relative 'test_base'
 require_relative 'spy_logger'
 
-class ExternalShellerTest < RunnerTestBase
+class BashShellerTest < TestBase
 
   def self.hex_prefix; 'C89'; end
 
@@ -14,7 +14,7 @@ class ExternalShellerTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - -
 
   test 'DBB',
-  'exec(cmd) succeeds with output' do
+  'exec(cmd) succeeds with verbose output' do
     shell_exec('echo Hello')
     assert_status 0
     assert_stdout "Hello\n"
@@ -25,7 +25,7 @@ class ExternalShellerTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - -
 
   test '490',
-  'exec(cmd) succeeds with no output' do
+  'exec(cmd) fails with verbose output' do
     shell_exec('false')
     assert_status 1
     assert_stdout ''
@@ -41,7 +41,7 @@ class ExternalShellerTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - -
 
   test '46B',
-  'exec(cmd) fails with output' do
+  'exec(cmd) fails with verbose output' do
     shell_exec('sed salmon')
     assert_status 1
     assert_stdout ''
@@ -57,8 +57,8 @@ class ExternalShellerTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - -
 
   test '6D5',
-  'exec(cmd,logging=false) with output' do
-    shell_exec('sed salmon', logging = false)
+  'exec(cmd) fails with quiet output)' do
+    shell_exec('sed salmon', NullLogger.new(self))
     assert_status 1
     assert_stdout ''
     assert_stderr "sed: unmatched 'a'\n"
@@ -68,7 +68,7 @@ class ExternalShellerTest < RunnerTestBase
   # - - - - - - - - - - - - - - - - -
 
   test 'AF6',
-  'exec(cmd) raises' do
+  'exec(cmd) raises with verbose output' do
     assert_raises { shell_exec('zzzz') }
     assert_log [
       'COMMAND:zzzz',
@@ -79,8 +79,8 @@ class ExternalShellerTest < RunnerTestBase
 
   # - - - - - - - - - - - - - - - - -
 
-  def shell_exec(command, logging = true)
-    @stdout,@stderr,@status = shell.exec(command, logging)
+  def shell_exec(command, *args)
+    @stdout,@stderr,@status = shell.exec(command, *args)
   end
 
   def assert_status(expected)

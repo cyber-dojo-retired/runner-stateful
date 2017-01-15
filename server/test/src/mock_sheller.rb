@@ -11,7 +11,8 @@ class MockSheller
 
   def teardown
     mocks = read
-    fail "#{filename}: uncalled mocks(#{mocks})" unless mocks == []
+    pretty = JSON.pretty_generate(mocks)
+    fail "#{filename}: uncalled mocks(#{pretty})" unless mocks == []
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - -
@@ -28,7 +29,7 @@ class MockSheller
 
   # - - - - - - - - - - - - - - - - - - - - - - -
 
-  def exec(command, logging = true)
+  def exec(command, _ = nil)
     mocks = read
     mock = mocks.shift
     write(mocks)

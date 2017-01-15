@@ -1,7 +1,7 @@
-require_relative 'runner_test_base'
+require_relative 'test_base'
 require_relative '../../src/string_truncater'
 
-class StringTruncaterTest < RunnerTestBase
+class StringTruncaterTest < TestBase
 
   include StringTruncater
 
@@ -34,7 +34,7 @@ class StringTruncaterTest < RunnerTestBase
   test 'A48',
   'string of greater than 10k is truncated and truncated-message is appended' do
     s = '@' * (max_length)
-    message = 'output truncated by cyber-dojo server'
+    message = 'output truncated by cyber-dojo'
     assert_equal s + "\n" + message, truncated(s + 'x')
   end
 

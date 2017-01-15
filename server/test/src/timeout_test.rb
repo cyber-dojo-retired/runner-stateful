@@ -1,6 +1,6 @@
-require_relative 'runner_test_base'
+require_relative 'test_base'
 
-class DockerRunnerTimeoutTest < RunnerTestBase
+class TimeoutTest < TestBase
 
   def self.hex_prefix; '45B57'; end
   def hex_setup; kata_setup; end
@@ -21,7 +21,11 @@ class DockerRunnerTimeoutTest < RunnerTestBase
       '    return 6 * 7;',
       '}'
     ].join("\n")
-    stdout,stderr = assert_run_times_out(gcc_assert_files, max_seconds = 2)
+    named_args = {
+      changed_files:gcc_assert_files,
+      max_seconds:2
+    }
+    stdout,stderr = assert_run_times_out(named_args)
     assert_equal '', stdout
     assert_equal '', stderr
   end
@@ -43,7 +47,11 @@ class DockerRunnerTimeoutTest < RunnerTestBase
       '    return 6 * 7;',
       '}'
     ].join("\n")
-    stdout,stderr = assert_run_times_out(gcc_assert_files, max_seconds = 2)
+    named_args = {
+      changed_files:gcc_assert_files,
+      max_seconds:2
+    }
+    stdout,stderr = assert_run_times_out(named_args)
     assert_equal '', stdout
     assert_equal '', stderr
   end
