@@ -17,10 +17,6 @@ require_relative 'docker_runner_volume_mix_in'
 
 class DockerKataVolumeRunner
 
-  def initialize(parent)
-    @parent = parent
-  end
-
   include DockerRunnerVolumeMixIn
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

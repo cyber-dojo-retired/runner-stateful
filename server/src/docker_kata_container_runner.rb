@@ -19,10 +19,6 @@ require_relative 'docker_runner_mix_in'
 
 class DockerKataContainerRunner
 
-  def initialize(parent)
-    @parent = parent
-  end
-
   include DockerRunnerMixIn
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

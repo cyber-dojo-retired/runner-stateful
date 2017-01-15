@@ -7,7 +7,11 @@ require 'timeout'
 
 module DockerRunnerMixIn
 
-  attr_reader :parent
+  def initialize(parent)
+    @parent = parent
+  end
+
+  attr_reader :parent # For nearest_ancestors()
 
   def pulled?(image_name)
     image_names.include?(image_name)

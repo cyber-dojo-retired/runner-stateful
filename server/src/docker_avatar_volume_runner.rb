@@ -16,10 +16,6 @@ require_relative 'docker_runner_volume_mix_in'
 
 class DockerAvatarVolumeRunner
 
-  def initialize(parent)
-    @parent = parent
-  end
-
   include DockerRunnerVolumeMixIn
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
