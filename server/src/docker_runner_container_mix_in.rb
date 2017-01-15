@@ -1,4 +1,3 @@
-require_relative 'all_avatars_names'
 
 module DockerRunnerContainerMixIn
 
@@ -10,37 +9,6 @@ module DockerRunnerContainerMixIn
 
   def ubuntu_add_group_cmd
     "addgroup --gid #{gid} #{group}"
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def assert_valid_id(kata_id)
-    unless valid_id?(kata_id)
-      fail_kata_id('invalid')
-    end
-  end
-
-  def valid_id?(kata_id)
-    kata_id.class.name == 'String' &&
-      kata_id.length == 10 &&
-        kata_id.chars.all? { |char| hex?(char) }
-  end
-
-  def hex?(char)
-    '0123456789ABCDEF'.include?(char)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def assert_valid_name(avatar_name)
-    unless valid_avatar?(avatar_name)
-      fail_avatar_name('invalid')
-    end
-  end
-
-  include AllAvatarsNames
-  def valid_avatar?(avatar_name)
-    all_avatars_names.include?(avatar_name)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
