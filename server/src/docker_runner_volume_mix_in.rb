@@ -38,8 +38,5 @@ module DockerRunnerVolumeMixIn
     stdout
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - -
-
-
 end
 

@@ -7,15 +7,6 @@ module DockerRunnerContainerMixIn
 
   module_function # = = = = = = = = = = = = = = = =
 
-  def image_names
-    cmd = 'docker images --format "{{.Repository}}"'
-    stdout,_ = assert_exec(cmd)
-    names = stdout.split("\n")
-    names.uniq - ['<none']
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - -
-
   def alpine_add_group_cmd
     "addgroup -g #{gid} #{group}"
   end
@@ -25,34 +16,6 @@ module DockerRunnerContainerMixIn
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def alpine_add_user_cmd(avatar_name)
-    home = home_path(avatar_name)
-    uid = user_id(avatar_name)
-    [ 'adduser',
-        '-D',             # dont assign a password
-        "-G #{group}",
-        "-h #{home}",     # home dir
-        '-s /bin/sh',     # shell
-        "-u #{uid}",
-        avatar_name
-    ].join(space)
-  end
-
-  def ubuntu_add_user_cmd(avatar_name)
-    home = home_path(avatar_name)
-    uid = user_id(avatar_name)
-    [ 'adduser',
-        '--disabled-password',
-        '--gecos ""',          # don't ask for details
-        "--home #{home}",      # home dir
-        "--ingroup #{group}",
-        "--uid #{uid}",
-        avatar_name
-    ].join(space)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_valid_id(kata_id)
     unless valid_id?(kata_id)
