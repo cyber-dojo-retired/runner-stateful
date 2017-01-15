@@ -84,12 +84,7 @@ class DockerAvatarVolumeRunner
 
     cid = create_container(image_name, kata_id, avatar_name)
     begin
-      sandbox = sandbox_path(avatar_name)
-      mkdir = "mkdir -m 755 #{sandbox}"
-      assert_docker_exec(cid, mkdir)
-      uid = user_id(avatar_name)
-      chown = "chown #{uid}:#{gid} #{sandbox}"
-      assert_docker_exec(cid, chown)
+      make_sandbox(cid, avatar_name)
       write_files(cid, avatar_name, starting_files)
     ensure
       remove_container(cid)
