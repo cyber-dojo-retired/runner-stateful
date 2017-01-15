@@ -28,6 +28,11 @@ module DockerRunnerMixIn
     "/home/#{avatar_name}"
   end
 
+  def sandbox_path(avatar_name)
+    assert_valid_name(avatar_name)
+    "#{sandboxes_root}/#{avatar_name}"
+  end
+
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def group
@@ -36,13 +41,6 @@ module DockerRunnerMixIn
 
   def gid
     5000
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def sandbox_path(avatar_name)
-    assert_valid_name(avatar_name)
-    "#{sandboxes_root}/#{avatar_name}"
   end
 
   module_function # = = = = = = = = = = = = = = = =

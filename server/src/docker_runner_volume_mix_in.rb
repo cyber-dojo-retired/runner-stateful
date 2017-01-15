@@ -1,5 +1,8 @@
+require_relative 'docker_runner_mix_in'
 
 module DockerRunnerVolumeMixIn
+
+  include DockerRunnerMixIn
 
   module_function # = = = = = = = = = = = = = = = =
 

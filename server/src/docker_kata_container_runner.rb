@@ -1,4 +1,3 @@
-require_relative 'docker_runner_container_mix_in'
 require_relative 'docker_runner_mix_in'
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -24,7 +23,6 @@ class DockerKataContainerRunner
     @parent = parent
   end
 
-  include DockerRunnerContainerMixIn
   include DockerRunnerMixIn
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
