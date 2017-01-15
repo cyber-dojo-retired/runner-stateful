@@ -1,52 +1,11 @@
 require_relative 'all_avatars_names'
 require_relative 'nearest_ancestors'
-require_relative 'string_cleaner'
-require_relative 'string_truncater'
 require_relative 'null_logger'
 require 'timeout'
 
 module DockerRunnerContainerMixIn
 
   module_function # = = = = = = = = = = = = = = = =
-
-  include StringCleaner
-  include StringTruncater
-
-  def run_timeout(docker_cmd, max_seconds)
-    r_stdout, w_stdout = IO.pipe
-    r_stderr, w_stderr = IO.pipe
-    pid = Process.spawn(docker_cmd, {
-      pgroup:true,
-         out:w_stdout,
-         err:w_stderr
-    })
-    begin
-      Timeout::timeout(max_seconds) do
-        Process.waitpid(pid)
-        status = $?.exitstatus
-        w_stdout.close
-        w_stderr.close
-        stdout = truncated(cleaned(r_stdout.read))
-        stderr = truncated(cleaned(r_stderr.read))
-        [stdout, stderr, status]
-      end
-    rescue Timeout::Error
-      # Kill the [docker exec] processes running on the host.
-      # This does __not__ kill the cyber-dojo.sh process
-      # running __inside__ the docker container.
-      # See https://github.com/docker/docker/issues/9098
-      Process.kill(-9, pid)
-      Process.detach(pid)
-      ['', '', 'timed_out']
-    ensure
-      w_stdout.close unless w_stdout.closed?
-      w_stderr.close unless w_stderr.closed?
-      r_stdout.close
-      r_stderr.close
-    end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def image_names
     cmd = 'docker images --format "{{.Repository}}"'
