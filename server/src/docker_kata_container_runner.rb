@@ -8,8 +8,9 @@ require_relative 'docker_runner_mix_in'
 # Positives:
 #   o) avatars can share state.
 #   o) opens the way to avatars having sharing processes.
-#   o) reduces run() execution time
-#      eg on gcc_assert ~ 0.4s -> 0.3s.
+#   o) fastest run() execution time. In a rough sample
+#      ~20% faster than AvatarVolumeRunner
+#      ~30% faster than KataVolumeRunner
 #
 # Negatives:
 #   o) the cyber-dojo.sh process is not running as
