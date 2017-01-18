@@ -35,11 +35,9 @@ class DockerAvatarVolumeRunner
     refute_kata_exists(kata_id)
 
     name = kata_volume_container_name(kata_id)
-    cmd = [
-      'docker run',
-        "--name=#{name}",
-        image_name,
-        '/bin/true'
+    cmd = [ 'docker run', "--name=#{name}",
+                          image_name,
+                          '/bin/true'
     ].join(space)
     assert_exec(cmd)
   end
@@ -73,12 +71,10 @@ class DockerAvatarVolumeRunner
     refute_avatar_exists(kata_id, avatar_name)
 
     name = avatar_volume_container_name(kata_id, avatar_name)
-    cmd = [
-      'docker run',
-        "--volume #{sandboxes_root}",
-        "--name=#{name}",
-        image_name,
-        '/bin/true'
+    cmd = [ 'docker run', "--volume #{sandboxes_root}",
+                          "--name=#{name}",
+                          image_name,
+                          '/bin/true'
     ].join(space)
     assert_exec(cmd)
 
