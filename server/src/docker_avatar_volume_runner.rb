@@ -25,8 +25,8 @@ class DockerAvatarVolumeRunner
   def kata_exists?(image_name, kata_id)
     assert_valid_id(kata_id)
 
-    name = kata_volume_container_name(kata_id)
-    cmd = "docker ps --quiet --all --filter name=#{name}"
+    name = kata_volume_name(kata_id)
+    cmd = "docker volume ls --quiet --filter 'name=#{name}'"
     stdout,_ = assert_exec(cmd)
     stdout.strip != ''
   end
@@ -34,19 +34,16 @@ class DockerAvatarVolumeRunner
   def new_kata(image_name, kata_id)
     refute_kata_exists(kata_id)
 
-    name = kata_volume_container_name(kata_id)
-    cmd = [ 'docker run', "--name=#{name}",
-                          image_name,
-                          '/bin/true'
-    ].join(space)
+    name = kata_volume_name(kata_id)
+    cmd = "docker volume create --name #{name}"
     assert_exec(cmd)
   end
 
   def old_kata(image_name, kata_id)
     assert_kata_exists(kata_id)
 
-    name = kata_volume_container_name(kata_id)
-    cmd = "docker rm --volumes #{name}"
+    name = kata_volume_name(kata_id)
+    cmd = "docker volume rm #{name}"
     assert_exec(cmd)
   end
 
@@ -59,8 +56,8 @@ class DockerAvatarVolumeRunner
     assert_kata_exists(kata_id)
     assert_valid_name(avatar_name)
 
-    name = avatar_volume_container_name(kata_id, avatar_name)
-    cmd = "docker ps --quiet --all --filter name=#{name}"
+    name = avatar_volume_name(kata_id, avatar_name)
+    cmd = "docker volume ls --quiet --filter 'name=#{name}'"
     stdout,_ = assert_exec(cmd)
     stdout.strip != ''
   end
@@ -70,17 +67,13 @@ class DockerAvatarVolumeRunner
     assert_kata_exists(kata_id)
     refute_avatar_exists(kata_id, avatar_name)
 
-    name = avatar_volume_container_name(kata_id, avatar_name)
-    cmd = [ 'docker run', "--volume #{sandboxes_root}",
-                          "--name=#{name}",
-                          image_name,
-                          '/bin/true'
-    ].join(space)
+    name = avatar_volume_name(kata_id, avatar_name)
+    cmd = "docker volume create --name #{name}"
     assert_exec(cmd)
 
     cid = create_container(image_name, kata_id, avatar_name)
     begin
-      make_sandbox(cid, avatar_name)
+      chown_sandbox(cid, avatar_name)
       write_files(cid, avatar_name, starting_files)
     ensure
       remove_container(cid)
@@ -91,8 +84,8 @@ class DockerAvatarVolumeRunner
     assert_kata_exists(kata_id)
     assert_avatar_exists(kata_id, avatar_name)
 
-    name = avatar_volume_container_name(kata_id, avatar_name)
-    cmd = "docker rm --volumes #{name}"
+    name = avatar_volume_name(kata_id, avatar_name)
+    cmd = "docker volume rm #{name}"
     assert_exec(cmd)
   end
 
@@ -131,7 +124,7 @@ class DockerAvatarVolumeRunner
     # https://github.com/docker/docker/issues/13121
     sandbox = sandbox_path(avatar_name)
     home = home_path(avatar_name)
-    avcn = avatar_volume_container_name(kata_id, avatar_name)
+    avn = avatar_volume_name(kata_id, avatar_name)
     args = [
       '--detach',                          # get the cid
       '--interactive',                     # later execs
@@ -143,7 +136,7 @@ class DockerAvatarVolumeRunner
       "--env CYBER_DOJO_SANDBOX=#{sandbox}",
       "--env HOME=#{home}",
       '--user=root',
-      "--volumes-from=#{avcn}:rw"
+      "--volume #{avn}:#{sandbox}:rw"
     ].join(space)
     stdout,_ = assert_exec("docker run #{args} #{image_name} sh")
     cid = stdout.strip
@@ -187,11 +180,11 @@ class DockerAvatarVolumeRunner
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  def kata_volume_container_name(kata_id)
+  def kata_volume_name(kata_id)
     'cyber_dojo_avatar_volume_runner_kata_' + kata_id
   end
 
-  def avatar_volume_container_name(kata_id, avatar_name)
+  def avatar_volume_name(kata_id, avatar_name)
     'cyber_dojo_avatar_volume_runner_avatar_' + kata_id + '_' + avatar_name
   end
 

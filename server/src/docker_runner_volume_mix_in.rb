@@ -43,10 +43,8 @@ module DockerRunnerVolumeMixIn
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  def make_sandbox(cid, avatar_name)
+  def chown_sandbox(cid, avatar_name)
     sandbox = sandbox_path(avatar_name)
-    mkdir = "mkdir -m 755 #{sandbox}"
-    assert_docker_exec(cid, mkdir)
     uid = user_id(avatar_name)
     chown = "chown #{uid}:#{gid} #{sandbox}"
     assert_docker_exec(cid, chown)

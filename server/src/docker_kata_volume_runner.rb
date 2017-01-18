@@ -25,29 +25,23 @@ class DockerKataVolumeRunner
 
   def kata_exists?(_image_name, kata_id)
     assert_valid_id(kata_id)
-    name = kata_volume_container_name(kata_id)
-    cmd = "docker ps --quiet --all --filter name=#{name}"
+    name = kata_volume_name(kata_id)
+    cmd = "docker volume ls --quiet --filter 'name=#{name}'"
     stdout,_ = assert_exec(cmd)
     stdout.strip != ''
   end
 
   def new_kata(image_name, kata_id)
     refute_kata_exists(image_name, kata_id)
-    name = kata_volume_container_name(kata_id)
-    cmd = [
-      'docker run',
-        "--volume #{sandboxes_root}",
-        "--name=#{name}",
-        image_name,
-        '/bin/true'
-    ].join(space)
+    name = kata_volume_name(kata_id)
+    cmd = "docker volume create --name #{name}"
     assert_exec(cmd)
   end
 
   def old_kata(image_name, kata_id)
     assert_kata_exists(image_name, kata_id)
-    name = kata_volume_container_name(kata_id)
-    cmd = "docker rm --volumes #{name}"
+    name = kata_volume_name(kata_id)
+    cmd = "docker volume rm #{name}"
     assert_exec(cmd)
   end
 
@@ -69,6 +63,7 @@ class DockerKataVolumeRunner
     begin
       refute_avatar_exists(cid, avatar_name)
       make_sandbox(cid, avatar_name)
+      chown_sandbox(cid, avatar_name)
       write_files(cid, avatar_name, starting_files)
     ensure
       remove_container(cid)
@@ -125,7 +120,7 @@ class DockerKataVolumeRunner
 
     sandbox = sandbox_path(avatar_name)
     home = home_path(avatar_name)
-    kvcn = kata_volume_container_name(kata_id)
+    kvn = kata_volume_name(kata_id)
     args = [
       '--detach',                          # get the cid
       '--interactive',                     # later execs
@@ -137,7 +132,7 @@ class DockerKataVolumeRunner
       "--env CYBER_DOJO_SANDBOX=#{sandbox}",
       "--env HOME=#{home}",
       '--user=root',
-      "--volumes-from=#{kvcn}:rw"
+      "--volume #{kvn}:#{sandboxes_root}:rw"
     ].join(space)
     stdout,_ = assert_exec("docker run #{args} #{image_name} sh")
     cid = stdout.strip
@@ -149,6 +144,14 @@ class DockerKataVolumeRunner
     assert_docker_exec(cid, cmd)
 
     cid
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def make_sandbox(cid, avatar_name)
+    sandbox = sandbox_path(avatar_name)
+    mkdir = "mkdir -m 755 #{sandbox}"
+    assert_docker_exec(cid, mkdir)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -188,7 +191,7 @@ class DockerKataVolumeRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def kata_volume_container_name(kata_id)
+  def kata_volume_name(kata_id)
     'cyber_dojo_kata_volume_runner_' + kata_id
   end
 
