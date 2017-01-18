@@ -188,11 +188,11 @@ class DockerAvatarVolumeRunner
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def kata_volume_container_name(kata_id)
-    'cyber_dojo_avatar_volume_runner_' + kata_id + '_kata'
+    'cyber_dojo_avatar_volume_runner_kata_' + kata_id
   end
 
   def avatar_volume_container_name(kata_id, avatar_name)
-    'cyber_dojo_avatar_volume_runner_' + kata_id + '_' + avatar_name
+    'cyber_dojo_avatar_volume_runner_avatar_' + kata_id + '_' + avatar_name
   end
 
 end
