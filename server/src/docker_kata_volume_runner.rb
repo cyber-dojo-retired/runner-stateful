@@ -140,7 +140,7 @@ class DockerKataVolumeRunner
     cmd = [
       add_group_cmd(cid),
       add_user_cmd(cid, avatar_name)
-    ].join('&&')
+    ].join(' && ')
     assert_docker_exec(cid, cmd)
 
     cid

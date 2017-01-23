@@ -86,8 +86,14 @@ class DockerKataContainerRunner
     assert_kata_exists(kata_id)
     assert_valid_name(avatar_name)
 
-    id_cmd = docker_cmd(kata_id, "id #{avatar_name}")
-    _,_,status = quiet_exec(id_cmd)
+    id_cmd = docker_cmd(kata_id, "id -u #{avatar_name}")
+    stdout,_,status = quiet_exec(id_cmd)
+    # Alpine Linux has an existing proxy-server user
+    # called squid (uid=31) which I have to work around.
+    # See alpine_add_user_cmd() in docker_runner_mix_in.rb
+    if avatar_name == 'squid' && stdout.strip == '31'
+      return false
+    end
     status == success
   end
 
@@ -103,7 +109,7 @@ class DockerKataContainerRunner
     sandbox = sandbox_path(avatar_name)
     mkdir = "mkdir -m 755 #{sandbox}"
     chown = "chown #{avatar_name}:#{group} #{sandbox}"
-    assert_docker_exec(kata_id, [ mkdir, chown ].join('&&'))
+    assert_docker_exec(kata_id, [ mkdir, chown ].join(' && '))
 
     write_files(kata_id, avatar_name, starting_files)
   end

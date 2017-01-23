@@ -108,15 +108,20 @@ module DockerRunnerMixIn
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def alpine_add_user_cmd(avatar_name)
+    # Alpine linux has an existing web-proxy user
+    # called squid which I have to work round.
+    # See avatar_exists?() in docker_avatar_volume_runner.rb
     home = home_path(avatar_name)
     uid = user_id(avatar_name)
-    [ 'adduser',
-        '-D',             # dont assign a password
+    [ "(deluser #{avatar_name};",
+      'adduser',
+        '-D',             # don't assign a password
         "-G #{group}",
         "-h #{home}",     # home dir
         '-s /bin/sh',     # shell
         "-u #{uid}",
-        avatar_name
+        avatar_name,
+        ')'
     ].join(space)
   end
 

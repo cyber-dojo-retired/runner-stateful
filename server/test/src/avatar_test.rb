@@ -27,6 +27,16 @@ class AvatarTest < TestBase
     refute avatar_exists?
   end
 
+  test '9BD',
+  'Alpine Linux has an existing user called squid',
+  "which would clash with the squid avatar and has to be deluser'd" do
+    squid = { avatar_name:'squid' }
+    refute avatar_exists?(squid)
+    new_avatar(squid)
+    assert avatar_exists?(squid)
+    old_avatar(squid)
+  end
+
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
   # negative tests cases: new_avatar
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
