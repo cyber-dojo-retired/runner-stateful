@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# NB: Alpine images do not have bash
+# Note: Alpine images do not have bash
 
 KATA_ID=$1
 AVATAR=$2

@@ -4,7 +4,7 @@ module DockerRunnerVolumeMixIn
 
   include DockerRunnerMixIn
 
-  module_function # = = = = = = = = = = = = = = = =
+  module_function
 
   def add_group_cmd(cid)
     if alpine? cid

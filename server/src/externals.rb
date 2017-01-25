@@ -1,4 +1,5 @@
 def runner_class; ENV['CYBER_DOJO_RUNNER_CLASS']; end
+
 require_relative 'snake_caser'
 require_relative SnakeCaser::snake_cased(runner_class)
 
@@ -16,7 +17,7 @@ module Externals
 
 end
 
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # How does Externals work? How are they designed to be used?
 #
 # 1. include Externals in your top-level scope.
@@ -57,4 +58,4 @@ end
 #      end
 #    end
 #
-#- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#- - - - - - - - - - - - - - - - - - - - - - - - - - - - -

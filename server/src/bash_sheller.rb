@@ -38,4 +38,5 @@ class BashSheller
   def log; nearest_ancestors(:log); end
 
   def line; '-' * 40; end
+
 end

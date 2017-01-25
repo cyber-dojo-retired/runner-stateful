@@ -16,7 +16,7 @@ module NearestAncestors # mix-in
 
 end
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Assumes the object (which included the module) has a parent and
 # repeatedly chains back parent to parent to parent until it gets
 # to an object with the required property, or runs out of parents.
@@ -24,7 +24,7 @@ end
 #   o) shell - executes shell commands
 #   o) disk  - file-system directories and file read/write
 #   o) log   - stdout based logging
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# Allows classes representing external objects to easily access
-# each other as well.
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Allows classes representing external objects to easily
+# access each other as well.
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

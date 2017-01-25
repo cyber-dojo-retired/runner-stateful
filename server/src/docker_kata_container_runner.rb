@@ -1,14 +1,14 @@
 require_relative 'docker_runner_mix_in'
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Uses a new long-lived container per kata.
 # Each avatar's run() [docker exec]s a new process inside
 # the kata's container.
 #
 # Positives:
 #   o) avatars can share state.
-#   o) opens the way to avatars having sharing processes.
-#   o) fastest run() execution time. In a rough sample
+#   o) opens the way to avatars sharing processes.
+#   o) fastest run(). In a rough sample
 #      ~20% faster than AvatarVolumeRunner
 #      ~30% faster than KataVolumeRunner
 #
@@ -16,15 +16,15 @@ require_relative 'docker_runner_mix_in'
 #   o) the cyber-dojo.sh process is not running as
 #      pid-1. A pid-1 process is a robust way of
 #      killing an entire process tree.
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 class DockerKataContainerRunner
 
   include DockerRunnerMixIn
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # kata
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def kata_exists?(_image_name, kata_id)
     assert_valid_id(kata_id)
@@ -35,7 +35,7 @@ class DockerKataContainerRunner
     stdout.strip != ''
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def new_kata(image_name, kata_id)
     refute_kata_exists(kata_id)
@@ -46,8 +46,8 @@ class DockerKataContainerRunner
       '--interactive',                     # later execs
       "--name=#{name}",
       '--net=none',                        # security
-      '--pids-limit=256',                  # security
-      '--security-opt=no-new-privileges',  # security
+      '--pids-limit=256',                  # no fork bombs
+      '--security-opt=no-new-privileges',  # no escalation
       '--user=root',
     ].join(space)
     cmd = "docker run #{args} #{image_name} sh -c 'sleep 3h'"
@@ -68,7 +68,7 @@ class DockerKataContainerRunner
     assert_docker_exec(kata_id, mkdir)
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def old_kata(image_name, kata_id)
     assert_kata_exists(kata_id)
@@ -78,9 +78,9 @@ class DockerKataContainerRunner
     assert_exec(cmd)
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # avatar
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def avatar_exists?(_image_name, kata_id, avatar_name)
     assert_kata_exists(kata_id)
@@ -97,7 +97,7 @@ class DockerKataContainerRunner
     status == success
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def new_avatar(_image_name, kata_id, avatar_name, starting_files)
     assert_kata_exists(kata_id)
@@ -114,7 +114,7 @@ class DockerKataContainerRunner
     write_files(kata_id, avatar_name, starting_files)
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def old_avatar(_image_name, kata_id, avatar_name)
     assert_kata_exists(kata_id)
@@ -124,9 +124,9 @@ class DockerKataContainerRunner
     assert_docker_exec(kata_id, del_user)
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # run
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run(_image_name, kata_id, avatar_name, deleted_filenames, changed_files, max_seconds)
     assert_kata_exists(kata_id)
@@ -138,7 +138,7 @@ class DockerKataContainerRunner
     { stdout:stdout, stderr:stderr, status:status }
   end
 
-  private # = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+  private
 
   def delete_files(kata_id, avatar_name, filenames)
     return if filenames == []
@@ -148,7 +148,7 @@ class DockerKataContainerRunner
     assert_docker_exec(kata_id, rm)
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def write_files(kata_id, avatar_name, files)
     return if files == {}
@@ -167,11 +167,11 @@ class DockerKataContainerRunner
     end
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run_cyber_dojo_sh(kata_id, avatar_name, max_seconds)
-    # The processes __inside__ the docker container are killed
-    # by /usr/local/bin/timeout_cyber_dojo.sh
+    # The processes __inside__ the docker container
+    # are killed by /usr/local/bin/timeout_cyber_dojo.sh
     # See new_kata() above.
     sh_cmd = [
       '/usr/local/bin/timeout_cyber_dojo.sh',
@@ -182,7 +182,7 @@ class DockerKataContainerRunner
     run_timeout(docker_cmd(kata_id, sh_cmd), max_seconds)
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def add_group_cmd(kata_id)
     if alpine? kata_id
@@ -211,7 +211,7 @@ class DockerKataContainerRunner
     end
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def alpine?(kata_id)
     etc_issue(kata_id).include?('Alpine')
@@ -226,7 +226,7 @@ class DockerKataContainerRunner
     stdout
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_kata_exists(kata_id)
     assert_valid_id(kata_id)
@@ -242,7 +242,7 @@ class DockerKataContainerRunner
     end
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_avatar_exists(kata_id, avatar_name)
     assert_valid_name(avatar_name)
@@ -258,7 +258,7 @@ class DockerKataContainerRunner
     end
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_docker_exec(kata_id, cmd)
     assert_exec(docker_cmd(kata_id, cmd))
@@ -269,10 +269,9 @@ class DockerKataContainerRunner
     "docker exec #{cid} sh -c '#{cmd}'"
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def container_name(kata_id)
-    # service containers use -hyphens so don't use -hypens
     'cyber_dojo_kata_container_runner_' + kata_id
   end
 

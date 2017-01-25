@@ -1,6 +1,6 @@
 require_relative 'docker_runner_volume_mix_in'
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Uses a new short-lived docker container per run().
 # Uses a long-lived docker volume per avatar.
 #
@@ -10,17 +10,18 @@ require_relative 'docker_runner_volume_mix_in'
 #      process tree is killed.
 #
 # Negatives:
-#   o) increased run() time (compared to one container per kata)
 #   o) no possibility of avatars sharing state or processes.
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#   o) increased run() time
+#      (compared to one container per kata)
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 class DockerAvatarVolumeRunner
 
   include DockerRunnerVolumeMixIn
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # kata
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def kata_exists?(image_name, kata_id)
     assert_valid_id(kata_id)
@@ -47,9 +48,9 @@ class DockerAvatarVolumeRunner
     assert_exec(cmd)
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # avatar
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def avatar_exists?(image_name, kata_id, avatar_name)
     assert_valid_id(kata_id)
@@ -89,13 +90,14 @@ class DockerAvatarVolumeRunner
     assert_exec(cmd)
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # run
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # Copes with infinite loops (eg) in the avatar's code/tests by
-  # removing the container - which obviously kills all processes
-  # running inside the container.
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Copes with infinite loops (eg) in the avatar's
+  # code/tests by removing the container - which
+  # obviously kills all processes running inside
+  # the container.
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run(image_name, kata_id, avatar_name, deleted_filenames, changed_files, max_seconds)
     assert_valid_id(kata_id)
@@ -128,9 +130,9 @@ class DockerAvatarVolumeRunner
     args = [
       '--detach',                          # get the cid
       '--interactive',                     # later execs
-      '--net=none',                        # security - no network
-      '--pids-limit=64',                   # security - no fork bombs
-      '--security-opt=no-new-privileges',  # security - no escalation
+      '--net=none',                        # security
+      '--pids-limit=64',                   # no fork bombs
+      '--security-opt=no-new-privileges',  # no escalation
       "--env CYBER_DOJO_KATA_ID=#{kata_id}",
       "--env CYBER_DOJO_AVATAR_NAME=#{avatar_name}",
       "--env CYBER_DOJO_SANDBOX=#{sandbox}",

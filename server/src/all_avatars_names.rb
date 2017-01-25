@@ -17,8 +17,7 @@ module AllAvatarsNames # mix-in
        skunk     snake        spider    squid
        squirrel  starfish     swan      tiger
        toucan    tuna         turtle    vulture
-       walrus    whale        wolf      zebra
-    )
+       walrus    whale        wolf      zebra)
   end
 
 end

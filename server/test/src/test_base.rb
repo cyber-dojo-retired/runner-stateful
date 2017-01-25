@@ -56,7 +56,7 @@ class TestBase < HexMiniTest
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def sss_run(named_args = {})
-    # don't call this run() as it clashes with MiniTest
+    # don't name this run() as it clashes with MiniTest
     @sss = runner.run(*defaulted_args(__method__, named_args))
     [stdout,stderr,status]
   end

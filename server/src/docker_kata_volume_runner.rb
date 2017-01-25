@@ -1,6 +1,6 @@
 require_relative 'docker_runner_volume_mix_in'
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Uses a new short-lived docker container per run().
 # Uses a long-lived docker volume per kata.
 #
@@ -11,17 +11,18 @@ require_relative 'docker_runner_volume_mix_in'
 #      process tree is killed.
 #
 # Negatives:
-#   o) increased run() time (compared to one container per kata)
 #   o) avatars cannot share processes.
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#   o) increased run() time
+#      (compared to one container per kata)
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 class DockerKataVolumeRunner
 
   include DockerRunnerVolumeMixIn
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # kata
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def kata_exists?(_image_name, kata_id)
     assert_valid_id(kata_id)
@@ -45,9 +46,9 @@ class DockerKataVolumeRunner
     assert_exec(cmd)
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # avatar
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def avatar_exists?(image_name, kata_id, avatar_name)
     cid = create_container(image_name, kata_id, avatar_name)
@@ -82,13 +83,14 @@ class DockerKataVolumeRunner
     end
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # run
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # Copes with infinite loops (eg) in the avatar's code/tests by
-  # removing the container - which obviously kills all processes
-  # running inside the container.
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Copes with infinite loops (eg) in the avatar's
+  # code/tests by removing the container - which
+  # obviously kills all processes running inside
+  # the container.
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run(image_name, kata_id, avatar_name, deleted_filenames, changed_files, max_seconds)
     cid = create_container(image_name, kata_id, avatar_name)
@@ -103,7 +105,7 @@ class DockerKataVolumeRunner
     end
   end
 
-  private # ==========================================================
+  private
 
   def create_container(image_name, kata_id, avatar_name)
     # The [docker run] must be guarded by argument checks
@@ -124,9 +126,9 @@ class DockerKataVolumeRunner
     args = [
       '--detach',                          # get the cid
       '--interactive',                     # later execs
-      '--net=none',                        # security - no network
-      '--pids-limit=64',                   # security - no fork bombs
-      '--security-opt=no-new-privileges',  # security - no escalation
+      '--net=none',                        # security
+      '--pids-limit=64',                   # no fork bombs
+      '--security-opt=no-new-privileges',  # no escalation
       "--env CYBER_DOJO_KATA_ID=#{kata_id}",
       "--env CYBER_DOJO_AVATAR_NAME=#{avatar_name}",
       "--env CYBER_DOJO_SANDBOX=#{sandbox}",
@@ -146,7 +148,7 @@ class DockerKataVolumeRunner
     cid
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def make_sandbox(cid, avatar_name)
     sandbox = sandbox_path(avatar_name)
@@ -154,7 +156,7 @@ class DockerKataVolumeRunner
     assert_docker_exec(cid, mkdir)
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_kata_exists(image_name, kata_id)
     unless kata_exists?(image_name, kata_id)
@@ -168,7 +170,7 @@ class DockerKataVolumeRunner
     end
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_avatar_exists(cid, avatar_name)
     unless avatar_exists_cid?(cid, avatar_name)
@@ -189,7 +191,7 @@ class DockerKataVolumeRunner
     status == success
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def kata_volume_name(kata_id)
     'cyber_dojo_kata_volume_runner_' + kata_id
