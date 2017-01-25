@@ -25,27 +25,17 @@ class DockerAvatarVolumeRunner
 
   def kata_exists?(image_name, kata_id)
     assert_valid_id(kata_id)
-
-    name = kata_volume_name(kata_id)
-    cmd = "docker volume ls --quiet --filter 'name=#{name}'"
-    stdout,_ = assert_exec(cmd)
-    stdout.strip != ''
+    volume_exists?(kata_volume_name(kata_id))
   end
 
   def new_kata(image_name, kata_id)
     refute_kata_exists(kata_id)
-
-    name = kata_volume_name(kata_id)
-    cmd = "docker volume create --name #{name}"
-    assert_exec(cmd)
+    create_volume(kata_volume_name(kata_id))
   end
 
   def old_kata(image_name, kata_id)
     assert_kata_exists(kata_id)
-
-    name = kata_volume_name(kata_id)
-    cmd = "docker volume rm #{name}"
-    assert_exec(cmd)
+    remove_volume(kata_volume_name(kata_id))
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -56,23 +46,17 @@ class DockerAvatarVolumeRunner
     assert_valid_id(kata_id)
     assert_kata_exists(kata_id)
     assert_valid_name(avatar_name)
-
-    name = avatar_volume_name(kata_id, avatar_name)
-    cmd = "docker volume ls --quiet --filter 'name=#{name}'"
-    stdout,_ = assert_exec(cmd)
-    stdout.strip != ''
+    volume_exists?(avatar_volume_name(kata_id, avatar_name))
   end
 
   def new_avatar(image_name, kata_id, avatar_name, starting_files)
     assert_valid_id(kata_id)
     assert_kata_exists(kata_id)
     refute_avatar_exists(kata_id, avatar_name)
-
-    name = avatar_volume_name(kata_id, avatar_name)
-    cmd = "docker volume create --name #{name}"
-    assert_exec(cmd)
-
-    cid = create_container(image_name, kata_id, avatar_name)
+    volume_name = avatar_volume_name(kata_id, avatar_name)
+    create_volume(volume_name)
+    volume_root = sandbox_path(avatar_name)
+    cid = create_container(image_name, kata_id, avatar_name, volume_name, volume_root)
     begin
       chown_sandbox(cid, avatar_name)
       write_files(cid, avatar_name, starting_files)
@@ -84,10 +68,7 @@ class DockerAvatarVolumeRunner
   def old_avatar(_image_name, kata_id, avatar_name)
     assert_kata_exists(kata_id)
     assert_avatar_exists(kata_id, avatar_name)
-
-    name = avatar_volume_name(kata_id, avatar_name)
-    cmd = "docker volume rm #{name}"
-    assert_exec(cmd)
+    remove_volume(avatar_volume_name(kata_id, avatar_name))
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -103,8 +84,9 @@ class DockerAvatarVolumeRunner
     assert_valid_id(kata_id)
     assert_kata_exists(kata_id)
     assert_avatar_exists(kata_id, avatar_name)
-
-    cid = create_container(image_name, kata_id, avatar_name)
+    volume_name = avatar_volume_name(kata_id, avatar_name)
+    volume_root = sandbox_path(avatar_name)
+    cid = create_container(image_name, kata_id, avatar_name, volume_name, volume_root)
     begin
       delete_files(cid, avatar_name, deleted_filenames)
       write_files(cid, avatar_name, changed_files)
@@ -116,43 +98,6 @@ class DockerAvatarVolumeRunner
   end
 
   private
-
-  def create_container(image_name, kata_id, avatar_name)
-    # Volume mounts the avatar's volume
-    #     [docker run ... --volume=V:/sandbox  ...]
-    # Volume V is assumed to exist via an earlier new_avatar() call.
-    # If volume V does _not_ exist the [docker run] will nevertheless
-    # succeed, create the container, and create a /sandbox folder in it!
-    # https://github.com/docker/docker/issues/13121
-    sandbox = sandbox_path(avatar_name)
-    home = home_path(avatar_name)
-    avn = avatar_volume_name(kata_id, avatar_name)
-    args = [
-      '--detach',                          # get the cid
-      '--interactive',                     # later execs
-      '--net=none',                        # security
-      '--pids-limit=64',                   # no fork bombs
-      '--security-opt=no-new-privileges',  # no escalation
-      "--env CYBER_DOJO_KATA_ID=#{kata_id}",
-      "--env CYBER_DOJO_AVATAR_NAME=#{avatar_name}",
-      "--env CYBER_DOJO_SANDBOX=#{sandbox}",
-      "--env HOME=#{home}",
-      '--user=root',
-      "--volume #{avn}:#{sandbox}:rw"
-    ].join(space)
-    stdout,_ = assert_exec("docker run #{args} #{image_name} sh")
-    cid = stdout.strip
-
-    cmd = [
-      add_group_cmd(cid),
-      add_user_cmd(cid, avatar_name)
-    ].join(' && ')
-    assert_docker_exec(cid, cmd)
-
-    cid
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_kata_exists(kata_id)
     unless kata_exists?(nil, kata_id)

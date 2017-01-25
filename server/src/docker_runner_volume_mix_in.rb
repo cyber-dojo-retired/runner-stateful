@@ -6,6 +6,45 @@ module DockerRunnerVolumeMixIn
 
   module_function
 
+  def create_container(image_name, kata_id, avatar_name, volume_name, volume_root)
+    # The [docker run] must be guarded by argument checks
+    # because it volume mounts...
+    #     [docker run ... --volume=V:...]
+    # Volume V must already exist.
+    # If volume V does _not_ exist the [docker run]
+    # will nevertheless succeed, create the container,
+    # and create a temporary /sandboxes/ folder in it!
+    # See https://github.com/docker/docker/issues/13121
+
+    sandbox = sandbox_path(avatar_name)
+    home = home_path(avatar_name)
+    args = [
+      '--detach',                          # get the cid
+      '--interactive',                     # later execs
+      '--net=none',                        # security
+      '--pids-limit=64',                   # no fork bombs
+      '--security-opt=no-new-privileges',  # no escalation
+      "--env CYBER_DOJO_KATA_ID=#{kata_id}",
+      "--env CYBER_DOJO_AVATAR_NAME=#{avatar_name}",
+      "--env CYBER_DOJO_SANDBOX=#{sandbox}",
+      "--env HOME=#{home}",
+      '--user=root',
+      "--volume #{volume_name}:#{volume_root}:rw"
+    ].join(space)
+    stdout,_ = assert_exec("docker run #{args} #{image_name} sh")
+    cid = stdout.strip
+
+    cmd = [
+      add_group_cmd(cid),
+      add_user_cmd(cid, avatar_name)
+    ].join(' && ')
+    assert_docker_exec(cid, cmd)
+
+    cid
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - -
+
   def add_group_cmd(cid)
     if alpine? cid
       return alpine_add_group_cmd
