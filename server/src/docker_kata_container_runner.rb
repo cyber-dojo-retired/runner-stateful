@@ -40,6 +40,10 @@ class DockerKataContainerRunner
   def new_kata(image_name, kata_id)
     refute_kata_exists(kata_id)
 
+    volume_name = container_name(kata_id)
+    cmd = "docker volume create --name #{volume_name}"
+    assert_exec(cmd)
+
     name = container_name(kata_id)
     args = [
       '--detach',
@@ -49,6 +53,7 @@ class DockerKataContainerRunner
       '--pids-limit=256',                  # no fork bombs
       '--security-opt=no-new-privileges',  # no escalation
       '--user=root',
+      "--volume #{volume_name}:#{sandboxes_root}:rw"
     ].join(space)
     cmd = "docker run #{args} #{image_name} sh -c 'sleep 3h'"
     assert_exec(cmd)
@@ -63,9 +68,6 @@ class DockerKataContainerRunner
 
     add_group = add_group_cmd(kata_id)
     assert_docker_exec(kata_id, add_group)
-
-    mkdir = "mkdir -m 755 #{sandboxes_root}"
-    assert_docker_exec(kata_id, mkdir)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -75,6 +77,8 @@ class DockerKataContainerRunner
 
     name = container_name(kata_id)
     cmd = "docker rm --force #{name}"
+    assert_exec(cmd)
+    cmd = "docker volume rm #{name}"
     assert_exec(cmd)
   end
 

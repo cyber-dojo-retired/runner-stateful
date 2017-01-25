@@ -176,6 +176,24 @@ module DockerRunnerVolumeMixIn
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
+  def volume_exists?(name)
+    cmd = "docker volume ls --quiet --filter 'name=#{name}'"
+    stdout,_ = assert_exec(cmd)
+    stdout.strip != ''
+  end
+
+  def create_volume(name)
+    cmd = "docker volume create --name #{name}"
+    assert_exec(cmd)
+  end
+
+  def remove_volume(name)
+    cmd = "docker volume rm #{name}"
+    assert_exec(cmd)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
   def assert_docker_exec(cid, cmd)
     assert_exec("docker exec #{cid} sh -c '#{cmd}'")
   end
