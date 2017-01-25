@@ -71,10 +71,11 @@ module DockerRunnerMixIn
         [stdout, stderr, status]
       end
     rescue Timeout::Error
-      # Kill the [docker exec] processes running on the host.
-      # This does __not__ kill the cyber-dojo.sh process
-      # running __inside__ the docker container.
-      # See https://github.com/docker/docker/issues/9098
+      # Kill the [docker exec] processes running
+      # on the host. This does __not__ kill the
+      # cyber-dojo.sh process running __inside__
+      # the docker container. See
+      # https://github.com/docker/docker/issues/9098
       Process.kill(-9, pid)
       Process.detach(pid)
       ['', '', 'timed_out']

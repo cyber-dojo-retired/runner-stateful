@@ -140,16 +140,21 @@ module DockerRunnerVolumeMixIn
 
   def remove_container(cid)
     assert_exec("docker rm --force #{cid}")
-    # The docker daemon responds to [docker rm] asynchronously...
-    # An 'immediately' following old_avatar()'s [docker volume rm]
+    # The docker daemon responds to [docker rm]
+    # asynchronously...
+    # An 'immediately' following old_avatar()'s
+    #    [docker volume rm]
     # might fail since the container is not quite dead yet.
-    # This is unlikely to happen in real use but quite likely in tests.
-    # I considered making old_avatar() check the container was dead.
-    #   pro) remove_container will never do a sleep (delaying a run)
-    #   con) would mean storing the cid in the volume somewhere
-    # For now I'm waiting max 2 seconds for the container to die.
-    # Note: no delay if container_dead? is true 1st time.
-    # Note: 0.04s delay if the container_dead? is true 2nd time.
+    # This is unlikely to happen in real use but quite
+    # likely in tests. I considered making old_avatar()
+    # check the container was dead.
+    #   pro) remove_container will never do a sleep
+    #        (delaying a run)
+    #   con) would mean storing the cid in the volume
+    #        somewhere
+    # I'm waiting max 2 seconds for the container to die.
+    # o) no delay if container_dead? is true 1st time.
+    # o) 0.04s delay if container_dead? is true 2nd time.
     removed = false
     tries = 0
     while !removed && tries < 50

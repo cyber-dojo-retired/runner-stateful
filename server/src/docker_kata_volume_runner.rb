@@ -83,9 +83,7 @@ class DockerKataVolumeRunner
     cid = create_container(image_name, kata_id, avatar_name, volume_name, volume_root)
     begin
       assert_avatar_exists(cid, avatar_name)
-      sandbox = sandbox_path(avatar_name)
-      rm = "rm -rf #{sandbox}"
-      assert_docker_exec(cid, rm)
+      remove_sandbox(cid, avatar_name)
     ensure
       remove_container(cid)
     end
@@ -124,6 +122,12 @@ class DockerKataVolumeRunner
     sandbox = sandbox_path(avatar_name)
     mkdir = "mkdir -m 755 #{sandbox}"
     assert_docker_exec(cid, mkdir)
+  end
+
+  def remove_sandbox(cid, avatar_name)
+    sandbox = sandbox_path(avatar_name)
+    rmdir = "rm -rf #{sandbox}"
+    assert_docker_exec(cid, rmdir)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
