@@ -29,13 +29,13 @@ class DockerKataVolumeRunner
     volume_exists?(kata_volume_name(kata_id))
   end
 
-  def new_kata(image_name, kata_id)
-    refute_kata_exists(image_name, kata_id)
+  def new_kata(_image_name, kata_id)
+    refute_kata_exists(kata_id)
     create_volume(kata_volume_name(kata_id))
   end
 
-  def old_kata(image_name, kata_id)
-    assert_kata_exists(image_name, kata_id)
+  def old_kata(_image_name, kata_id)
+    assert_kata_exists(kata_id)
     remove_volume(kata_volume_name(kata_id))
   end
 
@@ -45,7 +45,7 @@ class DockerKataVolumeRunner
 
   def avatar_exists?(image_name, kata_id, avatar_name)
     assert_valid_id(kata_id)
-    assert_kata_exists(image_name, kata_id)
+    assert_kata_exists(kata_id)
     assert_valid_name(avatar_name)
     volume_name = kata_volume_name(kata_id)
     volume_root = sandboxes_root
@@ -59,7 +59,7 @@ class DockerKataVolumeRunner
 
   def new_avatar(image_name, kata_id, avatar_name, starting_files)
     assert_valid_id(kata_id)
-    assert_kata_exists(image_name, kata_id)
+    assert_kata_exists(kata_id)
     assert_valid_name(avatar_name)
     volume_name = kata_volume_name(kata_id)
     volume_root = sandboxes_root
@@ -76,7 +76,7 @@ class DockerKataVolumeRunner
 
   def old_avatar(image_name, kata_id, avatar_name)
     assert_valid_id(kata_id)
-    assert_kata_exists(image_name, kata_id)
+    assert_kata_exists(kata_id)
     assert_valid_name(avatar_name)
     volume_name = kata_volume_name(kata_id)
     volume_root = sandboxes_root
@@ -93,14 +93,13 @@ class DockerKataVolumeRunner
   # run
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # Copes with infinite loops (eg) in the avatar's
-  # code/tests by removing the container - which
-  # obviously kills all processes running inside
-  # the container.
+  # code/tests by removing the container - which kills
+  # kills all processes running inside the container.
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run(image_name, kata_id, avatar_name, deleted_filenames, changed_files, max_seconds)
     assert_valid_id(kata_id)
-    assert_kata_exists(image_name, kata_id)
+    assert_kata_exists(kata_id)
     assert_valid_name(avatar_name)
     volume_name = kata_volume_name(kata_id)
     volume_root = sandboxes_root
@@ -128,20 +127,6 @@ class DockerKataVolumeRunner
     sandbox = sandbox_path(avatar_name)
     rmdir = "rm -rf #{sandbox}"
     assert_docker_exec(cid, rmdir)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def assert_kata_exists(image_name, kata_id)
-    unless kata_exists?(image_name, kata_id)
-      fail_kata_id('!exists')
-    end
-  end
-
-  def refute_kata_exists(image_name, kata_id)
-    if kata_exists?(image_name, kata_id)
-      fail_kata_id('exists')
-    end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -

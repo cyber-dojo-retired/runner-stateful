@@ -194,6 +194,20 @@ module DockerRunnerVolumeMixIn
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
+  def assert_kata_exists(kata_id)
+    unless kata_exists?(nil, kata_id)
+      fail_kata_id('!exists')
+    end
+  end
+
+  def refute_kata_exists(kata_id)
+    if kata_exists?(nil, kata_id)
+      fail_kata_id('exists')
+    end
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
   def assert_docker_exec(cid, cmd)
     assert_exec("docker exec #{cid} sh -c '#{cmd}'")
   end

@@ -72,7 +72,7 @@ class DockerKataContainerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def old_kata(image_name, kata_id)
+  def old_kata(_image_name, kata_id)
     assert_kata_exists(kata_id)
 
     name = container_name(kata_id)

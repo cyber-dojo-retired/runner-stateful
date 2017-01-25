@@ -23,17 +23,17 @@ class DockerAvatarVolumeRunner
   # kata
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def kata_exists?(image_name, kata_id)
+  def kata_exists?(_image_name, kata_id)
     assert_valid_id(kata_id)
     volume_exists?(kata_volume_name(kata_id))
   end
 
-  def new_kata(image_name, kata_id)
+  def new_kata(_image_name, kata_id)
     refute_kata_exists(kata_id)
     create_volume(kata_volume_name(kata_id))
   end
 
-  def old_kata(image_name, kata_id)
+  def old_kata(_image_name, kata_id)
     assert_kata_exists(kata_id)
     remove_volume(kata_volume_name(kata_id))
   end
@@ -42,7 +42,7 @@ class DockerAvatarVolumeRunner
   # avatar
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def avatar_exists?(image_name, kata_id, avatar_name)
+  def avatar_exists?(_image_name, kata_id, avatar_name)
     assert_valid_id(kata_id)
     assert_kata_exists(kata_id)
     assert_valid_name(avatar_name)
@@ -75,9 +75,8 @@ class DockerAvatarVolumeRunner
   # run
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # Copes with infinite loops (eg) in the avatar's
-  # code/tests by removing the container - which
-  # obviously kills all processes running inside
-  # the container.
+  # code/tests by removing the container - which kills
+  # all processes running inside the container.
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run(image_name, kata_id, avatar_name, deleted_filenames, changed_files, max_seconds)
@@ -98,20 +97,6 @@ class DockerAvatarVolumeRunner
   end
 
   private
-
-  def assert_kata_exists(kata_id)
-    unless kata_exists?(nil, kata_id)
-      fail_kata_id('!exists')
-    end
-  end
-
-  def refute_kata_exists(kata_id)
-    if kata_exists?(nil, kata_id)
-      fail_kata_id('exists')
-    end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_avatar_exists(kata_id, avatar_name)
     unless avatar_exists?(nil, kata_id, avatar_name)
