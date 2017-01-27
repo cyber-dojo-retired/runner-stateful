@@ -30,7 +30,13 @@ class DockerKataContainerRunner
     assert_valid_id(kata_id)
 
     name = container_name(kata_id)
-    cmd = "docker ps --quiet --all --filter name=#{name}"
+    cmd = [
+      'docker ps',
+        '--quiet',
+        '--all',
+        '--filter status=running',
+        "--filter name=#{name}"
+    ].join(space)
     stdout,_ = assert_exec(cmd)
     stdout.strip != ''
   end
@@ -40,11 +46,16 @@ class DockerKataContainerRunner
   def new_kata(image_name, kata_id)
     refute_kata_exists(kata_id)
 
-    volume_name = container_name(kata_id)
-    cmd = "docker volume create --name #{volume_name}"
-    assert_exec(cmd)
-
+    # The container may have exited
+    # but not been collected yet.
     name = container_name(kata_id)
+    cmd = "docker rm --force #{name}"
+    quiet_exec(cmd)
+    cmd = "docker volume rm #{name}"
+    quiet_exec(cmd)
+
+    cmd = "docker volume create --name #{name}"
+    assert_exec(cmd)
     args = [
       '--detach',
       '--interactive',                     # later execs
@@ -53,7 +64,7 @@ class DockerKataContainerRunner
       '--pids-limit=256',                  # no fork bombs
       '--security-opt=no-new-privileges',  # no escalation
       '--user=root',
-      "--volume #{volume_name}:#{sandboxes_root}:rw"
+      "--volume #{name}:#{sandboxes_root}:rw"
     ].join(space)
     cmd = "docker run #{args} #{image_name} sh -c 'sleep 3h'"
     assert_exec(cmd)
