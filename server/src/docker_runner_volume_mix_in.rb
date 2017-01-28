@@ -183,13 +183,11 @@ module DockerRunnerVolumeMixIn
   end
 
   def create_volume(name)
-    cmd = "docker volume create --name #{name}"
-    assert_exec(cmd)
+    assert_exec(create_volume_cmd(name))
   end
 
   def remove_volume(name)
-    cmd = "docker volume rm #{name}"
-    assert_exec(cmd)
+    assert_exec(remove_volume_cmd(name))
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -

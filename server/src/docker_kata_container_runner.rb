@@ -49,13 +49,10 @@ class DockerKataContainerRunner
     # The container may have exited
     # but not been collected yet.
     name = container_name(kata_id)
-    cmd = "docker rm --force #{name}"
-    quiet_exec(cmd)
-    cmd = "docker volume rm #{name}"
-    quiet_exec(cmd)
+    quiet_exec(remove_container_cmd(name))
+    quiet_exec(remove_volume_cmd(name))
 
-    cmd = "docker volume create --name #{name}"
-    assert_exec(cmd)
+    assert_exec(create_volume_cmd(name))
     args = [
       '--detach',
       '--interactive',                     # later execs
@@ -77,8 +74,7 @@ class DockerKataContainerRunner
     ].join(space)
     assert_exec(docker_cp)
 
-    add_group = add_group_cmd(kata_id)
-    assert_docker_exec(kata_id, add_group)
+    assert_docker_exec(kata_id, add_group_cmd(kata_id))
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -87,10 +83,8 @@ class DockerKataContainerRunner
     assert_kata_exists(kata_id)
 
     name = container_name(kata_id)
-    cmd = "docker rm --force #{name}"
-    assert_exec(cmd)
-    cmd = "docker volume rm #{name}"
-    assert_exec(cmd)
+    assert_exec(remove_container_cmd(name))
+    assert_exec(remove_volume_cmd(name))
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -107,9 +101,10 @@ class DockerKataContainerRunner
     # called squid (uid=31) which I have to work around.
     # See alpine_add_user_cmd() in docker_runner_mix_in.rb
     if avatar_name == 'squid' && stdout.strip == '31'
-      return false
+      false
+    else
+      status == success
     end
-    status == success
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -288,6 +283,10 @@ class DockerKataContainerRunner
 
   def container_name(kata_id)
     'cyber_dojo_kata_container_runner_' + kata_id
+  end
+
+  def remove_container_cmd(name)
+    "docker rm --force #{name}"
   end
 
 end

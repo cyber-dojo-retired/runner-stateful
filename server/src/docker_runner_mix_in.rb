@@ -115,14 +115,14 @@ module DockerRunnerMixIn
     home = home_path(avatar_name)
     uid = user_id(avatar_name)
     [ "(deluser #{avatar_name};",
-      'adduser',
-        '-D',             # don't assign a password
-        "-G #{group}",
-        "-h #{home}",     # home dir
-        '-s /bin/sh',     # shell
-        "-u #{uid}",
-        avatar_name,
-        ')'
+       'adduser',
+         '-D',             # don't assign a password
+         "-G #{group}",
+         "-h #{home}",     # home dir
+         '-s /bin/sh',     # shell
+         "-u #{uid}",
+         avatar_name,
+      ')'
     ].join(space)
   end
 
@@ -139,6 +139,16 @@ module DockerRunnerMixIn
         "--uid #{uid}",
         avatar_name
     ].join(space)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def create_volume_cmd(name)
+    "docker volume create --name #{name}"
+  end
+
+  def remove_volume_cmd(name)
+    "docker volume rm #{name}"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
