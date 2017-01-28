@@ -275,8 +275,8 @@ class DockerKataContainerRunner
   end
 
   def docker_cmd(kata_id, cmd)
-    cid = container_name(kata_id)
-    "docker exec #{cid} sh -c '#{cmd}'"
+    name = container_name(kata_id)
+    "docker exec #{name} sh -c '#{cmd}'"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
