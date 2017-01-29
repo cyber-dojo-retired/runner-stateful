@@ -251,14 +251,12 @@ class DockerKataContainerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_avatar_exists(avatar_name)
-    assert_valid_name(avatar_name)
     unless avatar_exists?(avatar_name)
       fail_avatar_name('!exists')
     end
   end
 
   def refute_avatar_exists(avatar_name)
-    assert_valid_name(avatar_name)
     if avatar_exists?(avatar_name)
       fail_avatar_name('exists')
     end
