@@ -26,10 +26,8 @@ class DockerKataContainerRunner
   # kata
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def kata_exists?(_image_name, kata_id)
-    assert_valid_id(kata_id)
-
-    name = container_name(kata_id)
+  def kata_exists?
+    name = container_name
     cmd = [
       'docker ps',
         '--quiet',
@@ -43,12 +41,12 @@ class DockerKataContainerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def new_kata(image_name, kata_id)
-    refute_kata_exists(kata_id)
+  def new_kata
+    refute_kata_exists
 
     # The container may have exited
     # but not been collected yet.
-    name = container_name(kata_id)
+    name = container_name
     quiet_exec(remove_container_cmd(name))
     quiet_exec(remove_volume_cmd(name))
 
@@ -74,15 +72,15 @@ class DockerKataContainerRunner
     ].join(space)
     assert_exec(docker_cp)
 
-    assert_docker_exec(kata_id, add_group_cmd(kata_id))
+    assert_docker_exec(add_group_cmd)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def old_kata(_image_name, kata_id)
-    assert_kata_exists(kata_id)
+  def old_kata
+    assert_kata_exists
 
-    name = container_name(kata_id)
+    name = container_name
     assert_exec(remove_container_cmd(name))
     assert_exec(remove_volume_cmd(name))
   end
@@ -91,11 +89,11 @@ class DockerKataContainerRunner
   # avatar
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def avatar_exists?(_image_name, kata_id, avatar_name)
-    assert_kata_exists(kata_id)
+  def avatar_exists?(avatar_name)
+    assert_kata_exists
     assert_valid_name(avatar_name)
 
-    id_cmd = docker_cmd(kata_id, "id -u #{avatar_name}")
+    id_cmd = docker_cmd("id -u #{avatar_name}")
     stdout,_,status = quiet_exec(id_cmd)
     # Alpine Linux has an existing proxy-server user
     # called squid (uid=31) which I have to work around.
@@ -109,77 +107,77 @@ class DockerKataContainerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def new_avatar(_image_name, kata_id, avatar_name, starting_files)
-    assert_kata_exists(kata_id)
-    refute_avatar_exists(kata_id, avatar_name)
+  def new_avatar(avatar_name, starting_files)
+    assert_kata_exists
+    refute_avatar_exists(avatar_name)
 
-    add_user = add_user_cmd(kata_id, avatar_name)
-    assert_docker_exec(kata_id, add_user)
+    add_user = add_user_cmd(avatar_name)
+    assert_docker_exec(add_user)
 
     sandbox = sandbox_path(avatar_name)
     mkdir = "mkdir -m 755 #{sandbox}"
     chown = "chown #{avatar_name}:#{group} #{sandbox}"
-    assert_docker_exec(kata_id, [ mkdir, chown ].join(' && '))
+    assert_docker_exec([ mkdir, chown ].join(' && '))
 
-    write_files(kata_id, avatar_name, starting_files)
+    write_files(avatar_name, starting_files)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def old_avatar(_image_name, kata_id, avatar_name)
-    assert_kata_exists(kata_id)
-    assert_avatar_exists(kata_id, avatar_name)
+  def old_avatar(avatar_name)
+    assert_kata_exists
+    assert_avatar_exists(avatar_name)
 
-    del_user = del_user_cmd(kata_id, avatar_name)
-    assert_docker_exec(kata_id, del_user)
+    del_user = del_user_cmd(avatar_name)
+    assert_docker_exec(del_user)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # run
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def run(_image_name, kata_id, avatar_name, deleted_filenames, changed_files, max_seconds)
-    assert_kata_exists(kata_id)
-    assert_avatar_exists(kata_id, avatar_name)
+  def run(avatar_name, deleted_filenames, changed_files, max_seconds)
+    assert_kata_exists
+    assert_avatar_exists(avatar_name)
 
-    delete_files(kata_id, avatar_name, deleted_filenames)
-    write_files(kata_id, avatar_name, changed_files)
-    stdout,stderr,status = run_cyber_dojo_sh(kata_id, avatar_name, max_seconds)
+    delete_files(avatar_name, deleted_filenames)
+    write_files(avatar_name, changed_files)
+    stdout,stderr,status = run_cyber_dojo_sh(avatar_name, max_seconds)
     { stdout:stdout, stderr:stderr, status:status }
   end
 
   private
 
-  def delete_files(kata_id, avatar_name, filenames)
+  def delete_files(avatar_name, filenames)
     return if filenames == []
     sandbox = sandbox_path(avatar_name)
     all = filenames.map { |filename| "#{sandbox}/#{filename}" }
     rm = 'rm ' + all.join(space)
-    assert_docker_exec(kata_id, rm)
+    assert_docker_exec(rm)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def write_files(kata_id, avatar_name, files)
+  def write_files(avatar_name, files)
     return if files == {}
     Dir.mktmpdir('runner') do |tmp_dir|
       files.each do |filename, content|
         host_filename = tmp_dir + '/' + filename
         disk.write(host_filename, content)
       end
-      cid = container_name(kata_id)
+      cid = container_name
       sandbox = sandbox_path(avatar_name)
       docker_cp = "docker cp #{tmp_dir}/. #{cid}:#{sandbox}"
       assert_exec(docker_cp)
       all = files.keys.map { |filename| "#{sandbox}/#{filename}" }
       chown = "chown #{avatar_name}:#{group} " + all.join(space)
-      assert_docker_exec(kata_id, chown)
+      assert_docker_exec(chown)
     end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def run_cyber_dojo_sh(kata_id, avatar_name, max_seconds)
+  def run_cyber_dojo_sh(avatar_name, max_seconds)
     # The processes __inside__ the docker container
     # are killed by /usr/local/bin/timeout_cyber_dojo.sh
     # See new_kata() above.
@@ -189,99 +187,97 @@ class DockerKataContainerRunner
       avatar_name,
       max_seconds
     ].join(space)
-    run_timeout(docker_cmd(kata_id, sh_cmd), max_seconds)
+    run_timeout(docker_cmd(sh_cmd), max_seconds)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def add_group_cmd(kata_id)
-    if alpine? kata_id
+  def add_group_cmd
+    if alpine?
       return alpine_add_group_cmd
     end
-    if ubuntu? kata_id
+    if ubuntu?
       return ubuntu_add_group_cmd
     end
   end
 
-  def add_user_cmd(kata_id, avatar_name)
-    if alpine?(kata_id)
+  def add_user_cmd(avatar_name)
+    if alpine?
       return alpine_add_user_cmd(avatar_name)
     end
-    if ubuntu?(kata_id)
+    if ubuntu?
       return ubuntu_add_user_cmd(avatar_name)
     end
   end
 
-  def del_user_cmd(kata_id, avatar_name)
-    if alpine? kata_id
+  def del_user_cmd(avatar_name)
+    if alpine?
       return "deluser --remove-home #{avatar_name}"
     end
-    if ubuntu? kata_id
+    if ubuntu?
       return "userdel --remove #{avatar_name}"
     end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def alpine?(kata_id)
-    etc_issue(kata_id).include?('Alpine')
+  def alpine?
+    etc_issue.include?('Alpine')
   end
 
-  def ubuntu?(kata_id)
-    etc_issue(kata_id).include?('Ubuntu')
+  def ubuntu?
+    etc_issue.include?('Ubuntu')
   end
 
-  def etc_issue(kata_id)
-    stdout,_ = assert_docker_exec(kata_id, 'cat /etc/issue')
+  def etc_issue
+    stdout,_ = assert_docker_exec('cat /etc/issue')
     stdout
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_kata_exists(kata_id)
-    assert_valid_id(kata_id)
-    unless kata_exists?(nil, kata_id)
+  def assert_kata_exists
+    unless kata_exists?
       fail_kata_id('!exists')
     end
   end
 
-  def refute_kata_exists(kata_id)
-    assert_valid_id(kata_id)
-    if kata_exists?(nil, kata_id)
+  def refute_kata_exists
+    if kata_exists?
       fail_kata_id('exists')
     end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_avatar_exists(kata_id, avatar_name)
+  def assert_avatar_exists(avatar_name)
     assert_valid_name(avatar_name)
-    unless avatar_exists?(nil, kata_id, avatar_name)
+    unless avatar_exists?(avatar_name)
       fail_avatar_name('!exists')
     end
   end
 
-  def refute_avatar_exists(kata_id, avatar_name)
+  def refute_avatar_exists(avatar_name)
     assert_valid_name(avatar_name)
-    if avatar_exists?(nil, kata_id, avatar_name)
+    if avatar_exists?(avatar_name)
       fail_avatar_name('exists')
     end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_docker_exec(kata_id, cmd)
-    assert_exec(docker_cmd(kata_id, cmd))
+  def assert_docker_exec(cmd)
+    assert_exec(docker_cmd(cmd))
   end
 
-  def docker_cmd(kata_id, cmd)
-    name = container_name(kata_id)
+  def docker_cmd(cmd)
+    name = container_name
     "docker exec #{name} sh -c '#{cmd}'"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def container_name(kata_id)
+  def container_name
     'cyber_dojo_kata_container_runner_' + kata_id
   end
 
