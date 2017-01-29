@@ -1,15 +1,8 @@
-def runner_class; ENV['CYBER_DOJO_RUNNER_CLASS']; end
-
-require_relative 'snake_caser'
-require_relative SnakeCaser::snake_cased(runner_class)
-
 require_relative 'disk_writer'
 require_relative 'bash_sheller'
 require_relative 'stdout_logger'
 
 module Externals
-
-  def runner; @runner ||= Object.const_get(runner_class).new(self); end
 
   def  shell;  @shell ||=  BashSheller.new(self); end
   def   disk;   @disk ||=   DiskWriter.new(self); end

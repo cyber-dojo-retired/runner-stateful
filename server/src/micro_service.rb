@@ -1,4 +1,5 @@
 require_relative 'externals'
+require_relative 'runner'
 require 'sinatra/base'
 require 'json'
 
@@ -77,6 +78,7 @@ class MicroService < Sinatra::Base
   # - - - - - - - - - - - - - - - -
 
   include Externals
+  include Runner
 
   def self.request_args(*names)
     names.each { |name|

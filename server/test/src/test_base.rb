@@ -1,5 +1,6 @@
 require_relative '../hex_mini_test'
 require_relative '../../src/externals'
+require_relative '../../src/runner'
 require 'json'
 
 class TestBase < HexMiniTest
@@ -101,6 +102,7 @@ class TestBase < HexMiniTest
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   include Externals
+  include Runner
 
   def sss; @sss; end
 
