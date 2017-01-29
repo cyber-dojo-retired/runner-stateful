@@ -18,26 +18,26 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def pulled?(named_args = {})
-    runner.pulled?(*defaulted_args(__method__, named_args))
+  def pulled?
+    runner.pulled?
   end
 
-  def pull(named_args = {})
-    runner.pull(*defaulted_args(__method__, named_args))
+  def pull
+    runner.pull
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def kata_exists?(named_args = {})
-    runner.kata_exists?(*defaulted_args(__method__, named_args))
+  def kata_exists?
+    runner.kata_exists?
   end
 
-  def new_kata(named_args = {})
-    runner.new_kata(*defaulted_args(__method__, named_args))
+  def new_kata
+    runner.new_kata
   end
 
-  def old_kata(named_args = {})
-    runner.old_kata(*defaulted_args(__method__, named_args))
+  def old_kata
+    runner.old_kata
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -68,11 +68,11 @@ class TestBase < HexMiniTest
     method = method.to_s
     args = []
 
-    default_kata_id = test_id + '0' * (10-test_id.length)
-    args << defaulted_arg(named_args, :image_name, image_name)
-    args << defaulted_arg(named_args, :kata_id, default_kata_id)
-    return args if ['pulled?','pull'].include?(method)
-    return args if ['kata_exists?','new_kata','old_kata'].include?(method)
+    #default_kata_id = test_id + '0' * (10-test_id.length)
+    #args << defaulted_arg(named_args, :image_name, image_name)
+    #args << defaulted_arg(named_args, :kata_id, default_kata_id)
+    #return args if ['pulled?','pull'].include?(method)
+    #return args if ['kata_exists?','new_kata','old_kata'].include?(method)
 
     default_avatar_name = 'salmon'
     args << defaulted_arg(named_args, :avatar_name, default_avatar_name)
@@ -190,20 +190,6 @@ class TestBase < HexMiniTest
 
   def success; shell.success; end
   def timed_out; 'timed_out'; end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def invalid_kata_ids
-    [
-      nil,          # not string
-      Object.new,   # not string
-      [],           # not string
-      '',           # not 10 chars
-      '123456789',  # not 10 chars
-      '123456789AB',# not 10 chars
-      '123456789G'  # not 10 hex-chars
-    ]
-  end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

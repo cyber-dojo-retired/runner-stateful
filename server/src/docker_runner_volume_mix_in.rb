@@ -6,7 +6,7 @@ module DockerRunnerVolumeMixIn
 
   module_function
 
-  def create_container(image_name, kata_id, avatar_name, volume_name, volume_root)
+  def create_container(avatar_name, volume_name, volume_root)
     # The [docker run] must be guarded by argument checks
     # because it volume mounts...
     #     [docker run ... --volume=V:...]
@@ -192,14 +192,14 @@ module DockerRunnerVolumeMixIn
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_kata_exists(kata_id)
-    unless kata_exists?(nil, kata_id)
+  def assert_kata_exists
+    unless kata_exists?
       fail_kata_id('!exists')
     end
   end
 
-  def refute_kata_exists(kata_id)
-    if kata_exists?(nil, kata_id)
+  def refute_kata_exists
+    if kata_exists?
       fail_kata_id('exists')
     end
   end

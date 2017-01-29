@@ -23,40 +23,37 @@ class DockerAvatarVolumeRunner
   # kata
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def kata_exists?(_image_name, kata_id)
-    assert_valid_id(kata_id)
-    volume_exists?(kata_volume_name(kata_id))
+  def kata_exists?
+    volume_exists?(kata_volume_name)
   end
 
-  def new_kata(_image_name, kata_id)
-    refute_kata_exists(kata_id)
-    create_volume(kata_volume_name(kata_id))
+  def new_kata
+    refute_kata_exists
+    create_volume(kata_volume_name)
   end
 
-  def old_kata(_image_name, kata_id)
-    assert_kata_exists(kata_id)
-    remove_volume(kata_volume_name(kata_id))
+  def old_kata
+    assert_kata_exists
+    remove_volume(kata_volume_name)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # avatar
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def avatar_exists?(_image_name, kata_id, avatar_name)
-    assert_valid_id(kata_id)
-    assert_kata_exists(kata_id)
+  def avatar_exists?(avatar_name)
+    assert_kata_exists
     assert_valid_name(avatar_name)
-    volume_exists?(avatar_volume_name(kata_id, avatar_name))
+    volume_exists?(avatar_volume_name(avatar_name))
   end
 
-  def new_avatar(image_name, kata_id, avatar_name, starting_files)
-    assert_valid_id(kata_id)
-    assert_kata_exists(kata_id)
-    refute_avatar_exists(kata_id, avatar_name)
-    volume_name = avatar_volume_name(kata_id, avatar_name)
+  def new_avatar(avatar_name, starting_files)
+    assert_kata_exists
+    refute_avatar_exists(avatar_name)
+    volume_name = avatar_volume_name(avatar_name)
     create_volume(volume_name)
     volume_root = sandbox_path(avatar_name)
-    cid = create_container(image_name, kata_id, avatar_name, volume_name, volume_root)
+    cid = create_container(avatar_name, volume_name, volume_root)
     begin
       chown_sandbox(cid, avatar_name)
       write_files(cid, avatar_name, starting_files)
@@ -65,10 +62,10 @@ class DockerAvatarVolumeRunner
     end
   end
 
-  def old_avatar(_image_name, kata_id, avatar_name)
-    assert_kata_exists(kata_id)
-    assert_avatar_exists(kata_id, avatar_name)
-    remove_volume(avatar_volume_name(kata_id, avatar_name))
+  def old_avatar(avatar_name)
+    assert_kata_exists
+    assert_avatar_exists(avatar_name)
+    remove_volume(avatar_volume_name(avatar_name))
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -79,13 +76,13 @@ class DockerAvatarVolumeRunner
   # all processes running inside the container.
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def run(image_name, kata_id, avatar_name, deleted_filenames, changed_files, max_seconds)
-    assert_valid_id(kata_id)
-    assert_kata_exists(kata_id)
-    assert_avatar_exists(kata_id, avatar_name)
-    volume_name = avatar_volume_name(kata_id, avatar_name)
+  def run(avatar_name, deleted_filenames, changed_files, max_seconds)
+    #assert_valid_id
+    assert_kata_exists
+    assert_avatar_exists(avatar_name)
+    volume_name = avatar_volume_name(avatar_name)
     volume_root = sandbox_path(avatar_name)
-    cid = create_container(image_name, kata_id, avatar_name, volume_name, volume_root)
+    cid = create_container(avatar_name, volume_name, volume_root)
     begin
       delete_files(cid, avatar_name, deleted_filenames)
       write_files(cid, avatar_name, changed_files)
@@ -98,25 +95,25 @@ class DockerAvatarVolumeRunner
 
   private
 
-  def assert_avatar_exists(kata_id, avatar_name)
-    unless avatar_exists?(nil, kata_id, avatar_name)
+  def assert_avatar_exists(avatar_name)
+    unless avatar_exists?(avatar_name)
       fail_avatar_name('!exists')
     end
   end
 
-  def refute_avatar_exists(kata_id, avatar_name)
-    if avatar_exists?(nil, kata_id, avatar_name)
+  def refute_avatar_exists(avatar_name)
+    if avatar_exists?(avatar_name)
       fail_avatar_name('exists')
     end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  def kata_volume_name(kata_id)
+  def kata_volume_name
     'cyber_dojo_avatar_volume_runner_kata_' + kata_id
   end
 
-  def avatar_volume_name(kata_id, avatar_name)
+  def avatar_volume_name(avatar_name)
     'cyber_dojo_avatar_volume_runner_avatar_' + kata_id + '_' + avatar_name
   end
 

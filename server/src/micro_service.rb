@@ -9,51 +9,54 @@ class MicroService < Sinatra::Base
   # in particular runner-service implementations.
 
   get '/pulled?' do
-    getter(__method__, image_name, kata_id)
+    args = []
+    getter(__method__, *args)
   end
 
   post '/pull' do
-    poster(__method__, image_name, kata_id)
+    args = []
+    poster(__method__, *args)
   end
 
   # - - - - - - - - - - - - - - - - - - - - -
 
   get '/kata_exists?' do
-    getter(__method__, image_name, kata_id)
+    args = []
+    getter(__method__, *args)
   end
 
   post '/new_kata' do
-    poster(__method__, image_name, kata_id)
+    args = []
+    poster(__method__, *args)
   end
 
   post '/old_kata' do
-    poster(__method__, image_name, kata_id)
+    args = []
+    poster(__method__, *args)
   end
 
   # - - - - - - - - - - - - - - - - - - - - -
 
   get '/avatar_exists?' do
-    args = [ image_name, kata_id, avatar_name ]
+    args = [ avatar_name ]
     getter(__method__, *args)
   end
 
   post '/new_avatar' do
-    args = [ image_name, kata_id, avatar_name ]
+    args = [ avatar_name ]
     args << starting_files
     poster(__method__, *args)
   end
 
   post '/old_avatar' do
-    args = [ image_name, kata_id, avatar_name ]
+    args = [ avatar_name ]
     poster(__method__, *args)
   end
 
   # - - - - - - - - - - - - - - - - - - - - -
 
   post '/run' do
-    args  = [ image_name, kata_id, avatar_name ]
-    args += [ deleted_filenames, changed_files ]
-    args += [ max_seconds ]
+    args = [ avatar_name, deleted_filenames, changed_files, max_seconds ]
     poster(__method__, *args)
   end
 
@@ -86,7 +89,7 @@ class MicroService < Sinatra::Base
     }
   end
 
-  request_args :image_name, :kata_id, :avatar_names
+  request_args :image_name, :kata_id
   request_args :avatar_name, :starting_files
   request_args :deleted_filenames, :changed_files
   request_args :max_seconds

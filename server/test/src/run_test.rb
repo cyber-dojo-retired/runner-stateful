@@ -10,15 +10,6 @@ class RunTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test 'D7B',
-  'run with an invalid kata_id raises' do
-    invalid_kata_ids.each do |invalid_kata_id|
-      assert_raises_kata_id(invalid_kata_id, 'invalid')
-    end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   test '1DC',
   'run with valid kata_id that does not exist raises' do
     kata_id = '0C67EC0416'

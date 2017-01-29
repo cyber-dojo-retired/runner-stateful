@@ -41,17 +41,16 @@ class AvatarTest < TestBase
   # negative tests cases: new_avatar
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test 'B20',
-  'new_avatar with an invalid kata_id raises' do
-    assert_method_raises(:new_avatar, invalid_kata_ids, 'salmon', 'kata_id:invalid')
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   test '7C4',
   'new_avatar with non-existent kata_id raises' do
-    kata_id = '42CF187311'
-    assert_method_raises(:new_avatar, kata_id, 'salmon', 'kata_id:!exists')
+    old_runner = @runner
+    error = assert_raises(ArgumentError) {
+      @runner = nil
+      kata_id = '92BB3FE5B6'
+      runner(image_name, kata_id).new_avatar('salmon', {})
+    }
+    assert_equal 'kata_id:!exists', error.message
+    @runner = old_runner
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -77,17 +76,16 @@ class AvatarTest < TestBase
   # negative test cases: old_avatar
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '2A8',
-  'old_avatar with invalid kata_id raises' do
-    assert_method_raises(:old_avatar, invalid_kata_ids, 'salmon', 'kata_id:invalid')
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   test 'E35',
   'old_avatar with non-existent kata_id raises' do
-    kata_id = '92BB3FE5B6'
-    assert_method_raises(:old_avatar, kata_id, 'salmon', 'kata_id:!exists')
+    old_runner = @runner
+    error = assert_raises(ArgumentError) {
+      @runner = nil
+      kata_id = '92BB3FE5B6'
+      runner(image_name, kata_id).old_avatar('salmon')
+    }
+    assert_equal 'kata_id:!exists', error.message
+    @runner = old_runner
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -

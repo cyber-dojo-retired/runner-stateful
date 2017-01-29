@@ -7,17 +7,20 @@ require 'timeout'
 
 module DockerRunnerMixIn
 
-  def initialize(parent)
+  def initialize(parent, image_name, kata_id)
     @parent = parent
+    @image_name = image_name
+    @kata_id = kata_id
+    assert_valid_id
   end
 
   attr_reader :parent # For nearest_ancestors()
 
-  def pulled?(image_name, _kata_id)
+  def pulled?
     image_names.include?(image_name)
   end
 
-  def pull(image_name, _kata_id)
+  def pull
     assert_exec("docker pull #{image_name}")
   end
 
@@ -48,6 +51,8 @@ module DockerRunnerMixIn
   end
 
   module_function
+
+  attr_reader :image_name, :kata_id
 
   include StringCleaner
   include StringTruncater
@@ -153,13 +158,13 @@ module DockerRunnerMixIn
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_valid_id(kata_id)
-    unless valid_id?(kata_id)
+  def assert_valid_id
+    unless valid_id?
       fail_kata_id('invalid')
     end
   end
 
-  def valid_id?(kata_id)
+  def valid_id?
     kata_id.class.name == 'String' &&
       kata_id.length == 10 &&
         kata_id.chars.all? { |char| hex?(char) }
