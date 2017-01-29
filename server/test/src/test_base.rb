@@ -42,16 +42,16 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def avatar_exists?(named_args = {})
-    runner.avatar_exists?(*defaulted_args(__method__, named_args))
+  def avatar_exists?(avatar_name = 'salmon')
+    runner.avatar_exists?(avatar_name)
   end
 
-  def new_avatar(named_args = {})
-    runner.new_avatar(*defaulted_args(__method__, named_args))
+  def new_avatar(avatar_name = 'salmon', the_files = files)
+    runner.new_avatar(avatar_name, the_files)
   end
 
-  def old_avatar(named_args = {})
-    runner.old_avatar(*defaulted_args(__method__, named_args))
+  def old_avatar(avatar_name = 'salmon')
+    runner.old_avatar(avatar_name)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -67,16 +67,8 @@ class TestBase < HexMiniTest
   def defaulted_args(method, named_args)
     method = method.to_s
     args = []
-
     default_avatar_name = 'salmon'
     args << defaulted_arg(named_args, :avatar_name, default_avatar_name)
-    return args if ['avatar_exists?','old_avatar'].include?(method)
-
-    if method == 'new_avatar'
-      args << defaulted_arg(named_args, :starting_files, files)
-      return args
-    end
-
     args << defaulted_arg(named_args, :deleted_filenames, [])
     args << defaulted_arg(named_args, :changed_files, files)
     args << defaulted_arg(named_args, :max_seconds, 10)

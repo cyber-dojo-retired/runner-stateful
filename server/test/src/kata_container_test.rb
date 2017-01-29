@@ -45,32 +45,25 @@ class KataContainerTest < TestBase
   kc_test '5F9',
   '[Alpine] after new_avatar(salmon)',
   'there is a linux user called salmon inside the kata container' do
-    new_avatar(salmon)
+    new_avatar('salmon')
     begin
       uid = assert_docker_exec('id -u salmon').strip
       assert_equal user_id('salmon'), uid
     ensure
-      old_avatar(salmon)
+      old_avatar('salmon')
     end
   end
 
   kc_test '2A8',
   '[Ubuntu] after new_avatar(salmon)',
   'there is a linux user called salmon inside the kata container' do
-    new_avatar(salmon)
+    new_avatar('salmon')
     begin
       uid = assert_docker_exec('id -u salmon').strip
       assert_equal user_id('salmon'), uid
     ensure
-      old_avatar(salmon)
+      old_avatar('salmon')
     end
   end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def salmon
-    { avatar_name:'salmon' }
-  end
-
 
 end

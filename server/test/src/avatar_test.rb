@@ -30,11 +30,10 @@ class AvatarTest < TestBase
   test '9BD',
   'Alpine Linux has an existing user called squid',
   "which would clash with the squid avatar and has to be deluser'd" do
-    squid = { avatar_name:'squid' }
-    refute avatar_exists?(squid)
-    new_avatar(squid)
-    assert avatar_exists?(squid)
-    old_avatar(squid)
+    refute avatar_exists?('squid')
+    new_avatar('squid')
+    assert avatar_exists?('squid')
+    old_avatar('squid')
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -64,11 +63,12 @@ class AvatarTest < TestBase
 
   test '119',
   'new_avatar with existing kata_id but avatar_name that already exists raises' do
-    new_avatar({ avatar_name:'salmon' })
+    new_avatar
     begin
-      assert_method_raises(:new_avatar, kata_id, 'salmon', 'avatar_name:exists')
+      error = assert_raises(ArgumentError) { new_avatar }
+      assert_equal 'avatar_name:exists', error.message
     ensure
-      old_avatar({ avatar_name:'salmon' })
+      old_avatar
     end
   end
 
@@ -97,7 +97,8 @@ class AvatarTest < TestBase
 
   test 'D6F',
   'old_avatar with existing kata_id but avatar_name that does not exist raises' do
-    assert_method_raises(:old_avatar, kata_id, 'salmon', 'avatar_name:!exists')
+    error = assert_raises(ArgumentError) { old_avatar('salmon') }
+    assert_equal 'avatar_name:!exists', error.message
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -

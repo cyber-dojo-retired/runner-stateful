@@ -79,7 +79,7 @@ module OsHelper
     # has setup a salmon. So I create a new avatar with
     # known ls-starting-files. Note that kata_teardown
     # calls old_avatar and old_kata
-    new_avatar({ avatar_name:'lion', starting_files:ls_starting_files })
+    new_avatar('lion', ls_starting_files)
     begin
       sss_run({ avatar_name:'lion', changed_files:{} })
       assert_equal success, status
@@ -93,7 +93,7 @@ module OsHelper
       assert_equal_atts('hello.txt',     '-rw-r--r--', lion_uid, group, 11, ls_files)
       assert_equal_atts('hello.sh',      '-rw-r--r--', lion_uid, group, 16, ls_files)
     ensure
-      old_avatar({ avatar_name:'lion' })
+      old_avatar('lion')
     end
   end
 
