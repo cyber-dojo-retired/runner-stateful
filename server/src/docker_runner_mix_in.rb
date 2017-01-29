@@ -13,11 +13,11 @@ module DockerRunnerMixIn
 
   attr_reader :parent # For nearest_ancestors()
 
-  def pulled?(image_name)
+  def pulled?(image_name, _kata_id)
     image_names.include?(image_name)
   end
 
-  def pull(image_name)
+  def pull(image_name, _kata_id)
     assert_exec("docker pull #{image_name}")
   end
 

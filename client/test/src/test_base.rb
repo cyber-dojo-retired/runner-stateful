@@ -68,10 +68,9 @@ class TestBase < HexMiniTest
 
     default_image_name = 'cyberdojofoundation/gcc_assert'
     args << defaulted_arg(named_args, :image_name, default_image_name)
-    return args if ['pulled?','pull'].include?(method)
-
     default_kata_id = test_id + '0' * (10-test_id.length)
     args << defaulted_arg(named_args, :kata_id, default_kata_id)
+    return args if ['pulled?','pull'].include?(method)
     return args if ['kata_exists?','new_kata','old_kata'].include?(method)
 
     default_avatar_name = 'salmon'

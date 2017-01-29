@@ -9,11 +9,11 @@ class MicroService < Sinatra::Base
   # in particular runner-service implementations.
 
   get '/pulled?' do
-    getter(__method__, image_name)
+    getter(__method__, image_name, kata_id)
   end
 
   post '/pull' do
-    poster(__method__, image_name)
+    poster(__method__, image_name, kata_id)
   end
 
   # - - - - - - - - - - - - - - - - - - - - -

@@ -68,11 +68,10 @@ class TestBase < HexMiniTest
     method = method.to_s
     args = []
 
-    args << defaulted_arg(named_args, :image_name, image_name)
-    return args if ['pulled?','pull'].include?(method)
-
     default_kata_id = test_id + '0' * (10-test_id.length)
+    args << defaulted_arg(named_args, :image_name, image_name)
     args << defaulted_arg(named_args, :kata_id, default_kata_id)
+    return args if ['pulled?','pull'].include?(method)
     return args if ['kata_exists?','new_kata','old_kata'].include?(method)
 
     default_avatar_name = 'salmon'
