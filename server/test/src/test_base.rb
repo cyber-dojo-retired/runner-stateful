@@ -58,22 +58,16 @@ class TestBase < HexMiniTest
 
   def sss_run(named_args = {})
     # don't name this run() as it clashes with MiniTest
-    @sss = runner.run(*defaulted_args(__method__, named_args))
+    args = []
+    args << defaulted_arg(named_args, :avatar_name, 'salmon')
+    args << defaulted_arg(named_args, :deleted_filenames, [])
+    args << defaulted_arg(named_args, :changed_files, files)
+    args << defaulted_arg(named_args, :max_seconds, 10)
+    @sss = runner.run(*args)
     [stdout,stderr,status]
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def defaulted_args(method, named_args)
-    method = method.to_s
-    args = []
-    default_avatar_name = 'salmon'
-    args << defaulted_arg(named_args, :avatar_name, default_avatar_name)
-    args << defaulted_arg(named_args, :deleted_filenames, [])
-    args << defaulted_arg(named_args, :changed_files, files)
-    args << defaulted_arg(named_args, :max_seconds, 10)
-    return args if method == 'sss_run'
-  end
 
   def defaulted_arg(named_args, arg_name, arg_default)
     named_args.key?(arg_name) ? named_args[arg_name] : arg_default
