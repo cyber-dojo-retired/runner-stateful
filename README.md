@@ -29,7 +29,9 @@ API:
 Asks whether the image with the given image_name has been pulled.
 - parameter, eg
 ```
-  { "image_name": "cyberdojofoundation/gcc_assert" }
+  { "image_name": "cyberdojofoundation/gcc_assert",
+       "kata_id": "15B9AD6C42"
+  }
 ```
 - returns true if it has, false if it hasn't.
 ```
@@ -41,7 +43,9 @@ Asks whether the image with the given image_name has been pulled.
 Pull the image with the given image_name.
 - parameter, eg
 ```
-  { "image_name": "cyberdojofoundation/gcc_assert" }
+  { "image_name": "cyberdojofoundation/gcc_assert",
+       "kata_id": "15B9AD6C42"
+  }
 ```
 
 - - - -
