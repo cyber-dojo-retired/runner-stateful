@@ -75,7 +75,7 @@ class TestBase < HexMiniTest
 
   def set_image_name(image_name); @image_name = image_name; end
   def image_name; @image_name; end
-  def kata_id; test_id + '0' * (10-test_id.length); end
+  def kata_id; hex_test_id + '0' * (10-hex_test_id.length); end
   def avatar_name; 'salmon'; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -127,8 +127,8 @@ class TestBase < HexMiniTest
       '[Alpine]'        => 'gcc_assert',
       '[Ubuntu]'        => 'clangpp_assert'
     }
-    row = rows.detect { |key,_| test_name.start_with? key }
-    fail 'cannot find image_name from test_name' if row.nil?
+    row = rows.detect { |key,_| hex_test_name.start_with? key }
+    fail 'cannot find image_name from hex_test_name' if row.nil?
     'cyberdojofoundation/' + row[1]
   end
 

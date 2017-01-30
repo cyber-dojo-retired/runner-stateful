@@ -53,7 +53,7 @@ class HexMiniTest < MiniTest::Test
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def _hex_setup_caller(hex_id, hex_name)
-    ENV['CYBER_DOJO_TEST_HEX_ID'] = hex_id
+    ENV['CYBER_DOJO_HEX_TEST_ID'] = hex_id
     @_hex_test_id = hex_id
     @_hex_test_name = hex_name
     hex_setup
@@ -70,7 +70,7 @@ class HexMiniTest < MiniTest::Test
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  def test_id; @_hex_test_id; end
-  def test_name; @_hex_test_name; end
+  def hex_test_id; @_hex_test_id; end
+  def hex_test_name; @_hex_test_name; end
 
 end

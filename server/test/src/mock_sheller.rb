@@ -2,8 +2,8 @@
 class MockSheller
 
   def initialize(_parent)
-    test_id =  ENV['CYBER_DOJO_TEST_HEX_ID']
-    @filename = Dir.tmpdir + '/cyber_dojo_mock_sheller_' + test_id + '.json'
+    hex_test_id = ENV['CYBER_DOJO_HEX_TEST_ID']
+    @filename = Dir.tmpdir + '/cyber_dojo_mock_sheller_' + hex_test_id + '.json'
     write([]) unless File.file?(filename)
   end
 
