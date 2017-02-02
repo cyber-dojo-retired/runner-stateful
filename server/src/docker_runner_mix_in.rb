@@ -16,16 +16,6 @@ module DockerRunnerMixIn
 
   attr_reader :parent # For nearest_ancestors()
 
-  def pulled?
-    image_names.include?(image_name)
-  end
-
-  def pull
-    assert_exec("docker pull #{image_name}")
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - -
-
   def user_id(avatar_name)
     assert_valid_name(avatar_name)
     40000 + all_avatars_names.index(avatar_name)
@@ -90,15 +80,6 @@ module DockerRunnerMixIn
       r_stdout.close
       r_stderr.close
     end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def image_names
-    cmd = 'docker images --format "{{.Repository}}"'
-    stdout,_ = assert_exec(cmd)
-    names = stdout.split("\n")
-    names.uniq - ['<none']
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -

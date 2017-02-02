@@ -8,18 +8,6 @@ class MicroService < Sinatra::Base
   # Some methods have arguments that are unused
   # in particular runner-service implementations.
 
-  get '/pulled?' do
-    args = []
-    getter(__method__, *args)
-  end
-
-  post '/pull' do
-    args = []
-    poster(__method__, *args)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - -
-
   get '/kata_exists?' do
     args = []
     getter(__method__, *args)
