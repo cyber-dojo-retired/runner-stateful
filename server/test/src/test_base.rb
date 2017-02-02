@@ -18,6 +18,12 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  def new_runner(image_name, kata_id)
+    Object.const_get(runner_class).new(self, image_name, kata_id)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   def kata_exists?
     runner.kata_exists?
   end

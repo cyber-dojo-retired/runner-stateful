@@ -6,8 +6,7 @@ class RunnerTest < TestBase
 
   test 'D01',
   'runner with valid_kata is does not raise' do
-    kata_id = '4C8DBD014C'
-    runner(image_name, kata_id)
+    new_runner(image_name, kata_id)
   end
 
   # - - - - - - - - - - - - - - - - -
@@ -16,8 +15,7 @@ class RunnerTest < TestBase
   'runner with invalid kata_id raises' do
     invalid_kata_ids.each do |invalid_kata_id|
       error = assert_raises(ArgumentError) {
-        @runner = nil
-        runner(image_name, invalid_kata_id)
+        new_runner(image_name, invalid_kata_id)
       }
       assert_equal 'kata_id:invalid', error.message
     end

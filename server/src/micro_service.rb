@@ -9,42 +9,37 @@ class MicroService < Sinatra::Base
   # in particular runner-service implementations.
 
   get '/kata_exists?' do
-    args = []
-    getter(__method__, *args)
+    getter(__method__)
   end
 
   post '/new_kata' do
-    args = []
-    poster(__method__, *args)
+    poster(__method__)
   end
 
   post '/old_kata' do
-    args = []
-    poster(__method__, *args)
+    poster(__method__)
   end
 
   # - - - - - - - - - - - - - - - - - - - - -
 
   get '/avatar_exists?' do
-    args = [ avatar_name ]
-    getter(__method__, *args)
+    getter(__method__, avatar_name)
   end
 
   post '/new_avatar' do
-    args = [ avatar_name ]
-    args << starting_files
-    poster(__method__, *args)
+    poster(__method__, avatar_name, starting_files)
   end
 
   post '/old_avatar' do
-    args = [ avatar_name ]
-    poster(__method__, *args)
+    poster(__method__, avatar_name)
   end
 
   # - - - - - - - - - - - - - - - - - - - - -
 
   post '/run' do
-    args = [ avatar_name, deleted_filenames, changed_files, max_seconds ]
+    args  = [ avatar_name ]
+    args += [ deleted_filenames, changed_files ]
+    args += [ max_seconds ]
     poster(__method__, *args)
   end
 

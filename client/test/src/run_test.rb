@@ -30,7 +30,7 @@ class RunTest < TestBase
 
   test '348',
   'red-traffic-light' do
-    sss_run(files)
+    sss_run
     assert_stdout "makefile:14: recipe for target 'test.output' failed\n"
     assert stderr.start_with?('Assertion failed: answer() == 42'), sss.to_s
     assert_status 2
@@ -41,7 +41,7 @@ class RunTest < TestBase
   test '16F',
   'green-traffic-light' do
     file_sub('hiker.c', '6 * 9', '6 * 7')
-    sss_run(files)
+    sss_run
     assert_stdout "All tests passed\n"
     assert_stderr ''
     assert_status 0
@@ -52,7 +52,7 @@ class RunTest < TestBase
   test '295',
   'amber-traffic-light' do
     file_sub('hiker.c', '6 * 9', '6 * 9sss')
-    sss_run(files)
+    sss_run
     lines = [
       "invalid suffix \"sss\" on integer constant",
       'return 6 * 9sss'
@@ -67,7 +67,7 @@ class RunTest < TestBase
   test 'E6F',
   'timed-out-traffic-light' do
     file_sub('hiker.c', 'return', "for(;;);\nreturn")
-    sss_run({ changed_files:files, max_seconds:3 })
+    sss_run({ max_seconds:3 })
     assert_stdout ''
     assert_stderr ''
     assert_timed_out

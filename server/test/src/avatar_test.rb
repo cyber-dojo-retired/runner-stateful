@@ -42,14 +42,11 @@ class AvatarTest < TestBase
 
   test '7C4',
   'new_avatar with non-existent kata_id raises' do
-    old_runner = @runner
     error = assert_raises(ArgumentError) {
-      @runner = nil
       kata_id = '92BB3FE5B6'
-      runner(image_name, kata_id).new_avatar('salmon', {})
+      new_runner(image_name, kata_id).new_avatar('salmon', {})
     }
     assert_equal 'kata_id:!exists', error.message
-    @runner = old_runner
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -78,14 +75,11 @@ class AvatarTest < TestBase
 
   test 'E35',
   'old_avatar with non-existent kata_id raises' do
-    old_runner = @runner
     error = assert_raises(ArgumentError) {
-      @runner = nil
       kata_id = '92BB3FE5B6'
-      runner(image_name, kata_id).old_avatar('salmon')
+      new_runner(image_name, kata_id).old_avatar('salmon')
     }
     assert_equal 'kata_id:!exists', error.message
-    @runner = old_runner
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
