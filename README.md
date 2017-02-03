@@ -25,31 +25,6 @@ API:
 
 - - - -
 
-# pulled?
-Asks whether the image with the given image_name has been pulled.
-- parameter, eg
-```
-  { "image_name": "cyberdojofoundation/gcc_assert",
-       "kata_id": "15B9AD6C42"
-  }
-```
-- returns true if it has, false if it hasn't.
-```
-  { "pulled?": true   }
-  { "pulled?": false  }
-```
-
-# pull
-Pull the image with the given image_name.
-- parameter, eg
-```
-  { "image_name": "cyberdojofoundation/gcc_assert",
-       "kata_id": "15B9AD6C42"
-  }
-```
-
-- - - -
-
 # kata_exists?
 Asks whether the kata with the given kata_id exists.
 - parameters, eg
