@@ -77,7 +77,6 @@ class DockerAvatarVolumeRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run(avatar_name, deleted_filenames, changed_files, max_seconds)
-    #assert_valid_id
     assert_kata_exists
     assert_avatar_exists(avatar_name)
     volume_name = avatar_volume_name(avatar_name)
