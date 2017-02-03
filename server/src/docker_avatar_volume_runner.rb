@@ -43,7 +43,7 @@ class DockerAvatarVolumeRunner
 
   def avatar_exists?(avatar_name)
     assert_kata_exists
-    assert_valid_name(avatar_name)
+    assert_valid_avatar_name(avatar_name)
     volume_exists?(avatar_volume_name(avatar_name))
   end
 

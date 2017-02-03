@@ -44,7 +44,7 @@ class DockerKataVolumeRunner
 
   def avatar_exists?(avatar_name)
     assert_kata_exists
-    assert_valid_name(avatar_name)
+    assert_valid_avatar_name(avatar_name)
     volume_name = kata_volume_name
     volume_root = sandboxes_root
     cid = create_container(avatar_name, volume_name, volume_root)
@@ -57,7 +57,7 @@ class DockerKataVolumeRunner
 
   def new_avatar(avatar_name, starting_files)
     assert_kata_exists
-    assert_valid_name(avatar_name)
+    assert_valid_avatar_name(avatar_name)
     volume_name = kata_volume_name
     volume_root = sandboxes_root
     cid = create_container(avatar_name, volume_name, volume_root)
@@ -73,7 +73,7 @@ class DockerKataVolumeRunner
 
   def old_avatar(avatar_name)
     assert_kata_exists
-    assert_valid_name(avatar_name)
+    assert_valid_avatar_name(avatar_name)
     volume_name = kata_volume_name
     volume_root = sandboxes_root
     cid = create_container(avatar_name, volume_name, volume_root)
@@ -95,7 +95,7 @@ class DockerKataVolumeRunner
 
   def run(avatar_name, deleted_filenames, changed_files, max_seconds)
     assert_kata_exists
-    assert_valid_name(avatar_name)
+    assert_valid_avatar_name(avatar_name)
     volume_name = kata_volume_name
     volume_root = sandboxes_root
     cid = create_container(avatar_name, volume_name, volume_root)

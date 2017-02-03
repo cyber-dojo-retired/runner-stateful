@@ -11,13 +11,14 @@ module DockerRunnerMixIn
     @parent = parent
     @image_name = image_name
     @kata_id = kata_id
-    assert_valid_id
+    assert_valid_image_name
+    assert_valid_kata_id
   end
 
   attr_reader :parent # For nearest_ancestors()
 
   def user_id(avatar_name)
-    assert_valid_name(avatar_name)
+    assert_valid_avatar_name(avatar_name)
     40000 + all_avatars_names.index(avatar_name)
   end
 
@@ -26,7 +27,7 @@ module DockerRunnerMixIn
   end
 
   def sandbox_path(avatar_name)
-    assert_valid_name(avatar_name)
+    assert_valid_avatar_name(avatar_name)
     "#{sandboxes_root}/#{avatar_name}"
   end
 
@@ -139,13 +140,33 @@ module DockerRunnerMixIn
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_valid_id
-    unless valid_id?
+  def assert_valid_image_name
+    unless valid_image_name?
+      fail_image_name('invalid')
+    end
+  end
+
+  def valid_image_name?
+    # http://stackoverflow.com/questions/37861791/
+    #      how-are-docker-image-names-parsed
+    # https://github.com/docker/docker/blob/master/image/spec/v1.1.md
+    # Simplified, no hostname, no :tag
+    alpha_numeric = '[a-z0-9]+'
+    separator = '[_.-]+'
+    component = "#{alpha_numeric}(#{separator}#{alpha_numeric})*"
+    name = "#{component}(/#{component})*"
+    image_name =~ /^#{name}$/o
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def assert_valid_kata_id
+    unless valid_kata_id?
       fail_kata_id('invalid')
     end
   end
 
-  def valid_id?
+  def valid_kata_id?
     kata_id.class.name == 'String' &&
       kata_id.length == 10 &&
         kata_id.chars.all? { |char| hex?(char) }
@@ -157,18 +178,22 @@ module DockerRunnerMixIn
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_valid_name(avatar_name)
-    unless valid_avatar?(avatar_name)
+  def assert_valid_avatar_name(avatar_name)
+    unless valid_avatar_name?(avatar_name)
       fail_avatar_name('invalid')
     end
   end
 
   include AllAvatarsNames
-  def valid_avatar?(avatar_name)
+  def valid_avatar_name?(avatar_name)
     all_avatars_names.include?(avatar_name)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def fail_image_name(message)
+    fail bad_argument("image_name:#{message}")
+  end
 
   def fail_kata_id(message)
     fail bad_argument("kata_id:#{message}")

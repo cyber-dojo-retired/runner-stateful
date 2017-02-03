@@ -91,7 +91,7 @@ class DockerKataContainerRunner
 
   def avatar_exists?(avatar_name)
     assert_kata_exists
-    assert_valid_name(avatar_name)
+    assert_valid_avatar_name(avatar_name)
 
     id_cmd = docker_cmd("id -u #{avatar_name}")
     stdout,_,status = quiet_exec(id_cmd)
