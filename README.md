@@ -87,7 +87,7 @@ Must be called before run.
     "starting_files": { "hiker.h": "#ifndef HIKER_INCLUDED...",
                         "hiker.c": "#include...",
                         ...
-                       }
+                      }
   }
 ```
 
