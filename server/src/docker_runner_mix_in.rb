@@ -203,10 +203,6 @@ module DockerRunnerMixIn
     fail bad_argument("avatar_name:#{message}")
   end
 
-  def fail_command(message)
-    fail bad_argument("command:#{message}")
-  end
-
   def bad_argument(message)
     ArgumentError.new(message)
   end
