@@ -1,8 +1,26 @@
 require_relative 'test_base'
 
+class RunnerFake
+  def initialize(_,_,_)
+  end
+end
+
 class RunnerTest < TestBase
 
   def self.hex_prefix; '4C8DB'; end
+
+  test '186',
+  'runner can be set via CYBER_DOJO_RUNNER_CLASS environment-variable' do
+    existing_runner = ENV['CYBER_DOJO_RUNNER_CLASS']
+    ENV['CYBER_DOJO_RUNNER_CLASS'] = 'RunnerFake'
+    begin
+      assert_equal 'RunnerFake', runner.class.name
+    ensure
+      ENV['CYBER_DOJO_RUNNER_CLASS'] = existing_runner
+    end
+  end
+
+  # - - - - - - - - - - - - - - - - -
 
   test 'D01',
   'runner with valid image_name and valid kata_id does not raise' do
