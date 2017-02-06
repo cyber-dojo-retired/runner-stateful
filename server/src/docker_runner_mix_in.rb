@@ -203,10 +203,6 @@ module DockerRunnerMixIn
     fail bad_argument("avatar_name:#{message}")
   end
 
-  def bad_argument(message)
-    ArgumentError.new(message)
-  end
-
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_exec(cmd)
@@ -216,7 +212,7 @@ module DockerRunnerMixIn
       log << "status:#{status}"
       log << "stdout:#{stdout}"
       log << "stderr:#{stderr}"
-      fail_command(cmd)
+      fail bad_argument("command:#{cmd}")
     end
     [stdout,stderr]
   end
@@ -227,6 +223,10 @@ module DockerRunnerMixIn
 
   def quiet_exec(cmd)
     shell.exec(cmd, NullLogger.new(self))
+  end
+
+  def bad_argument(message)
+    ArgumentError.new(message)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - -
