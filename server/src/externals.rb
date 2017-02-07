@@ -1,12 +1,12 @@
 require_relative 'disk_writer'
 require_relative 'bash_sheller'
-require_relative 'stdout_logger'
+require_relative 'logger_stdout'
 
 module Externals
 
   def  shell;  @shell ||=  BashSheller.new(self); end
   def   disk;   @disk ||=   DiskWriter.new(self); end
-  def    log;    @log ||= StdoutLogger.new(self); end
+  def    log;    @log ||= LoggerStdout.new(self); end
 
 end
 

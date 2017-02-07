@@ -1,12 +1,12 @@
 require_relative 'test_base'
-require_relative 'spy_logger'
+require_relative '../../src/logger_spy'
 
 class BashShellerTest < TestBase
 
   def self.hex_prefix; 'C89'; end
 
   def hex_setup
-    @log = SpyLogger.new(self)
+    @log = LoggerSpy.new(self)
   end
 
   attr_reader :log
@@ -90,8 +90,8 @@ class BashShellerTest < TestBase
   # - - - - - - - - - - - - - - - - -
 
   test '6D5',
-  'exec(cmd) failure with NullLogger turns off logging' do
-    shell_exec('sed salmon', NullLogger.new(self))
+  'exec(cmd) failure with LoggerNull turns off logging' do
+    shell_exec('sed salmon', LoggerNull.new(self))
     assert_status 1
     assert_stdout ''
     assert_stderr "sed: unmatched 'a'\n"

@@ -1,13 +1,13 @@
 require_relative 'test_base'
-require_relative 'spy_logger'
+require_relative '../../src/logger_spy'
 
-class SpyLoggerTest < TestBase
+class LoggerSpyTest < TestBase
 
   def self.hex_prefix; 'CD4'; end
 
   test '20C',
   'logged message is spied' do
-    logger = SpyLogger.new(nil)
+    logger = LoggerSpy.new(nil)
     assert_equal [], logger.spied
     logger << 'hello'
     assert_equal ['hello'], logger.spied

@@ -16,8 +16,8 @@ class ExternalsTest < TestBase
   # - - - - - - - - - - - - - - - - -
 
   test '3EC',
-  'default log is StdoutLogger' do
-    assert_equal 'StdoutLogger', log.class.name
+  'default log is LoggerStdout' do
+    assert_equal 'LoggerStdout', log.class.name
   end
 
   # - - - - - - - - - - - - - - - - -

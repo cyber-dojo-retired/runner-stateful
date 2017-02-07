@@ -1,5 +1,5 @@
 
-class NullLogger
+class LoggerNull
 
   def initialize(_parent)
   end

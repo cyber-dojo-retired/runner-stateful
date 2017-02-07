@@ -21,7 +21,7 @@ class CustomAssertTest < TestBase
 
   test '249',
   '[Alpine] bad assert_exec raises' do
-    @log = SpyLogger.new(self)
+    @log = LoggerSpy.new(self)
     error = assert_raises { assert_exec 'xxxx' }
     assert_equal 'No such file or directory - xxxx', error.message
     assert_equal [
@@ -56,7 +56,7 @@ class CustomAssertTest < TestBase
     stdout,_ = assert_exec(cmd)
     cid = stdout.strip
     begin
-      @log = SpyLogger.new(self)
+      @log = LoggerSpy.new(self)
       error = assert_raises { assert_docker_exec 'xxxx' }
       expected = "docker exec #{container_name} sh -c 'xxxx'"
       assert_equal expected, error.message
