@@ -14,7 +14,7 @@ class BashShellerTest < TestBase
   # - - - - - - - - - - - - - - - - -
 
   test 'DBB',
-  'exec(cmd) succeeds with verbose output' do
+  'exec(cmd) succeeds with output, no logging' do
     shell_exec('echo Hello')
     assert_status 0
     assert_stdout "Hello\n"
@@ -25,7 +25,7 @@ class BashShellerTest < TestBase
   # - - - - - - - - - - - - - - - - -
 
   test '490',
-  'exec(cmd) fails with verbose output' do
+  'exec(cmd) failure (no output) is logged' do
     shell_exec('false')
     assert_status 1
     assert_stdout ''
@@ -41,7 +41,7 @@ class BashShellerTest < TestBase
   # - - - - - - - - - - - - - - - - -
 
   test '46B',
-  'exec(cmd) fails with verbose output' do
+  'exec(cmd) failure (with output) is logged' do
     shell_exec('sed salmon')
     assert_status 1
     assert_stdout ''
@@ -57,7 +57,7 @@ class BashShellerTest < TestBase
   # - - - - - - - - - - - - - - - - -
 
   test '6D5',
-  'exec(cmd) fails with quiet output)' do
+  'exec(cmd) failure with NullLogger turns of logging)' do
     shell_exec('sed salmon', NullLogger.new(self))
     assert_status 1
     assert_stdout ''
@@ -69,7 +69,10 @@ class BashShellerTest < TestBase
 
   test 'AF6',
   'exec(cmd) raises with verbose output' do
-    assert_raises { shell_exec('zzzz') }
+    # some commands fail with simple non-zero exit status...
+    # some commands fail with an exception...
+    error = assert_raises { shell_exec('zzzz') }
+    assert_equal 'Errno::ENOENT', error.class.name
     assert_log [
       'COMMAND:zzzz',
       'RAISED-CLASS:Errno::ENOENT',

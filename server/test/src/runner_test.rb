@@ -1,6 +1,6 @@
 require_relative 'test_base'
 
-class RunnerFake
+class RunnerAlternative
   def initialize(_,_,_)
   end
 end
@@ -12,9 +12,9 @@ class RunnerTest < TestBase
   test '186',
   'runner can be set via CYBER_DOJO_RUNNER_CLASS environment-variable' do
     existing_runner = ENV['CYBER_DOJO_RUNNER_CLASS']
-    ENV['CYBER_DOJO_RUNNER_CLASS'] = 'RunnerFake'
+    ENV['CYBER_DOJO_RUNNER_CLASS'] = 'RunnerAlternative'
     begin
-      assert_equal 'RunnerFake', runner.class.name
+      assert_equal 'RunnerAlternative', runner.class.name
     ensure
       ENV['CYBER_DOJO_RUNNER_CLASS'] = existing_runner
     end
