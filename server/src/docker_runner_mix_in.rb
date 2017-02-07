@@ -206,19 +206,7 @@ module DockerRunnerMixIn
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_exec(cmd)
-    stdout,stderr,status = exec(cmd)
-    unless status == success
-      log << "cmd:#{cmd}"
-      log << "status:#{status}"
-      log << "stdout:#{stdout}"
-      log << "stderr:#{stderr}"
-      fail bad_argument("command:#{cmd}")
-    end
-    [stdout,stderr]
-  end
-
-  def exec(cmd)
-    shell.exec(cmd)
+    shell.assert_exec(cmd)
   end
 
   def quiet_exec(cmd)
