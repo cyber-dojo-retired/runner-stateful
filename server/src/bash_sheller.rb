@@ -9,6 +9,14 @@ class BashSheller
 
   attr_reader :parent
 
+  def assert_exec(command)
+    stdout,stderr,status = exec(command)
+    if status != success
+      fail ArgumentError.new("command:#{command}")
+    end
+    [stdout,stderr]
+  end
+
   def exec(command, verbose = log)
     begin
       stdout,stderr,r = Open3.capture3(command)

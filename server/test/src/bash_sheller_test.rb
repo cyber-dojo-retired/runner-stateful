@@ -13,6 +13,37 @@ class BashShellerTest < TestBase
 
   # - - - - - - - - - - - - - - - - -
 
+  test '14B',
+  'assert_exec(cmd) logs and raises when command fails' do
+    error = assert_raises(ArgumentError) {
+      shell.assert_exec('false')
+    }
+    assert_log [
+      line,
+      'COMMAND:false',
+      'STATUS:1',
+      'STDOUT:',
+      'STDERR:'
+    ]
+    error = assert_raises(ArgumentError) {
+      shell.assert_exec('sed salmon')
+    }
+    assert_log [
+      line,
+      'COMMAND:false',
+      'STATUS:1',
+      'STDOUT:',
+      'STDERR:',
+      line,
+      'COMMAND:sed salmon',
+      'STATUS:1',
+      'STDOUT:',
+      "STDERR:sed: unmatched 'a'\n"
+    ]
+  end
+
+  # - - - - - - - - - - - - - - - - -
+
   test 'DBB',
   'exec(cmd) succeeds with output, no logging' do
     shell_exec('echo Hello')
@@ -31,6 +62,7 @@ class BashShellerTest < TestBase
     assert_stdout ''
     assert_stderr ''
     assert_log [
+      line,
       'COMMAND:false',
       'STATUS:1',
       'STDOUT:',
@@ -47,6 +79,7 @@ class BashShellerTest < TestBase
     assert_stdout ''
     assert_stderr "sed: unmatched 'a'\n"
     assert_log [
+      line,
       'COMMAND:sed salmon',
       'STATUS:1',
       'STDOUT:',
@@ -57,7 +90,7 @@ class BashShellerTest < TestBase
   # - - - - - - - - - - - - - - - - -
 
   test '6D5',
-  'exec(cmd) failure with NullLogger turns of logging)' do
+  'exec(cmd) failure with NullLogger turns off logging' do
     shell_exec('sed salmon', NullLogger.new(self))
     assert_status 1
     assert_stdout ''
@@ -74,6 +107,7 @@ class BashShellerTest < TestBase
     error = assert_raises { shell_exec('zzzz') }
     assert_equal 'Errno::ENOENT', error.class.name
     assert_log [
+      line,
       'COMMAND:zzzz',
       'RAISED-CLASS:Errno::ENOENT',
       'RAISED-TO_S:No such file or directory - zzzz'
@@ -82,8 +116,8 @@ class BashShellerTest < TestBase
 
   # - - - - - - - - - - - - - - - - -
 
-  def shell_exec(command, *args)
-    @stdout,@stderr,@status = shell.exec(command, *args)
+  def shell_exec(command, log = @log)
+    @stdout,@stderr,@status = shell.exec(command, log)
   end
 
   def assert_status(expected)
@@ -99,9 +133,11 @@ class BashShellerTest < TestBase
   end
 
   def assert_log(expected)
-    line = '-' * 40
-    expected.unshift(line) unless expected == []
     assert_equal expected, log.spied
+  end
+
+  def line
+    '-' * 40
   end
 
 end
