@@ -12,7 +12,7 @@ alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
 
 There are three runner implementations in this repo with varying
 speed/sharing/security tradeoffs. They all use the same tests.
-Pick your runner by specifying CYBER_DOJO_RUNNER_CLASS in docker-compose.yml
+Pick your runner by specifying CYBER_DOJO_RUNNER_CLASS environment variable as
   * [DockerKavaVolumeRunner](https://github.com/cyber-dojo/runner/blob/master/server/src/docker_kata_container_runner.rb)
   * [DockerAvatarVolumeRunner](https://github.com/cyber-dojo/runner/blob/master/server/src/docker_avatar_volume_runner.rb)
   * [DockerKataContainerRunner](https://github.com/cyber-dojo/runner/blob/master/server/src/docker_kata_volume_runner.rb)
