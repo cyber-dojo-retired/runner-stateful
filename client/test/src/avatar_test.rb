@@ -23,6 +23,14 @@ class AvatarTest < TestBase
   # negative test cases: new_avatar
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
+  test 'E06',
+  'new_avatar with invalid image_name raises' do
+    error = assert_raises { new_avatar({ image_name:Object.new }) }
+    assert_equal 'RunnerService:new_avatar:image_name:invalid', error.message
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
   test '48A',
   'new_avatar with invalid kata_id raises' do
     error = assert_raises { new_avatar({ kata_id:Object.new }) }
@@ -52,6 +60,14 @@ class AvatarTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
   # negative test cases: old_avatar
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test '538',
+  'old_avatar with invalid image_name raises' do
+    error = assert_raises { old_avatar({ image_name:Object.new }) }
+    assert_equal 'RunnerService:old_avatar:image_name:invalid', error.message
+  end
+
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '70F',

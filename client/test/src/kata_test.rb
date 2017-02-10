@@ -21,6 +21,14 @@ class KataTest < TestBase
   # negative test cases: new_kata
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
+  test '4D7',
+  'new_kata with invalid image_name raises' do
+    error = assert_raises { new_kata({ image_name:Object.new }) }
+    assert_equal 'RunnerService:new_kata:image_name:invalid', error.message
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
   test '2F2',
   'new_kata with invalid kata_id raises' do
     error = assert_raises { new_kata({ kata_id:Object.new }) }
@@ -42,6 +50,14 @@ class KataTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
   # negative test cases: old_kata
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test 'A87',
+  'old_kata with invalid image_name raises' do
+    error = assert_raises { old_kata({ image_name:Object.new }) }
+    assert_equal 'RunnerService:old_kata:image_name:invalid', error.message
+  end
+
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'BA3',

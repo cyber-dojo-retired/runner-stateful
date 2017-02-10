@@ -10,6 +10,14 @@ class RunTest < TestBase
   # negative test cases
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  test 'D5F',
+  'run with invalid image_name raises' do
+    error = assert_raises { sss_run({ image_name:Object.new }) }
+    assert_equal 'RunnerService:run:image_name:invalid', error.message
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   test '42D',
   'run with invalid kata_id raises' do
     error = assert_raises { sss_run({ kata_id:Object.new }) }
