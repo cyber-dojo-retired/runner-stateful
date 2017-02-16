@@ -27,6 +27,13 @@ class AvatarTest < TestBase
     refute avatar_exists?
   end
 
+  test 'A64',
+  'in resurrection new_avatar() has to work after old_avatar()' do
+    new_avatar
+    old_avatar
+    new_avatar
+  end
+
   test '9BD',
   'Alpine Linux has an existing user called squid',
   "which would clash with the squid avatar and has to be deluser'd" do

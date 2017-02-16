@@ -122,8 +122,6 @@ class DockerKataContainerRunner
     assert_docker_exec([ mkdir, chown ].join(' && '))
 
     write_files(avatar_name, starting_files)
-
-
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -134,6 +132,10 @@ class DockerKataContainerRunner
 
     del_user = del_user_cmd(avatar_name)
     assert_docker_exec(del_user)
+
+    sandbox = sandbox_path(avatar_name)
+    del_sandbox = "rm -rf #{sandbox}"
+    assert_docker_exec(del_sandbox)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
