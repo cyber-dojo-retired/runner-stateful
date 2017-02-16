@@ -1,7 +1,7 @@
 require_relative 'test_base.rb'
 require_relative 'os_helper'
 
-class KataVolumeTest < TestBase
+class SharedFolderTest < TestBase
 
   include OsHelper
 
@@ -17,7 +17,8 @@ class KataVolumeTest < TestBase
   end
 
   def self.kv_test(hex_suffix, *lines, &test_block)
-    if runner_class == 'DockerKataVolumeRunner'
+    if runner_class == 'DockerKataVolumeRunner' ||
+       runner_class == 'DockerKataContainerRunner'
       test(hex_suffix, *lines, &test_block)
     end
   end
@@ -53,11 +54,9 @@ class KataVolumeTest < TestBase
     new_avatar('salmon')
     begin
       shared = '/sandboxes/shared'
-
       # sandbox's is owned by cyber-dojo
       stat_group = assert_cyber_dojo_sh("stat -c '%G' #{shared}").strip
       assert_equal 'cyber-dojo', stat_group
-
       # sandbox's permissions are set
       stat_perms = assert_cyber_dojo_sh("stat -c '%A' #{shared}").strip
       assert_equal 'drwxrwxr-x', stat_perms

@@ -111,6 +111,8 @@ class DockerKataContainerRunner
     assert_kata_exists
     refute_avatar_exists(avatar_name)
 
+    make_shared_folder
+
     add_user = add_user_cmd(avatar_name)
     assert_docker_exec(add_user)
 
@@ -120,6 +122,8 @@ class DockerKataContainerRunner
     assert_docker_exec([ mkdir, chown ].join(' && '))
 
     write_files(avatar_name, starting_files)
+
+
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -147,6 +151,17 @@ class DockerKataContainerRunner
   end
 
   private
+
+  def make_shared_folder
+    shared_folder = "/sandboxes/shared"
+    mkdir = "mkdir -m 775 #{shared_folder} || true" # idempotent
+    assert_docker_exec(mkdir)
+    group = 'cyber-dojo'
+    chown = "chown root:#{group} #{shared_folder}"
+    assert_docker_exec(chown)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def delete_files(avatar_name, filenames)
     return if filenames == []
