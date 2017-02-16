@@ -62,8 +62,9 @@ class DockerKataVolumeRunner
     volume_root = sandboxes_root
     cid = create_container(avatar_name, volume_name, volume_root)
     begin
+      make_shared_folder(cid)
       refute_avatar_exists(cid, avatar_name)
-      make_sandbox(cid, avatar_name)
+      assert_make_sandbox(cid, avatar_name)
       chown_sandbox(cid, avatar_name)
       write_files(cid, avatar_name, starting_files)
     ensure
@@ -112,7 +113,7 @@ class DockerKataVolumeRunner
 
   private
 
-  def make_sandbox(cid, avatar_name)
+  def assert_make_sandbox(cid, avatar_name)
     sandbox = sandbox_path(avatar_name)
     mkdir = "mkdir -m 755 #{sandbox}"
     assert_docker_exec(cid, mkdir)
@@ -122,6 +123,17 @@ class DockerKataVolumeRunner
     sandbox = sandbox_path(avatar_name)
     rmdir = "rm -rf #{sandbox}"
     assert_docker_exec(cid, rmdir)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def make_shared_folder(cid)
+    shared_folder = "/sandboxes/shared"
+    mkdir = "mkdir -m 775 #{shared_folder} || true" # idempotent
+    assert_docker_exec(cid, mkdir)
+    group = 'cyber-dojo'
+    chown = "chown root:#{group} #{shared_folder}"
+    assert_docker_exec(cid, chown)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
