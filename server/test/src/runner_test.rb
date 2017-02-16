@@ -22,6 +22,20 @@ class RunnerTest < TestBase
 
   # - - - - - - - - - - - - - - - - -
 
+  test 'C18',
+  'runner defaults to DockerKataContainerRunner if not set via',
+  'CYBER_DOJO_RUNNER_CLASS environment-variable' do
+    existing_runner = ENV['CYBER_DOJO_RUNNER_CLASS']
+    ENV.delete('CYBER_DOJO_RUNNER_CLASS')
+    begin
+      assert_equal 'DockerKataContainerRunner', runner.class.name
+    ensure
+      ENV['CYBER_DOJO_RUNNER_CLASS'] = existing_runner
+    end
+  end
+
+  # - - - - - - - - - - - - - - - - -
+
   test 'D01',
   'runner with valid image_name and valid kata_id does not raise' do
     new_runner(image_name, kata_id)

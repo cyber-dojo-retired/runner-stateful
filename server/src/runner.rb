@@ -4,7 +4,7 @@ def runner_class
   if env_var != '' && !env_var.nil?
     env_var
   else
-    'DockerAvatarVolumeRunner'
+    'DockerKataContainerRunner'
   end
 end
 
