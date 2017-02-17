@@ -6,6 +6,15 @@ module DockerRunnerVolumeMixIn
 
   module_function
 
+  def in_container(avatar_name, volume_name, volume_root, &block)
+    cid = create_container(avatar_name, kata_volume_name, sandboxes_root)
+    begin
+      block.call(cid)
+    ensure
+      remove_container(cid)
+    end
+  end
+
   def create_container(avatar_name, volume_name, volume_root)
     # The [docker run] must be guarded by argument checks
     # because it volume mounts...
@@ -36,6 +45,44 @@ module DockerRunnerVolumeMixIn
     assert_docker_exec(cid, add_group_cmd(cid))
     assert_docker_exec(cid, add_user_cmd(cid, avatar_name))
     cid
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - -
+
+  def remove_container(cid)
+    assert_exec("docker rm --force #{cid}")
+    # The docker daemon responds to [docker rm]
+    # asynchronously...
+    # An 'immediately' following old_avatar()'s
+    #    [docker volume rm]
+    # might fail since the container is not quite dead yet.
+    # This is unlikely to happen in real use but quite
+    # likely in tests. I considered making old_avatar()
+    # check the container was dead.
+    #   pro) remove_container will never do a sleep
+    #        (delaying a run)
+    #   con) would mean storing the cid in the volume
+    #        somewhere
+    # I'm waiting max 2 seconds for the container to die.
+    # o) no delay if container_dead? is true 1st time.
+    # o) 0.04s delay if container_dead? is true 2nd time.
+    removed = false
+    tries = 0
+    while !removed && tries < 50
+      removed = container_dead?(cid)
+      sleep(1.0 / 25.0) unless removed
+      tries += 1
+    end
+    log << "Failed:remove_container(#{cid})" unless removed
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - -
+
+  def container_dead?(cid)
+    cmd = "docker inspect --format='{{ .State.Running }}' #{cid}"
+    _,stderr,status = quiet_exec(cmd)
+    expected_stderr = "Error: No such image, container or task: #{cid}"
+    (status == 1) && (stderr.strip == expected_stderr)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
@@ -129,44 +176,6 @@ module DockerRunnerVolumeMixIn
     ].join(space)
 
     run_timeout(docker_cmd, max_seconds)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - -
-
-  def remove_container(cid)
-    assert_exec("docker rm --force #{cid}")
-    # The docker daemon responds to [docker rm]
-    # asynchronously...
-    # An 'immediately' following old_avatar()'s
-    #    [docker volume rm]
-    # might fail since the container is not quite dead yet.
-    # This is unlikely to happen in real use but quite
-    # likely in tests. I considered making old_avatar()
-    # check the container was dead.
-    #   pro) remove_container will never do a sleep
-    #        (delaying a run)
-    #   con) would mean storing the cid in the volume
-    #        somewhere
-    # I'm waiting max 2 seconds for the container to die.
-    # o) no delay if container_dead? is true 1st time.
-    # o) 0.04s delay if container_dead? is true 2nd time.
-    removed = false
-    tries = 0
-    while !removed && tries < 50
-      removed = container_dead?(cid)
-      sleep(1.0 / 25.0) unless removed
-      tries += 1
-    end
-    log << "Failed:remove_container(#{cid})" unless removed
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - -
-
-  def container_dead?(cid)
-    cmd = "docker inspect --format='{{ .State.Running }}' #{cid}"
-    _,stderr,status = quiet_exec(cmd)
-    expected_stderr = "Error: No such image, container or task: #{cid}"
-    (status == 1) && (stderr.strip == expected_stderr)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -

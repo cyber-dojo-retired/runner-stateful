@@ -45,38 +45,32 @@ class DockerKataVolumeRunner
   def avatar_exists?(avatar_name)
     assert_kata_exists
     assert_valid_avatar_name(avatar_name)
-    cid = create_container(avatar_name, kata_volume_name, sandboxes_root)
-    begin
+
+    in_kvr_container(avatar_name) do |cid|
       avatar_exists_cid?(cid, avatar_name)
-    ensure
-      remove_container(cid)
     end
   end
 
   def new_avatar(avatar_name, starting_files)
     assert_kata_exists
     assert_valid_avatar_name(avatar_name)
-    cid = create_container(avatar_name, kata_volume_name, sandboxes_root)
-    begin
+
+    in_kvr_container(avatar_name) do |cid|
       refute_avatar_exists(cid, avatar_name)
       make_shared_folder(cid)
       make_sandbox(cid, avatar_name)
       chown_sandbox(cid, avatar_name)
       write_files(cid, avatar_name, starting_files)
-    ensure
-      remove_container(cid)
     end
   end
 
   def old_avatar(avatar_name)
     assert_kata_exists
     assert_valid_avatar_name(avatar_name)
-    cid = create_container(avatar_name, kata_volume_name, sandboxes_root)
-    begin
+
+    in_kvr_container(avatar_name) do |cid|
       assert_avatar_exists(cid, avatar_name)
       remove_sandbox(cid, avatar_name)
-    ensure
-      remove_container(cid)
     end
   end
 
@@ -91,19 +85,23 @@ class DockerKataVolumeRunner
   def run(avatar_name, deleted_filenames, changed_files, max_seconds)
     assert_kata_exists
     assert_valid_avatar_name(avatar_name)
-    cid = create_container(avatar_name, kata_volume_name, sandboxes_root)
-    begin
+
+    in_kvr_container(avatar_name) do |cid|
       assert_avatar_exists(cid, avatar_name)
       delete_files(cid, avatar_name, deleted_filenames)
       write_files(cid, avatar_name, changed_files)
       stdout,stderr,status = run_cyber_dojo_sh(cid, avatar_name, max_seconds)
       { stdout:stdout, stderr:stderr, status:status }
-    ensure
-      remove_container(cid)
     end
   end
 
   private
+
+  def in_kvr_container(avatar_name, &block)
+    in_container(avatar_name, kata_volume_name, sandboxes_root, &block)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def make_sandbox(cid, avatar_name)
     sandbox = sandbox_path(avatar_name)
