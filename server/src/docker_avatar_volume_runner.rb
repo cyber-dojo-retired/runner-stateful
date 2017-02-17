@@ -50,15 +50,11 @@ class DockerAvatarVolumeRunner
   def new_avatar(avatar_name, starting_files)
     assert_kata_exists
     refute_avatar_exists(avatar_name)
-    volume_name = avatar_volume_name(avatar_name)
-    create_volume(volume_name)
-    volume_root = sandbox_path(avatar_name)
-    cid = create_container(avatar_name, volume_name, volume_root)
-    begin
+
+    create_volume(avatar_volume_name(avatar_name))
+    in_avr_container(avatar_name) do |cid|
       chown_sandbox(cid, avatar_name)
       write_files(cid, avatar_name, starting_files)
-    ensure
-      remove_container(cid)
     end
   end
 
@@ -79,20 +75,24 @@ class DockerAvatarVolumeRunner
   def run(avatar_name, deleted_filenames, changed_files, max_seconds)
     assert_kata_exists
     assert_avatar_exists(avatar_name)
-    volume_name = avatar_volume_name(avatar_name)
-    volume_root = sandbox_path(avatar_name)
-    cid = create_container(avatar_name, volume_name, volume_root)
-    begin
+
+    in_avr_container(avatar_name) do |cid|
       delete_files(cid, avatar_name, deleted_filenames)
       write_files(cid, avatar_name, changed_files)
       stdout,stderr,status = run_cyber_dojo_sh(cid, avatar_name, max_seconds)
       { stdout:stdout, stderr:stderr, status:status }
-    ensure
-      remove_container(cid)
     end
   end
 
   private
+
+  def in_avr_container(avatar_name, &block)
+    volume_name = avatar_volume_name(avatar_name)
+    volume_root = sandbox_path(avatar_name)
+    in_container(avatar_name, volume_name, volume_root, &block)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_avatar_exists(avatar_name)
     unless avatar_exists?(avatar_name)

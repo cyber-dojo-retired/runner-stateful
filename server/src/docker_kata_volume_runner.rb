@@ -98,7 +98,9 @@ class DockerKataVolumeRunner
   private
 
   def in_kvr_container(avatar_name, &block)
-    in_container(avatar_name, kata_volume_name, sandboxes_root, &block)
+    volume_name = kata_volume_name
+    volume_root = sandboxes_root
+    in_container(avatar_name, volume_name, volume_root, &block)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
