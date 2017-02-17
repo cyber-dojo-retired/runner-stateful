@@ -73,7 +73,11 @@ class CustomAssertTest < TestBase
     end
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+  private
+
+  def container_name
+    'cyber_dojo_kata_container_runner_' + kata_id
+  end
 
   def line
     '-' * 40

@@ -128,8 +128,7 @@ class DockerKataVolumeRunner
 
   def chown_shared_dir(cid)
     shared_dir = "/sandboxes/shared"
-    group = 'cyber-dojo'
-    chown = "chown root:#{group} #{shared_dir}"
+    chown = "chown root:cyber-dojo #{shared_dir}"
     assert_docker_exec(cid, chown)
   end
 

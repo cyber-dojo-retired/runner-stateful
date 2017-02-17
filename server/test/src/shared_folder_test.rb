@@ -17,8 +17,8 @@ class SharedFolderTest < TestBase
   end
 
   def self.kv_test(hex_suffix, *lines, &test_block)
-    if runner_class == 'DockerKataVolumeRunner' ||
-       runner_class == 'DockerKataContainerRunner'
+    if runner_class_name == 'DockerKataVolumeRunner' ||
+       runner_class_name == 'DockerKataContainerRunner'
       test(hex_suffix, *lines, &test_block)
     end
   end

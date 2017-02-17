@@ -1,38 +1,8 @@
 require_relative 'test_base'
 
-class RunnerAlternative
-  def initialize(_,_,_)
-  end
-end
-
 class RunnerTest < TestBase
 
   def self.hex_prefix; '4C8DB'; end
-
-  test '186',
-  'runner can be set via CYBER_DOJO_RUNNER_CLASS environment-variable' do
-    existing_runner = ENV['CYBER_DOJO_RUNNER_CLASS']
-    ENV['CYBER_DOJO_RUNNER_CLASS'] = 'RunnerAlternative'
-    begin
-      assert_equal 'RunnerAlternative', runner.class.name
-    ensure
-      ENV['CYBER_DOJO_RUNNER_CLASS'] = existing_runner
-    end
-  end
-
-  # - - - - - - - - - - - - - - - - -
-
-  test 'C18',
-  'runner defaults to DockerKataVolumeRunner if not set via',
-  'CYBER_DOJO_RUNNER_CLASS environment-variable' do
-    existing_runner = ENV['CYBER_DOJO_RUNNER_CLASS']
-    ENV.delete('CYBER_DOJO_RUNNER_CLASS')
-    begin
-      assert_equal 'DockerKataVolumeRunner', runner.class.name
-    ensure
-      ENV['CYBER_DOJO_RUNNER_CLASS'] = existing_runner
-    end
-  end
 
   # - - - - - - - - - - - - - - - - -
 

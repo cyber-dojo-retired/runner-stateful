@@ -2,7 +2,7 @@ require_relative 'disk_writer'
 require_relative 'bash_sheller'
 require_relative 'logger_stdout'
 
-module Externals
+module Externals # mix-in
 
   def  shell;  @shell ||=  BashSheller.new(self); end
   def   disk;   @disk ||=   DiskWriter.new(self); end

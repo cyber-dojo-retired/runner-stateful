@@ -32,6 +32,7 @@ class AvatarTest < TestBase
     new_avatar
     old_avatar
     new_avatar
+    old_avatar
   end
 
   test '9BD',

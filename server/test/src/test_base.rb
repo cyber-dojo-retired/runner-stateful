@@ -19,7 +19,7 @@ class TestBase < HexMiniTest
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def new_runner(image_name, kata_id)
-    Object.const_get(runner_class).new(self, image_name, kata_id)
+    Object.const_get(runner_class_name).new(self, image_name, kata_id)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -184,6 +184,7 @@ class TestBase < HexMiniTest
   end
 
   def assert_docker_exec(cmd)
+    # child class provides (container_name)
     cid = container_name
     stdout,stderr = assert_exec("docker exec #{cid} sh -c '#{cmd}'")
     assert_equal '', stderr, stdout
@@ -200,10 +201,6 @@ class TestBase < HexMiniTest
 
   def exec(cmd, *args)
     shell.exec(cmd, *args)
-  end
-
-  def container_name
-    'cyber_dojo_kata_container_runner_' + kata_id
   end
 
 end
