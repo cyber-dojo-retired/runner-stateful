@@ -1,7 +1,12 @@
 require_relative 'snake_caser'
 
+def default_runner_name
+  'DockerKataVolumeRunner'
+end
+
 def env_require_runner(name)
-  if ENV['CYBER_DOJO_RUNNER_CLASS'] == name
+  env = ENV['CYBER_DOJO_RUNNER_CLASS']
+  if env == name || (env.nil? && name == default_runner_name)
     require_relative SnakeCaser::snake_cased(name)
   end
 end
@@ -15,7 +20,7 @@ def runner_class
   if env_var != '' && !env_var.nil?
     env_var
   else
-    'DockerKataContainerRunner'
+    default_runner_name
   end
 end
 

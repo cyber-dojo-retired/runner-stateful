@@ -1,10 +1,5 @@
 require_relative 'test_base'
 
-class DockerKataContainerRunner
-  def initialize(_,_,_)
-  end
-end
-
 class RunnerAlternative
   def initialize(_,_,_)
   end
@@ -28,12 +23,12 @@ class RunnerTest < TestBase
   # - - - - - - - - - - - - - - - - -
 
   test 'C18',
-  'runner defaults to DockerKataContainerRunner if not set via',
+  'runner defaults to DockerKataVolumeRunner if not set via',
   'CYBER_DOJO_RUNNER_CLASS environment-variable' do
     existing_runner = ENV['CYBER_DOJO_RUNNER_CLASS']
     ENV.delete('CYBER_DOJO_RUNNER_CLASS')
     begin
-      assert_equal 'DockerKataContainerRunner', runner.class.name
+      assert_equal 'DockerKataVolumeRunner', runner.class.name
     ensure
       ENV['CYBER_DOJO_RUNNER_CLASS'] = existing_runner
     end
