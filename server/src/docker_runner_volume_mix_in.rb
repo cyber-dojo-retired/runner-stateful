@@ -7,7 +7,7 @@ module DockerRunnerVolumeMixIn
   module_function
 
   def in_container(avatar_name, volume_name, volume_root, &block)
-    cid = create_container(avatar_name, kata_volume_name, sandboxes_root)
+    cid = create_container(avatar_name, volume_name, volume_root)
     begin
       block.call(cid)
     ensure
