@@ -1,5 +1,10 @@
 require_relative 'test_base'
 
+class DockerKataContainerRunner
+  def initialize(_,_,_)
+  end
+end
+
 class RunnerAlternative
   def initialize(_,_,_)
   end

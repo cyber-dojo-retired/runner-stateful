@@ -1,3 +1,14 @@
+require_relative 'snake_caser'
+
+def env_require_runner(name)
+  if ENV['CYBER_DOJO_RUNNER_CLASS'] == name
+    require_relative SnakeCaser::snake_cased(name)
+  end
+end
+
+env_require_runner 'DockerAvatarVolumeRunner'
+env_require_runner 'DockerKataVolumeRunner'
+env_require_runner 'DockerKataContainerRunner'
 
 def runner_class
   env_var = ENV['CYBER_DOJO_RUNNER_CLASS']
@@ -7,9 +18,6 @@ def runner_class
     'DockerKataContainerRunner'
   end
 end
-
-require_relative 'snake_caser'
-require_relative SnakeCaser::snake_cased(runner_class)
 
 module Runner # mix-in
 
