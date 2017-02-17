@@ -53,7 +53,7 @@ class DockerAvatarVolumeRunner
 
     create_volume(avatar_volume_name(avatar_name))
     in_avr_container(avatar_name) do |cid|
-      chown_sandbox(cid, avatar_name)
+      chown_sandbox_dir(cid, avatar_name)
       write_files(cid, avatar_name, starting_files)
     end
   end

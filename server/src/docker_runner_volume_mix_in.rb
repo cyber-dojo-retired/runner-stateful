@@ -124,7 +124,7 @@ module DockerRunnerVolumeMixIn
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  def chown_sandbox(cid, avatar_name)
+  def chown_sandbox_dir(cid, avatar_name)
     sandbox = sandbox_path(avatar_name)
     uid = user_id(avatar_name)
     chown = "chown #{uid}:#{gid} #{sandbox}"

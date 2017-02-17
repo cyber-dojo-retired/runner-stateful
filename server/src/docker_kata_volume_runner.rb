@@ -57,9 +57,10 @@ class DockerKataVolumeRunner
 
     in_kvr_container(avatar_name) do |cid|
       refute_avatar_exists(cid, avatar_name)
-      make_shared_folder(cid)
-      make_sandbox(cid, avatar_name)
-      chown_sandbox(cid, avatar_name)
+      make_shared_dir(cid)
+      chown_shared_dir(cid)
+      make_sandbox_dir(cid, avatar_name)
+      chown_sandbox_dir(cid, avatar_name)
       write_files(cid, avatar_name, starting_files)
     end
   end
@@ -70,7 +71,7 @@ class DockerKataVolumeRunner
 
     in_kvr_container(avatar_name) do |cid|
       assert_avatar_exists(cid, avatar_name)
-      remove_sandbox(cid, avatar_name)
+      remove_sandbox_dir(cid, avatar_name)
     end
   end
 
@@ -105,13 +106,13 @@ class DockerKataVolumeRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def make_sandbox(cid, avatar_name)
+  def make_sandbox_dir(cid, avatar_name)
     sandbox = sandbox_path(avatar_name)
     mkdir = "mkdir -m 755 #{sandbox}"
     assert_docker_exec(cid, mkdir)
   end
 
-  def remove_sandbox(cid, avatar_name)
+  def remove_sandbox_dir(cid, avatar_name)
     sandbox = sandbox_path(avatar_name)
     rmdir = "rm -rf #{sandbox}"
     assert_docker_exec(cid, rmdir)
@@ -119,12 +120,16 @@ class DockerKataVolumeRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def make_shared_folder(cid)
-    shared_folder = "/sandboxes/shared"
-    mkdir = "mkdir -m 775 #{shared_folder} || true" # idempotent
+  def make_shared_dir(cid)
+    shared_dir = "/sandboxes/shared"
+    mkdir = "mkdir -m 775 #{shared_dir} || true" # idempotent
     assert_docker_exec(cid, mkdir)
+  end
+
+  def chown_shared_dir(cid)
+    shared_dir = "/sandboxes/shared"
     group = 'cyber-dojo'
-    chown = "chown root:#{group} #{shared_folder}"
+    chown = "chown root:#{group} #{shared_dir}"
     assert_docker_exec(cid, chown)
   end
 
