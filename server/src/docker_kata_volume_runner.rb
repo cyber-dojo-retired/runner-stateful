@@ -58,9 +58,9 @@ class DockerKataVolumeRunner
     assert_valid_avatar_name(avatar_name)
     cid = create_container(avatar_name, kata_volume_name, sandboxes_root)
     begin
-      assert_make_shared_folder(cid)
       refute_avatar_exists(cid, avatar_name)
-      assert_make_sandbox(cid, avatar_name)
+      make_shared_folder(cid)
+      make_sandbox(cid, avatar_name)
       chown_sandbox(cid, avatar_name)
       write_files(cid, avatar_name, starting_files)
     ensure
@@ -74,7 +74,7 @@ class DockerKataVolumeRunner
     cid = create_container(avatar_name, kata_volume_name, sandboxes_root)
     begin
       assert_avatar_exists(cid, avatar_name)
-      assert_remove_sandbox(cid, avatar_name)
+      remove_sandbox(cid, avatar_name)
     ensure
       remove_container(cid)
     end
@@ -105,13 +105,13 @@ class DockerKataVolumeRunner
 
   private
 
-  def assert_make_sandbox(cid, avatar_name)
+  def make_sandbox(cid, avatar_name)
     sandbox = sandbox_path(avatar_name)
     mkdir = "mkdir -m 755 #{sandbox}"
     assert_docker_exec(cid, mkdir)
   end
 
-  def assert_remove_sandbox(cid, avatar_name)
+  def remove_sandbox(cid, avatar_name)
     sandbox = sandbox_path(avatar_name)
     rmdir = "rm -rf #{sandbox}"
     assert_docker_exec(cid, rmdir)
@@ -119,7 +119,7 @@ class DockerKataVolumeRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_make_shared_folder(cid)
+  def make_shared_folder(cid)
     shared_folder = "/sandboxes/shared"
     mkdir = "mkdir -m 775 #{shared_folder} || true" # idempotent
     assert_docker_exec(cid, mkdir)
