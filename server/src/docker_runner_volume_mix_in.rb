@@ -33,13 +33,8 @@ module DockerRunnerVolumeMixIn
     ].join(space)
     stdout,_ = assert_exec("docker run #{args} #{image_name} sh")
     cid = stdout.strip
-
-    cmd = [
-      add_group_cmd(cid),
-      add_user_cmd(cid, avatar_name)
-    ].join(' && ')
-    assert_docker_exec(cid, cmd)
-
+    assert_docker_exec(cid, add_group_cmd(cid))
+    assert_docker_exec(cid, add_user_cmd(cid, avatar_name))
     cid
   end
 
