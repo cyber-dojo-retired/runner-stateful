@@ -51,7 +51,6 @@ class DockerAvatarVolumeRunner
   def new_avatar(avatar_name, starting_files)
     assert_kata_exists
     refute_avatar_exists(avatar_name)
-
     create_volume(avatar_volume_name(avatar_name))
     in_avr_container(avatar_name) do |cid|
       chown_avatar_dir(cid, avatar_name)
@@ -76,7 +75,6 @@ class DockerAvatarVolumeRunner
   def run(avatar_name, deleted_filenames, changed_files, max_seconds)
     assert_kata_exists
     assert_avatar_exists(avatar_name)
-
     in_avr_container(avatar_name) do |cid|
       delete_files(cid, avatar_name, deleted_filenames)
       write_files(cid, avatar_name, changed_files)

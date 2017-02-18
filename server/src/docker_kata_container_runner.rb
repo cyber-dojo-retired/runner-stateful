@@ -46,7 +46,6 @@ class DockerKataContainerRunner
 
   def new_kata
     refute_kata_exists
-
     # The container may have exited
     # but not been collected yet.
     name = container_name
@@ -82,7 +81,6 @@ class DockerKataContainerRunner
 
   def old_kata
     assert_kata_exists
-
     name = container_name
     assert_exec(remove_container_cmd(name))
     assert_exec(remove_volume_cmd(name))
@@ -95,7 +93,6 @@ class DockerKataContainerRunner
   def avatar_exists?(avatar_name)
     assert_kata_exists
     assert_valid_avatar_name(avatar_name)
-
     id_cmd = docker_cmd("id -u #{avatar_name}")
     stdout,_,status = quiet_exec(id_cmd)
     # Alpine Linux has an existing proxy-server user
@@ -149,7 +146,6 @@ class DockerKataContainerRunner
   def run(avatar_name, deleted_filenames, changed_files, max_seconds)
     assert_kata_exists
     assert_avatar_exists(avatar_name)
-
     delete_files(avatar_name, deleted_filenames)
     write_files(avatar_name, changed_files)
     stdout,stderr,status = run_cyber_dojo_sh(avatar_name, max_seconds)

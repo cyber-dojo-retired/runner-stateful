@@ -46,7 +46,6 @@ class DockerKataVolumeRunner
   def avatar_exists?(avatar_name)
     assert_kata_exists
     assert_valid_avatar_name(avatar_name)
-
     in_kvr_container(avatar_name) do |cid|
       avatar_exists_cid?(cid, avatar_name)
     end
@@ -55,7 +54,6 @@ class DockerKataVolumeRunner
   def new_avatar(avatar_name, starting_files)
     assert_kata_exists
     assert_valid_avatar_name(avatar_name)
-
     in_kvr_container(avatar_name) do |cid|
       refute_avatar_exists(cid, avatar_name)
       make_shared_dir(cid)
@@ -69,7 +67,6 @@ class DockerKataVolumeRunner
   def old_avatar(avatar_name)
     assert_kata_exists
     assert_valid_avatar_name(avatar_name)
-
     in_kvr_container(avatar_name) do |cid|
       assert_avatar_exists(cid, avatar_name)
       remove_avatar_dir(cid, avatar_name)
@@ -87,7 +84,6 @@ class DockerKataVolumeRunner
   def run(avatar_name, deleted_filenames, changed_files, max_seconds)
     assert_kata_exists
     assert_valid_avatar_name(avatar_name)
-
     in_kvr_container(avatar_name) do |cid|
       assert_avatar_exists(cid, avatar_name)
       delete_files(cid, avatar_name, deleted_filenames)
@@ -100,9 +96,7 @@ class DockerKataVolumeRunner
   private
 
   def in_kvr_container(avatar_name, &block)
-    volume_name = kata_volume_name
-    volume_root_dir = sandboxes_root_dir
-    in_container(avatar_name, volume_name, volume_root_dir, &block)
+    in_container(avatar_name, kata_volume_name, sandboxes_root_dir, &block)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
