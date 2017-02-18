@@ -125,10 +125,9 @@ module DockerRunnerVolumeMixIn
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def chown_avatar_dir(cid, avatar_name)
-    dir = avatar_dir(avatar_name)
     uid = user_id(avatar_name)
-    chown = "chown #{uid}:#{gid} #{dir}"
-    assert_docker_exec(cid, chown)
+    dir = avatar_dir(avatar_name)
+    assert_docker_exec(cid, "chown #{uid}:#{gid} #{dir}")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
@@ -136,9 +135,7 @@ module DockerRunnerVolumeMixIn
   def delete_files(cid, avatar_name, filenames)
     return if filenames == []
     dir = avatar_dir(avatar_name)
-    all = filenames.map { |filename| "#{dir}/#{filename}" }
-    rm = 'rm ' + all.join(space)
-    assert_docker_exec(cid, rm)
+    assert_docker_exec(cid, "cd #{dir} && rm #{filenames.join(space)}")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
@@ -152,11 +149,10 @@ module DockerRunnerVolumeMixIn
       end
       uid = user_id(avatar_name)
       dir = avatar_dir(avatar_name)
-      docker_cp = "docker cp #{tmp_dir}/. #{cid}:#{dir}"
-      assert_exec(docker_cp)
-      all = files.keys.map { |filename| "#{dir}/#{filename}" }
-      chown = "chown #{uid}:#{gid} " + all.join(space)
-      assert_docker_exec(cid, chown)
+      assert_exec("docker cp #{tmp_dir}/. #{cid}:#{dir}")
+      filenames = files.keys.map { |filename| "#{dir}/#{filename}" }
+      chown_files = "chown #{uid}:#{gid} " + filenames.join(space)
+      assert_docker_exec(cid, chown_files)
     end
   end
 
@@ -181,8 +177,7 @@ module DockerRunnerVolumeMixIn
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def volume_exists?(name)
-    cmd = "docker volume ls --quiet --filter 'name=#{name}'"
-    stdout,_ = assert_exec(cmd)
+    stdout,_ = assert_exec("docker volume ls --quiet --filter 'name=#{name}'")
     stdout.strip != ''
   end
 

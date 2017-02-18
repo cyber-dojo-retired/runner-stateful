@@ -187,9 +187,7 @@ class DockerKataContainerRunner
   def delete_files(avatar_name, filenames)
     return if filenames == []
     dir = avatar_dir(avatar_name)
-    all = filenames.map { |filename| "#{dir}/#{filename}" }
-    rm = 'rm ' + all.join(space)
-    assert_docker_exec(rm)
+    assert_docker_exec(cid, "cd #{dir} && rm #{filenames.join(space)}")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -304,8 +302,7 @@ class DockerKataContainerRunner
   end
 
   def docker_cmd(cmd)
-    name = container_name
-    "docker exec #{name} sh -c '#{cmd}'"
+    "docker exec #{container_name} sh -c '#{cmd}'"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
