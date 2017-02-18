@@ -23,6 +23,7 @@ module DockerRunnerMixIn
   end
 
   def home_dir(avatar_name)
+    assert_valid_avatar_name(avatar_name)
     "/home/#{avatar_name}"
   end
 
@@ -101,7 +102,8 @@ module DockerRunnerMixIn
     # See avatar_exists?() in docker_avatar_volume_runner.rb
     home = home_dir(avatar_name)
     uid = user_id(avatar_name)
-    [ "(deluser #{avatar_name};",
+    [ "(deluser #{avatar_name}",
+       ';',
        'adduser',
          '-D',             # don't assign a password
          "-G #{group}",
