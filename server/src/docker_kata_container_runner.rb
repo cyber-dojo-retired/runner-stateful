@@ -135,7 +135,7 @@ class DockerKataContainerRunner
     assert_docker_exec(del_user)
 
     dir = avatar_dir(avatar_name)
-    rm_dir = "rm -rf #{sandbox}"
+    rm_dir = "rm -rf #{dir}"
     assert_docker_exec(rm_dir)
   end
 
