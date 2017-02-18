@@ -5,9 +5,10 @@ require_relative 'docker_runner_volume_mix_in'
 # Uses a long-lived docker volume per avatar.
 #
 # Positives:
-#   o) the cyber-dojo.sh process is running as pid-1
-#      which is a robust way of ensuring the entire
-#      process tree is killed.
+#   o) short-lived container per run() limits
+#      fork-bomb escalation.
+#   o) container has low pids-limit-16 which further
+#      limits fork-bomb escalation.
 #
 # Negatives:
 #   o) no possibility of avatars sharing state or processes.

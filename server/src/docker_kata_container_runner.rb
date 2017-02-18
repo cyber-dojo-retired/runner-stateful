@@ -1,9 +1,17 @@
 require_relative 'docker_runner_mix_in'
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# Recommended only for private cyber-dojo servers.
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Uses a new long-lived container per kata.
 # Each avatar's run() [docker exec]s a new process inside
 # the kata's container.
+#
+# Negatives:
+#   o) long-lived container per run() is easier
+#      to fork-bomb.
+#   o) container has higher pids-limit=256
+#      which makes it easier to fork-bomb.
 #
 # Positives:
 #   o) avatars can share state.
@@ -11,11 +19,6 @@ require_relative 'docker_runner_mix_in'
 #   o) fastest run(). In a rough sample
 #      ~20% faster than AvatarVolumeRunner
 #      ~30% faster than KataVolumeRunner
-#
-# Negatives:
-#   o) the cyber-dojo.sh process is not running as
-#      pid-1. A pid-1 process is a robust way of
-#      killing an entire process tree.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 class DockerKataContainerRunner
