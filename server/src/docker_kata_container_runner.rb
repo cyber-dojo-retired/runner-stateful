@@ -51,8 +51,8 @@ class DockerKataContainerRunner
     name = container_name
     quiet_exec(remove_container_cmd(name))
     quiet_exec(remove_volume_cmd(name))
-
     assert_exec(create_volume_cmd(name))
+
     args = [
       '--detach',
       '--interactive',                     # later execs
@@ -110,18 +110,11 @@ class DockerKataContainerRunner
   def new_avatar(avatar_name, starting_files)
     assert_kata_exists
     refute_avatar_exists(avatar_name)
-
     make_shared_dir
     chown_shared_dir
-
-    add_user = add_user_cmd(avatar_name)
-    assert_docker_exec(add_user)
-
-    dir = avatar_dir(avatar_name)
-    mkdir = "mkdir -m 755 #{dir}"
-    chown = "chown #{avatar_name}:#{group} #{dir}"
-    assert_docker_exec([ mkdir, chown ].join(' && '))
-
+    add_avatar_user(avatar_name)
+    make_avatar_dir(avatar_name)
+    chown_avatar_dir(avatar_name)
     write_files(avatar_name, starting_files)
   end
 
@@ -130,13 +123,8 @@ class DockerKataContainerRunner
   def old_avatar(avatar_name)
     assert_kata_exists
     assert_avatar_exists(avatar_name)
-
-    del_user = del_user_cmd(avatar_name)
-    assert_docker_exec(del_user)
-
-    dir = avatar_dir(avatar_name)
-    rm_dir = "rm -rf #{dir}"
-    assert_docker_exec(rm_dir)
+    delete_avatar_user(avatar_name)
+    remove_avatar_dir(avatar_name)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -154,14 +142,40 @@ class DockerKataContainerRunner
 
   private
 
+  def add_avatar_user(avatar_name)
+    assert_docker_exec(add_user_cmd(avatar_name))
+  end
+
+  def delete_avatar_user(avatar_name)
+    assert_docker_exec(del_user_cmd(avatar_name))
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def make_avatar_dir(avatar_name)
+    dir = avatar_dir(avatar_name)
+    assert_docker_exec("mkdir -m 755 #{dir}")
+  end
+
+  def chown_avatar_dir(avatar_name)
+    dir = avatar_dir(avatar_name)
+    assert_docker_exec("chown #{avatar_name}:#{group} #{dir}")
+  end
+
+  def remove_avatar_dir(avatar_name)
+    dir = avatar_dir(avatar_name)
+    assert_docker_exec("rm -rf #{dir}")
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   def make_shared_dir
-    mkdir = "mkdir -m 775 #{shared_dir} || true" # idempotent
-    assert_docker_exec(mkdir)
+    # first avatar actually makes the shared dir
+    assert_docker_exec("mkdir -m 775 #{shared_dir} || true")
   end
 
   def chown_shared_dir
-    chown = "chown root:#{group} #{shared_dir}"
-    assert_docker_exec(chown)
+    assert_docker_exec("chown root:#{group} #{shared_dir}")
   end
 
   def shared_dir
@@ -189,8 +203,7 @@ class DockerKataContainerRunner
       end
       cid = container_name
       dir = avatar_dir(avatar_name)
-      docker_cp = "docker cp #{tmp_dir}/. #{cid}:#{dir}"
-      assert_exec(docker_cp)
+      assert_exec("docker cp #{tmp_dir}/. #{cid}:#{dir}")
       all = files.keys.map { |filename| "#{dir}/#{filename}" }
       chown = "chown #{avatar_name}:#{group} " + all.join(space)
       assert_docker_exec(chown)
