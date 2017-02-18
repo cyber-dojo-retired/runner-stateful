@@ -135,7 +135,10 @@ module DockerRunnerVolumeMixIn
   def delete_files(cid, avatar_name, filenames)
     return if filenames == []
     dir = avatar_dir(avatar_name)
-    assert_docker_exec(cid, "cd #{dir} && rm #{filenames.join(space)}")
+    filenames.each do |filename|
+      assert_docker_exec(cid, "rm #{dir}/#{filename}")
+    end
+    #assert_docker_exec(cid, "cd #{dir} && rm #{filenames.join(space)}")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
@@ -147,12 +150,12 @@ module DockerRunnerVolumeMixIn
         host_filename = tmp_dir + '/' + filename
         disk.write(host_filename, content)
       end
-      uid = user_id(avatar_name)
       dir = avatar_dir(avatar_name)
       assert_exec("docker cp #{tmp_dir}/. #{cid}:#{dir}")
-      filenames = files.keys.map { |filename| "#{dir}/#{filename}" }
-      chown_files = "chown #{uid}:#{gid} " + filenames.join(space)
-      assert_docker_exec(cid, chown_files)
+      files.keys.each do |filename|
+        chown_file = "chown #{avatar_name}:#{group} #{dir}/#{filename}"
+        assert_docker_exec(cid, chown_file)
+      end
     end
   end
 
