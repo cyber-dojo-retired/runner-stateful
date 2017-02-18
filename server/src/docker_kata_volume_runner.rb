@@ -60,8 +60,8 @@ class DockerKataVolumeRunner
       refute_avatar_exists(cid, avatar_name)
       make_shared_dir(cid)
       chown_shared_dir(cid)
-      make_sandbox_dir(cid, avatar_name)
-      chown_sandbox_dir(cid, avatar_name)
+      make_avatar_dir(cid, avatar_name)
+      chown_avatar_dir(cid, avatar_name)
       write_files(cid, avatar_name, starting_files)
     end
   end
@@ -72,7 +72,7 @@ class DockerKataVolumeRunner
 
     in_kvr_container(avatar_name) do |cid|
       assert_avatar_exists(cid, avatar_name)
-      remove_sandbox_dir(cid, avatar_name)
+      remove_avatar_dir(cid, avatar_name)
     end
   end
 
@@ -107,15 +107,15 @@ class DockerKataVolumeRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def make_sandbox_dir(cid, avatar_name)
-    sandbox = sandbox_dir(avatar_name)
-    mkdir = "mkdir -m 755 #{sandbox}"
+  def make_avatar_dir(cid, avatar_name)
+    dir = avatar_dir(avatar_name)
+    mkdir = "mkdir -m 755 #{dir}"
     assert_docker_exec(cid, mkdir)
   end
 
-  def remove_sandbox_dir(cid, avatar_name)
-    sandbox = sandbox_dir(avatar_name)
-    rmdir = "rm -rf #{sandbox}"
+  def remove_avatar_dir(cid, avatar_name)
+    dir = avatar_dir(avatar_name)
+    rmdir = "rm -rf #{dir}"
     assert_docker_exec(cid, rmdir)
   end
 
@@ -127,7 +127,7 @@ class DockerKataVolumeRunner
   end
 
   def chown_shared_dir(cid)
-    chown = "chown root:cyber-dojo #{shared_dir}"
+    chown = "chown root:#{group} #{shared_dir}"
     assert_docker_exec(cid, chown)
   end
 
@@ -150,8 +150,8 @@ class DockerKataVolumeRunner
   end
 
   def avatar_exists_cid?(cid, avatar_name)
-    sandbox = sandbox_dir(avatar_name)
-    cmd = "docker exec #{cid} sh -c '[ -d #{sandbox} ]'"
+    dir = avatar_dir(avatar_name)
+    cmd = "docker exec #{cid} sh -c '[ -d #{dir} ]'"
     _,_,status = quiet_exec(cmd)
     status == success
   end

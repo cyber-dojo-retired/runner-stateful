@@ -6,8 +6,8 @@ module DockerRunnerVolumeMixIn
 
   module_function
 
-  def in_container(avatar_name, volume_name, volume_root, &block)
-    cid = create_container(avatar_name, volume_name, volume_root)
+  def in_container(avatar_name, volume_name, volume_root_dir, &block)
+    cid = create_container(avatar_name, volume_name, volume_root_dir)
     begin
       block.call(cid)
     ensure
@@ -25,7 +25,7 @@ module DockerRunnerVolumeMixIn
     # and create a temporary /sandboxes/ folder in it!
     # See https://github.com/docker/docker/issues/13121
 
-    sandbox = sandbox_dir(avatar_name)
+    dir = avatar_dir(avatar_name)
     home = home_dir(avatar_name)
     args = [
       '--detach',                          # get the cid
@@ -35,7 +35,7 @@ module DockerRunnerVolumeMixIn
       '--security-opt=no-new-privileges',  # no escalation
       "--env CYBER_DOJO_KATA_ID=#{kata_id}",
       "--env CYBER_DOJO_AVATAR_NAME=#{avatar_name}",
-      "--env CYBER_DOJO_SANDBOX=#{sandbox}",
+      "--env CYBER_DOJO_SANDBOX=#{dir}",
       "--env HOME=#{home}",
       '--user=root',
       "--volume #{volume_name}:#{volume_root}:rw"
@@ -124,10 +124,10 @@ module DockerRunnerVolumeMixIn
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  def chown_sandbox_dir(cid, avatar_name)
-    sandbox = sandbox_dir(avatar_name)
+  def chown_avatar_dir(cid, avatar_name)
+    dir = avatar_dir(avatar_name)
     uid = user_id(avatar_name)
-    chown = "chown #{uid}:#{gid} #{sandbox}"
+    chown = "chown #{uid}:#{gid} #{dir}"
     assert_docker_exec(cid, chown)
   end
 
@@ -135,8 +135,8 @@ module DockerRunnerVolumeMixIn
 
   def delete_files(cid, avatar_name, filenames)
     return if filenames == []
-    sandbox = sandbox_dir(avatar_name)
-    all = filenames.map { |filename| "#{sandbox}/#{filename}" }
+    dir = avatar_dir(avatar_name)
+    all = filenames.map { |filename| "#{dir}/#{filename}" }
     rm = 'rm ' + all.join(space)
     assert_docker_exec(cid, rm)
   end
@@ -151,10 +151,10 @@ module DockerRunnerVolumeMixIn
         disk.write(host_filename, content)
       end
       uid = user_id(avatar_name)
-      sandbox = sandbox_dir(avatar_name)
-      docker_cp = "docker cp #{tmp_dir}/. #{cid}:#{sandbox}"
+      dir = avatar_dir(avatar_name)
+      docker_cp = "docker cp #{tmp_dir}/. #{cid}:#{dir}"
       assert_exec(docker_cp)
-      all = files.keys.map { |filename| "#{sandbox}/#{filename}" }
+      all = files.keys.map { |filename| "#{dir}/#{filename}" }
       chown = "chown #{uid}:#{gid} " + all.join(space)
       assert_docker_exec(cid, chown)
     end
@@ -166,13 +166,13 @@ module DockerRunnerVolumeMixIn
     # I thought doing [chmod 755] in new_avatar() would
     # be "sticky" and remain 755 but it appears not...
     uid = user_id(avatar_name)
-    sandbox = sandbox_dir(avatar_name)
+    dir = avatar_dir(avatar_name)
     docker_cmd = [
       'docker exec',
       "--user=#{uid}:#{gid}",
       '--interactive',
       cid,
-      "sh -c 'cd #{sandbox} && chmod 755 . && sh ./cyber-dojo.sh'"
+      "sh -c 'cd #{dir} && chmod 755 . && sh ./cyber-dojo.sh'"
     ].join(space)
 
     run_timeout(docker_cmd, max_seconds)

@@ -125,7 +125,7 @@ class AvatarTest < TestBase
   'sandbox_path with invalid avatar_name raises' do
     invalid_avatar_names.each do |invalid_avatar_name|
       error = assert_raises(ArgumentError) {
-        runner.sandbox_dir(invalid_avatar_name)
+        runner.avatar_dir(invalid_avatar_name)
       }
       assert_equal 'avatar_name:invalid', error.message
     end

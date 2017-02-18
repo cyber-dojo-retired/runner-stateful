@@ -161,7 +161,7 @@ class TestBase < HexMiniTest
   end
 
   def sandbox(name = 'salmon')
-    runner.sandbox_dir(name)
+    runner.avatar_dir(name)
   end
 
   def success; shell.success; end

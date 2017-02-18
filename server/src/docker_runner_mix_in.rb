@@ -26,7 +26,7 @@ module DockerRunnerMixIn
     "/home/#{avatar_name}"
   end
 
-  def sandbox_dir(avatar_name)
+  def avatar_dir(avatar_name)
     assert_valid_avatar_name(avatar_name)
     "#{sandboxes_root_dir}/#{avatar_name}"
   end

@@ -120,9 +120,9 @@ class DockerKataContainerRunner
     add_user = add_user_cmd(avatar_name)
     assert_docker_exec(add_user)
 
-    sandbox = sandbox_dir(avatar_name)
-    mkdir = "mkdir -m 755 #{sandbox}"
-    chown = "chown #{avatar_name}:#{group} #{sandbox}"
+    dir = avatar_dir(avatar_name)
+    mkdir = "mkdir -m 755 #{dir}"
+    chown = "chown #{avatar_name}:#{group} #{dir}"
     assert_docker_exec([ mkdir, chown ].join(' && '))
 
     write_files(avatar_name, starting_files)
@@ -137,9 +137,9 @@ class DockerKataContainerRunner
     del_user = del_user_cmd(avatar_name)
     assert_docker_exec(del_user)
 
-    sandbox = sandbox_dir(avatar_name)
-    rm_sandbox = "rm -rf #{sandbox}"
-    assert_docker_exec(rm_sandbox)
+    dir = avatar_dir(avatar_name)
+    rm_dir = "rm -rf #{sandbox}"
+    assert_docker_exec(rm_dir)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -159,23 +159,25 @@ class DockerKataContainerRunner
   private
 
   def make_shared_dir
-    shared_dir = "/sandboxes/shared"
     mkdir = "mkdir -m 775 #{shared_dir} || true" # idempotent
     assert_docker_exec(mkdir)
   end
 
   def chown_shared_dir
-    shared_dir = "/sandboxes/shared"
-    chown = "chown root:cyber-dojo #{shared_dir}"
+    chown = "chown root:#{group} #{shared_dir}"
     assert_docker_exec(chown)
+  end
+
+  def shared_dir
+    "/#{sandboxes_root_dir}/shared"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def delete_files(avatar_name, filenames)
     return if filenames == []
-    sandbox = sandbox_dir(avatar_name)
-    all = filenames.map { |filename| "#{sandbox}/#{filename}" }
+    dir = avatar_dir(avatar_name)
+    all = filenames.map { |filename| "#{dir}/#{filename}" }
     rm = 'rm ' + all.join(space)
     assert_docker_exec(rm)
   end
@@ -190,10 +192,10 @@ class DockerKataContainerRunner
         disk.write(host_filename, content)
       end
       cid = container_name
-      sandbox = sandbox_dir(avatar_name)
-      docker_cp = "docker cp #{tmp_dir}/. #{cid}:#{sandbox}"
+      dir = avatar_dir(avatar_name)
+      docker_cp = "docker cp #{tmp_dir}/. #{cid}:#{dir}"
       assert_exec(docker_cp)
-      all = files.keys.map { |filename| "#{sandbox}/#{filename}" }
+      all = files.keys.map { |filename| "#{dir}/#{filename}" }
       chown = "chown #{avatar_name}:#{group} " + all.join(space)
       assert_docker_exec(chown)
     end
