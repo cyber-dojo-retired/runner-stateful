@@ -89,8 +89,8 @@ class DockerAvatarVolumeRunner
 
   def in_avr_container(avatar_name, &block)
     volume_name = avatar_volume_name(avatar_name)
-    volume_root = sandbox_path(avatar_name)
-    in_container(avatar_name, volume_name, volume_root, &block)
+    volume_root_dir = sandbox_dir(avatar_name)
+    in_container(avatar_name, volume_name, volume_root_dir, &block)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -

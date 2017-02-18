@@ -62,7 +62,7 @@ class DockerKataContainerRunner
       '--pids-limit=256',                  # no fork bombs
       '--security-opt=no-new-privileges',  # no escalation
       '--user=root',
-      "--volume #{name}:#{sandboxes_root}:rw"
+      "--volume #{name}:#{sandboxes_root_dir}:rw"
     ].join(space)
     cmd = "docker run #{args} #{image_name} sh -c 'sleep 3h'"
     assert_exec(cmd)
@@ -120,7 +120,7 @@ class DockerKataContainerRunner
     add_user = add_user_cmd(avatar_name)
     assert_docker_exec(add_user)
 
-    sandbox = sandbox_path(avatar_name)
+    sandbox = sandbox_dir(avatar_name)
     mkdir = "mkdir -m 755 #{sandbox}"
     chown = "chown #{avatar_name}:#{group} #{sandbox}"
     assert_docker_exec([ mkdir, chown ].join(' && '))
@@ -137,9 +137,9 @@ class DockerKataContainerRunner
     del_user = del_user_cmd(avatar_name)
     assert_docker_exec(del_user)
 
-    sandbox = sandbox_path(avatar_name)
-    del_sandbox = "rm -rf #{sandbox}"
-    assert_docker_exec(del_sandbox)
+    sandbox = sandbox_dir(avatar_name)
+    rm_sandbox = "rm -rf #{sandbox}"
+    assert_docker_exec(rm_sandbox)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -174,7 +174,7 @@ class DockerKataContainerRunner
 
   def delete_files(avatar_name, filenames)
     return if filenames == []
-    sandbox = sandbox_path(avatar_name)
+    sandbox = sandbox_dir(avatar_name)
     all = filenames.map { |filename| "#{sandbox}/#{filename}" }
     rm = 'rm ' + all.join(space)
     assert_docker_exec(rm)
@@ -190,7 +190,7 @@ class DockerKataContainerRunner
         disk.write(host_filename, content)
       end
       cid = container_name
-      sandbox = sandbox_path(avatar_name)
+      sandbox = sandbox_dir(avatar_name)
       docker_cp = "docker cp #{tmp_dir}/. #{cid}:#{sandbox}"
       assert_exec(docker_cp)
       all = files.keys.map { |filename| "#{sandbox}/#{filename}" }

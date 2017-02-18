@@ -101,20 +101,20 @@ class DockerKataVolumeRunner
 
   def in_kvr_container(avatar_name, &block)
     volume_name = kata_volume_name
-    volume_root = sandboxes_root
-    in_container(avatar_name, volume_name, volume_root, &block)
+    volume_root_dir = sandboxes_root_dir
+    in_container(avatar_name, volume_name, volume_root_dir, &block)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def make_sandbox_dir(cid, avatar_name)
-    sandbox = sandbox_path(avatar_name)
+    sandbox = sandbox_dir(avatar_name)
     mkdir = "mkdir -m 755 #{sandbox}"
     assert_docker_exec(cid, mkdir)
   end
 
   def remove_sandbox_dir(cid, avatar_name)
-    sandbox = sandbox_path(avatar_name)
+    sandbox = sandbox_dir(avatar_name)
     rmdir = "rm -rf #{sandbox}"
     assert_docker_exec(cid, rmdir)
   end
@@ -122,15 +122,17 @@ class DockerKataVolumeRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def make_shared_dir(cid)
-    shared_dir = "/sandboxes/shared"
     mkdir = "mkdir -m 775 #{shared_dir} || true" # idempotent
     assert_docker_exec(cid, mkdir)
   end
 
   def chown_shared_dir(cid)
-    shared_dir = "/sandboxes/shared"
     chown = "chown root:cyber-dojo #{shared_dir}"
     assert_docker_exec(cid, chown)
+  end
+
+  def shared_dir
+    "/#{sandboxes_root_dir}/shared"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -148,7 +150,7 @@ class DockerKataVolumeRunner
   end
 
   def avatar_exists_cid?(cid, avatar_name)
-    sandbox = sandbox_path(avatar_name)
+    sandbox = sandbox_dir(avatar_name)
     cmd = "docker exec #{cid} sh -c '[ -d #{sandbox} ]'"
     _,_,status = quiet_exec(cmd)
     status == success

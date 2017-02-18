@@ -22,13 +22,13 @@ module DockerRunnerMixIn
     40000 + all_avatars_names.index(avatar_name)
   end
 
-  def home_path(avatar_name)
+  def home_dir(avatar_name)
     "/home/#{avatar_name}"
   end
 
-  def sandbox_path(avatar_name)
+  def sandbox_dir(avatar_name)
     assert_valid_avatar_name(avatar_name)
-    "#{sandboxes_root}/#{avatar_name}"
+    "#{sandboxes_root_dir}/#{avatar_name}"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
@@ -99,7 +99,7 @@ module DockerRunnerMixIn
     # Alpine linux has an existing web-proxy user
     # called squid which I have to work round.
     # See avatar_exists?() in docker_avatar_volume_runner.rb
-    home = home_path(avatar_name)
+    home = home_dir(avatar_name)
     uid = user_id(avatar_name)
     [ "(deluser #{avatar_name};",
        'adduser',
@@ -116,7 +116,7 @@ module DockerRunnerMixIn
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def ubuntu_add_user_cmd(avatar_name)
-    home = home_path(avatar_name)
+    home = home_dir(avatar_name)
     uid = user_id(avatar_name)
     [ 'adduser',
         '--disabled-password',
@@ -219,7 +219,7 @@ module DockerRunnerMixIn
 
   # - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def sandboxes_root; '/sandboxes'; end
+  def sandboxes_root_dir; '/sandboxes'; end
   def success; shell.success; end
   def space; ' '; end
 

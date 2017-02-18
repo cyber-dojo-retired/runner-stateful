@@ -25,8 +25,8 @@ module DockerRunnerVolumeMixIn
     # and create a temporary /sandboxes/ folder in it!
     # See https://github.com/docker/docker/issues/13121
 
-    sandbox = sandbox_path(avatar_name)
-    home = home_path(avatar_name)
+    sandbox = sandbox_dir(avatar_name)
+    home = home_dir(avatar_name)
     args = [
       '--detach',                          # get the cid
       '--interactive',                     # later execs
@@ -125,7 +125,7 @@ module DockerRunnerVolumeMixIn
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def chown_sandbox_dir(cid, avatar_name)
-    sandbox = sandbox_path(avatar_name)
+    sandbox = sandbox_dir(avatar_name)
     uid = user_id(avatar_name)
     chown = "chown #{uid}:#{gid} #{sandbox}"
     assert_docker_exec(cid, chown)
@@ -135,7 +135,7 @@ module DockerRunnerVolumeMixIn
 
   def delete_files(cid, avatar_name, filenames)
     return if filenames == []
-    sandbox = sandbox_path(avatar_name)
+    sandbox = sandbox_dir(avatar_name)
     all = filenames.map { |filename| "#{sandbox}/#{filename}" }
     rm = 'rm ' + all.join(space)
     assert_docker_exec(cid, rm)
@@ -151,7 +151,7 @@ module DockerRunnerVolumeMixIn
         disk.write(host_filename, content)
       end
       uid = user_id(avatar_name)
-      sandbox = sandbox_path(avatar_name)
+      sandbox = sandbox_dir(avatar_name)
       docker_cp = "docker cp #{tmp_dir}/. #{cid}:#{sandbox}"
       assert_exec(docker_cp)
       all = files.keys.map { |filename| "#{sandbox}/#{filename}" }
@@ -166,7 +166,7 @@ module DockerRunnerVolumeMixIn
     # I thought doing [chmod 755] in new_avatar() would
     # be "sticky" and remain 755 but it appears not...
     uid = user_id(avatar_name)
-    sandbox = sandbox_path(avatar_name)
+    sandbox = sandbox_dir(avatar_name)
     docker_cmd = [
       'docker exec',
       "--user=#{uid}:#{gid}",
