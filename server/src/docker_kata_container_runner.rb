@@ -111,7 +111,8 @@ class DockerKataContainerRunner
     assert_kata_exists
     refute_avatar_exists(avatar_name)
 
-    make_shared_folder
+    make_shared_dir
+    chown_shared_dir
 
     add_user = add_user_cmd(avatar_name)
     assert_docker_exec(add_user)
@@ -154,12 +155,15 @@ class DockerKataContainerRunner
 
   private
 
-  def make_shared_folder
-    shared_folder = "/sandboxes/shared"
-    mkdir = "mkdir -m 775 #{shared_folder} || true" # idempotent
+  def make_shared_dir
+    shared_dir = "/sandboxes/shared"
+    mkdir = "mkdir -m 775 #{shared_dir} || true" # idempotent
     assert_docker_exec(mkdir)
-    group = 'cyber-dojo'
-    chown = "chown root:#{group} #{shared_folder}"
+  end
+
+  def chown_shared_dir
+    shared_dir = "/sandboxes/shared"
+    chown = "chown root:cyber-dojo #{shared_dir}"
     assert_docker_exec(chown)
   end
 
