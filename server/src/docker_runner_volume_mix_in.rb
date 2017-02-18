@@ -18,7 +18,7 @@ module DockerRunnerVolumeMixIn
   def create_container(avatar_name, volume_name, volume_root)
     # The [docker run] must be guarded by argument checks
     # because it volume mounts...
-    #     [docker run ... --volume=V:...]
+    #     [docker run ... --volume ...]
     # Volume V must already exist.
     # If volume V does _not_ exist the [docker run]
     # will nevertheless succeed, create the container,
