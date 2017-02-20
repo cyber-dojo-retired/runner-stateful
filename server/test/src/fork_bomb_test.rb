@@ -19,6 +19,7 @@ class ForkBombTest < TestBase
       '#include "hiker.h"',
       '#include <stdio.h>',
       '#include <unistd.h>',
+      '',
       'int answer(void)',
       '{',
       '    for(;;)',
@@ -32,15 +33,14 @@ class ForkBombTest < TestBase
       '    return 6 * 7;',
       '}'
     ].join("\n")
-
     begin
       sss_run({ avatar_name:'lion', changed_files:{'hiker.c' => hiker_c }})
       assert_equal success, status
       assert_equal '', stderr
       lines = stdout.split("\n")
-      assert lines.count{|line| line == 'All tests passed'} > 42
-      assert lines.count{|line| line == 'fork() => 0'} > 42
-      assert lines.count{|line| line == 'fork() => -1'} > 42
+      assert lines.count{ |line| line == 'All tests passed' } > 42
+      assert lines.count{ |line| line == 'fork() => 0' } > 42
+      assert lines.count{ |line| line == 'fork() => -1' } > 42
     ensure
       old_avatar('lion')
     end
