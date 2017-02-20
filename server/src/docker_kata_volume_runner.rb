@@ -103,26 +103,23 @@ class DockerKataVolumeRunner
 
   def make_avatar_dir(cid, avatar_name)
     dir = avatar_dir(avatar_name)
-    mkdir = "mkdir -m 755 #{dir}"
-    assert_docker_exec(cid, mkdir)
+    assert_docker_exec(cid, "mkdir -m 755 #{dir}")
   end
 
   def remove_avatar_dir(cid, avatar_name)
     dir = avatar_dir(avatar_name)
-    rmdir = "rm -rf #{dir}"
-    assert_docker_exec(cid, rmdir)
+    assert_docker_exec(cid, "rm -rf #{dir}")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def make_shared_dir(cid)
-    mkdir = "mkdir -m 775 #{shared_dir} || true" # idempotent
-    assert_docker_exec(cid, mkdir)
+    # first avatar actually makes the shared dir
+    assert_docker_exec(cid, "mkdir -m 775 #{shared_dir} || true")
   end
 
   def chown_shared_dir(cid)
-    chown = "chown root:#{group} #{shared_dir}"
-    assert_docker_exec(cid, chown)
+    assert_docker_exec(cid, "chown root:#{group} #{shared_dir}")
   end
 
   def shared_dir
@@ -145,8 +142,7 @@ class DockerKataVolumeRunner
 
   def avatar_exists_cid?(cid, avatar_name)
     dir = avatar_dir(avatar_name)
-    cmd = "docker exec #{cid} sh -c '[ -d #{dir} ]'"
-    _,_,status = quiet_exec(cmd)
+    _,_,status = quiet_exec("docker exec #{cid} sh -c '[ -d #{dir} ]'")
     status == success
   end
 

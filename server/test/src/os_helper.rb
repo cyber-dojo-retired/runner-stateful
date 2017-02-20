@@ -78,7 +78,7 @@ module OsHelper
     # kata_setup has already called new_avatar() which
     # has setup a salmon. So I create a new avatar with
     # known ls-starting-files. Note that kata_teardown
-    # calls old_avatar and old_kata
+    # calls old_avatar('salmon') and old_kata
     new_avatar('lion', ls_starting_files)
     begin
       sss_run({ avatar_name:'lion', changed_files:{} })
@@ -195,6 +195,40 @@ module OsHelper
     end
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def max_processes_test
+    lines = assert_cyber_dojo_sh('ulimit -a').strip
+    #Alpine == '-p: processes        1048576'
+    #Ubuntu == 'process              1048576'
+    line = lines.split("\n").detect { |limit| limit.include? 'process' }
+    max_processes = line.split[-1].to_i
+    assert_equal 64, max_processes
+  end
+
+  def max_core_size_test
+    lines = assert_cyber_dojo_sh('ulimit -a').strip
+    #Alpine == -c: core file size (blocks) 0
+    #Ubuntu == coredump(blocks)     0
+    line = lines.split("\n").detect { |limit| limit.include? 'core' }
+    max_core_size = line.split[-1].to_i
+    assert_equal 0, max_core_size
+  end
+
+  def max_number_of_files_test
+    lines = assert_cyber_dojo_sh('ulimit -a').strip
+    if alpine?
+      #-n: file descriptors 1048576
+      line = lines.split("\n").detect { |limit| limit.include? 'file descriptors' }
+    end
+    if ubuntu?
+      #nofiles 1048576
+      line = lines.split("\n").detect { |limit| limit.include? 'nofiles' }
+    end
+    max_no_files = line.split[-1].to_i
+    assert_equal 128, max_no_files
+  end
+
   private
 
   def ls_starting_files
@@ -230,6 +264,22 @@ module OsHelper
          time_stamp: attr[6],
       }]
     }]
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def alpine?
+    etc_issue.include? 'Alpine'
+  end
+
+  def ubuntu?
+    etc_issue.include? 'Ubuntu'
+  end
+
+  def etc_issue
+    changed_files = { 'cyber-dojo.sh' => 'cat /etc/issue' }
+    stdout,_,_ = sss_run({ changed_files:changed_files })
+    stdout
   end
 
 end
