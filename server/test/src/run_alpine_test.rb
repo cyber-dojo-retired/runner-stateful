@@ -79,22 +79,8 @@ class RunAlpineTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'D7C',
-  '[Alpine] max number of processes is ulimited' do
-    max_processes_test
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test '3B7',
-  '[Alpine] max core size is ulimited' do
-    max_core_size_test
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test 'BC6',
-  '[Alpine] max number of files is ulimited' do
-    max_number_of_files_test
+  '[Alpine] is ulimited' do
+    ulimit_test
   end
 
 end

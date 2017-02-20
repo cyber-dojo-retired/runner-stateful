@@ -197,19 +197,14 @@ module OsHelper
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def max_processes_test
-    assert_equal 64, ulimit(:max_processes)
+  def ulimit_test
+    lines = assert_cyber_dojo_sh('ulimit -a').split("\n")
+    assert_equal  64, ulimit(lines, :max_processes)
+    assert_equal   0, ulimit(lines, :max_core_size)
+    assert_equal 128, ulimit(lines, :max_no_files)
   end
 
-  def max_core_size_test
-    assert_equal 0, ulimit(:max_core_size)
-  end
-
-  def max_number_of_files_test
-    assert_equal 128, ulimit(:max_no_files)
-  end
-
-  def ulimit(key)
+  def ulimit(lines, key)
     table = {             # alpine,                       ubuntu
       :max_processes => [ '-p: processes',               'process'         ],
       :max_core_size => [ '-c: core file size (blocks)', 'coredump(blocks)'],
@@ -217,7 +212,6 @@ module OsHelper
     }
     if alpine?; txt = table[key][0]; end
     if ubuntu?; txt = table[key][1]; end
-    lines = assert_cyber_dojo_sh('ulimit -a').split("\n")
     line = lines.detect { |limit| limit.start_with? txt }
     line.split[-1].to_i
   end

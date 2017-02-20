@@ -76,22 +76,8 @@ class RunUbuntuTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'D7D',
-  '[Ubuntu] max number of processes is ulimited' do
-    max_processes_test
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test '3B8',
-  '[Alpine] max core size is ulimited' do
-    max_core_size_test
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test 'BC7',
-  '[Ubuntu] max number of files is ulimited' do
-    max_number_of_files_test
+  '[Ubuntu] is ulimited' do
+    ulimit_test
   end
 
 end
