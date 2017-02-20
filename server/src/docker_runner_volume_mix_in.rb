@@ -29,8 +29,8 @@ module DockerRunnerVolumeMixIn
     home = home_dir(avatar_name)
     args = [
       '--detach',                          # get the cid
-      '--interactive',                     # later execs
-      '--net=none',                        # security
+      '--interactive',                     # for later execs
+      '--net=none',                        # for security
       '--pids-limit=64',                   # no fork bombs
       '--security-opt=no-new-privileges',  # no escalation
       '--ulimit nproc=64:64',              # max number processes = 64
