@@ -1,7 +1,7 @@
 require_relative 'test_base'
 require_relative 'os_helper'
 
-class FilekBombTest < TestBase
+class FileBombTest < TestBase
 
   include OsHelper
 
@@ -13,7 +13,7 @@ class FilekBombTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'DB3',
-  '[Alpine] file() bomb in C runs out of steam' do
+  '[Alpine] file() bomb in C to exhaust file-handles runs out of steam' do
     new_avatar('lion')
     hiker_c = [
       '#include "hiker.h"',
@@ -21,20 +21,20 @@ class FilekBombTest < TestBase
       '',
       'int answer(void)',
       '{',
-      'for (int i = 0;;i++)',
-      '{',
+      '  for (int i = 0;;i++)',
+      '  {',
       '    char filename[42];',
       '    sprintf(filename, "wibble%d.txt", i);',
       '    FILE * f = fopen(filename, "w");',
       '    if (f)',
-      '        fprintf(stdout, "fopen() != NULL %s\n", filename);',
+      '      fprintf(stdout, "fopen() != NULL %s\n", filename);',
       '    else',
       '    {',
-      '        fprintf(stdout, "fopen() == NULL %s\n", filename);',
-      '        break;',
+      '      fprintf(stdout, "fopen() == NULL %s\n", filename);',
+      '      break;',
       '    }',
-      '}',
-      '    return 6 * 7;',
+      '  }',
+      '  return 6 * 7;',
       '}'
     ].join("\n")
     begin
