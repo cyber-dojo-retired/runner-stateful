@@ -1,7 +1,7 @@
 #!/bin/bash
 
-my_dir="${PWD}"
-my_name="${PWD##*/}"
+my_dir="$( cd "$( dirname "${0}" )" && pwd )"
+my_name="${my_dir##*/}"
 
 server_cid=`docker ps --all --quiet --filter "name=${my_name}_server"`
 server_status=0
