@@ -21,8 +21,8 @@ speed/sharing/security tradeoffs. They all use the same tests.
   * [DockerKataContainerRunner](https://github.com/cyber-dojo/runner/blob/master/server/src/docker_kata_volume_runner.rb)
 
 API:
-  * All methods receive their arguments in a json object.
-  * All methods return a json object with a single key.
+  * All methods receive their arguments in a json hash.
+  * All methods return a json hash with a single key.
   * If successful, the key equals the method's name.
   * If unsuccessful, the key equals "exception".
 
