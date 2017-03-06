@@ -42,9 +42,11 @@ module DockerRunnerMixIn
     5000
   end
 
+  attr_reader :image_name
+
   module_function
 
-  attr_reader :image_name, :kata_id
+  attr_reader :kata_id
 
   include StringCleaner
   include StringTruncater

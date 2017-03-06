@@ -1,9 +1,18 @@
+require 'benchmark'
+require 'prometheus/client/push'
+
 require_relative 'externals'
 require_relative 'runner'
 require 'sinatra/base'
 require 'json'
 
+
 class MicroService < Sinatra::Base
+
+  def self.prom(prometheus)
+    @@prometheus = prometheus
+    @@run = @@prometheus.histogram(:run, 'seconds')
+  end
 
   # Some methods have arguments that are unused
   # in particular runner-service implementations.
@@ -40,7 +49,18 @@ class MicroService < Sinatra::Base
     args  = [ avatar_name ]
     args += [ deleted_filenames, changed_files ]
     args += [ max_seconds ]
-    poster(__method__, *args)
+
+    json = nil
+    duration = Benchmark.realtime {
+      json = poster(__method__, *args)
+    }
+
+    @@run.observe({ image_name: runner.image_name }, duration)
+    gateway = 'http://prometheus_pushgateway:9091'
+    job_name = 'runner'
+    Prometheus::Client::Push.new(job_name, instance=nil, gateway).add(@@prometheus)
+
+    json
   end
 
   private
