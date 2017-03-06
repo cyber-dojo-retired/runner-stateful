@@ -1,21 +1,18 @@
 require 'benchmark'
+require 'prometheus/client'
 require 'prometheus/client/push'
-
-require_relative 'externals'
-require_relative 'runner'
 require 'sinatra/base'
 require 'json'
-
+require_relative 'externals'
+require_relative 'runner'
 
 class MicroService < Sinatra::Base
 
-  def self.prom(prometheus)
-    @@prometheus = prometheus
-    @@run = @@prometheus.histogram(:run, 'seconds')
+  def initialize
+    super
+    @prometheus = Prometheus::Client.registry
+    @run = @prometheus.histogram(:run, 'seconds')
   end
-
-  # Some methods have arguments that are unused
-  # in particular runner-service implementations.
 
   get '/kata_exists?' do
     getter(__method__)
@@ -55,10 +52,10 @@ class MicroService < Sinatra::Base
       json = poster(__method__, *args)
     }
 
-    @@run.observe({ image_name: runner.image_name }, duration)
+    @run.observe({ image_name: runner.image_name }, duration)
     gateway = 'http://prometheus_pushgateway:9091'
-    job_name = 'runner'
-    Prometheus::Client::Push.new(job_name, instance=nil, gateway).add(@@prometheus)
+    job_name = 'cyber-dojo'
+    Prometheus::Client::Push.new(job_name, instance=nil, gateway).add(@prometheus)
 
     json
   end
