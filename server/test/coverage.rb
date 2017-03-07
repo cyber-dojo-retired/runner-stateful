@@ -14,4 +14,4 @@ SimpleCov.start do
 end
 
 SimpleCov.root cov_root
-SimpleCov.coverage_dir '/tmp/coverage'
+SimpleCov.coverage_dir ENV['CYBER_DOJO_COVERAGE_ROOT']

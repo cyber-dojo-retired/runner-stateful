@@ -9,12 +9,7 @@ fi
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # client
 
-rm -rf /tmp/cyber-dojo
-mkdir /tmp/cyber-dojo
-
-cov_dir=/tmp/coverage
-rm -rf ${cov_dir}
-mkdir ${cov_dir}
+cov_dir=${CYBER_DOJO_COVERAGE_ROOT}
 test_log=${cov_dir}/test.log
 
 my_dir="$( cd "$( dirname "${0}" )" && pwd )"

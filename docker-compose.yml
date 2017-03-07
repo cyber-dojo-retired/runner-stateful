@@ -5,19 +5,54 @@ services:
   runner_client:
     user: nobody
     image: cyberdojo/runner_client
+    container_name: runner_client
+    read_only: true
+    tmpfs: /tmp
+    depends_on:
+      - runner
+      - runner-client-coverage-container
+    volumes_from:
+      - runner-client-coverage-container:rw
+    environment:
+      - CYBER_DOJO_COVERAGE_ROOT
     build:
       context: client
       args:
-        PORT: 4558
-    ports: [ "4558:4558" ]
-    container_name: runner_client
+        - PORT=${CYBER_DOJO_RUNNER_CLIENT_PORT}
+    ports:
+      - ${CYBER_DOJO_RUNNER_CLIENT_PORT}:${CYBER_DOJO_RUNNER_CLIENT_PORT}
 
   runner:
+    user: root
+    image: cyberdojo/runner
+    container_name: runner_server
+    read_only: true
+    tmpfs: /tmp
+    depends_on:
+      - runner-server-coverage-container
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+    volumes_from:
+      - runner-server-coverage-container:rw
+    environment:
+      - CYBER_DOJO_COVERAGE_ROOT
     build:
       context: server
       args:
-        PORT: 4557
+        - PORT=${CYBER_DOJO_RUNNER_SERVER_PORT}
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  runner-client-coverage-container:
+    image: cyberdojo/runner_client
+    container_name: runner-client-coverage-container
+    volumes:
+      - /${CYBER_DOJO_COVERAGE_ROOT}
+    command: "chown nobody:nobody ${CYBER_DOJO_COVERAGE_ROOT}"
+
+
+  runner-server-coverage-container:
     image: cyberdojo/runner
-    container_name: runner_server
-    user: root
-    volumes: [ '/var/run/docker.sock:/var/run/docker.sock' ]
+    container_name: runner-server-coverage-container
+    volumes:
+      - /${CYBER_DOJO_COVERAGE_ROOT}
