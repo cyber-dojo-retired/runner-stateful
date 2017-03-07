@@ -1,18 +1,9 @@
-require 'benchmark'
-require 'prometheus/client'
-require 'prometheus/client/push'
 require 'sinatra/base'
 require 'json'
 require_relative 'externals'
 require_relative 'runner'
 
 class MicroService < Sinatra::Base
-
-  def initialize
-    super
-    @prometheus = Prometheus::Client.registry
-    @run = @prometheus.histogram(:run, 'seconds')
-  end
 
   get '/kata_exists?' do
     getter(__method__)
@@ -46,18 +37,7 @@ class MicroService < Sinatra::Base
     args  = [ avatar_name ]
     args += [ deleted_filenames, changed_files ]
     args += [ max_seconds ]
-
-    json = nil
-    duration = Benchmark.realtime {
-      json = poster(__method__, *args)
-    }
-
-    @run.observe({ image_name: runner.image_name }, duration)
-    gateway = 'http://prometheus_pushgateway:9091'
-    job_name = 'cyber-dojo'
-    Prometheus::Client::Push.new(job_name, instance=nil, gateway).add(@prometheus)
-
-    json
+    poster(__method__, *args)
   end
 
   private
