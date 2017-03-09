@@ -177,4 +177,3 @@ If the runner-client's IP address is 192.168.99.100 then put
 - grey: tests did not complete (in 3 seconds)
 
 ![red amber green demo](red_amber_green_demo.png?raw=true "red amber green demo")
-
