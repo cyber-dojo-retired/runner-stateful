@@ -1,12 +1,9 @@
-require_relative 'externals'
-require_relative 'runner'
 require 'sinatra/base'
 require 'json'
+require_relative 'externals'
+require_relative 'runner'
 
 class MicroService < Sinatra::Base
-
-  # Some methods have arguments that are unused
-  # in particular runner-service implementations.
 
   get '/kata_exists?' do
     getter(__method__)
