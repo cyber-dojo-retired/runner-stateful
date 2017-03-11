@@ -11,10 +11,8 @@ alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
 
 # cyberdojo/runner docker image
 
-- A micro-service for [cyber-dojo](http://cyber-dojo.org)
+- A stateful micro-service for [cyber-dojo](http://cyber-dojo.org)
 - Runs an avatar's tests.
-- See also [collector](https://github.com/cyber-dojo/collector)
-- See also [puller](https://github.com/cyber-dojo/puller)
 
 The runner is currently DockerKataVolumeRunner but there
 are three runner implementations in this repo with varying
