@@ -5,6 +5,7 @@ MAINTAINER Jon Jagger <jon@jaggersoft.com>
 RUN apk --update add tar
 
 WORKDIR /app
+
 RUN echo "gem 'prometheus-client'" >> /app/Gemfile
 RUN apk --update add --virtual build-dependencies build-base \
   && bundle install && gem clean \
