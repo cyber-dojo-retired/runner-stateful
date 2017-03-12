@@ -9,6 +9,16 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - -
 
+  def pulled?(named_args = {})
+    runner.pulled?(*defaulted_args(__method__, named_args))
+  end
+
+  def pull(named_args = {})
+    runner.pull(*defaulted_args(__method__, named_args))
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - -
+
   def kata_exists?(named_args = {})
     runner.kata_exists?(*defaulted_args(__method__, named_args))
   end
