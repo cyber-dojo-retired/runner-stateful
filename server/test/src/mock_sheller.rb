@@ -29,6 +29,16 @@ class MockSheller
 
   # - - - - - - - - - - - - - - - - - - - - - - -
 
+  def assert_exec(command)
+    stdout,stderr,status = exec(command)
+    if status != success
+      fail ArgumentError.new("command:#{command}")
+    end
+    [stdout,stderr]
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - -
+
   def exec(command, _ = nil)
     mocks = read
     mock = mocks.shift

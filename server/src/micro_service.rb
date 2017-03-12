@@ -5,6 +5,16 @@ require_relative 'runner'
 
 class MicroService < Sinatra::Base
 
+  get '/pulled?' do
+    getter('GET /', __method__)
+  end
+
+  post '/pull' do
+    poster('POST /', __method__)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - -
+
   get '/kata_exists?' do
     getter(__method__)
   end

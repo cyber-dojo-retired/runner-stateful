@@ -24,6 +24,16 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  def pulled?
+    runner.pulled?
+  end
+
+  def pull
+    runner.pull
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   def kata_exists?
     runner.kata_exists?
   end
