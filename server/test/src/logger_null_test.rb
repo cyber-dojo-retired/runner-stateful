@@ -7,8 +7,22 @@ class LoggerNullTest < TestBase
 
   test 'F87',
   'logged message is lost' do
-    logger = LoggerNull.new(nil)
-    logger << 'hello'
+    log = LoggerNull.new(nil)
+    written = with_captured_stdout { log << "Hello world" }
+    assert_equal '', written
+  end
+
+  private
+
+  def with_captured_stdout
+    begin
+      old_stdout = $stdout
+      $stdout = StringIO.new('','w')
+      yield
+      $stdout.string
+    ensure
+      $stdout = old_stdout
+    end
   end
 
 end
