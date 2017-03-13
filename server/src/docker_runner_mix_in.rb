@@ -66,7 +66,7 @@ module DockerRunnerMixIn
     cmd = 'docker images --format "{{.Repository}}"'
     stdout,_ = assert_exec(cmd)
     names = stdout.split("\n")
-    names.uniq - ['<none']
+    names.uniq - ['<none>']
   end
 
   def run_timeout(docker_cmd, max_seconds)
