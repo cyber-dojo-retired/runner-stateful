@@ -24,8 +24,8 @@ speed/sharing/security tradeoffs. They all use the same tests.
 API:
   * All methods receive their arguments in a json hash.
   * All methods return a json hash with a single key.
-  * If successful, the key equals the method's name.
-  * If unsuccessful, the key equals "exception".
+  * If the method raises an exception, the key equals "exception".
+  * If the method completes, the key equals the method's name.
 
 - - - -
 
@@ -51,7 +51,7 @@ Pull the image with the given image_name.
        "kata_id": "15B9AD6C42"
   }
 ```
-- returns true if the pull succeeds (otherwise exception)
+- returns true if the pull succeeds.
 ```
   { "pull": true   }
 ```
