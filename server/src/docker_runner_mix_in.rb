@@ -23,6 +23,7 @@ module DockerRunnerMixIn
 
   def pull
     assert_exec("docker pull #{image_name}")
+    true
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
