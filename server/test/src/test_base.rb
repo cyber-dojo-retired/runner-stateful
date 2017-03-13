@@ -24,12 +24,12 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def pulled?
-    runner.pulled?
+  def image_pulled?
+    runner.image_pulled?
   end
 
-  def pull
-    runner.pull
+  def image_pull
+    runner.image_pull
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

@@ -29,7 +29,7 @@ API:
 
 - - - -
 
-# pulled?
+# image_pulled?
 Asks whether the image with the given image_name has been pulled.
 - parameter, eg
 ```
@@ -43,7 +43,7 @@ Asks whether the image with the given image_name has been pulled.
   { "pulled?": false  }
 ```
 
-# pull
+# image_pull
 Pull the image with the given image_name.
 - parameter, eg
 ```

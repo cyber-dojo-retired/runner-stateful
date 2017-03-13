@@ -9,12 +9,12 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - -
 
-  def pulled?(named_args = {})
-    runner.pulled?(*defaulted_args(__method__, named_args))
+  def image_pulled?(named_args = {})
+    runner.image_pulled?(*defaulted_args(__method__, named_args))
   end
 
-  def pull(named_args = {})
-    runner.pull(*defaulted_args(__method__, named_args))
+  def image_pull(named_args = {})
+    runner.image_pull(*defaulted_args(__method__, named_args))
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - -
@@ -68,7 +68,7 @@ class TestBase < HexMiniTest
 
     args << defaulted_arg(named_args, :image_name, default_image_name)
     args << defaulted_arg(named_args, :kata_id, default_kata_id)
-    return args if ['pulled?','pull'].include?(method)
+    return args if ['image_pulled?','image_pull'].include?(method)
     return args if ['kata_exists?','new_kata','old_kata'].include?(method)
 
     args << defaulted_arg(named_args, :avatar_name, default_avatar_name)

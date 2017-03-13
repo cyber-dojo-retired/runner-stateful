@@ -14,11 +14,11 @@ class PullerTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'D97',
-  'when image_name is invalid, pulled?() raises' do
+  'when image_name is invalid, image_pulled?() raises' do
     invalid_image_names.each do |image_name|
       set_image_name image_name
       error = assert_raises(StandardError) {
-        pulled?
+        image_pulled?
       }
       assert_equal 'image_name:invalid', error.message
     end
@@ -27,19 +27,19 @@ class PullerTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '9C3',
-  'when image_name is valid but not in [docker images], pulled?() is false' do
+  'when image_name is valid but not in [docker images], image_pulled?() is false' do
     set_image_name "#{cdf}/ruby_mini_test"
     mock_docker_images_prints_gcc_assert
-    refute pulled?
+    refute image_pulled?
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'A44',
-  'when image_name is valid and in [docker images], pulled?() is true' do
+  'when image_name is valid and in [docker images], image_pulled?() is true' do
     set_image_name "#{cdf}/gcc_assert"
     mock_docker_images_prints_gcc_assert
-    assert pulled?
+    assert image_pulled?
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -47,25 +47,25 @@ class PullerTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '934',
-  'when image_name is invalid, pull() raises' do
+  'when image_name is invalid, image_pull() raises' do
     invalid_image_names.each do |image_name|
       set_image_name image_name
       error = assert_raises(StandardError) {
-        pull
+        image_pull
       }
       assert_equal 'image_name:invalid', error.message
     end
   end
 
   test '91C',
-  'when image_name is valid, pull() issues unconditional docker-pull' do
+  'when image_name is valid, image_pull() issues unconditional docker-pull' do
     set_image_name "#{cdf}/ruby_mini_test"
     mock_docker_pull_cdf_ruby_mini_test
-    pull
+    image_pull
   end
 
   test '933',
-  'when there is no network connectivitity, pull() raises' do
+  'when there is no network connectivitity, image_pull() raises' do
     set_image_name "#{cdf}/gcc_assert"
     cmd = "docker pull #{@image_name}"
     stdout = [
@@ -79,7 +79,7 @@ class PullerTest < TestBase
     ].join(' ')
     status = 1
     shell.mock_exec(cmd, stdout, stderr, status)
-    error = assert_raises { pull }
+    error = assert_raises { image_pull }
     assert_equal "command:#{cmd}", error.message
   end
 

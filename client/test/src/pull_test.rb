@@ -5,30 +5,30 @@ class PullerTest < TestBase
   def self.hex_prefix; '4CD0A7F'; end
 
   # - - - - - - - - - - - - - - - - - - - - -
-  # pulled?
+  # image_pulled?
   # - - - - - - - - - - - - - - - - - - - - -
 
   test '5EC',
-  'pulled?(valid but unpulled image_name) is false' do
-    assert_equal false, pulled?({image_name:'lazybox'})
+  'image_pulled?(valid but unpulled image_name) is false' do
+    assert_equal false, image_pulled?({image_name:'lazybox'})
   end
 
   # - - - - - - - - - - - - - - - - - - - - -
 
   test 'B22',
-  'pulled?(valid and pulled image_name) is true' do
-    pull({image_name:'busybox'})
-    assert_equal true, pulled?({image_name:'busybox'})
+  'image_pulled?(valid and pulled image_name) is true' do
+    image_pull({image_name:'busybox'})
+    assert_equal true, image_pulled?({image_name:'busybox'})
   end
 
   # - - - - - - - - - - - - - - - - - - - - -
 
   test 'D71',
-  'pulled?(invalid_image name) raises' do
+  'image_pulled?(invalid_image name) raises' do
     error = assert_raises(StandardError) {
-      pulled?({image_name:'_cantStartWithSeparator'})
+      image_pulled?({image_name:'_cantStartWithSeparator'})
     }
-    expected = 'RunnerService:pulled?:image_name:invalid'
+    expected = 'RunnerService:image_pulled?:image_name:invalid'
     assert_equal expected, error.message
   end
 
@@ -37,29 +37,29 @@ class PullerTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - -
 
   test 'A82',
-  'pull(valid and existing image_name) succeeds and returns true' do
-    assert_equal true, pull({image_name:'busybox'})
+  'image_pull(valid and existing image_name) succeeds and returns true' do
+    assert_equal true, image_pull({image_name:'busybox'})
   end
 
   # - - - - - - - - - - - - - - - - - - - - -
 
   test '667',
-  'pull(valid non-existing image_name) raises' do
+  'image_pull(valid non-existing image_name) raises' do
     error = assert_raises(StandardError) {
-      pull({image_name:'non_existent_box'})
+      image_pull({image_name:'non_existent_box'})
     }
-    expected = 'RunnerService:pull:command:docker pull non_existent_box'
+    expected = 'RunnerService:image_pull:command:docker pull non_existent_box'
     assert_equal expected, error.message
   end
 
   # - - - - - - - - - - - - - - - - - - - - -
 
   test '1A7',
-  'pull(invalid_image name) raises' do
+  'image_pull(invalid_image name) raises' do
     error = assert_raises(StandardError) {
-      pull({image_name:'_cantStartWithSeparator'})
+      image_pull({image_name:'_cantStartWithSeparator'})
     }
-    expected = 'RunnerService:pull:image_name:invalid'
+    expected = 'RunnerService:image_pull:image_name:invalid'
     assert_equal expected, error.message
   end
 

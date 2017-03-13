@@ -5,11 +5,11 @@ require_relative 'runner'
 
 class MicroService < Sinatra::Base
 
-  get '/pulled?' do
+  get '/image_pulled?' do
     getter(__method__)
   end
 
-  post '/pull' do
+  post '/image_pull' do
     poster(__method__)
   end
 
