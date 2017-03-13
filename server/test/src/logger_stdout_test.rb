@@ -1,7 +1,7 @@
 require_relative 'test_base'
 require_relative '../../src/logger_stdout'
 
-class StdoutLoggerTest < TestBase
+class LoggerStdoutTest < TestBase
 
   def self.hex_prefix; '1B6'; end
 
