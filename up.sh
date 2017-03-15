@@ -20,5 +20,5 @@ check_up()
   fi
 }
 
-check_up 'runner_stateless_server'
-check_up 'runner_stateless_client'
+check_up 'runner_server'
+check_up 'runner_client'
