@@ -37,10 +37,10 @@ Asks whether the image with the given image_name has been pulled.
        "kata_id": "15B9AD6C42"
   }
 ```
-- returns true if it has, false if it hasn't.
+- returns true if it has, false if it hasn't, eg
 ```
-  { "pulled?": true   }
-  { "pulled?": false  }
+  { "image_pulled?": true   }
+  { "image_pulled?": false  }
 ```
 
 # image_pull
@@ -51,9 +51,9 @@ Pull the image with the given image_name.
        "kata_id": "15B9AD6C42"
   }
 ```
-- returns true if the pull succeeds.
+- returns true if the pull succeeds, eg
 ```
-  { "pull": true   }
+  { "image_pull": true   }
 ```
 
 - - - -
