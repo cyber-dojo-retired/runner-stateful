@@ -188,7 +188,7 @@ class DockerKataContainerRunner
     return if filenames == []
     dir = avatar_dir(avatar_name)
     filenames.each do |filename|
-      assert_docker_exec(cid, "rm #{dir}/#{filename}")
+      assert_docker_exec("rm #{dir}/#{filename}")
     end
   end
 
@@ -196,13 +196,13 @@ class DockerKataContainerRunner
 
   def write_files(avatar_name, files)
     return if files == {}
+    cid = container_name
     dir = avatar_dir(avatar_name)
     Dir.mktmpdir('runner') do |tmp_dir|
       files.each do |filename, content|
         host_filename = tmp_dir + '/' + filename
         disk.write(host_filename, content)
       end
-      cid = container_name
       assert_exec("docker cp #{tmp_dir}/. #{cid}:#{dir}")
       files.keys.each do |filename|
         chown_file = "chown #{avatar_name}:#{group} #{dir}/#{filename}"
