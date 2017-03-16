@@ -96,23 +96,15 @@ module DockerRunnerVolumeMixIn
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def add_group_cmd(cid)
-    if alpine? cid
-      return alpine_add_group_cmd
-    end
-    if ubuntu? cid
-      return ubuntu_add_group_cmd
-    end
+    return alpine_add_group_cmd if alpine? cid
+    return ubuntu_add_group_cmd if ubuntu? cid
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def add_user_cmd(cid, avatar_name)
-    if alpine? cid
-      return alpine_add_user_cmd(avatar_name)
-    end
-    if ubuntu? cid
-      return ubuntu_add_user_cmd(avatar_name)
-    end
+    return alpine_add_user_cmd(avatar_name) if alpine? cid
+    return ubuntu_add_user_cmd(avatar_name) if ubuntu? cid
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -

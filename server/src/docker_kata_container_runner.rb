@@ -46,8 +46,8 @@ class DockerKataContainerRunner
 
   def new_kata
     refute_kata_exists
-    # The container may have exited
-    # but not been collected yet.
+    # The container may have exited but its
+    # volume may not have been collected yet.
     name = container_name
     quiet_exec(remove_container_cmd(name))
     quiet_exec(remove_volume_cmd(name))
@@ -170,7 +170,7 @@ class DockerKataContainerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def make_shared_dir
-    # first avatar actually makes the shared dir
+    # first avatar makes the shared dir
     assert_docker_exec("mkdir -m 775 #{shared_dir} || true")
   end
 
@@ -179,7 +179,7 @@ class DockerKataContainerRunner
   end
 
   def shared_dir
-    "/#{sandboxes_root_dir}/shared"
+    "#{sandboxes_root_dir}/shared"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -196,13 +196,13 @@ class DockerKataContainerRunner
 
   def write_files(avatar_name, files)
     return if files == {}
+    dir = avatar_dir(avatar_name)
     Dir.mktmpdir('runner') do |tmp_dir|
       files.each do |filename, content|
         host_filename = tmp_dir + '/' + filename
         disk.write(host_filename, content)
       end
       cid = container_name
-      dir = avatar_dir(avatar_name)
       assert_exec("docker cp #{tmp_dir}/. #{cid}:#{dir}")
       files.keys.each do |filename|
         chown_file = "chown #{avatar_name}:#{group} #{dir}/#{filename}"
@@ -229,30 +229,18 @@ class DockerKataContainerRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def add_group_cmd
-    if alpine?
-      return alpine_add_group_cmd
-    end
-    if ubuntu?
-      return ubuntu_add_group_cmd
-    end
+    return alpine_add_group_cmd if alpine?
+    return ubuntu_add_group_cmd if ubuntu?
   end
 
   def add_user_cmd(avatar_name)
-    if alpine?
-      return alpine_add_user_cmd(avatar_name)
-    end
-    if ubuntu?
-      return ubuntu_add_user_cmd(avatar_name)
-    end
+    return alpine_add_user_cmd(avatar_name) if alpine?
+    return ubuntu_add_user_cmd(avatar_name) if ubuntu?
   end
 
   def del_user_cmd(avatar_name)
-    if alpine?
-      return "deluser --remove-home #{avatar_name}"
-    end
-    if ubuntu?
-      return "userdel --remove #{avatar_name}"
-    end
+    return "deluser --remove-home #{avatar_name}" if alpine?
+    return "userdel --remove #{avatar_name}"      if ubuntu?
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -266,8 +254,8 @@ class DockerKataContainerRunner
   end
 
   def etc_issue
-    stdout,_ = assert_docker_exec('cat /etc/issue')
-    stdout
+    @ss ||= assert_docker_exec('cat /etc/issue')
+    @ss[stdout=0]
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -

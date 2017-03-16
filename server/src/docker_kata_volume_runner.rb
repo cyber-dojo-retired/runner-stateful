@@ -114,7 +114,7 @@ class DockerKataVolumeRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def make_shared_dir(cid)
-    # first avatar actually makes the shared dir
+    # first avatar makes the shared dir
     assert_docker_exec(cid, "mkdir -m 775 #{shared_dir} || true")
   end
 
