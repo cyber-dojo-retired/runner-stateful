@@ -123,7 +123,7 @@ class DockerKataVolumeRunner
   end
 
   def shared_dir
-    "/#{sandboxes_root_dir}/shared"
+    "#{sandboxes_root_dir}/shared"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
