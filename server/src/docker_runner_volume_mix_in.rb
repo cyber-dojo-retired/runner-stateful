@@ -148,12 +148,12 @@ module DockerRunnerVolumeMixIn
 
   def write_files(cid, avatar_name, files)
     return if files == {}
+    dir = avatar_dir(avatar_name)
     Dir.mktmpdir('runner') do |tmp_dir|
       files.each do |filename, content|
         host_filename = tmp_dir + '/' + filename
         disk.write(host_filename, content)
       end
-      dir = avatar_dir(avatar_name)
       assert_exec("docker cp #{tmp_dir}/. #{cid}:#{dir}")
       files.keys.each do |filename|
         chown_file = "chown #{avatar_name}:#{group} #{dir}/#{filename}"
