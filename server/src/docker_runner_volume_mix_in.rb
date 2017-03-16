@@ -141,7 +141,6 @@ module DockerRunnerVolumeMixIn
     filenames.each do |filename|
       assert_docker_exec(cid, "rm #{dir}/#{filename}")
     end
-    #assert_docker_exec(cid, "cd #{dir} && rm #{filenames.join(space)}")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
