@@ -45,13 +45,7 @@ module DockerRunnerVolumeMixIn
     ].join(space)
     stdout,_ = assert_exec("docker run #{args} #{image_name} sh")
     cid = stdout.strip
-
-    add_user_and_group_cmd = [
-      add_group_cmd(cid),
-      add_user_cmd(cid, avatar_name)
-    ].join(' && ')
-    assert_docker_exec(cid, add_user_and_group_cmd)
-
+    add_user_and_group(cid, avatar_name)
     cid
   end
 
@@ -94,13 +88,21 @@ module DockerRunnerVolumeMixIn
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - -
+
+  def add_user_and_group(cid, avatar_name)
+    assert_docker_exec(cid,
+      [
+        add_group_cmd(cid),
+        add_user_cmd(cid, avatar_name)
+      ].join(' && ')
+    )
+  end
 
   def add_group_cmd(cid)
     return alpine_add_group_cmd if alpine? cid
     return ubuntu_add_group_cmd if ubuntu? cid
   end
-
-  # - - - - - - - - - - - - - - - - - - - - - -
 
   def add_user_cmd(cid, avatar_name)
     return alpine_add_user_cmd(avatar_name) if alpine? cid
