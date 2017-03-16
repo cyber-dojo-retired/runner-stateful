@@ -121,8 +121,8 @@ module DockerRunnerVolumeMixIn
   end
 
   def etc_issue(cid)
-    stdout,_ = assert_docker_exec(cid, 'cat /etc/issue')
-    stdout
+    @ss ||= assert_docker_exec(cid, 'cat /etc/issue')
+    @ss[stdout=0]
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
