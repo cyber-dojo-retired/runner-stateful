@@ -3,8 +3,7 @@
 
 - - - -
 
-[![Build Status](https://travis-ci.org/cyber-dojo/runner.svg?branch=master)]
-(https://travis-ci.org/cyber-dojo/runner)
+[![Build Status](https://travis-ci.org/cyber-dojo/runner.svg?branch=master)](https://travis-ci.org/cyber-dojo/runner)
 
 <img src="https://raw.githubusercontent.com/cyber-dojo/nginx/master/images/home_page_logo.png"
 alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
