@@ -35,7 +35,6 @@ class ForkBombTest < TestBase
     ].join("\n")
     begin
       sss_run({ avatar_name:'lion', changed_files:{'hiker.c' => hiker_c }})
-      assert_equal success, status
       assert_equal '', stderr
       lines = stdout.split("\n")
       assert lines.count{ |line| line == 'All tests passed' } > 42

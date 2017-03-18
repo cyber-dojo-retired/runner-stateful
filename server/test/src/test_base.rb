@@ -25,13 +25,13 @@ class TestBase < HexMiniTest
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def image_pulled?; runner.image_pulled?; end
-  def image_pull; runner.image_pull; end
+  def image_pull;    runner.image_pull   ; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def kata_exists?; runner.kata_exists?; end
-  def new_kata; runner.new_kata; end
-  def old_kata; runner.old_kata; end
+  def new_kata    ; runner.new_kata    ; end
+  def old_kata    ; runner.old_kata    ; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
