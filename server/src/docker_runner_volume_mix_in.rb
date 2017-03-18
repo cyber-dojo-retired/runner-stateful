@@ -35,7 +35,7 @@ module DockerRunnerVolumeMixIn
       '--security-opt=no-new-privileges',  # no escalation
       '--ulimit nproc=64:64',              # max number processes = 64
       '--ulimit core=0:0',                 # max core file size = 0 blocks
-      '--ulimit nofile=128:128',           # max number of files = 128
+      '--ulimit nofile=64:64',             # max number of files = 64
       "--env CYBER_DOJO_KATA_ID=#{kata_id}",
       "--env CYBER_DOJO_AVATAR_NAME=#{avatar_name}",
       "--env CYBER_DOJO_SANDBOX=#{dir}",

@@ -54,9 +54,9 @@ class DockerKataContainerRunner
       '--interactive',                     # later execs
       "--name=#{name}",
       '--net=none',                        # security
-      '--pids-limit=256',                  # no fork bombs
+      '--pids-limit=128',                  # no fork bombs
       '--security-opt=no-new-privileges',  # no escalation
-      '--ulimit nproc=64:64',              # max number processes = 64
+      '--ulimit nproc=128:128',            # max number processes = 128
       '--ulimit core=0:0',                 # max core file size = 0 blocks
       '--ulimit nofile=128:128',           # max number of files = 128
       '--user=root',
