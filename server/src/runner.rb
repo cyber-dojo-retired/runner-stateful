@@ -16,9 +16,6 @@ def runner_class_name(image_name)
   class_name
 end
 
-#require_relative 'snake_caser'
-#require_relative SnakeCaser::snake_cased(runner_class_name)
-
 module Runner # mix-in
 
   def runner
