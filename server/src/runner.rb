@@ -2,7 +2,7 @@
 def runner_class_name
   #'DockerAvatarVolumeRunner'
   'DockerKataVolumeRunner'
-  #'DockerKataContainerRunner' # some tests are failing
+  #'DockerKataContainerRunner'
 end
 
 require_relative 'snake_caser'
