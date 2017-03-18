@@ -171,7 +171,6 @@ module DockerRunnerMixIn
 
   def valid_image_name?
     # http://stackoverflow.com/questions/37861791/
-    #      how-are-docker-image-names-parsed
     # https://github.com/docker/docker/blob/master/image/spec/v1.1.md
     # Simplified, no hostname, no :tag
     alpha_numeric = '[a-z0-9]+'
