@@ -199,9 +199,11 @@ module OsHelper
 
   def ulimit_test
     lines = assert_cyber_dojo_sh('ulimit -a').split("\n")
-    assert_equal 128, ulimit(lines, :max_processes)
+    max =  64 if runner.class.name == 'DockerKataVolumeRunner'
+    max = 128 if runner.class.name == 'DockerKataContainerRunner'
+    assert_equal max, ulimit(lines, :max_processes)
     assert_equal   0, ulimit(lines, :max_core_size)
-    assert_equal 128, ulimit(lines, :max_no_files)
+    assert_equal max, ulimit(lines, :max_no_files)
   end
 
   def ulimit(lines, key)
