@@ -24,27 +24,14 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def image_pulled?
-    runner.image_pulled?
-  end
-
-  def image_pull
-    runner.image_pull
-  end
+  def image_pulled?; runner.image_pulled?; end
+  def image_pull; runner.image_pull; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def kata_exists?
-    runner.kata_exists?
-  end
-
-  def new_kata
-    runner.new_kata
-  end
-
-  def old_kata
-    runner.old_kata
-  end
+  def kata_exists?; runner.kata_exists?; end
+  def new_kata; runner.new_kata; end
+  def old_kata; runner.old_kata; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -158,24 +145,12 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def user_id(name = 'salmon')
-    runner.user_id(name).to_s
-  end
-
-  def group
-    runner.group
-  end
-
-  def gid
-    runner.gid
-  end
-
-  def sandbox(name = 'salmon')
-    runner.avatar_dir(name)
-  end
-
+  def user_id(name = 'salmon'); runner.user_id(name).to_s; end
+  def group; runner.group; end
+  def gid; runner.gid; end
+  def sandbox(name = 'salmon'); runner.avatar_dir(name); end
   def success; shell.success; end
-  def timed_out; 'timed_out'; end
+  def timed_out; runner.timed_out; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
