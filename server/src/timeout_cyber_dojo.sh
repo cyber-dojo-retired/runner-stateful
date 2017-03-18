@@ -27,5 +27,5 @@ if [ $? -eq 0 ]; then
   status=$?
 fi
 
-ps -o user,pid | grep "^${PS_AVATAR}\s" | awk '{print $2}' | xargs -r kill -9
+ps -o user,pid | grep "^${PS_AVATAR}\s" | awk '{print $2}' | xargs -r kill -9 >/dev/null 2>&1
 exit ${status}
