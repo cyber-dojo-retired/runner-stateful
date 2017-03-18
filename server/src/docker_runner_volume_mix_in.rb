@@ -67,12 +67,12 @@ module DockerRunnerVolumeMixIn
     #        somewhere
     # I'm waiting max 2 seconds for the container to die.
     # o) no delay if container_dead? is true 1st time.
-    # o) 0.04s delay if container_dead? is true 2nd time.
+    # o) 0.04s delay if container_dead? is true 2nd time, etc.
     removed = false
     tries = 0
     while !removed && tries < 50
       removed = container_dead?(cid)
-      sleep(1.0 / 25.0) unless removed
+      assert_exec("sleep #{1.0 / 25.0}") unless removed
       tries += 1
     end
     log << "Failed:remove_container(#{cid})" unless removed
