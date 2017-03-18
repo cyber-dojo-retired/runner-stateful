@@ -135,7 +135,6 @@ module DockerRunnerVolumeMixIn
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def delete_files(cid, avatar_name, filenames)
-    return if filenames == []
     dir = avatar_dir(avatar_name)
     filenames.each do |filename|
       assert_docker_exec(cid, "rm #{dir}/#{filename}")
@@ -206,8 +205,6 @@ module DockerRunnerVolumeMixIn
       fail_kata_id('exists')
     end
   end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_docker_exec(cid, cmd)
     assert_exec("docker exec #{cid} sh -c '#{cmd}'")

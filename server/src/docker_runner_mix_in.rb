@@ -28,6 +28,9 @@ module DockerRunnerMixIn
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
+  def group; 'cyber-dojo'; end
+  def gid; 5000; end
+
   def user_id(avatar_name)
     assert_valid_avatar_name(avatar_name)
     40000 + all_avatars_names.index(avatar_name)
@@ -39,19 +42,15 @@ module DockerRunnerMixIn
   end
 
   def avatar_dir(avatar_name)
+    # TODO?: change to sandbox_dir
     assert_valid_avatar_name(avatar_name)
     "#{sandboxes_root_dir}/#{avatar_name}"
   end
 
+  def sandboxes_root_dir; '/sandboxes'; end
+  def timed_out; 'timed_out'; end
+
   # - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def group
-    'cyber-dojo'
-  end
-
-  def gid
-    5000
-  end
 
   attr_reader :image_name
 
@@ -68,6 +67,8 @@ module DockerRunnerMixIn
     names = stdout.split("\n")
     names.uniq - ['<none>']
   end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run_timeout(docker_cmd, max_seconds)
     r_stdout, w_stdout = IO.pipe
@@ -95,7 +96,7 @@ module DockerRunnerMixIn
       # https://github.com/docker/docker/issues/9098
       Process.kill(-9, pid)
       Process.detach(pid)
-      ['', '', 'timed_out']
+      ['', '', timed_out]
     ensure
       w_stdout.close unless w_stdout.closed?
       w_stderr.close unless w_stderr.closed?
@@ -127,7 +128,7 @@ module DockerRunnerMixIn
        'adduser',
          '-D',             # don't assign a password
          "-G #{group}",
-         "-h #{home}",     # home dir
+         "-h #{home}",
          '-s /bin/sh',     # shell
          "-u #{uid}",
          avatar_name,
@@ -143,7 +144,7 @@ module DockerRunnerMixIn
     [ 'adduser',
         '--disabled-password',
         '--gecos ""',          # don't ask for details
-        "--home #{home}",      # home dir
+        "--home #{home}",
         "--ingroup #{group}",
         "--uid #{uid}",
         avatar_name
@@ -207,6 +208,7 @@ module DockerRunnerMixIn
   end
 
   include AllAvatarsNames
+
   def valid_avatar_name?(avatar_name)
     all_avatars_names.include?(avatar_name)
   end
@@ -241,11 +243,11 @@ module DockerRunnerMixIn
 
   # - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def sandboxes_root_dir; '/sandboxes'; end
   def success; shell.success; end
   def space; ' '; end
 
   include NearestAncestors
+
   def shell; nearest_ancestors(:shell); end
   def  disk; nearest_ancestors(:disk ); end
   def   log; nearest_ancestors(:log  ); end

@@ -8,16 +8,12 @@ require_relative 'docker_runner_mix_in'
 # the kata's container.
 #
 # Negatives:
-#   o) long-lived container per run() is easier
-#      to fork-bomb.
-#   o) container has higher pids-limit=256
-#      which makes it easier to fork-bomb.
+#   o) long-lived container per run() is harder to secure.
 #
 # Positives:
 #   o) avatars can share state.
 #   o) opens the way to avatars sharing processes.
 #   o) fastest run(). In a rough sample
-#      ~20% faster than AvatarVolumeRunner
 #      ~30% faster than KataVolumeRunner
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
