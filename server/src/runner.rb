@@ -19,6 +19,10 @@ end
 module Runner # mix-in
 
   def runner
+    new_runner(image_name, kata_id)
+  end
+
+  def new_runner(image_name, kata_id)
     Object.const_get(runner_class_name(image_name)).new(self, image_name, kata_id)
   end
 
