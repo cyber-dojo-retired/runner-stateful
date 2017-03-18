@@ -177,7 +177,8 @@ module DockerRunnerMixIn
     separator = '[_.-]+'
     component = "#{alpha_numeric}(#{separator}#{alpha_numeric})*"
     name = "#{component}(/#{component})*"
-    image_name =~ /^#{name}$/o
+    tag = '[\w][\w.-]{0,127}'
+    image_name =~ /^(#{name})(:#{tag})?$/o
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -

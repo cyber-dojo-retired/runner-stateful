@@ -11,6 +11,26 @@ class RunnerTest < TestBase
     new_runner(image_name, kata_id)
   end
 
+  test 'D02',
+  'default runner for image_name without a tag is DockerVolumeRunner' do
+    assert_tag_runner_class '', 'DockerVolumeRunner'
+  end
+
+  test 'D03',
+  'default runner for image_name with :shared_disk tag is DockerVolumeRunner' do
+    assert_tag_runner_class ':shared_disk', 'DockerVolumeRunner'
+  end
+
+   #test 'D04',
+   #'runner for image_name with :shared_process tag is DockerContainerRunner' do
+   #   'shared_process', 'DockerContainerRunner'
+   #end
+
+  def assert_tag_runner_class(tag, expected)
+    image_name = "#{cdf}/gcc_assert#{tag}"
+    assert_equal expected, new_runner(image_name, kata_id).class.name
+  end
+
   # - - - - - - - - - - - - - - - - -
 
   test 'E2A',
@@ -38,7 +58,11 @@ class RunnerTest < TestBase
   private
 
   def image_name
-    'cyberdojofoundation/gcc_assert'
+    "#{cdf}/gcc_assert"
+  end
+
+  def cdf
+    'cyberdojofoundation'
   end
 
   def invalid_image_names
