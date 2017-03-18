@@ -1,3 +1,4 @@
+=begin
 require_relative 'test_base.rb'
 require_relative 'os_helper'
 
@@ -17,7 +18,7 @@ class KataContainerTest < TestBase
   end
 
   def self.kc_test(hex_suffix, *lines, &test_block)
-    if runner_class_name == 'DockerKataContainerRunner'
+    if runner_class_name == 'DockerContainerRunner'
       test(hex_suffix, *lines, &test_block)
     end
   end
@@ -75,3 +76,4 @@ class KataContainerTest < TestBase
   end
 
 end
+=end
