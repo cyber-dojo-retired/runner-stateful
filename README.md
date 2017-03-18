@@ -13,12 +13,11 @@ alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
 - A stateful micro-service for [cyber-dojo](http://cyber-dojo.org)
 - Runs an avatar's tests.
 
-The runner is currently DockerKataVolumeRunner but there
-are three runner implementations in this repo with varying
+The default runner is currently DockerVolumeRunner but there
+are two runner implementations in this repo with varying
 speed/sharing/security tradeoffs. They all use the same tests.
-  * [DockerAvatarVolumeRunner](https://github.com/cyber-dojo/runner/blob/master/server/src/docker_avatar_volume_runner.rb)
-  * [DockerKavaVolumeRunner](https://github.com/cyber-dojo/runner/blob/master/server/src/docker_kata_container_runner.rb)
-  * [DockerKataContainerRunner](https://github.com/cyber-dojo/runner/blob/master/server/src/docker_kata_volume_runner.rb)
+  * [DockerVolumeRunner](https://github.com/cyber-dojo/runner/blob/master/server/src/docker_container_runner.rb)
+  * [DockerContainerRunner](https://github.com/cyber-dojo/runner/blob/master/server/src/docker_volume_runner.rb)
 
 API:
   * All methods receive their arguments in a json hash.

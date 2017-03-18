@@ -17,7 +17,7 @@ require_relative 'docker_runner_mix_in'
 #      ~30% faster than KataVolumeRunner
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-class DockerKataContainerRunner
+class DockerContainerRunner
 
   include DockerRunnerMixIn
 

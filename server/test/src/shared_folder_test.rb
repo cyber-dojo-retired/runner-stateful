@@ -16,16 +16,16 @@ class SharedFolderTest < TestBase
     old_kata
   end
 
-  def self.kv_test(hex_suffix, *lines, &test_block)
-    if runner_class_name == 'DockerKataVolumeRunner' ||
-       runner_class_name == 'DockerKataContainerRunner'
-      test(hex_suffix, *lines, &test_block)
-    end
-  end
+  #def self.kv_test(hex_suffix, *lines, &test_block)
+  #  if runner_class_name == 'DockerVolumeRunner' ||
+  #     runner_class_name == 'DockerContainerRunner'
+  #    test(hex_suffix, *lines, &test_block)
+  #  end
+  #end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
-  kv_test 'B33',
+  test 'B33',
   '[Alpine] first new_avatar event in a kata causes creation of /sandboxes/shared' do
     new_avatar('salmon')
     begin
@@ -36,7 +36,9 @@ class SharedFolderTest < TestBase
     end
   end
 
-  kv_test 'A54',
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test 'A54',
   '[Alpine] shared sandbox creation is idempotent' do
     new_avatar('salmon')
     new_avatar('lion')
@@ -49,7 +51,9 @@ class SharedFolderTest < TestBase
     end
   end
 
-  kv_test '893',
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test '893',
   '[Alpine] /sandboxes/shared is writable by any avatar' do
     new_avatar('salmon')
     begin

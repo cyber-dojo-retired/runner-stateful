@@ -7,7 +7,7 @@ require_relative 'docker_runner_volume_mix_in'
 # Positives:
 #   o) short-lived container per run() limits
 #      fork-bomb escalation.
-#   o) container has low pids-limit-16 which further
+#   o) container has low pids-limit which further
 #      limits fork-bomb escalation.
 #   o) avatars can share state (eg sqlite database
 #      in /sandboxes/shared)
@@ -17,7 +17,7 @@ require_relative 'docker_runner_volume_mix_in'
 #   o) bit slower than KataContainerRunner.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-class DockerKataVolumeRunner
+class DockerVolumeRunner
 
   include DockerRunnerVolumeMixIn
 
