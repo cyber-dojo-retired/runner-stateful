@@ -16,6 +16,8 @@ module DockerRunnerMixIn
   end
 
   attr_reader :parent # For nearest_ancestors()
+  attr_reader :image_name
+  attr_reader :kata_id
 
   def image_pulled?
     image_names.include?(image_name)
@@ -50,13 +52,7 @@ module DockerRunnerMixIn
   def sandboxes_root_dir; '/sandboxes'; end
   def timed_out; 'timed_out'; end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - -
-
-  attr_reader :image_name
-
   module_function
-
-  attr_reader :kata_id
 
   include StringCleaner
   include StringTruncater
