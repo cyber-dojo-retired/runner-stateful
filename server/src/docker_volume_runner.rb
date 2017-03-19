@@ -5,16 +5,13 @@ require_relative 'docker_runner_mix_in'
 # Uses a long-lived docker volume per kata.
 #
 # Positives:
-#   o) short-lived container per run() limits
-#      fork-bomb escalation.
-#   o) container has low pids-limit which further
-#      limits fork-bomb escalation.
+#   o) long-lived container per run() is harder to secure.
 #   o) avatars can share state (eg sqlite database
 #      in /sandboxes/shared)
 #
 # Negatives:
 #   o) avatars cannot share processes.
-#   o) bit slower than KataContainerRunner.
+#   o) bit slower than DockerContainerRunner.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 class DockerVolumeRunner
@@ -46,7 +43,7 @@ class DockerVolumeRunner
   def avatar_exists?(avatar_name)
     assert_kata_exists
     assert_valid_avatar_name(avatar_name)
-    in_vr_container(avatar_name) do |cid|
+    in_container(avatar_name) do |cid|
       avatar_exists_cid?(cid, avatar_name)
     end
   end
@@ -54,7 +51,7 @@ class DockerVolumeRunner
   def new_avatar(avatar_name, starting_files)
     assert_kata_exists
     assert_valid_avatar_name(avatar_name)
-    in_vr_container(avatar_name) do |cid|
+    in_container(avatar_name) do |cid|
       refute_avatar_exists(cid, avatar_name)
       make_shared_dir(cid)
       chown_shared_dir(cid)
@@ -67,7 +64,7 @@ class DockerVolumeRunner
   def old_avatar(avatar_name)
     assert_kata_exists
     assert_valid_avatar_name(avatar_name)
-    in_vr_container(avatar_name) do |cid|
+    in_container(avatar_name) do |cid|
       assert_avatar_exists(cid, avatar_name)
       remove_avatar_dir(cid, avatar_name)
     end
@@ -84,7 +81,7 @@ class DockerVolumeRunner
   def run(avatar_name, deleted_filenames, changed_files, max_seconds)
     assert_kata_exists
     assert_valid_avatar_name(avatar_name)
-    in_vr_container(avatar_name) do |cid|
+    in_container(avatar_name) do |cid|
       assert_avatar_exists(cid, avatar_name)
       delete_files(cid, avatar_name, deleted_filenames)
       write_files(cid, avatar_name, changed_files)
@@ -95,12 +92,8 @@ class DockerVolumeRunner
 
   private
 
-  def in_vr_container(avatar_name, &block)
-    in_container(avatar_name, kata_volume_name, sandboxes_root_dir, &block)
-  end
-
-  def in_container(avatar_name, volume_name, volume_root_dir, &block)
-    cid = create_container(avatar_name, volume_name, volume_root_dir)
+  def in_container(avatar_name, &block)
+    cid = create_container(avatar_name, kata_volume_name, sandboxes_root_dir)
     begin
       block.call(cid)
     ensure
