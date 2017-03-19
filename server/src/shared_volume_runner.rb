@@ -11,10 +11,10 @@ require_relative 'docker_runner_mix_in'
 #
 # Negatives:
 #   o) avatars cannot share processes.
-#   o) bit slower than DockerContainerRunner.
+#   o) bit slower than SharedContainerRunner.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-class DockerVolumeRunner
+class SharedVolumeRunner
 
   include DockerRunnerMixIn
 

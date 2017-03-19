@@ -1,10 +1,10 @@
 
 def runner_class_name(image_name)
-  class_name ||= 'DockerContainerRunner' if container_runner?(image_name)
-  class_name ||= 'DockerVolumeRunner'    if volume_runner?(image_name)
-  class_name ||= 'DockerVolumeRunner'    # default
-  autoload(:DockerContainerRunner, '/app/src/docker_container_runner.rb') if class_name == 'DockerContainerRunner'
-  autoload(:DockerVolumeRunner,    '/app/src/docker_volume_runner.rb')    if class_name == 'DockerVolumeRunner'
+  class_name ||= 'SharedContainerRunner' if container_runner?(image_name)
+  class_name ||= 'SharedVolumeRunner'    if volume_runner?(image_name)
+  class_name ||= 'SharedVolumeRunner'    # default
+  autoload(:SharedContainerRunner, '/app/src/shared_container_runner.rb') if class_name == 'SharedContainerRunner'
+  autoload(:SharedVolumeRunner,    '/app/src/shared_volume_runner.rb')    if class_name == 'SharedVolumeRunner'
   class_name
 end
 

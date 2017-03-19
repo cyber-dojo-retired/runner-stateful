@@ -18,7 +18,7 @@ class KataContainerTest < TestBase
   end
 
   def self.kc_test(hex_suffix, *lines, &test_block)
-    if runner_class_name == 'DockerContainerRunner'
+    if runner_class_name == 'SharedContainerRunner'
       test(hex_suffix, *lines, &test_block)
     end
   end

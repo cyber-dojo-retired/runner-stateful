@@ -1,11 +1,9 @@
 require_relative 'docker_runner_mix_in'
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# Recommended only for private cyber-dojo servers.
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Uses a new long-lived container per kata.
-# Each avatar's run() [docker exec]s a new process inside
-# the kata's container.
+# Each avatar's run() [docker exec]s a new process
+# inside the kata's container.
 #
 # Negatives:
 #   o) long-lived container per run() is harder to secure.
@@ -14,10 +12,10 @@ require_relative 'docker_runner_mix_in'
 #   o) avatars can share state.
 #   o) opens the way to avatars sharing processes.
 #   o) fastest run(). In a rough sample
-#      ~30% faster than KataVolumeRunner
+#      ~30% faster than SharedVolumeRunner
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-class DockerContainerRunner
+class SharedContainerRunner
 
   include DockerRunnerMixIn
 
