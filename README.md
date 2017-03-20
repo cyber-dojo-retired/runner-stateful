@@ -13,11 +13,11 @@ alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
 - A stateful micro-service for [cyber-dojo](http://cyber-dojo.org)
 - Runs an avatar's tests.
 
-The default runner is currently DockerVolumeRunner but there
-are two runner implementations in this repo with varying
+The default runner is SharedVolumeRunner.
+There are two runner implementations in this repo with different
 speed/sharing/security tradeoffs. They all use the same tests.
-  * [DockerVolumeRunner](https://github.com/cyber-dojo/runner/blob/master/server/src/docker_container_runner.rb)
-  * [DockerContainerRunner](https://github.com/cyber-dojo/runner/blob/master/server/src/docker_volume_runner.rb)
+  * [SharedVolumeRunner](https://github.com/cyber-dojo/runner/blob/master/server/src/shared_volume_runner.rb)
+  * [SharedContainerRunner](https://github.com/cyber-dojo/runner/blob/master/server/src/shared_container_runner.rb)
 
 API:
   * All methods receive their arguments in a json hash.
@@ -26,6 +26,21 @@ API:
   * If the method completes, the key equals the method's name.
 
 - - - -
+
+# image_exists?
+Asks whether the image with the given image_name exists, as determined
+by running [docker search].
+- parameter, eg
+```
+  { "image_name": "cyberdojofoundation/gcc_assert",
+       "kata_id": "15B9AD6C42"
+  }
+```
+- returns true if it does, false if it doesn't, eg
+```
+  { "image_exists?": true   }
+  { "image_exists?": false  }
+```
 
 # image_pulled?
 Asks whether the image with the given image_name has been pulled.
