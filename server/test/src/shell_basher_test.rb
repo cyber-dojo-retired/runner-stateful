@@ -1,7 +1,7 @@
 require_relative 'test_base'
 require_relative '../../src/logger_spy'
 
-class BashShellerTest < TestBase
+class ShellBasherTest < TestBase
 
   def self.hex_prefix; 'C89'; end
 

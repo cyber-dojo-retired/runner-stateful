@@ -1,7 +1,7 @@
 require_relative 'nearest_ancestors'
 require 'open3'
 
-class BashSheller
+class ShellBasher
 
   def initialize(parent)
     @parent = parent

@@ -23,8 +23,8 @@ class ExternalsTest < TestBase
   # - - - - - - - - - - - - - - - - -
 
   test '1B1',
-  'default shell is Sheller' do
-    assert_equal 'BashSheller', shell.class.name
+  'default shell is ShellBasher' do
+    assert_equal 'ShellBasher', shell.class.name
   end
 
 end
