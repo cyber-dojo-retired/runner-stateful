@@ -9,6 +9,10 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - -
 
+  def image_exists?(named_args = {})
+    runner.image_exists?(*defaulted_args(__method__, named_args))
+  end
+
   def image_pulled?(named_args = {})
     runner.image_pulled?(*defaulted_args(__method__, named_args))
   end
