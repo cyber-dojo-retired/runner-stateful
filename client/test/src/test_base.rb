@@ -68,7 +68,7 @@ class TestBase < HexMiniTest
 
     args << defaulted_arg(named_args, :image_name, default_image_name)
     args << defaulted_arg(named_args, :kata_id, default_kata_id)
-    return args if ['image_pulled?','image_pull'].include?(method)
+    return args if ['image_exists?','image_pulled?','image_pull'].include?(method)
     return args if ['kata_exists?','new_kata','old_kata'].include?(method)
 
     args << defaulted_arg(named_args, :avatar_name, default_avatar_name)
@@ -90,7 +90,7 @@ class TestBase < HexMiniTest
   end
 
   def default_image_name
-    'cyberdojofoundation/gcc_assert'
+    "#{cdf}/gcc_assert"
   end
 
   def default_kata_id
@@ -99,6 +99,10 @@ class TestBase < HexMiniTest
 
   def default_avatar_name
     'salmon'
+  end
+
+  def cdf
+    'cyberdojofoundation'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - -

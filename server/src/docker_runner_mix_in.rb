@@ -19,13 +19,35 @@ module DockerRunnerMixIn
   attr_reader :image_name
   attr_reader :kata_id
 
-  def image_pulled?
-    image_names.include?(image_name)
+  def image_exists?
+    stdout,_ = assert_exec("docker search #{image_name}")
+    lines = stdout.split("\n")
+    lines.shift # HEADINGS
+    images = lines.map { |line| line.split[0] }
+    images.include? image_name
   end
 
+  # - - - - - - - - - - - - - - - - - -
+
+  def image_pulled?
+    image_names.include? image_name
+  end
+
+  # - - - - - - - - - - - - - - - - - -
+
   def image_pull
-    assert_exec("docker pull #{image_name}")
-    true
+    # [1] The contents of stderr seem to vary depending
+    # on what your running on, eg DockerToolbox or not
+    # and where, eg Travis or not. I'm using 'not found'
+    # as that always seems to be present.
+    _stdout,stderr,status = quiet_exec("docker pull #{image_name}")
+    if status == shell.success
+      return true
+    elsif stderr.include?('not found') # [1]
+      return false
+    else
+      fail stderr
+    end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -

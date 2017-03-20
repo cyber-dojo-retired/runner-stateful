@@ -18,6 +18,7 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  def image_exists?; runner.image_exists?; end
   def image_pulled?; runner.image_pulled?; end
   def image_pull;    runner.image_pull   ; end
 
@@ -116,7 +117,7 @@ class TestBase < HexMiniTest
     }
     row = rows.detect { |key,_| hex_test_name.start_with? key }
     fail 'cannot find image_name from hex_test_name' if row.nil?
-    'cyberdojofoundation/' + row[1]
+    "#{cdf}/" + row[1]
   end
 
   def files(language_dir = language_dir_from_image_name)
@@ -193,6 +194,28 @@ class TestBase < HexMiniTest
     ensure
       $stdout = old_stdout
     end
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def invalid_image_names
+    [
+      '',             # nothing!
+      '_',            # cannot start with separator
+      'name_',        # cannot end with separator
+      'ALPHA/name',   # no uppercase
+      'alpha/name_',  # cannot end in separator
+      'alpha/_name',  # cannot begin with separator
+      'n:tag space',  # tags can't contain a space
+      'n:-tag',       # tags can't start with a -
+      'n:.tag',       # tags can't start with a .
+    ]
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def cdf
+    'cyberdojofoundation'
   end
 
 end

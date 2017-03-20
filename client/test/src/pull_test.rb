@@ -37,19 +37,15 @@ class PullerTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - -
 
   test 'A82',
-  'image_pull(valid and existing image_name) succeeds and returns true' do
-    assert_equal true, image_pull({image_name:'busybox'})
+  'image_pull(valid and existing image_name) returns true' do
+    assert_equal true, image_pull({image_name:"#{cdf}/gcc_assert"})
   end
 
   # - - - - - - - - - - - - - - - - - - - - -
 
   test '667',
-  'image_pull(valid non-existing image_name) raises' do
-    error = assert_raises(StandardError) {
-      image_pull({image_name:'non_existent_box'})
-    }
-    expected = 'RunnerService:image_pull:command:docker pull non_existent_box'
-    assert_equal expected, error.message
+  'image_pull(valid non-existing image_name) returns false' do
+    assert_equal false, image_pull({image_name:"#{cdf}/lazybox"})
   end
 
   # - - - - - - - - - - - - - - - - - - - - -
