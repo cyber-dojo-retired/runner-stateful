@@ -1,12 +1,12 @@
 require_relative 'test_base'
-require_relative 'mock_sheller'
+require_relative 'shell_mocker'
 require_relative '../../src/logger_spy'
 
 class PullerTest < TestBase
 
   def self.hex_prefix; '0D5713'; end
 
-  def hex_setup; @shell ||= MockSheller.new(nil); end
+  def hex_setup; @shell ||= ShellMocker.new(nil); end
   def hex_teardown; shell.teardown; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
