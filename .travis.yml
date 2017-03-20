@@ -1,6 +1,7 @@
 sudo: required
 services: docker
 language: node_js
+bundler_args: --retry 5
 
 before_script:
     - curl -O https://raw.githubusercontent.com/cyber-dojo/cyber-dojo/master/shared/push_and_trigger.sh
@@ -15,4 +16,4 @@ script:
     - docker pull cyberdojofoundation/clangpp_assert
     #
     - ./pipe_build_up_test.sh \
-        && ./push_and_trigger.sh cyber-dojo/web
+        && travis_wait ./push_and_trigger.sh cyber-dojo/web
