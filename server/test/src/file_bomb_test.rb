@@ -14,7 +14,7 @@ class FileBombTest < TestBase
 
   test 'DB3',
   '[Alpine] file() bomb in C to exhaust file-handles runs out of steam' do
-    new_avatar('lion')
+    avatar_new('lion')
     hiker_c = [
       '#include "hiker.h"',
       '#include <stdio.h>',
@@ -46,7 +46,7 @@ class FileBombTest < TestBase
       assert lines.count{ |line| line.start_with? 'fopen() != NULL' } > 42
       assert_equal 1, lines.count{ |line| line.start_with? 'fopen() == NULL' }
     ensure
-      old_avatar('lion')
+      avatar_old('lion')
     end
   end
 

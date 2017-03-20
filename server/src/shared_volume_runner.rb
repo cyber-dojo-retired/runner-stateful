@@ -26,12 +26,12 @@ class SharedVolumeRunner
     volume_exists?(kata_volume_name)
   end
 
-  def new_kata
+  def kata_new
     refute_kata_exists
     create_volume(kata_volume_name)
   end
 
-  def old_kata
+  def kata_old
     assert_kata_exists
     remove_volume(kata_volume_name)
   end
@@ -48,7 +48,7 @@ class SharedVolumeRunner
     end
   end
 
-  def new_avatar(avatar_name, starting_files)
+  def avatar_new(avatar_name, starting_files)
     assert_kata_exists
     assert_valid_avatar_name(avatar_name)
     in_container(avatar_name) do |cid|
@@ -61,7 +61,7 @@ class SharedVolumeRunner
     end
   end
 
-  def old_avatar(avatar_name)
+  def avatar_old(avatar_name)
     assert_kata_exists
     assert_valid_avatar_name(avatar_name)
     in_container(avatar_name) do |cid|
@@ -141,7 +141,7 @@ class SharedVolumeRunner
     assert_exec("docker rm --force #{cid}")
     # The docker daemon responds to [docker rm]
     # asynchronously...
-    # An 'immediately' following old_avatar()'s
+    # An 'immediately' following avatar_old()'s
     #    [docker volume rm]
     # might fail since the container is not quite dead yet.
     # This is unlikely to happen in real use but quite
@@ -243,7 +243,7 @@ class SharedVolumeRunner
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def run_cyber_dojo_sh(cid, avatar_name, max_seconds)
-    # I thought doing [chmod 755] in new_avatar() would
+    # I thought doing [chmod 755] in avatar_new() would
     # be "sticky" and remain 755 but it appears not...
     uid = user_id(avatar_name)
     dir = avatar_dir(avatar_name)

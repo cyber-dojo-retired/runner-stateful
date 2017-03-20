@@ -6,11 +6,11 @@ class AvatarTest < TestBase
 
   def hex_setup
     set_image_name 'cyberdojofoundation/gcc_assert'
-    new_kata
+    kata_new
   end
 
   def hex_teardown
-    old_kata
+    kata_old
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -18,41 +18,41 @@ class AvatarTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '75E',
-  "before new_avatar avatar does not exist",
-  "after new_avatar it does exist" do
+  "before avatar_new avatar does not exist",
+  "after avatar_new it does exist" do
     refute avatar_exists?
-    new_avatar
+    avatar_new
     assert avatar_exists?
-    old_avatar
+    avatar_old
     refute avatar_exists?
   end
 
   test 'A64',
-  'in resurrection new_avatar() has to work after old_avatar()' do
-    new_avatar
-    old_avatar
-    new_avatar
-    old_avatar
+  'in resurrection avatar_new() has to work after avatar_old()' do
+    avatar_new
+    avatar_old
+    avatar_new
+    avatar_old
   end
 
   test '9BD',
   'Alpine Linux has an existing user called squid',
   "which would clash with the squid avatar and has to be deluser'd" do
     refute avatar_exists?('squid')
-    new_avatar('squid')
+    avatar_new('squid')
     assert avatar_exists?('squid')
-    old_avatar('squid')
+    avatar_old('squid')
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # negative tests cases: new_avatar
+  # negative tests cases: avatar_new
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '7C4',
-  'new_avatar with non-existent kata_id raises' do
+  'avatar_new with non-existent kata_id raises' do
     error = assert_raises(ArgumentError) {
       kata_id = '92BB3FE5B6'
-      new_runner(image_name, kata_id).new_avatar('salmon', {})
+      new_runner(image_name, kata_id).avatar_new('salmon', {})
     }
     assert_equal 'kata_id:!exists', error.message
   end
@@ -60,32 +60,32 @@ class AvatarTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '35D',
-  'new_avatar with existing kata_id but invalid avatar_name raises' do
-    assert_method_raises(:new_avatar, kata_id, invalid_avatar_names, 'avatar_name:invalid')
+  'avatar_new with existing kata_id but invalid avatar_name raises' do
+    assert_method_raises(:avatar_new, kata_id, invalid_avatar_names, 'avatar_name:invalid')
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '119',
-  'new_avatar with existing kata_id but avatar_name that already exists raises' do
-    new_avatar
+  'avatar_new with existing kata_id but avatar_name that already exists raises' do
+    avatar_new
     begin
-      error = assert_raises(ArgumentError) { new_avatar }
+      error = assert_raises(ArgumentError) { avatar_new }
       assert_equal 'avatar_name:exists', error.message
     ensure
-      old_avatar
+      avatar_old
     end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # negative test cases: old_avatar
+  # negative test cases: avatar_old
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'E35',
-  'old_avatar with non-existent kata_id raises' do
+  'avatar_old with non-existent kata_id raises' do
     error = assert_raises(ArgumentError) {
       kata_id = '92BB3FE5B6'
-      new_runner(image_name, kata_id).old_avatar('salmon')
+      new_runner(image_name, kata_id).avatar_old('salmon')
     }
     assert_equal 'kata_id:!exists', error.message
   end
@@ -93,13 +93,13 @@ class AvatarTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'E5D',
-  'old_avatar with existing kata_id but invalid avatar_name raises' do
-    assert_method_raises(:old_avatar, kata_id, invalid_avatar_names, 'avatar_name:invalid')
+  'avatar_old with existing kata_id but invalid avatar_name raises' do
+    assert_method_raises(:avatar_old, kata_id, invalid_avatar_names, 'avatar_name:invalid')
   end
 
   test 'D6F',
-  'old_avatar with existing kata_id but avatar_name that does not exist raises' do
-    error = assert_raises(ArgumentError) { old_avatar('salmon') }
+  'avatar_old with existing kata_id but avatar_name that does not exist raises' do
+    error = assert_raises(ArgumentError) { avatar_old('salmon') }
     assert_equal 'avatar_name:!exists', error.message
   end
 

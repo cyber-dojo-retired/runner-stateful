@@ -9,11 +9,11 @@ class RunAlpineKataTest < TestBase
 
   def hex_setup
     set_image_name image_for_test
-    new_kata
+    kata_new
   end
 
   def hex_teardown
-    old_kata
+    kata_old
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -

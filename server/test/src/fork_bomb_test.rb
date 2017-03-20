@@ -14,7 +14,7 @@ class ForkBombTest < TestBase
 
   test 'CD5',
   '[Alpine] fork() bomb in C runs out of steam' do
-    new_avatar('lion')
+    avatar_new('lion')
     hiker_c = [
       '#include "hiker.h"',
       '#include <stdio.h>',
@@ -41,7 +41,7 @@ class ForkBombTest < TestBase
       assert lines.count{ |line| line == 'fork() => 0' } > 42
       assert lines.count{ |line| line == 'fork() => -1' } > 42
     ensure
-      old_avatar('lion')
+      avatar_old('lion')
     end
   end
 
@@ -49,7 +49,7 @@ class ForkBombTest < TestBase
 
   test '4DE',
   '[Alpine] fork() bomb in shell runs out of steam' do
-    new_avatar('lion')
+    avatar_new('lion')
     cyber_dojo_sh = 'bomb() { bomb | bomb & }; bomb'
     begin
       sss_run({ avatar_name:'lion', changed_files:{'cyber-dojo.sh' => cyber_dojo_sh }})
@@ -57,7 +57,7 @@ class ForkBombTest < TestBase
       assert_equal '', stdout
       assert stderr.include? "./cyber-dojo.sh: line 1: can't fork"
     ensure
-      old_avatar('lion')
+      avatar_old('lion')
     end
   end
 

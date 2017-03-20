@@ -3,8 +3,8 @@ require_relative 'test_base'
 class RunTest < TestBase
 
   def self.hex_prefix; '201BCEF'; end
-  def hex_setup; new_kata; new_avatar; end
-  def hex_teardown; old_avatar; old_kata; end
+  def hex_setup; kata_new; avatar_new; end
+  def hex_teardown; avatar_old; kata_old; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # negative test cases

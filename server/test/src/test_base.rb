@@ -7,13 +7,13 @@ class TestBase < HexMiniTest
 
   def kata_setup
     set_image_name image_for_test
-    new_kata
-    new_avatar
+    kata_new
+    avatar_new
   end
 
   def kata_teardown
-    old_avatar
-    old_kata
+    avatar_old
+    kata_old
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -25,8 +25,8 @@ class TestBase < HexMiniTest
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def kata_exists?; runner.kata_exists?; end
-  def new_kata    ; runner.new_kata    ; end
-  def old_kata    ; runner.old_kata    ; end
+  def kata_new    ; runner.kata_new    ; end
+  def kata_old    ; runner.kata_old    ; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -34,12 +34,12 @@ class TestBase < HexMiniTest
     runner.avatar_exists?(avatar_name)
   end
 
-  def new_avatar(avatar_name = 'salmon', the_files = files)
-    runner.new_avatar(avatar_name, the_files)
+  def avatar_new(avatar_name = 'salmon', the_files = files)
+    runner.avatar_new(avatar_name, the_files)
   end
 
-  def old_avatar(avatar_name = 'salmon')
-    runner.old_avatar(avatar_name)
+  def avatar_old(avatar_name = 'salmon')
+    runner.avatar_old(avatar_name)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

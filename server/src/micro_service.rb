@@ -12,14 +12,14 @@ class MicroService < Sinatra::Base
   # - - - - - - - - - - - - - - - - - - - - -
 
    get '/kata_exists?' do; getter(__method__); end
-  post '/new_kata'     do; poster(__method__); end
-  post '/old_kata'     do; poster(__method__); end
+  post '/kata_new'     do; poster(__method__); end
+  post '/kata_old'     do; poster(__method__); end
 
   # - - - - - - - - - - - - - - - - - - - - -
 
    get '/avatar_exists?' do; getter(__method__, avatar_name); end
-  post '/new_avatar'     do; poster(__method__, avatar_name, starting_files); end
-  post '/old_avatar'     do; poster(__method__, avatar_name); end
+  post '/avatar_new'     do; poster(__method__, avatar_name, starting_files); end
+  post '/avatar_old'     do; poster(__method__, avatar_name); end
 
   # - - - - - - - - - - - - - - - - - - - - -
 

@@ -5,7 +5,7 @@ class KataTest < TestBase
   def self.hex_prefix; 'FB0D4'; end
 
   def hex_setup
-    set_image_name 'cyberdojofoundation/gcc_assert'
+    set_image_name "#{cdf}/gcc_assert"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -13,38 +13,38 @@ class KataTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'DBC',
-  'before new_kata kata does not exist,',
-  'after new_kata it does exist,',
-  'after old_kata it does not exist' do
+  'before kata_new kata does not exist,',
+  'after kata_new it does exist,',
+  'after kata_old it does not exist' do
     refute kata_exists?
-    new_kata
+    kata_new
     assert kata_exists?
-    old_kata
+    kata_old
     refute kata_exists?
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # negative test cases: new_kata
+  # negative test cases: kata_new
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '183',
-  'new_kata with kata_id that already exists raises' do
-    new_kata
+  'kata_new with kata_id that already exists raises' do
+    kata_new
     begin
-      error = assert_raises(ArgumentError) { new_kata }
+      error = assert_raises(ArgumentError) { kata_new }
       assert_equal 'kata_id:exists', error.message
     ensure
-      old_kata
+      kata_old
     end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # negative test cases: old_kata
+  # negative test cases: kata_old
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '0A2',
-  'old_kata with valid kata_id that does not exist raises' do
-    error = assert_raises(ArgumentError) { old_kata }
+  'kata_old with valid kata_id that does not exist raises' do
+    error = assert_raises(ArgumentError) { kata_old }
     assert_equal 'kata_id:!exists', error.message
   end
 

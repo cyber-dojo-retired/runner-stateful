@@ -70,16 +70,16 @@ Asks whether the kata with the given kata_id exists.
   { "kata_exists?": false  }
 ```
 
-# new_kata
+# kata_new
 The kata with the given kata_id has been set up.
-Must be called before new_avatar.
+Must be called before avatar_new.
 - parameters, eg
 ```
   { "image_name": "cyberdojofoundation/gcc_assert",
        "kata_id": "15B9AD6C42"
   }
 ```
-# old_kata
+# kata_old
 The kata with the given kata_id has been torn down.
 - parameters, eg
 ```
@@ -106,7 +106,7 @@ has entered the kata with the given kata_id.
   { "avatar_exists?": false  }
 ```
 
-# new_avatar
+# avatar_new
 The avatar with the given avatar_name has entered the
 kata with the given kata with the given starting files.
 Must be called before run.
@@ -122,7 +122,7 @@ Must be called before run.
   }
 ```
 
-# old_avatar
+# avatar_old
 The avatar with the given avatar_name_ has left
 the kata with the given kata_id.
 - parameters, eg

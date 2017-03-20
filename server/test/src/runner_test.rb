@@ -61,10 +61,6 @@ class RunnerTest < TestBase
     "#{cdf}/gcc_assert"
   end
 
-  def cdf
-    'cyberdojofoundation'
-  end
-
   def invalid_image_names
     [
       '',             # nothing!

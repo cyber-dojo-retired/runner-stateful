@@ -9,23 +9,23 @@ class SharedFolderTest < TestBase
 
   def hex_setup
     set_image_name image_for_test
-    new_kata
+    kata_new
   end
 
   def hex_teardown
-    old_kata
+    kata_old
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'B33',
-  '[Alpine] first new_avatar event in a kata causes creation of /sandboxes/shared' do
-    new_avatar('salmon')
+  '[Alpine] first avatar_new event in a kata causes creation of /sandboxes/shared' do
+    avatar_new('salmon')
     begin
       shared = '/sandboxes/shared'
       assert_cyber_dojo_sh "[ -d #{shared} ]"
     ensure
-      old_avatar('salmon')
+      avatar_old('salmon')
     end
   end
 
@@ -33,14 +33,14 @@ class SharedFolderTest < TestBase
 
   test 'A54',
   '[Alpine] shared sandbox creation is idempotent' do
-    new_avatar('salmon')
-    new_avatar('lion')
+    avatar_new('salmon')
+    avatar_new('lion')
     begin
       shared = '/sandboxes/shared'
       assert_cyber_dojo_sh "[ -d #{shared} ]"
     ensure
-      old_avatar('lion')
-      old_avatar('salmon')
+      avatar_old('lion')
+      avatar_old('salmon')
     end
   end
 
@@ -48,7 +48,7 @@ class SharedFolderTest < TestBase
 
   test '893',
   '[Alpine] /sandboxes/shared is writable by any avatar' do
-    new_avatar('salmon')
+    avatar_new('salmon')
     begin
       shared = '/sandboxes/shared'
       # sandbox's is owned by cyber-dojo
@@ -58,7 +58,7 @@ class SharedFolderTest < TestBase
       stat_perms = assert_cyber_dojo_sh("stat -c '%A' #{shared}").strip
       assert_equal 'drwxrwxr-x', stat_perms
     ensure
-      old_avatar('salmon')
+      avatar_old('salmon')
     end
   end
 

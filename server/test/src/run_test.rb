@@ -20,11 +20,11 @@ class RunTest < TestBase
 
   test '7FE',
   'run with kata_id that exists but invalid avatar_name raises' do
-    new_kata
+    kata_new
     begin
       assert_raises_avatar_name(kata_id, 'scissors', 'invalid')
     ensure
-      old_kata
+      kata_old
     end
   end
 
@@ -32,11 +32,11 @@ class RunTest < TestBase
 
   test '951',
   'run with kata_id that exists and valid avatar_name that does not exist yet raises' do
-    new_kata
+    kata_new
     begin
       assert_raises_avatar_name(kata_id, 'salmon', '!exists')
     ensure
-      old_kata
+      kata_old
     end
   end
 

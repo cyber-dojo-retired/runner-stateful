@@ -16,8 +16,8 @@ class Demo < Sinatra::Base
     sss = nil
     html = '<div style="font-size:0.5em">'
 
-    runner.new_kata(image_name, kata_id)
-    runner.new_avatar(image_name, kata_id, avatar_name, files)
+    runner.kata_new(image_name, kata_id)
+    runner.avatar_new(image_name, kata_id, avatar_name, files)
     duration = timed { sss = run({}) }
     html += pre('run', duration, sss, 'Red')
 
@@ -33,8 +33,8 @@ class Demo < Sinatra::Base
     duration = timed { sss = run(times_out, 3) }
     html += pre('run', duration, sss, 'LightGray')
 
-    runner.old_avatar(image_name, kata_id, avatar_name)
-    runner.old_kata(image_name, kata_id)
+    runner.avatar_old(image_name, kata_id, avatar_name)
+    runner.kata_old(image_name, kata_id)
 
     html += '</div>'
   end

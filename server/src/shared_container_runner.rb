@@ -38,7 +38,7 @@ class SharedContainerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def new_kata
+  def kata_new
     refute_kata_exists
     # The container may have exited but its
     # volume may not have been collected yet.
@@ -76,7 +76,7 @@ class SharedContainerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def old_kata
+  def kata_old
     assert_kata_exists
     name = container_name
     assert_exec(remove_container_cmd(name))
@@ -104,7 +104,7 @@ class SharedContainerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def new_avatar(avatar_name, starting_files)
+  def avatar_new(avatar_name, starting_files)
     assert_kata_exists
     refute_avatar_exists(avatar_name)
     make_shared_dir
@@ -117,7 +117,7 @@ class SharedContainerRunner
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def old_avatar(avatar_name)
+  def avatar_old(avatar_name)
     assert_kata_exists
     assert_avatar_exists(avatar_name)
     delete_avatar_user(avatar_name)
@@ -213,7 +213,7 @@ class SharedContainerRunner
   def run_cyber_dojo_sh(avatar_name, max_seconds)
     # The processes __inside__ the docker container
     # are killed by /usr/local/bin/timeout_cyber_dojo.sh
-    # See new_kata() above.
+    # See kata_new() above.
     sh_cmd = [
       '/usr/local/bin/timeout_cyber_dojo.sh',
       kata_id,

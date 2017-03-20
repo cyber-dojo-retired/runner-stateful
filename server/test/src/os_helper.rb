@@ -41,7 +41,7 @@ module OsHelper
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def new_avatar_home_test
+  def avatar_new_home_test
     home = assert_cyber_dojo_sh('printenv HOME').strip
     assert_equal "/home/#{avatar_name}", home
 
@@ -51,7 +51,7 @@ module OsHelper
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def new_avatar_sandbox_setup_test
+  def avatar_new_sandbox_setup_test
     # sandbox exists
     assert_cyber_dojo_sh "[ -d #{sandbox} ]"
 
@@ -74,12 +74,12 @@ module OsHelper
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def new_avatar_starting_files_test
-    # kata_setup has already called new_avatar() which
+  def avatar_new_starting_files_test
+    # kata_setup has already called avatar_new() which
     # has setup a salmon. So I create a new avatar with
     # known ls-starting-files. Note that kata_teardown
-    # calls old_avatar('salmon') and old_kata
-    new_avatar('lion', ls_starting_files)
+    # calls avatar_old('salmon')
+    avatar_new('lion', ls_starting_files)
     begin
       sss_run({ avatar_name:'lion', changed_files:{} })
       assert_equal success, status
@@ -93,7 +93,7 @@ module OsHelper
       assert_equal_atts('hello.txt',     '-rw-r--r--', lion_uid, group, 11, ls_files)
       assert_equal_atts('hello.sh',      '-rw-r--r--', lion_uid, group, 16, ls_files)
     ensure
-      old_avatar('lion')
+      avatar_old('lion')
     end
   end
 

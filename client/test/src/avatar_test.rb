@@ -3,93 +3,93 @@ require_relative 'test_base'
 class AvatarTest < TestBase
 
   def self.hex_prefix; '4F725'; end
-  def hex_setup; new_kata; end
-  def hex_teardown; old_kata; end
+  def hex_setup; kata_new; end
+  def hex_teardown; kata_old; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
   # positive test case
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '26D',
-  'new_avatar/old_avatar' do
+  'avatar_new/avatar_old' do
     refute avatar_exists?
-    new_avatar
+    avatar_new
     assert avatar_exists?
-    old_avatar
+    avatar_old
     refute avatar_exists?
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
-  # negative test cases: new_avatar
+  # negative test cases: avatar_new
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'E06',
-  'new_avatar with invalid image_name raises' do
-    error = assert_raises { new_avatar({ image_name:Object.new }) }
-    assert_equal 'RunnerService:new_avatar:image_name:invalid', error.message
+  'avatar_new with invalid image_name raises' do
+    error = assert_raises { avatar_new({ image_name:Object.new }) }
+    assert_equal 'RunnerService:avatar_new:image_name:invalid', error.message
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '48A',
-  'new_avatar with invalid kata_id raises' do
-    error = assert_raises { new_avatar({ kata_id:Object.new }) }
-    assert_equal 'RunnerService:new_avatar:kata_id:invalid', error.message
+  'avatar_new with invalid kata_id raises' do
+    error = assert_raises { avatar_new({ kata_id:Object.new }) }
+    assert_equal 'RunnerService:avatar_new:kata_id:invalid', error.message
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'C43',
-  'new_avatar with kata_id that does not exist name raises' do
-    error = assert_raises { new_avatar({ kata_id:'6E070B323A' }) }
-    assert_equal 'RunnerService:new_avatar:kata_id:!exists', error.message
+  'avatar_new with kata_id that does not exist name raises' do
+    error = assert_raises { avatar_new({ kata_id:'6E070B323A' }) }
+    assert_equal 'RunnerService:avatar_new:kata_id:!exists', error.message
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '1E0',
-  'new_avatar with kata_id that exists and avatar_name that exists raises' do
-    new_avatar
+  'avatar_new with kata_id that exists and avatar_name that exists raises' do
+    avatar_new
     begin
-      error = assert_raises { new_avatar }
-      assert_equal 'RunnerService:new_avatar:avatar_name:exists', error.message
+      error = assert_raises { avatar_new }
+      assert_equal 'RunnerService:avatar_new:avatar_name:exists', error.message
     ensure
-      old_avatar
+      avatar_old
     end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
-  # negative test cases: old_avatar
+  # negative test cases: avatar_old
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '538',
-  'old_avatar with invalid image_name raises' do
-    error = assert_raises { old_avatar({ image_name:Object.new }) }
-    assert_equal 'RunnerService:old_avatar:image_name:invalid', error.message
+  'avatar_old with invalid image_name raises' do
+    error = assert_raises { avatar_old({ image_name:Object.new }) }
+    assert_equal 'RunnerService:avatar_old:image_name:invalid', error.message
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '70F',
-  'old_avatar with invalid kata_id raises' do
-    error = assert_raises { old_avatar({ kata_id:Object.new }) }
-    assert_equal 'RunnerService:old_avatar:kata_id:invalid', error.message
+  'avatar_old with invalid kata_id raises' do
+    error = assert_raises { avatar_old({ kata_id:Object.new }) }
+    assert_equal 'RunnerService:avatar_old:kata_id:invalid', error.message
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '45E',
-  'old_avatar with kata_id that does not exist raises' do
-    error = assert_raises { old_avatar({ kata_id:'B8D2EA7DF1' }) }
-    assert_equal 'RunnerService:old_avatar:kata_id:!exists', error.message
+  'avatar_old with kata_id that does not exist raises' do
+    error = assert_raises { avatar_old({ kata_id:'B8D2EA7DF1' }) }
+    assert_equal 'RunnerService:avatar_old:kata_id:!exists', error.message
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'DE2',
-  'old_avatar with kata_id that exists and avatar_name that does not exist raises' do
-    error = assert_raises { old_avatar }
-    assert_equal 'RunnerService:old_avatar:avatar_name:!exists', error.message
+  'avatar_old with kata_id that exists and avatar_name that does not exist raises' do
+    error = assert_raises { avatar_old }
+    assert_equal 'RunnerService:avatar_old:avatar_name:!exists', error.message
   end
 
 end

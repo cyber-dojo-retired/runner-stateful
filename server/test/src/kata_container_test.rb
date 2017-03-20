@@ -10,11 +10,11 @@ class KataContainerTest < TestBase
 
   def hex_setup
     set_image_name image_for_test
-    new_kata
+    kata_new
   end
 
   def hex_teardown
-    old_kata
+    kata_old
   end
 
   def self.kc_test(hex_suffix, *lines, &test_block)
@@ -26,7 +26,7 @@ class KataContainerTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   kc_test '3B1',
-  '[Alpine] after new_kata the timeout script is in /usr/local/bin' do
+  '[Alpine] after kata_new the timeout script is in /usr/local/bin' do
     filename = 'timeout_cyber_dojo.sh'
     src = assert_docker_exec("cat /usr/local/bin/#{filename}")
     local_src = IO.read("/app/src/#{filename}")
@@ -34,7 +34,7 @@ class KataContainerTest < TestBase
   end
 
   kc_test '3B2',
-  '[Ubuntu] after new_kata the timeout script is in /usr/local/bin' do
+  '[Ubuntu] after kata_new the timeout script is in /usr/local/bin' do
     filename = 'timeout_cyber_dojo.sh'
     src = assert_docker_exec("cat /usr/local/bin/#{filename}")
     local_src = IO.read("/app/src/#{filename}")
@@ -44,28 +44,28 @@ class KataContainerTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   kc_test '5F9',
-  '[Alpine] after new_avatar(salmon)',
+  '[Alpine] after avatar_new(salmon)',
   'there is a linux user called salmon inside the kata container' do
-    new_avatar('salmon')
+    avatar_new('salmon')
     begin
       uid = assert_docker_exec('id -u salmon').strip
       assert_equal user_id('salmon'), uid
     ensure
-      old_avatar('salmon')
+      avatar_old('salmon')
     end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   kc_test '2A8',
-  '[Ubuntu] after new_avatar(salmon)',
+  '[Ubuntu] after avatar_new(salmon)',
   'there is a linux user called salmon inside the kata container' do
-    new_avatar('salmon')
+    avatar_new('salmon')
     begin
       uid = assert_docker_exec('id -u salmon').strip
       assert_equal user_id('salmon'), uid
     ensure
-      old_avatar('salmon')
+      avatar_old('salmon')
     end
   end
 
