@@ -9,9 +9,7 @@ class ShellMockerTest < TestBase
 
   test 'B51',
   'MockSheller ctor only sets mocks=[] when file does not already exist' do
-    # eg when a test issues a controller GET then it goes through the rails routers
-    # which creates a new MockSheller object in a new thread.
-    # So the Mock has to work when it is "re-created" in different threads
+    # has to work when it is "re-created" in different threads
     shell_1 = ShellMocker.new(nil)
     shell_1.mock_exec(pwd, wd, stderr='', success)
 
@@ -69,6 +67,32 @@ class ShellMockerTest < TestBase
     shell = ShellMocker.new(nil)
     shell.mock_exec(pwd, wd, stderr='', success)
     assert_raises { shell.teardown }
+  end
+
+  # - - - - - - - - - - - - - - -
+
+  test '470',
+  'teardown does not raise if there is an uncaught exception' do
+    shell = ShellMocker.new(nil)
+    shell.mock_exec(pwd, wd, stderr='', success)
+    error = assert_raises {
+      begin
+        fail 'forced'
+      ensure
+        shell.teardown
+      end
+    }
+    assert_equal 'forced', error.message
+  end
+
+  # - - - - - - - - - - - - - - -
+
+  test '4FF',
+  'assert_exec raises when status is non-zero' do
+    shell = ShellMocker.new(nil)
+    shell.mock_exec('false', '', '', 1)
+    error = assert_raises { shell.assert_exec('false') }
+    assert_equal 'command:false', error.message
   end
 
   # - - - - - - - - - - - - - - -
