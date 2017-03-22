@@ -134,7 +134,8 @@ class SharedContainerRunner
     delete_files(avatar_name, deleted_filenames)
     write_files(avatar_name, changed_files)
     stdout,stderr,status = run_cyber_dojo_sh(avatar_name, max_seconds)
-    { stdout:stdout, stderr:stderr, status:status }
+    colour = ragger.colour(image_name, stdout, stderr, status)
+    { stdout:stdout, stderr:stderr, status:status, colour:colour }
   end
 
   private

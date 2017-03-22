@@ -75,7 +75,7 @@ class SharedVolumeRunner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # Copes with infinite loops (eg) in the avatar's
   # code/tests by removing the container - which kills
-  # kills all processes running inside the container.
+  # all processes running inside the container.
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run(avatar_name, deleted_filenames, changed_files, max_seconds)
@@ -86,7 +86,8 @@ class SharedVolumeRunner
       delete_files(cid, avatar_name, deleted_filenames)
       write_files(cid, avatar_name, changed_files)
       stdout,stderr,status = run_cyber_dojo_sh(cid, avatar_name, max_seconds)
-      { stdout:stdout, stderr:stderr, status:status }
+      colour = ragger.colour(image_name, stdout, stderr, status)
+      { stdout:stdout, stderr:stderr, status:status, colour:colour }
     end
   end
 

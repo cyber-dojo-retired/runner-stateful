@@ -5,7 +5,38 @@ class RunTest < TestBase
   def self.hex_prefix; '58410'; end
 
   def hex_setup
-    set_image_name 'cyberdojofoundation/gcc_assert'
+    set_image_name "#{cdf}/gcc_assert"
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test '8A9',
+  'run with image=cdf/gcc_assert returns non-nil traffic-light colour' do
+    kata_new
+    avatar_new
+    begin
+      sss_run( { kata_id:kata_id })
+      assert_colour 'red'
+    ensure
+      avatar_old
+      kata_old
+    end
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test '8C5',
+  'run with image!=cdf/gcc_assert returns nil traffic-light colour' do
+    set_image_name "#{cdf}/clangpp_assert"
+    kata_new
+    avatar_new
+    begin
+      sss_run( { kata_id:kata_id })
+      assert_nil colour
+    ensure
+      avatar_old
+      kata_old
+    end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
