@@ -86,7 +86,7 @@ class SharedVolumeRunner
       delete_files(cid, avatar_name, deleted_filenames)
       write_files(cid, avatar_name, changed_files)
       stdout,stderr,status = run_cyber_dojo_sh(cid, avatar_name, max_seconds)
-      colour = ragger.colour(image_name, stdout, stderr, status)
+      colour = red_amber_green(cid, stdout, stderr, status)
       { stdout:stdout, stderr:stderr, status:status, colour:colour }
     end
   end

@@ -66,7 +66,6 @@ module DockerRunnerMixIn
   end
 
   def avatar_dir(avatar_name)
-    # TODO?: change to sandbox_dir
     assert_valid_avatar_name(avatar_name)
     "#{sandboxes_root_dir}/#{avatar_name}"
   end
@@ -177,6 +176,19 @@ module DockerRunnerMixIn
 
   def remove_volume_cmd(name)
     "docker volume rm #{name}"
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def red_amber_green(cid, stdout, stderr, status)
+    cmd = 'cat /usr/local/bin/red_amber_green.rb'
+    stdout,_stderr,status = quiet_exec("docker exec #{cid} sh -c '#{cmd}'")
+    if status == shell.success
+      rag = eval(stdout)
+      rag.call(stdout, stderr, status).to_s
+    else
+      nil
+    end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
