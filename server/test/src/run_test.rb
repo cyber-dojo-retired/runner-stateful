@@ -10,8 +10,10 @@ class RunTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '8A9',
-  'run with image=cdf/gcc_assert returns non-nil traffic-light colour' do
+  test '8A9', %w(
+  image with red_amber_green.rb
+    returns non-nil traffic-light colour
+  ) do
     kata_new
     avatar_new
     begin
@@ -25,10 +27,11 @@ class RunTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-=begin
-  test '8C5',
-  'run with image!=cdf/gcc_assert returns nil traffic-light colour' do
-    set_image_name "#{cdf}/clangpp_assert"
+  test '8C5', %w(
+  image without red_amber_green.rb
+    returns nil traffic-light colour
+  ) do
+    set_image_name "#{cdf}/visual-basic_nunit"
     kata_new
     avatar_new
     begin
@@ -39,20 +42,24 @@ class RunTest < TestBase
       kata_old
     end
   end
-=end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '1DC',
-  'run with valid kata_id that does not exist raises' do
+  test '1DC', %w(
+  run with valid kata_id that does not exist
+    raises
+  ) do
     kata_id = '0C67EC0416'
     assert_raises_kata_id(kata_id, '!exists')
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '7FE',
-  'run with kata_id that exists but invalid avatar_name raises' do
+  test '7FE', %w(
+  run with kata_id that exists
+    but invalid avatar_name
+      raises
+  ) do
     kata_new
     begin
       assert_raises_avatar_name(kata_id, 'scissors', 'invalid')
@@ -63,8 +70,11 @@ class RunTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '951',
-  'run with kata_id that exists and valid avatar_name that does not exist yet raises' do
+  test '951', %w(
+  run with kata_id that exists
+    and valid avatar_name that does not exist yet
+      raises
+  ) do
     kata_new
     begin
       assert_raises_avatar_name(kata_id, 'salmon', '!exists')

@@ -14,6 +14,8 @@ class RunnerTest < TestBase
     new_runner(image_name, kata_id)
   end
 
+  # - - - - - - - - - - - - - - - - -
+
   test 'D02', %w(
   default runner
     for image_name without a tag
@@ -21,6 +23,8 @@ class RunnerTest < TestBase
   ) do
     assert_tag_runner_class '', 'SharedVolumeRunner'
   end
+
+  # - - - - - - - - - - - - - - - - -
 
   test 'D03', %w(
   runner for image_name
