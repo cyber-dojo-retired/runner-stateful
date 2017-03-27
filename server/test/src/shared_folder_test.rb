@@ -6,20 +6,20 @@ class SharedFolderTest < TestBase
   include OsHelper
 
   def self.hex_prefix; 'B4A'; end
-
   def hex_setup
     set_image_name image_for_test
     kata_new
   end
-
   def hex_teardown
     kata_old
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - -
 
-  test 'B33',
-  '[Alpine] first avatar_new event in a kata causes creation of /sandboxes/shared' do
+  test 'B33', %w( [Alpine]
+  first avatar_new event in a kata
+  causes creation of /sandboxes/shared
+  ) do
     avatar_new('salmon')
     begin
       shared = '/sandboxes/shared'
@@ -29,10 +29,11 @@ class SharedFolderTest < TestBase
     end
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - -
 
-  test 'A54',
-  '[Alpine] shared sandbox creation is idempotent' do
+  test 'A54', %w( [Alpine]
+  shared sandbox creation is idempotent
+  ) do
     avatar_new('salmon')
     avatar_new('lion')
     begin
@@ -44,10 +45,11 @@ class SharedFolderTest < TestBase
     end
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - -
 
-  test '893',
-  '[Alpine] /sandboxes/shared is writable by any avatar' do
+  test '893', %w( [Alpine]
+  /sandboxes/shared is writable by any avatar
+  ) do
     avatar_new('salmon')
     begin
       shared = '/sandboxes/shared'
