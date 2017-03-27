@@ -110,8 +110,6 @@ class TestBase < HexMiniTest
 
   def image_for_test
     rows = {
-      '[C#,NUnit]'      => 'csharp_nunit',
-      '[C#,Moq]'        => 'csharp_moq',
       '[gcc,assert]'    => 'gcc_assert',
       '[Java,Cucumber]' => 'java_cucumber_pico',
       '[Alpine]'        => 'gcc_assert',
