@@ -18,16 +18,26 @@ class RunAlpineKataTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test 'CA0',
-  '[Alpine] image is indeed based on Alpine' do
+  test 'CA0', %w( [Alpine]
+  image is indeed based on Alpine
+  ) do
     etc_issue = assert_docker_run 'cat /etc/issue'
     assert etc_issue.include?('Alpine'), etc_issue
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '214',
-  '[Alpine] container must have tini installed to do zombie reaping' do
+  test '267', %w( [Alpine]
+  none of the 64 avatar's uid's are already taken
+  ) do
+    refute_avatar_users_exist
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test '214', %w( [Alpine]
+  image has tini installed to do zombie reaping
+  ) do
     ps = assert_docker_run 'ps'
     ps_lines = ps.strip.split("\n")
     # PID   USER     TIME   COMMAND
@@ -44,13 +54,6 @@ class RunAlpineKataTest < TestBase
     }]
     refute_nil procs[1], 'no process at pid 1!'
     assert procs[1].include?('/sbin/tini'), 'no tini at pid 1'
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test '267',
-  "[Alpine] none of the 64 avatar's uid's are already taken" do
-    refute_avatar_users_exist
   end
 
 end
