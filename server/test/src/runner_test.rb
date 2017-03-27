@@ -6,35 +6,43 @@ class RunnerTest < TestBase
 
   # - - - - - - - - - - - - - - - - -
 
-  test 'D01',
-  'runner with valid image_name and valid kata_id does not raise' do
+  test 'D01', %w(
+  runner with valid image_name
+    and valid kata_id
+      does not raise
+  ) do
     new_runner(image_name, kata_id)
   end
 
-  test 'D02',
-  'default runner for image_name without a tag is SharedVolumeRunner' do
+  test 'D02', %w(
+  default runner
+    for image_name without a tag
+      is SharedVolumeRunner
+  ) do
     assert_tag_runner_class '', 'SharedVolumeRunner'
   end
 
-  test 'D03',
-  'runner for image_name with :shared_disk tag is SharedVolumeRunner' do
+  test 'D03', %w(
+  runner for image_name
+    with :shared_disk tag
+      is SharedVolumeRunner
+  ) do
     assert_tag_runner_class ':shared_disk', 'SharedVolumeRunner'
   end
 
-   #test 'D04',
-   #'runner for image_name with :shared_process tag is SharedContainerRunner' do
+   #test 'D04', %w(
+   #runner for image_name
+   #  with :shared_process tag
+   #    is SharedContainerRunner
+   #) do
    #   'shared_process', 'SharedContainerRunner'
    #end
 
-  def assert_tag_runner_class(tag, expected)
-    image_name = "#{cdf}/gcc_assert#{tag}"
-    assert_equal expected, new_runner(image_name, kata_id).class.name
-  end
-
   # - - - - - - - - - - - - - - - - -
 
-  test 'E2A',
-  'runner with invalid image_name raises' do
+  test 'E2A', %w(
+  runner with invalid image_name raises
+  ) do
     invalid_image_names.each do |invalid_image_name|
       error = assert_raises(ArgumentError) {
         new_runner(invalid_image_name, kata_id)
@@ -45,8 +53,9 @@ class RunnerTest < TestBase
 
   # - - - - - - - - - - - - - - - - -
 
-  test '6FD',
-  'runner with invalid kata_id raises' do
+  test '6FD', %w(
+  runner with invalid kata_id raises
+  ) do
     invalid_kata_ids.each do |invalid_kata_id|
       error = assert_raises(ArgumentError) {
         new_runner(image_name, invalid_kata_id)
@@ -56,6 +65,11 @@ class RunnerTest < TestBase
   end
 
   private
+
+  def assert_tag_runner_class(tag, expected)
+    image_name = "#{cdf}/gcc_assert#{tag}"
+    assert_equal expected, new_runner(image_name, kata_id).class.name
+  end
 
   def image_name
     "#{cdf}/gcc_assert"
