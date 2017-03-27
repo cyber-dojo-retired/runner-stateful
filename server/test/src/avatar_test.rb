@@ -17,9 +17,10 @@ class AvatarTest < TestBase
   # positive test case
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '75E',
-  "before avatar_new avatar does not exist",
-  "after avatar_new it does exist" do
+  test '75E', %w(
+  before avatar_new avatar does not exist
+  after avatar_new it does exist
+  ) do
     refute avatar_exists?
     avatar_new
     assert avatar_exists?
@@ -27,17 +28,21 @@ class AvatarTest < TestBase
     refute avatar_exists?
   end
 
-  test 'A64',
-  'in resurrection avatar_new() has to work after avatar_old()' do
+  test 'A64', %w(
+  because of resurrection
+  avatar_new() has to work after avatar_old()
+  ) do
     avatar_new
     avatar_old
     avatar_new
     avatar_old
   end
 
-  test '9BD',
-  'Alpine Linux has an existing user called squid',
-  "which would clash with the squid avatar and has to be deluser'd" do
+  test '9BD', %w( [Alpine]
+  in Alpine there is an existing user called squid
+  which would clash with the squid avatar and has to be
+  worked around using deluser
+  ) do
     refute avatar_exists?('squid')
     avatar_new('squid')
     assert avatar_exists?('squid')
@@ -48,8 +53,9 @@ class AvatarTest < TestBase
   # negative tests cases: avatar_new
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '7C4',
-  'avatar_new with non-existent kata_id raises' do
+  test '7C4', %w(
+  avatar_new with non-existent kata_id raises
+  ) do
     error = assert_raises(ArgumentError) {
       kata_id = '92BB3FE5B6'
       new_runner(image_name, kata_id).avatar_new('salmon', {})
@@ -59,15 +65,23 @@ class AvatarTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '35D',
-  'avatar_new with existing kata_id but invalid avatar_name raises' do
-    assert_method_raises(:avatar_new, kata_id, invalid_avatar_names, 'avatar_name:invalid')
+  test '35D', %w(
+  avatar_new with existing kata_id
+    but invalid avatar_name raises
+  ) do
+    assert_method_raises(
+      :avatar_new,
+      kata_id,
+      invalid_avatar_names,
+      'avatar_name:invalid')
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '119',
-  'avatar_new with existing kata_id but avatar_name that already exists raises' do
+  test '119', %w(
+  avatar_new with existing kata_id
+    but avatar_name that already exists raises
+  ) do
     avatar_new
     begin
       error = assert_raises(ArgumentError) { avatar_new }
@@ -81,8 +95,9 @@ class AvatarTest < TestBase
   # negative test cases: avatar_old
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test 'E35',
-  'avatar_old with non-existent kata_id raises' do
+  test 'E35', %w(
+  avatar_old with non-existent kata_id raises
+  ) do
     error = assert_raises(ArgumentError) {
       kata_id = '92BB3FE5B6'
       new_runner(image_name, kata_id).avatar_old('salmon')
@@ -92,13 +107,21 @@ class AvatarTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test 'E5D',
-  'avatar_old with existing kata_id but invalid avatar_name raises' do
-    assert_method_raises(:avatar_old, kata_id, invalid_avatar_names, 'avatar_name:invalid')
+  test 'E5D', %w(
+  avatar_old with existing kata_id
+    but invalid avatar_name raises
+  ) do
+    assert_method_raises(
+      :avatar_old,
+      kata_id,
+      invalid_avatar_names,
+      'avatar_name:invalid')
   end
 
-  test 'D6F',
-  'avatar_old with existing kata_id but avatar_name that does not exist raises' do
+  test 'D6F', %w(
+  avatar_old with existing kata_id
+    but avatar_name that does not exist raises
+  ) do
     error = assert_raises(ArgumentError) { avatar_old('salmon') }
     assert_equal 'avatar_name:!exists', error.message
   end
@@ -107,8 +130,9 @@ class AvatarTest < TestBase
   # negative test case: user_id
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test 'A10',
-  'user_id with invalid avatar_name raises' do
+  test 'A10', %w(
+  user_id with invalid avatar_name raises
+  ) do
     invalid_avatar_names.each do |invalid_avatar_name|
       error = assert_raises(ArgumentError) {
         runner.user_id(invalid_avatar_name)
@@ -121,8 +145,9 @@ class AvatarTest < TestBase
   # negative test case: user_id
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '0C8',
-  'sandbox_path with invalid avatar_name raises' do
+  test '0C8', %w(
+  sandbox_path with invalid avatar_name raises
+  ) do
     invalid_avatar_names.each do |invalid_avatar_name|
       error = assert_raises(ArgumentError) {
         runner.avatar_dir(invalid_avatar_name)
