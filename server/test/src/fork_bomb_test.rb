@@ -12,8 +12,9 @@ class ForkBombTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test 'CD5',
-  '[Alpine] fork() bomb in C runs out of steam' do
+  test 'CD5', %w( [Alpine]
+  fork-bomb in C fails to go off
+  ) do
     avatar_new('lion')
     hiker_c = [
       '#include "hiker.h"',
@@ -47,8 +48,9 @@ class ForkBombTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '4DE',
-  '[Alpine] fork() bomb in shell runs out of steam' do
+  test '4DE', %w( [Alpine]
+  fork-bomb in shell fails to go off
+  ) do
     avatar_new('lion')
     cyber_dojo_sh = 'bomb() { bomb | bomb & }; bomb'
     begin
