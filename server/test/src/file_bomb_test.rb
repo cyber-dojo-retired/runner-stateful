@@ -12,8 +12,9 @@ class FileBombTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test 'DB3',
-  '[Alpine] file() bomb in C to exhaust file-handles runs out of steam' do
+  test 'DB3', %w( [Alpine]
+  file() bomb in C fails to go off
+  ) do
     avatar_new('lion')
     hiker_c = [
       '#include "hiker.h"',
