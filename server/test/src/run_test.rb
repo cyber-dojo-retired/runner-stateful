@@ -25,6 +25,7 @@ class RunTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+=begin
   test '8C5',
   'run with image!=cdf/gcc_assert returns nil traffic-light colour' do
     set_image_name "#{cdf}/clangpp_assert"
@@ -38,6 +39,7 @@ class RunTest < TestBase
       kata_old
     end
   end
+=end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
