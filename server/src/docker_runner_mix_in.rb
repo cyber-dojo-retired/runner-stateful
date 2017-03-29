@@ -182,13 +182,9 @@ module DockerRunnerMixIn
 
   def red_amber_green(cid, stdout, stderr, status)
     cmd = 'cat /usr/local/bin/red_amber_green.rb'
-    out,_err,st = quiet_exec("docker exec #{cid} sh -c '#{cmd}'")
-    if st == shell.success
-      rag = eval(out)
-      rag.call(stdout, stderr, status).to_s
-    else
-      nil
-    end
+    out,_err = assert_exec("docker exec #{cid} sh -c '#{cmd}'")
+    rag = eval(out)
+    rag.call(stdout, stderr, status).to_s
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -

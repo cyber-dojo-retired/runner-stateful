@@ -11,32 +11,13 @@ class RunTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '8A9', %w(
-  image with red_amber_green.rb
-    returns non-nil traffic-light colour
+  run returns red-amber-green traffic-light colour
   ) do
     kata_new
     avatar_new
     begin
       sss_run( { kata_id:kata_id })
       assert_colour 'red'
-    ensure
-      avatar_old
-      kata_old
-    end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test '8C5', %w(
-  image without red_amber_green.rb
-    returns nil traffic-light colour
-  ) do
-    set_image_name "#{cdf}/visual-basic_nunit"
-    kata_new
-    avatar_new
-    begin
-      sss_run( { kata_id:kata_id })
-      assert_nil colour
     ensure
       avatar_old
       kata_old
