@@ -64,9 +64,10 @@ Pull the image with the given image_name.
        "kata_id": "15B9AD6C42"
   }
 ```
-- returns true if the pull succeeds, eg
+- returns true if the pull succeeds, false if it failed.
 ```
   { "image_pull": true   }
+  { "image_pull": false  }
 ```
 
 - - - -
