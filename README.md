@@ -22,8 +22,9 @@ speed/sharing/security tradeoffs. They all use the same tests.
 API:
   * All methods receive their arguments in a json hash.
   * All methods return a json hash with a single key.
-  * If the method raises an exception, the key equals "exception".
   * If the method completes, the key equals the method's name.
+  * If the method raises an exception, the key equals "exception".
+    For example, if the image_name is invalid.
 
 - - - -
 
@@ -36,7 +37,7 @@ by running [docker search].
        "kata_id": "15B9AD6C42"
   }
 ```
-- returns true if it does, false if it doesn't, eg
+- returns true if it does, false if it doesn't.
 ```
   { "image_exists?": true   }
   { "image_exists?": false  }
@@ -50,7 +51,7 @@ Asks whether the image with the given image_name has been pulled.
        "kata_id": "15B9AD6C42"
   }
 ```
-- returns true if it has, false if it hasn't, eg
+- returns true if it has, false if it hasn't.
 ```
   { "image_pulled?": true   }
   { "image_pulled?": false  }
@@ -95,6 +96,7 @@ Must be called before avatar_new.
        "kata_id": "15B9AD6C42"
   }
 ```
+
 # kata_old
 The kata with the given kata_id has been torn down.
 - parameters, eg
