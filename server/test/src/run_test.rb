@@ -26,6 +26,27 @@ class RunTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  test 'B82', %w(
+    files can be in sub-dirs of sandbox
+  ) do
+    kata_new
+    avatar_new
+    begin
+      sss_run( { changed_files: {
+        'cyber-dojo.sh' => ls_cmd,
+        'a/hello.txt' => 'hello world'
+      }})
+      ls_files = ls_parse(stdout)
+      salmon_uid = runner.user_id('salmon')
+      assert_equal_atts('a', 'drwxr-xr-x', salmon_uid, runner.group, 4096, ls_files)
+    ensure
+      avatar_old
+      kata_old
+    end
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   test '1DC', %w(
   run with valid kata_id that does not exist
     raises

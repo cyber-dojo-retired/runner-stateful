@@ -192,8 +192,10 @@ module DockerRunnerMixIn
   def write_files(cid, avatar_name, files)
     return if files == {}
     Dir.mktmpdir('runner') do |tmp_dir|
-      files.each do |filename, content|
-        host_filename = tmp_dir + '/' + filename
+      files.each do |pathed_filename, content|
+        src_dir = tmp_dir + '/' + File.dirname(pathed_filename)
+        shell.exec("mkdir -vp #{src_dir}") if src_dir != '.'
+        host_filename = tmp_dir + '/' + pathed_filename
         disk.write(host_filename, content)
       end
       dir = avatar_dir(avatar_name)
