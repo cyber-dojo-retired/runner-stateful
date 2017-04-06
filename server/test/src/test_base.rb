@@ -140,7 +140,7 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def user_id(name = 'salmon'); runner.user_id(name).to_s; end
+  def user_id(name = 'salmon'); runner.user_id(name); end
   def group; runner.group; end
   def gid; runner.gid; end
   def sandbox(name = 'salmon'); runner.avatar_dir(name); end
@@ -234,7 +234,7 @@ class TestBase < HexMiniTest
       attr = line.split
       [filename = attr[0], {
         permissions: attr[1],
-               user: attr[2],
+               user: attr[2].to_i,
               group: attr[3],
                size: attr[4].to_i,
          time_stamp: attr[6],

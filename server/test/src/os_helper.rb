@@ -60,7 +60,7 @@ module OsHelper
     refute_equal '', ls
 
     # sandbox's is owned by avatar
-    stat_user = assert_cyber_dojo_sh("stat -c '%u' #{sandbox}").strip
+    stat_user = assert_cyber_dojo_sh("stat -c '%u' #{sandbox}").strip.to_i
     assert_equal user_id, stat_user
 
     # sandbox's group is set
