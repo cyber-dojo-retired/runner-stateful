@@ -228,16 +228,38 @@ class SharedVolumeRunner
   def write_files(cid, avatar_name, files)
     return if files == {}
     dir = avatar_dir(avatar_name)
+    uid = user_id(avatar_name)
     Dir.mktmpdir('runner') do |tmp_dir|
       files.each do |filename, content|
         host_filename = tmp_dir + '/' + filename
         disk.write(host_filename, content)
       end
-      assert_exec("docker cp #{tmp_dir}/. #{cid}:#{dir}")
-      files.keys.each do |filename|
-        chown_file = "chown #{avatar_name}:#{group} #{dir}/#{filename}"
-        assert_docker_exec(cid, chown_file)
-      end
+      cmd = [
+        "cd #{tmp_dir}",
+        '&&',
+        'tar',
+        "--owner=#{uid}",
+        "--group=#{gid}",
+        '-zcf',      # create a compressed tar file
+        '-',         # write it to stdout
+        '.',         # tar the current directory
+        '|',
+        'docker exec',
+        "--user=#{uid}:#{gid}",
+        '--interactive',
+        cid,
+        'sh -c',
+        "'",         # open quote
+        "cd #{dir}",
+        '&&',
+        'tar',
+        '-zxf',      # extract from a compressed tar file
+        '-',         # which is read from stdin
+        '-C',        # save the extracted files to
+        '.',         # the current directory
+        "'"          # close quote
+      ].join(space)
+      assert_exec(cmd)
     end
   end
 
