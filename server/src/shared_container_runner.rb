@@ -131,8 +131,8 @@ class SharedContainerRunner
   def run(avatar_name, deleted_filenames, changed_files, max_seconds)
     assert_kata_exists
     assert_avatar_exists(avatar_name)
-    delete_files(avatar_name, deleted_filenames)
-    write_files(avatar_name, changed_files)
+    delete_files(container_name, avatar_name, deleted_filenames)
+    write_files(container_name, avatar_name, changed_files)
     stdout,stderr,status = run_cyber_dojo_sh(avatar_name, max_seconds)
     colour = red_amber_green(cid, stdout, stderr, status)
     { stdout:stdout, stderr:stderr, status:status, colour:colour }
@@ -178,35 +178,6 @@ class SharedContainerRunner
 
   def shared_dir
     "#{sandboxes_root_dir}/shared"
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def delete_files(avatar_name, filenames)
-    return if filenames == []
-    dir = avatar_dir(avatar_name)
-    filenames.each do |filename|
-      assert_docker_exec("rm #{dir}/#{filename}")
-    end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def write_files(avatar_name, files)
-    return if files == {}
-    cid = container_name
-    dir = avatar_dir(avatar_name)
-    Dir.mktmpdir('runner') do |tmp_dir|
-      files.each do |filename, content|
-        host_filename = tmp_dir + '/' + filename
-        disk.write(host_filename, content)
-      end
-      assert_exec("docker cp #{tmp_dir}/. #{cid}:#{dir}")
-      files.keys.each do |filename|
-        chown_file = "chown #{avatar_name}:#{group} #{dir}/#{filename}"
-        assert_docker_exec(chown_file)
-      end
-    end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
