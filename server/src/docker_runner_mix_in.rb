@@ -191,13 +191,13 @@ module DockerRunnerMixIn
 
   def write_files(cid, avatar_name, files)
     return if files == {}
-    dir = avatar_dir(avatar_name)
-    uid = user_id(avatar_name)
     Dir.mktmpdir('runner') do |tmp_dir|
       files.each do |filename, content|
         host_filename = tmp_dir + '/' + filename
         disk.write(host_filename, content)
       end
+      dir = avatar_dir(avatar_name)
+      uid = user_id(avatar_name)
       cmd = [
         "cd #{tmp_dir}",
         '&&',
