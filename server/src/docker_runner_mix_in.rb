@@ -180,10 +180,10 @@ module DockerRunnerMixIn
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def delete_files(cid, avatar_name, filenames)
+  def delete_files(cid, avatar_name, pathed_filenames)
     dir = avatar_dir(avatar_name)
-    filenames.each do |filename|
-      assert_docker_exec(cid, "rm #{dir}/#{filename}")
+    pathed_filenames.each do |pathed_filename|
+      assert_docker_exec(cid, "rm #{dir}/#{pathed_filename}")
     end
   end
 

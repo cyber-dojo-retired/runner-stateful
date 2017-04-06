@@ -47,6 +47,32 @@ class RunTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  test '12B', %w(
+    files in sub-dirs of sandbox can be deleted
+  ) do
+    kata_new
+    avatar_new
+    begin
+      sss_run( { changed_files: {
+        'cyber-dojo.sh' => "cd a && #{ls_cmd}",
+        'a/hello.txt' => 'hello world'
+      }})
+      ls_files = ls_parse(stdout)
+      salmon_uid = runner.user_id('salmon')
+      assert_equal_atts('hello.txt', '-rw-r--r--', salmon_uid, runner.group, 11, ls_files)
+
+      sss_run( { deleted_filenames: [ 'a/hello.txt' ],
+                 changed_files: {}
+      })
+      assert_equal '', stdout
+    ensure
+      avatar_old
+      kata_old
+    end
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   test '1DC', %w(
   run with valid kata_id that does not exist
     raises
