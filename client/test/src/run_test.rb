@@ -75,6 +75,17 @@ class RunTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  test '722',
+  'code with extra 500K file is red' do
+    sss_run({
+      changed_files:{ 'large.txt' => 'X'*1023*500 },
+      image_name:"#{cdf}/gcc_assert"
+    })
+    assert_colour 'red'
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   test 'E6F',
   'timed-out-traffic-light' do
     file_sub('hiker.c', 'return', "for(;;);\nreturn")
