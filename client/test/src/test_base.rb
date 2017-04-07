@@ -63,6 +63,7 @@ class TestBase < HexMiniTest
   def status; sss['status']; end
   def stdout; sss['stdout']; end
   def stderr; sss['stderr']; end
+  def colour; sss['colour']; end
 
   # - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -136,6 +137,7 @@ class TestBase < HexMiniTest
   def assert_stdout(expected); assert_equal expected, stdout, sss.to_s; end
   def assert_stderr(expected); assert_equal expected, stderr, sss.to_s; end
   def assert_status(expected); assert_equal expected, status, sss.to_s; end
+  def assert_colour(expected); assert_equal expected, colour, sss.to_s; end
 
   # - - - - - - - - - - - - - - - - - - - - - - -
 

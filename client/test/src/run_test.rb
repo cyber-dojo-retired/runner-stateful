@@ -39,6 +39,7 @@ class RunTest < TestBase
   test '348',
   'red-traffic-light' do
     sss_run
+    assert_colour 'red'
     assert_stdout "makefile:14: recipe for target 'test.output' failed\n"
     assert stderr.start_with?('Assertion failed: answer() == 42'), sss.to_s
     assert_status 2
@@ -50,6 +51,7 @@ class RunTest < TestBase
   'green-traffic-light' do
     file_sub('hiker.c', '6 * 9', '6 * 7')
     sss_run
+    assert_colour 'green'
     assert_stdout "All tests passed\n"
     assert_stderr ''
     assert_status 0
@@ -61,6 +63,7 @@ class RunTest < TestBase
   'amber-traffic-light' do
     file_sub('hiker.c', '6 * 9', '6 * 9sss')
     sss_run
+    assert_colour 'amber'
     lines = [
       "invalid suffix \"sss\" on integer constant",
       'return 6 * 9sss'
