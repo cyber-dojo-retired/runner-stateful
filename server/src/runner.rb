@@ -9,11 +9,22 @@ def runner_class_name(image_name)
 end
 
 def volume_runner?(image_name)
-  image_name.end_with?(':shared_disk')
+  tagless(image_name).end_with?(':shared_disk')
 end
 
 def container_runner?(image_name)
-  image_name.end_with?(':shared_process')
+  tagless(image_name).end_with?(':shared_process')
+end
+
+def tagless(image_name)
+  alpha_numeric = '[a-z0-9]+'
+  separator = '[_.-]+'
+  component = "#{alpha_numeric}(#{separator}#{alpha_numeric})*"
+  name = "#{component}(/#{component})*"
+  tag = '[\w][\w.-]{0,127}'
+  md = /^(#{name})(:#{tag})?$/o.match(image_name)
+  return image_name if md.nil?
+  md[1]
 end
 
 module Runner # mix-in
