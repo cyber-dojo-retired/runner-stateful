@@ -20,28 +20,12 @@ speed/sharing/security tradeoffs. They all use the same tests.
   * [SharedContainerRunner](https://github.com/cyber-dojo/runner/blob/master/server/src/shared_container_runner.rb)
 
 API:
-  * All methods receive their arguments in a json hash.
+  * All methods receive their named arguments in a json hash.
   * All methods return a json hash with a single key.
-  * If the method completes, the key equals the method's name.
-  * If the method raises an exception, the key equals "exception".
-    For example, if the image_name is invalid.
+    * If the method completes, the key equals the method's name.
+    * If the method raises an exception, the key equals "exception".
 
 - - - -
-
-# image_exists?
-Asks whether the image with the given image_name exists, as determined
-by running [docker search].
-- parameter, eg
-```
-  { "image_name": "cyberdojofoundation/gcc_assert",
-       "kata_id": "15B9AD6C42"
-  }
-```
-- returns true if it does, false if it doesn't.
-```
-  { "image_exists?": true   }
-  { "image_exists?": false  }
-```
 
 # image_pulled?
 Asks whether the image with the given image_name has been pulled.
@@ -65,7 +49,7 @@ Pull the image with the given image_name.
        "kata_id": "15B9AD6C42"
   }
 ```
-- returns true if the pull succeeds, false if it failed.
+- returns true if the pull succeeded, false if it failed.
 ```
   { "image_pull": true   }
   { "image_pull": false  }
@@ -89,7 +73,7 @@ Asks whether the kata with the given kata_id exists.
 
 # kata_new
 The kata with the given kata_id has been set up.
-Must be called before avatar_new.
+Must be called once before any call to avatar_new with the same kata_id.
 - parameters, eg
 ```
   { "image_name": "cyberdojofoundation/gcc_assert",
@@ -127,7 +111,7 @@ has entered the kata with the given kata_id.
 # avatar_new
 The avatar with the given avatar_name has entered the
 kata with the given kata with the given starting files.
-Must be called before run.
+Must be called once before any call to run with the samean kata_id and avatar_name.
 - parameters, eg
 ```
   {     "image_name": "cyberdojofoundation/gcc_assert",
@@ -141,7 +125,7 @@ Must be called before run.
 ```
 
 # avatar_old
-The avatar with the given avatar_name_ has left
+The avatar with the given avatar_name has left
 the kata with the given kata_id.
 - parameters, eg
 ```
@@ -156,6 +140,8 @@ the kata with the given kata_id.
 # run
 For the avatar with the given avatar_name, in the kata with the given kata_id,
 removes the deleted_filenames, saves changed_files, runs cyber-dojo.sh
+Calls to run must be preceeded by one call to kata_new with the same kata_id,
+and one call to avatar_name with the same kata_id and avatar_name.
 - parameters, eg
 ```
   {        "image_name": "cyberdojofoundation/gcc_assert",

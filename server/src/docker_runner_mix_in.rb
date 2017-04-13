@@ -19,14 +19,6 @@ module DockerRunnerMixIn
   attr_reader :image_name
   attr_reader :kata_id
 
-  def image_exists?
-    stdout,_ = assert_exec("docker search #{image_name}")
-    lines = stdout.split("\n")
-    lines.shift # HEADINGS
-    images = lines.map { |line| line.split[0] }
-    images.include? image_name
-  end
-
   # - - - - - - - - - - - - - - - - - -
 
   def image_pulled?

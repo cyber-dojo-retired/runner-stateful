@@ -18,7 +18,6 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def image_exists?; runner.image_exists?; end
   def image_pulled?; runner.image_pulled?; end
   def image_pull;    runner.image_pull   ; end
 
