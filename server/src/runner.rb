@@ -17,6 +17,9 @@ def container_runner?(image_name)
 end
 
 def tagless(image_name)
+  # http://stackoverflow.com/questions/37861791/
+  # https://github.com/docker/docker/blob/master/image/spec/v1.1.md
+  # Simplified, no hostname
   alpha_numeric = '[a-z0-9]+'
   separator = '[_.-]+'
   component = "#{alpha_numeric}(#{separator}#{alpha_numeric})*"
