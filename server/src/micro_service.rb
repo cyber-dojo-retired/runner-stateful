@@ -5,19 +5,16 @@ require_relative 'runner'
 
 class MicroService < Sinatra::Base
 
-   get '/image_exists?' do; getter(__method__); end
    get '/image_pulled?' do; getter(__method__); end
   post '/image_pull'    do; poster(__method__); end
 
   # - - - - - - - - - - - - - - - - - - - - -
 
-   get '/kata_exists?' do; getter(__method__); end
   post '/kata_new'     do; poster(__method__); end
   post '/kata_old'     do; poster(__method__); end
 
   # - - - - - - - - - - - - - - - - - - - - -
 
-   get '/avatar_exists?' do; getter(__method__, avatar_name); end
   post '/avatar_new'     do; poster(__method__, avatar_name, starting_files); end
   post '/avatar_old'     do; poster(__method__, avatar_name); end
 

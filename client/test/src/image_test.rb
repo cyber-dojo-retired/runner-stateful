@@ -5,33 +5,6 @@ class ImageTest < TestBase
   def self.hex_prefix; '4CD0A7F'; end
 
   # - - - - - - - - - - - - - - - - - - - - -
-  # image_exists?
-  # - - - - - - - - - - - - - - - - - - - - -
-
-  test '17F',
-  'false when image_name is valid but does not exist' do
-    assert_equal false, image_exists?({image_name:"#{cdf}/lazybox"})
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - -
-
-  test 'AA1',
-  'true when image_name is valid and exists' do
-    assert_equal true, image_exists?({image_name:"#{cdf}/gcc_assert"})
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - -
-
-  test 'D6F',
-  'raises when image_name is invalid' do
-    error = assert_raises(StandardError) {
-      image_exists?({image_name:'_cantStartWithSeparator'})
-    }
-    expected = 'RunnerService:image_exists?:image_name:invalid'
-    assert_equal expected, error.message
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - -
   # image_pulled?
   # - - - - - - - - - - - - - - - - - - - - -
 

@@ -9,10 +9,6 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - -
 
-  def image_exists?(named_args = {})
-    runner.image_exists?(*defaulted_args(__method__, named_args))
-  end
-
   def image_pulled?(named_args = {})
     runner.image_pulled?(*defaulted_args(__method__, named_args))
   end
@@ -23,10 +19,6 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - -
 
-  def kata_exists?(named_args = {})
-    runner.kata_exists?(*defaulted_args(__method__, named_args))
-  end
-
   def kata_new(named_args = {})
     runner.kata_new(*defaulted_args(__method__, named_args))
   end
@@ -36,10 +28,6 @@ class TestBase < HexMiniTest
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - -
-
-  def avatar_exists?(named_args = {})
-    runner.avatar_exists?(*defaulted_args(__method__, named_args))
-  end
 
   def avatar_new(named_args = {})
     runner.avatar_new(*defaulted_args(__method__, named_args))
@@ -73,11 +61,11 @@ class TestBase < HexMiniTest
 
     args << defaulted_arg(named_args, :image_name, default_image_name)
     args << defaulted_arg(named_args, :kata_id, default_kata_id)
-    return args if ['image_exists?','image_pulled?','image_pull'].include?(method)
-    return args if ['kata_exists?','kata_new','kata_old'].include?(method)
+    return args if ['image_pulled?','image_pull'].include?(method)
+    return args if ['kata_new','kata_old'].include?(method)
 
     args << defaulted_arg(named_args, :avatar_name, default_avatar_name)
-    return args if ['avatar_exists?','avatar_old'].include?(method)
+    return args if ['avatar_old'].include?(method)
 
     if method == 'avatar_new'
       args << defaulted_arg(named_args, :starting_files, files)

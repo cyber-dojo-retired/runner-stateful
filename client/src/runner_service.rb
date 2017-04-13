@@ -2,10 +2,6 @@ require_relative 'http_service'
 
 class RunnerService
 
-  def image_exists?(image_name, kata_id)
-    get(__method__, image_name, kata_id)
-  end
-
   def image_pulled?(image_name, kata_id)
     get(__method__, image_name, kata_id)
   end
@@ -16,10 +12,6 @@ class RunnerService
 
   # - - - - - - - - - - - - - - - - - - -
 
-  def kata_exists?(image_name, kata_id)
-    get(__method__, image_name, kata_id)
-  end
-
   def kata_new(image_name, kata_id)
     post(__method__, image_name, kata_id)
   end
@@ -29,10 +21,6 @@ class RunnerService
   end
 
   # - - - - - - - - - - - - - - - - - - -
-
-  def avatar_exists?(image_name, kata_id, avatar_name)
-    get(__method__, image_name, kata_id, avatar_name)
-  end
 
   def avatar_new(image_name, kata_id, avatar_name, starting_files)
     post(__method__, image_name, kata_id, avatar_name, starting_files)

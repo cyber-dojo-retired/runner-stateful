@@ -7,19 +7,6 @@ class AvatarTest < TestBase
   def hex_teardown; kata_old; end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
-  # positive test case
-  # - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test '26D',
-  'avatar_new/avatar_old' do
-    refute avatar_exists?
-    avatar_new
-    assert avatar_exists?
-    avatar_old
-    refute avatar_exists?
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - -
   # negative test cases: avatar_new
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
