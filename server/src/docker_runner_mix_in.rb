@@ -11,8 +11,9 @@ module DockerRunnerMixIn
     @parent = parent
     @image_name = image_name
     @kata_id = kata_id
-    assert_valid_image_name
     assert_valid_kata_id
+    # image_name validation is assumed to have
+    # already take place in runner.rb
   end
 
   attr_reader :parent # For nearest_ancestors()
@@ -232,37 +233,6 @@ module DockerRunnerMixIn
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_valid_image_name
-    unless valid_image_name?
-      fail_image_name('invalid')
-    end
-  end
-
-  def valid_image_name?
-    # http://stackoverflow.com/questions/37861791/
-    i = image_name.index('/')
-    if i.nil? || i == -1 || (
-        !image_name[0...i].include?('.') &&
-        !image_name[0...i].include?(':') &&
-         image_name[0...i] != 'localhost')
-      hostname = ''
-      remote_name = image_name
-    else
-      hostname = image_name[0..i-1]
-      remote_name = image_name[i+1..-1]
-    end
-
-    alpha_numeric = '[a-z0-9]+'
-    separator = '([.]{1}|[_]{1,2}|[-]+)'
-    component = "#{alpha_numeric}(#{separator}#{alpha_numeric})*"
-    name = "#{component}(/#{component})*"
-    tag = '[\w][\w.-]{0,126}'
-
-    remote_name =~ /^(#{name})(:(#{tag}))?$/
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - -
-
   def assert_valid_kata_id
     unless valid_kata_id?
       fail_kata_id('invalid')
@@ -294,10 +264,6 @@ module DockerRunnerMixIn
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def fail_image_name(message)
-    fail bad_argument("image_name:#{message}")
-  end
 
   def fail_kata_id(message)
     fail bad_argument("kata_id:#{message}")

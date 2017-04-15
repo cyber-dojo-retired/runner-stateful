@@ -6,17 +6,6 @@ class RunnerTest < TestBase
 
   # - - - - - - - - - - - - - - - - -
 
-  test 'D00', %w(
-  direct call to runner.ctor with invalid image_name raises
-  ) do
-    error = assert_raises(ArgumentError) {
-      SharedVolumeRunner.new(self, invalid_image_name='', kata_id)
-    }
-    assert_equal 'image_name:invalid', error.message
-  end
-
-  # - - - - - - - - - - - - - - - - -
-
   test 'D01', %w(
   runner with valid image_name and valid kata_id does not raise
   ) do
