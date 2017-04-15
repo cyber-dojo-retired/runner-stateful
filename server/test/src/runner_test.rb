@@ -6,41 +6,59 @@ class RunnerTest < TestBase
 
   # - - - - - - - - - - - - - - - - -
 
-  test 'D01', %w(
-  runner with valid image_name
-    and valid kata_id
-      does not raise
+  test 'D00', %w(
+  direct call to runner.ctor with invalid image_name raises
   ) do
-    new_runner(image_name, kata_id)
+    error = assert_raises(ArgumentError) {
+      SharedVolumeRunner.new(self, invalid_image_name='', kata_id)
+    }
+    assert_equal 'image_name:invalid', error.message
+  end
+
+  # - - - - - - - - - - - - - - - - -
+
+  test 'D01', %w(
+  runner with valid image_name and valid kata_id does not raise
+  ) do
+    new_runner('cdf/gcc_assert', kata_id)
   end
 
   # - - - - - - - - - - - - - - - - -
 
   test 'D02', %w(
-  default runner
-    for image_name without a tag
-      is SharedVolumeRunner
+  default runner is SharedVolumeRunner
   ) do
-    assert_tag_runner_class '', 'SharedVolumeRunner'
+    assert_runner_class 'cdf/gcc_assert', 'SharedVolumeRunner'
+    assert_runner_class 'cdf/gcc_assert:1.2', 'SharedVolumeRunner'
+    assert_runner_class 'quay.io:8080/cdf/gcc_assert:latest', 'SharedVolumeRunner'
+    assert_runner_class 'localhost/cdf/gcc_assert:1.2', 'SharedVolumeRunner'
   end
 
   # - - - - - - - - - - - - - - - - -
 
   test 'D03', %w(
-  runner for image_name
-    with :shared_disk tag
-      is SharedVolumeRunner
+  runner for image_name ending in 'shared_disk' is SharedVolumeRunner
   ) do
-    assert_tag_runner_class ':shared_disk', 'SharedVolumeRunner'
+    assert_runner_class 'cdf/gcc_assert_shared_disk', 'SharedVolumeRunner'
+    assert_runner_class 'cdf/gcc_assert_shared_disk:1.2', 'SharedVolumeRunner'
+    assert_runner_class 'quay.io:8080/cdf/gcc_assert_shared_disk:latest', 'SharedVolumeRunner'
+    assert_runner_class 'localhost/cdf/gcc_assert_shared_disk:1.2', 'SharedVolumeRunner'
   end
 
-   #test 'D04', %w(
-   #runner for image_name
-   #  with :shared_process tag
-   #    is SharedContainerRunner
-   #) do
-   #   'shared_process', 'SharedContainerRunner'
-   #end
+=begin
+  # These pass but I'm turning them off till to keep 100% coverage
+  # till I start to use SharedContainerRunner
+
+   test 'D04', %w(
+   runner for image_name ending in 'shared_process' is SharedContainerRunner
+   ) do
+     expected = 'SharedContainerRunner'
+     assert_runner_class 'cdf/gcc_assert_shared_process', expected
+     assert_runner_class 'cdf/gcc_assert_shared_process:1.2', expected
+     assert_runner_class 'quay.io:8080/cdf/gcc_assert_shared_process:latest', expected
+     assert_runner_class 'localhost/cdf/gcc_assert_shared_process:1.2', expected
+   end
+=end
 
   # - - - - - - - - - - - - - - - - -
 
@@ -62,7 +80,7 @@ class RunnerTest < TestBase
   ) do
     invalid_kata_ids.each do |invalid_kata_id|
       error = assert_raises(ArgumentError) {
-        new_runner(image_name, invalid_kata_id)
+        new_runner('cdf/gcc_assert', invalid_kata_id)
       }
       assert_equal 'kata_id:invalid', error.message
     end
@@ -70,13 +88,8 @@ class RunnerTest < TestBase
 
   private
 
-  def assert_tag_runner_class(tag, expected)
-    image_name = "#{cdf}/gcc_assert#{tag}"
+  def assert_runner_class(image_name, expected)
     assert_equal expected, new_runner(image_name, kata_id).class.name
-  end
-
-  def image_name
-    "#{cdf}/gcc_assert"
   end
 
   def invalid_image_names

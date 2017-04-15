@@ -240,14 +240,25 @@ module DockerRunnerMixIn
 
   def valid_image_name?
     # http://stackoverflow.com/questions/37861791/
-    # https://github.com/docker/docker/blob/master/image/spec/v1.1.md
-    # Simplified, no hostname, no :tag
+    i = image_name.index('/')
+    if i.nil? || i == -1 || (
+        !image_name[0...i].include?('.') &&
+        !image_name[0...i].include?(':') &&
+         image_name[0...i] != 'localhost')
+      hostname = ''
+      remote_name = image_name
+    else
+      hostname = image_name[0..i-1]
+      remote_name = image_name[i+1..-1]
+    end
+
     alpha_numeric = '[a-z0-9]+'
-    separator = '[_.-]+'
+    separator = '([.]{1}|[_]{1,2}|[-]+)'
     component = "#{alpha_numeric}(#{separator}#{alpha_numeric})*"
     name = "#{component}(/#{component})*"
-    tag = '[\w][\w.-]{0,127}'
-    image_name =~ /^(#{name})(:#{tag})?$/o
+    tag = '[\w][\w.-]{0,126}'
+
+    remote_name =~ /^(#{name})(:(#{tag}))?$/
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
