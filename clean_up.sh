@@ -25,3 +25,5 @@ docker volume rm $(docker volume ls --quiet --filter "name=${NAME}")
 
 NAME=cyber_dojo_avatar_volume_runner_avatar_
 docker volume rm $(docker volume ls --quiet --filter "name=${NAME}")
+
+docker rmi $(docker images -q --filter "dangling=true")
