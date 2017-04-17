@@ -12,8 +12,6 @@ module DockerRunnerMixIn
     @image_name = image_name
     @kata_id = kata_id
     assert_valid_kata_id
-    # image_name validation is assumed to have
-    # already take place in runner.rb
   end
 
   attr_reader :parent # For nearest_ancestors()
