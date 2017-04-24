@@ -42,15 +42,19 @@ class RunAlpineTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  os_test '0C9',
-  'avatar_new has its own sandbox with owner/group/permissions set' do
+  os_test '0C9', %w(
+  avatar_new has its own sandbox
+  with owner/group/permissions set
+  ) do
     avatar_new_sandbox_setup_test
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  os_test '1FB',
-  'avatar_new has starting-files in its sandbox with owner/group/permissions set' do
+  os_test '1FB', %w(
+  avatar_new has starting-files in its sandbox
+  with owner/group/permissions set
+  ) do
     avatar_new_starting_files_test
   end
 
