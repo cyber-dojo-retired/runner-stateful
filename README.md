@@ -18,7 +18,7 @@ alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
 
 The default runner is SharedVolumeRunner.
 There are two runner implementations in this repo with different
-speed/sharing/security tradeoffs. They all use the same tests.
+speed/sharing/security tradeoffs. They use the same tests.
   * [SharedVolumeRunner](https://github.com/cyber-dojo/runner/blob/master/server/src/shared_volume_runner.rb)
   * [SharedContainerRunner](https://github.com/cyber-dojo/runner/blob/master/server/src/shared_container_runner.rb)
 
