@@ -1,4 +1,4 @@
-require_relative 'test_base.rb'
+require_relative 'test_base'
 require_relative 'os_helper'
 
 class SharedFolderTest < TestBase
