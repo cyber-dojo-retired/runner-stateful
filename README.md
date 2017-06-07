@@ -114,7 +114,8 @@ has entered the kata with the given kata_id.
 # avatar_new
 The avatar with the given avatar_name has entered the
 kata with the given kata with the given starting files.
-Must be called once before any call to run with the samean kata_id and avatar_name.
+Must be called once before any call to run with the same
+kata_id and avatar_name.
 - parameters, eg
 ```
   {     "image_name": "cyberdojofoundation/gcc_assert",
@@ -144,7 +145,7 @@ the kata with the given kata_id.
 For the avatar with the given avatar_name, in the kata with the given kata_id,
 removes the deleted_filenames, saves changed_files, runs cyber-dojo.sh
 Calls to run must be preceeded by one call to kata_new with the same kata_id,
-and one call to avatar_name with the same kata_id and avatar_name.
+and one call to avatar_new with the same kata_id and avatar_name.
 - parameters, eg
 ```
   {        "image_name": "cyberdojofoundation/gcc_assert",
