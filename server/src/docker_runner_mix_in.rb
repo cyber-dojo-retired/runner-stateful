@@ -1,6 +1,6 @@
 require_relative 'all_avatars_names'
-require_relative 'nearest_ancestors'
 require_relative 'logger_null'
+require_relative 'nearest_ancestors'
 require_relative 'string_cleaner'
 require_relative 'string_truncater'
 require 'timeout'
@@ -319,12 +319,12 @@ module DockerRunnerMixIn
     fail bad_argument("kata_id:#{message}")
   end
 
-  def fail_avatar_name(message)
-    fail bad_argument("avatar_name:#{message}")
-  end
-
   def fail_image_name(message)
     fail bad_argument("image_name:#{message}")
+  end
+
+  def fail_avatar_name(message)
+    fail bad_argument("avatar_name:#{message}")
   end
 
   def bad_argument(message)
