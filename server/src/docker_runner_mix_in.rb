@@ -239,6 +239,11 @@ module DockerRunnerMixIn
   end
 
   def valid_image_name?
+    hostname,remote_name = split_image_name
+    valid_hostname?(hostname) && valid_remote_name?(remote_name)
+  end
+
+  def split_image_name
     # http://stackoverflow.com/questions/37861791/
     i = image_name.index('/')
     if i.nil? || i == -1 || (
@@ -251,8 +256,7 @@ module DockerRunnerMixIn
       hostname = image_name[0..i-1]
       remote_name = image_name[i+1..-1]
     end
-
-    valid_hostname?(hostname) && valid_remote_name?(remote_name)
+    return hostname,remote_name
   end
 
   def valid_hostname?(hostname)
