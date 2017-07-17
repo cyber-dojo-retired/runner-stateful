@@ -10,19 +10,6 @@ class ImagePullTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '934',
-  'raises when image_name is invalid' do
-    invalid_image_names.each do |image_name|
-      error = assert_raises(StandardError) {
-        @image_name = image_name
-        image_pull
-      }
-      assert_equal 'image_name:invalid', error.message
-    end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   test '91C',
   'true when image_name is valid and exists' do
     image_name = "#{cdf}/ruby_mini_test"
@@ -81,7 +68,7 @@ class ImagePullTest < TestBase
     ].join
     image_name = repo
     image_name += ":#{tag}" unless tag == ''
-    mock_docker_pull(image_name, stdout, stderr, 1)
+    mock_docker_pull(image_name, stdout, stderr, status=1)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -

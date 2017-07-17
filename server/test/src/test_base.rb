@@ -197,22 +197,6 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def invalid_image_names
-    [
-      '',             # nothing!
-      '_',            # cannot start with separator
-      'name_',        # cannot end with separator
-      'ALPHA/name',   # no uppercase
-      'alpha/name_',  # cannot end in separator
-      'alpha/_name',  # cannot begin with separator
-      'n:tag space',  # tags can't contain a space
-      'n:-tag',       # tags can't start with a -
-      'n:.tag',       # tags can't start with a .
-    ]
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   def cdf
     'cyberdojofoundation'
   end

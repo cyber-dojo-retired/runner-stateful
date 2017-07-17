@@ -8,17 +8,6 @@ class ImagePulledTest < TestBase
   def hex_setup; @shell ||= ShellMocker.new(nil); end
   def hex_teardown; shell.teardown; end
 
-  test 'D97',
-  'raises when image_name is invalid' do
-    invalid_image_names.each do |image_name|
-      error = assert_raises(StandardError) {
-        @image_name = image_name
-        image_pulled?
-      }
-      assert_equal 'image_name:invalid', error.message
-    end
-  end
-
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '9C3',

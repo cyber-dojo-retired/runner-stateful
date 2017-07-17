@@ -1,19 +1,15 @@
 
-def runner_class_name(image_name)
-  class_name ||= 'SharedContainerRunner' if container_runner?(image_name)
-  class_name ||= 'SharedVolumeRunner'    if volume_runner?(image_name)
-  class_name ||= 'SharedVolumeRunner'    # default
-  autoload(:SharedContainerRunner, '/app/src/shared_container_runner.rb') if class_name == 'SharedContainerRunner'
-  autoload(:SharedVolumeRunner,    '/app/src/shared_volume_runner.rb')    if class_name == 'SharedVolumeRunner'
+# I had envisaged using the image_name to decide which stateful runner to use.
+# Now decided against that (retaining the same image_name, with no version tag,
+# is the key strategy for backwards compatibility).
+# Better and simpler to use an image label.
+
+def runner_class_name
+  class_name = 'SharedVolumeRunner'   # default
+  # dynamically load Ruby file so coverage stats
+  # don't include the runner that's not being used.
+  autoload(:SharedVolumeRunner, '/app/src/shared_volume_runner.rb') if class_name == 'SharedVolumeRunner'
   class_name
-end
-
-def volume_runner?(image_name)
-  tagless(image_name).end_with?('shared_disk')
-end
-
-def container_runner?(image_name)
-  tagless(image_name).end_with?('shared_process')
 end
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -25,30 +21,8 @@ module Runner # mix-in
   end
 
   def new_runner(image_name, kata_id)
-    class_name = runner_class_name(tagless(image_name))
+    class_name = runner_class_name
     Object.const_get(class_name).new(self, image_name, kata_id)
-  end
-
-  def tagless(image_name)
-    # http://stackoverflow.com/questions/37861791
-    i = image_name.index('/')
-    if i.nil? || i == -1 || (
-        !image_name[0...i].include?('.') &&
-        !image_name[0...i].include?(':') &&
-         image_name[0...i] != 'localhost')
-      remote_name = image_name
-    else
-      remote_name = image_name[i+1..-1]
-    end
-
-    alpha_numeric = '[a-z0-9]+'
-    separator = '([.]{1}|[_]{1,2}|[-]+)'
-    component = "#{alpha_numeric}(#{separator}#{alpha_numeric})*"
-    name = "#{component}(/#{component})*"
-    tag = '[\w][\w.-]{0,126}'
-    md = /^(#{name})(:(#{tag}))?$/.match(remote_name)
-    fail ArgumentError.new('image_name:invalid') if md.nil?
-    md[1]
   end
 
 end

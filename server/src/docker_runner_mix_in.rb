@@ -11,6 +11,7 @@ module DockerRunnerMixIn
     @parent = parent
     @image_name = image_name
     @kata_id = kata_id
+    assert_valid_image_name
     assert_valid_kata_id
   end
 
@@ -231,6 +232,53 @@ module DockerRunnerMixIn
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
+  def assert_valid_image_name
+    unless valid_image_name?
+      fail_image_name('invalid')
+    end
+  end
+
+  def valid_image_name?
+    # http://stackoverflow.com/questions/37861791/
+    i = image_name.index('/')
+    if i.nil? || i == -1 || (
+        !image_name[0...i].include?('.') &&
+        !image_name[0...i].include?(':') &&
+         image_name[0...i] != 'localhost')
+      hostname = ''
+      remote_name = image_name
+    else
+      hostname = image_name[0..i-1]
+      remote_name = image_name[i+1..-1]
+    end
+
+    valid_hostname?(hostname) && valid_remote_name?(remote_name)
+  end
+
+  def valid_hostname?(hostname)
+    return true if hostname == ''
+    port = '[\d]+'
+    component = "([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])"
+    hostname =~ /^(#{component}(\.#{component})*)(:(#{port}))?$/
+  end
+
+  def valid_remote_name?(remote_name)
+    alpha_numeric = '[a-z0-9]+'
+    separator = '([.]{1}|[_]{1,2}|[-]+)'
+    component = "#{alpha_numeric}(#{separator}#{alpha_numeric})*"
+    name = "#{component}(/#{component})*"
+    tag = '[\w][\w.-]{0,127}'
+
+    digest_component = '[A-Za-z][A-Za-z0-9]*'
+    digest_separator = '[-_+.]'
+    digest_algorithm = "#{digest_component}(#{digest_separator}#{digest_component})*"
+    digest_hex = "[0-9a-fA-F]{32,}"
+    digest = "#{digest_algorithm}[:]#{digest_hex}"
+    remote_name =~ /^(#{name})(:(#{tag}))?(@#{digest})?$/
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
   def assert_valid_kata_id
     unless valid_kata_id?
       fail_kata_id('invalid')
@@ -269,6 +317,10 @@ module DockerRunnerMixIn
 
   def fail_avatar_name(message)
     fail bad_argument("avatar_name:#{message}")
+  end
+
+  def fail_image_name(message)
+    fail bad_argument("image_name:#{message}")
   end
 
   def bad_argument(message)
