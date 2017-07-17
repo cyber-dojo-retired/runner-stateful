@@ -16,23 +16,23 @@ alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
 - A stateful micro-service for [cyber-dojo](http://cyber-dojo.org)
 - Runs an avatar's tests.
 
-The default runner is SharedVolumeRunner.
-There are two runner implementations in this repo with different
-speed/sharing/security tradeoffs. They use the same tests.
-  * [SharedVolumeRunner](https://github.com/cyber-dojo/runner/blob/master/server/src/shared_volume_runner.rb)
-  * [SharedContainerRunner](https://github.com/cyber-dojo/runner/blob/master/server/src/shared_container_runner.rb)
-
 API:
   * All methods receive their named arguments in a json hash.
   * All methods return a json hash with a single key.
     * If the method completes, the key equals the method's name.
     * If the method raises an exception, the key equals "exception".
 
+The default runner is SharedVolumeRunner.
+There are two runner implementations in this repo with different
+speed/sharing/security tradeoffs. They use the same tests.
+  * [SharedVolumeRunner](https://github.com/cyber-dojo/runner/blob/master/server/src/shared_volume_runner.rb)
+  * [SharedContainerRunner](https://github.com/cyber-dojo/runner/blob/master/server/src/shared_container_runner.rb)
+
 - - - -
 
 # image_pulled?
 Asks whether the image with the given image_name has been pulled.
-- parameter, eg
+- parameters, eg
 ```
   { "image_name": "cyberdojofoundation/gcc_assert",
        "kata_id": "15B9AD6C42"
@@ -46,7 +46,7 @@ Asks whether the image with the given image_name has been pulled.
 
 # image_pull
 Pull the image with the given image_name.
-- parameter, eg
+- parameters, eg
 ```
   { "image_name": "cyberdojofoundation/gcc_assert",
        "kata_id": "15B9AD6C42"
