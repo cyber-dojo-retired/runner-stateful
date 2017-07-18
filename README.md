@@ -40,8 +40,8 @@ Asks whether the image with the given image_name has been pulled.
 ```
 - returns true if it has, false if it hasn't.
 ```
-  { "image_pulled?": true   }
-  { "image_pulled?": false  }
+  { "image_pulled?": true  }
+  { "image_pulled?": false }
 ```
 
 # image_pull
@@ -54,8 +54,8 @@ Pull the image with the given image_name.
 ```
 - returns true if the pull succeeded, false if it failed.
 ```
-  { "image_pull": true   }
-  { "image_pull": false  }
+  { "image_pull": true  }
+  { "image_pull": false }
 ```
 
 - - - -
@@ -70,8 +70,8 @@ Asks whether the kata with the given kata_id exists.
 ```
 - returns true if it does, false if it doesn't.
 ```
-  { "kata_exists?": true   }
-  { "kata_exists?": false  }
+  { "kata_exists?": true  }
+  { "kata_exists?": false }
 ```
 
 # kata_new
@@ -107,8 +107,8 @@ has entered the kata with the given kata_id.
 ```
 - returns true if it does, false if it doesn't
 ```
-  { "avatar_exists?": true   }
-  { "avatar_exists?": false  }
+  { "avatar_exists?": true  }
+  { "avatar_exists?": false }
 ```
 
 # avatar_new
