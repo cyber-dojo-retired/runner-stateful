@@ -129,7 +129,7 @@ class TestBase < HexMiniTest
   end
 
   def load_files(language_dir)
-    dir = "/app/start_files/#{language_dir}"
+    dir = "/app/test/start_files/#{language_dir}"
     json = JSON.parse(IO.read("#{dir}/manifest.json"))
     set_image_name json['image_name']
     Hash[json['visible_filenames'].collect { |filename|
