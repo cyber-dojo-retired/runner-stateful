@@ -348,8 +348,6 @@ module DockerRunnerMixIn
 
   include NearestAncestors
 
-  def ragger; nearest_ancestors(:ragger); end
-
   def shell; nearest_ancestors(:shell); end
   def  disk; nearest_ancestors(:disk ); end
   def   log; nearest_ancestors(:log  ); end
