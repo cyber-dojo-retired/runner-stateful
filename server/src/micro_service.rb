@@ -5,18 +5,33 @@ require 'json'
 
 class MicroService < Sinatra::Base
 
-   get '/image_pulled?' do; getter(__method__); end
-  post '/image_pull'    do; poster(__method__); end
+  get '/image_pulled?' do
+    getter(__method__)
+  end
+
+  post '/image_pull' do
+    poster(__method__)
+  end
 
   # - - - - - - - - - - - - - - - - - - - - -
 
-  post '/kata_new'     do; poster(__method__); end
-  post '/kata_old'     do; poster(__method__); end
+  post '/kata_new' do
+    poster(__method__)
+  end
+
+  post '/kata_old' do
+    poster(__method__)
+  end
 
   # - - - - - - - - - - - - - - - - - - - - -
 
-  post '/avatar_new'     do; poster(__method__, avatar_name, starting_files); end
-  post '/avatar_old'     do; poster(__method__, avatar_name); end
+  post '/avatar_new' do
+    poster(__method__, avatar_name, starting_files)
+  end
+
+  post '/avatar_old' do
+    poster(__method__, avatar_name)
+  end
 
   # - - - - - - - - - - - - - - - - - - - - -
 
@@ -29,8 +44,13 @@ class MicroService < Sinatra::Base
 
   private
 
-  def getter(name, *args); runner_json( 'GET /', name, *args); end
-  def poster(name, *args); runner_json('POST /', name, *args); end
+  def getter(name, *args)
+    runner_json( 'GET /', name, *args)
+  end
+
+  def poster(name, *args)
+    runner_json('POST /', name, *args)
+  end
 
   def runner_json(prefix, caller, *args)
     name = caller.to_s[prefix.length .. -1]
@@ -56,7 +76,9 @@ class MicroService < Sinatra::Base
   request_args :deleted_filenames, :changed_files
   request_args :max_seconds
 
-  def args; @args ||= JSON.parse(request_body); end
+  def args
+    @args ||= JSON.parse(request_body)
+  end
 
   def request_body
     request.body.rewind

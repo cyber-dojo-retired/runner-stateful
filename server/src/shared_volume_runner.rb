@@ -242,7 +242,8 @@ class SharedVolumeRunner
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def volume_exists?(name)
-    stdout,_ = assert_exec("docker volume ls --quiet --filter 'name=#{name}'")
+    cmd = "docker volume ls --quiet --filter 'name=#{name}'"
+    stdout,_ = assert_exec(cmd)
     stdout.strip != ''
   end
 

@@ -45,8 +45,13 @@ module DockerRunnerMixIn
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def group; 'cyber-dojo'; end
-  def gid; 5000; end
+  def group
+    'cyber-dojo'
+  end
+
+  def gid
+    5000
+  end
 
   def user_id(avatar_name)
     assert_valid_avatar_name(avatar_name)
@@ -63,8 +68,13 @@ module DockerRunnerMixIn
     "#{sandboxes_root_dir}/#{avatar_name}"
   end
 
-  def sandboxes_root_dir; '/sandboxes'; end
-  def timed_out; 'timed_out'; end
+  def sandboxes_root_dir
+    '/sandboxes'
+  end
+
+  def timed_out
+    'timed_out'
+  end
 
   module_function
 
@@ -304,14 +314,27 @@ module DockerRunnerMixIn
 
   # - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def success; shell.success; end
-  def space; ' '; end
+  def success
+    shell.success
+  end
+
+  def space
+    ' '
+  end
 
   include NearestAncestors
 
-  def shell; nearest_ancestors(:shell); end
-  def  disk; nearest_ancestors(:disk ); end
-  def   log; nearest_ancestors(:log  ); end
+  def shell
+    nearest_ancestors(:shell)
+  end
+
+  def disk
+    nearest_ancestors(:disk)
+  end
+
+  def log
+    nearest_ancestors(:log)
+  end
 
 end
 
