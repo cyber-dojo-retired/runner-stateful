@@ -1,4 +1,5 @@
 require_relative 'docker_runner_mix_in'
+require 'securerandom'
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Uses a new short-lived docker container per run().
@@ -114,9 +115,11 @@ class SharedVolumeRunner
 
     dir = avatar_dir(avatar_name)
     home = home_dir(avatar_name)
+    name = "test_run__runner_stateful_#{kata_id}_#{avatar_name}_#{uuid}"
     args = [
       '--detach',                          # get the cid
       '--interactive',                     # for later execs
+      "--name=#{name}",                    # for easy clean up
       '--net=none',                        # for security
       '--pids-limit=64',                   # no fork bombs
       '--security-opt=no-new-privileges',  # no escalation
@@ -134,6 +137,10 @@ class SharedVolumeRunner
     cid = stdout.strip
     add_user_and_group(cid, avatar_name)
     cid
+  end
+
+  def uuid
+    SecureRandom.hex[0..10].upcase
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
