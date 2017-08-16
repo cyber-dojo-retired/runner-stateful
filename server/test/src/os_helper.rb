@@ -7,17 +7,17 @@ module OsHelper
   include AllAvatarsNames
 
   def kata_id_env_vars_test
-    printenv_cmd = 'printenv CYBER_DOJO_KATA_ID'
-    env_kata_id = assert_cyber_dojo_sh(printenv_cmd).strip
-    assert_equal kata_id, env_kata_id
+    env = {}
+    cmd = 'printenv CYBER_DOJO_KATA_ID'
+    env[:kata_id] = assert_cyber_dojo_sh(cmd).strip
+    cmd = 'printenv CYBER_DOJO_AVATAR_NAME'
+    env[:avatar_name] = assert_cyber_dojo_sh(cmd).strip
+    cmd = 'printenv CYBER_DOJO_SANDBOX'
+    env[:sandbox] = assert_cyber_dojo_sh(cmd).strip
 
-    printenv_cmd = 'printenv CYBER_DOJO_AVATAR_NAME'
-    env_avatar_name = assert_cyber_dojo_sh(printenv_cmd).strip
-    assert_equal avatar_name, env_avatar_name
-
-    printenv_cmd = 'printenv CYBER_DOJO_SANDBOX'
-    env_sandbox = assert_cyber_dojo_sh(printenv_cmd).strip
-    assert_equal sandbox, env_sandbox
+    assert_equal kata_id,     env[:kata_id]
+    assert_equal avatar_name, env[:avatar_name]
+    assert_equal sandbox,     env[:sandbox]
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -54,24 +54,19 @@ module OsHelper
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def avatar_new_sandbox_setup_test
-    # sandbox exists
-    assert_cyber_dojo_sh "[ -d #{sandbox} ]"
+    assert_cyber_dojo_sh "[ -d #{sandbox} ]" # sandbox exists
 
-    # sandbox is not empty
     ls = assert_cyber_dojo_sh "ls -A #{sandbox}"
-    refute_equal '', ls
+    refute_equal '', ls # sandbox is not empty
 
-    # sandbox's is owned by avatar
-    stat_user = assert_cyber_dojo_sh("stat -c '%u' #{sandbox}").strip.to_i
-    assert_equal user_id, stat_user
+    stat = {}
+    stat[:user_id] = assert_cyber_dojo_sh("stat -c '%u' #{sandbox}").strip.to_i
+    stat[:gid]     = assert_cyber_dojo_sh("stat -c '%g' #{sandbox}").strip.to_i
+    stat[:perms]   = assert_cyber_dojo_sh("stat -c '%A' #{sandbox}").strip
 
-    # sandbox's group is set
-    stat_gid = assert_cyber_dojo_sh("stat -c '%g' #{sandbox}").strip.to_i
-    assert_equal gid, stat_gid
-
-    # sandbox's permissions are set
-    stat_perms = assert_cyber_dojo_sh("stat -c '%A' #{sandbox}").strip
-    assert_equal 'drwxr-xr-x', stat_perms
+    assert_equal user_id,      stat[:user_id]
+    assert_equal gid,          stat[:gid]
+    assert_equal 'drwxr-xr-x', stat[:perms]
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
