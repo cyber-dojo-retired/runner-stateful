@@ -38,7 +38,7 @@ module OsHelper
       gid:entries[2].to_i
     }
     assert_equal group, ent[:group], stdout
-    assert_equal gid, ent[:gid], stdout
+    assert_equal gid,   ent[:gid],   stdout
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
