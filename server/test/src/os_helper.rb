@@ -190,8 +190,7 @@ module OsHelper
 
   def ulimit_test
     lines = assert_cyber_dojo_sh('ulimit -a').split("\n")
-    max =  64 if runner.class.name == 'SharedVolumeRunner'
-    max = 128 if runner.class.name == 'SharedContainerRunner'
+    max = 128
     assert_equal max, ulimit(lines, :max_processes)
     assert_equal   0, ulimit(lines, :max_core_size)
     assert_equal max, ulimit(lines, :max_no_files)
