@@ -10,10 +10,12 @@
 
 readonly ZOMBIE_CONTAINERS=$(docker ps --all --filter "name=test_run__runner_stateful_" --format "{{.Names}}")
 if [ "${ZOMBIE_CONTAINERS}" != "" ]; then
+  echo "zombie containers being removed..."
   docker rm --force --volumes ${ZOMBIE_CONTAINERS}
 fi
 
-readonly ZOMBIE_VOLUMES=$(docker volume ls --quiet --filter "name=cyber_dojo_kata_value_runner_")
+readonly ZOMBIE_VOLUMES=$(docker volume ls --quiet --filter "name=cyber_dojo_kata_volume_runner_")
 if [ "${ZOMBIE_VOLUMES}" != "" ]; then
+  echo "zombie volumes being removed..."
   docker volume rm --force ${ZOMBIE_VOLUMES}
 fi
