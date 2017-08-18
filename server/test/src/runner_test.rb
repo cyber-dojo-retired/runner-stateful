@@ -6,9 +6,8 @@ class RunnerTest < TestBase
 
   # - - - - - - - - - - - - - - - - -
 
-  test 'A53', %w(
-  runner with invalid image_name raises
-  ) do
+  test 'A53',
+  %w( runner with invalid image_name raises ) do
     invalid_image_names.each do |invalid_image_name|
       error = assert_raises(ArgumentError) {
         new_runner(invalid_image_name, '78307B424B')
@@ -19,9 +18,8 @@ class RunnerTest < TestBase
 
   # - - - - - - - - - - - - - - - - -
 
-  test '6FD', %w(
-  runner with invalid kata_id raises
-  ) do
+  test '6FD',
+  %w( runner with invalid kata_id raises ) do
     invalid_kata_ids.each do |invalid_kata_id|
       error = assert_raises(ArgumentError) {
         new_runner('cdf/gcc_assert', invalid_kata_id)
@@ -32,17 +30,15 @@ class RunnerTest < TestBase
 
   # - - - - - - - - - - - - - - - - -
 
-  test 'D01', %w(
-  runner with valid image_name and valid kata_id does not raise
-  ) do
+  test 'D01',
+  %w( runner with valid image_name and valid kata_id does not raise ) do
     new_runner('cdf/gcc_assert', kata_id)
   end
 
   # - - - - - - - - - - - - - - - - -
 
-  test 'D02', %w(
-  default runner is SharedVolumeRunner
-  ) do
+  test 'D02',
+  %w( default runner is SharedVolumeRunner ) do
     assert_runner_class 'cdf/gcc_assert', 'SharedVolumeRunner'
     assert_runner_class 'cdf/gcc_assert:1.2', 'SharedVolumeRunner'
     assert_runner_class 'quay.io:8080/cdf/gcc_assert:latest', 'SharedVolumeRunner'

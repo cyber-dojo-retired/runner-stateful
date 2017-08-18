@@ -2,7 +2,9 @@ require_relative 'test_base'
 
 class RunTest < TestBase
 
-  def self.hex_prefix; '58410'; end
+  def self.hex_prefix
+    '58410'
+  end
 
   def hex_setup
     set_image_name "#{cdf}/gcc_assert"
@@ -13,13 +15,13 @@ class RunTest < TestBase
   test '8A9',
   %w( run returns red-amber-green traffic-light colour ) do
     in_kata {
-      avatar_new
-      begin
-        sss_run( { kata_id:kata_id })
+      as_avatar('lion') {
+        sss_run({
+          avatar_name:'lion',
+              kata_id:kata_id
+        })
         assert_colour 'red'
-      ensure
-        avatar_old
-      end
+      }
     }
   end
 
@@ -28,18 +30,18 @@ class RunTest < TestBase
   test 'B82',
   %w( files can be in sub-dirs of sandbox ) do
     in_kata {
-      avatar_new
-      begin
-        sss_run( { changed_files: {
-          'cyber-dojo.sh' => ls_cmd,
-          'a/hello.txt' => 'hello world'
-        }})
+      as_avatar('salmon') {
+        sss_run({
+          changed_files: {
+            'cyber-dojo.sh' => ls_cmd,
+            'a/hello.txt'   => 'hello world'
+          }
+        })
         ls_files = ls_parse(stdout)
-        salmon_uid = runner.user_id('salmon')
-        assert_equal_atts('a', 'drwxr-xr-x', salmon_uid, runner.group, 4096, ls_files)
-      ensure
-        avatar_old
-      end
+        uid = runner.user_id('salmon')
+        gid = runner.group
+        assert_equal_atts('a', 'drwxr-xr-x', uid, gid, 4096, ls_files)
+      }
     }
   end
 
@@ -48,7 +50,7 @@ class RunTest < TestBase
   test '12B',
   %w( files in sub-dirs of sandbox can be deleted ) do
     in_kata {
-      as('salmon') {
+      as_avatar('salmon') {
         sss_run({
           changed_files: {
             'cyber-dojo.sh' => "cd a && #{ls_cmd}",
@@ -57,7 +59,8 @@ class RunTest < TestBase
         })
         ls_files = ls_parse(stdout)
         uid = runner.user_id('salmon')
-        assert_equal_atts('hello.txt', '-rw-r--r--', uid, runner.group, 11, ls_files)
+        gid = runner.group
+        assert_equal_atts('hello.txt', '-rw-r--r--', uid, gid, 11, ls_files)
 
         sss_run({
           deleted_filenames: [ 'a/hello.txt' ],

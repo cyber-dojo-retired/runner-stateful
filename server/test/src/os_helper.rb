@@ -76,18 +76,21 @@ module OsHelper
     # has setup a salmon. So I create a new avatar with
     # known ls-starting-files. Note that kata_teardown
     # calls avatar_old('salmon')
-    as('lion', ls_starting_files) {
-      sss_run({ avatar_name:'lion', changed_files:{} })
+    as_avatar('lion', ls_starting_files) {
+      sss_run({
+          avatar_name:'lion',
+        changed_files:{}
+      })
       assert_equal success, status
       assert_equal '', stderr
       ls_stdout = stdout
       ls_files = ls_parse(ls_stdout)
       assert_equal ls_starting_files.keys.sort, ls_files.keys.sort
-      lion_uid = user_id('lion')
-      assert_equal_atts('empty.txt',     '-rw-r--r--', lion_uid, group,  0, ls_files)
-      assert_equal_atts('cyber-dojo.sh', '-rw-r--r--', lion_uid, group, 29, ls_files)
-      assert_equal_atts('hello.txt',     '-rw-r--r--', lion_uid, group, 11, ls_files)
-      assert_equal_atts('hello.sh',      '-rw-r--r--', lion_uid, group, 16, ls_files)
+      uid = user_id('lion')
+      assert_equal_atts('empty.txt',     '-rw-r--r--', uid, group,  0, ls_files)
+      assert_equal_atts('cyber-dojo.sh', '-rw-r--r--', uid, group, 29, ls_files)
+      assert_equal_atts('hello.txt',     '-rw-r--r--', uid, group, 11, ls_files)
+      assert_equal_atts('hello.sh',      '-rw-r--r--', uid, group, 16, ls_files)
     }
   end
 
@@ -201,6 +204,8 @@ module OsHelper
     assert_equal   0, ulimit(lines, :max_core_size)
     assert_equal max, ulimit(lines, :max_no_files)
   end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def ulimit(lines, key)
     table = {             # alpine,                       ubuntu

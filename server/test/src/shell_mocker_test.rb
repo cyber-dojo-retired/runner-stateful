@@ -3,13 +3,15 @@ require_relative 'shell_mocker'
 
 class ShellMockerTest < TestBase
 
-  def self.hex_prefix; 'F03'; end
+  def self.hex_prefix
+    'F03'
+  end
 
   # - - - - - - - - - - - - - - -
 
-  test 'B51', %w(
-  MockSheller ctor only sets mocks=[]
-    when file does not already exist
+  test 'B51',
+  %w( when file does not already exist
+      MockSheller ctor only sets mocks=[]
   ) do
     # has to work when it is "re-created" in different threads
     shell_1 = ShellMocker.new(nil)
@@ -26,10 +28,10 @@ class ShellMockerTest < TestBase
 
   # - - - - - - - - - - - - - - -
 
-  test '4A5', %w(
-  teardown does not raise
-    when no mock_exec's are setup
+  test '4A5',
+  %w( when no mock_exec's are setup
       and no exec's are made
+      teardown does not raise
   ) do
     shell = ShellMocker.new(nil)
     shell.teardown
@@ -37,10 +39,10 @@ class ShellMockerTest < TestBase
 
   # - - - - - - - - - - - - - - -
 
-  test '652', %w(
-  exec(command) raises
-    when an exec is made
+  test '652',
+  %w( when an exec is made
       and there are no mock_exec's
+      exec(command) raises
   ) do
     shell = ShellMocker.new(nil)
     assert_raises { shell.exec(pwd) }
@@ -48,9 +50,9 @@ class ShellMockerTest < TestBase
 
   # - - - - - - - - - - - - - - -
 
-  test '181', %w(
-  exec(command) raises
-    when mock_exec is for a different command
+  test '181',
+  %w( when mock_exec is for a different command
+      exec(command) raises
   ) do
     shell = ShellMocker.new(nil)
     shell.mock_exec(pwd, wd, stderr='', success)
@@ -59,10 +61,10 @@ class ShellMockerTest < TestBase
 
   # - - - - - - - - - - - - - - -
 
-  test 'B4E', %w(
-  teardown does not raise
-    when one mock_exec is setup
+  test 'B4E',
+  %w( when one mock_exec is setup
       and a matching exec is made
+      teardown does not raise
   ) do
     shell = ShellMocker.new(nil)
     shell.mock_exec(pwd, wd, stderr='', success)
@@ -75,10 +77,10 @@ class ShellMockerTest < TestBase
 
   # - - - - - - - - - - - - - - -
 
-  test 'D0C', %w(
-  teardown raises
-    when one mock_exec setup
+  test 'D0C',
+  %w( when one mock_exec setup
       and no calls are made
+      teardown raises
   ) do
     shell = ShellMocker.new(nil)
     shell.mock_exec(pwd, wd, stderr='', success)
@@ -87,9 +89,9 @@ class ShellMockerTest < TestBase
 
   # - - - - - - - - - - - - - - -
 
-  test '470', %w(
-  teardown does not raise
-    if there is an uncaught exception
+  test '470',
+  %w( when there is an uncaught exception
+      teardown does not raise
   ) do
     shell = ShellMocker.new(nil)
     shell.mock_exec(pwd, wd, stderr='', success)
@@ -105,9 +107,9 @@ class ShellMockerTest < TestBase
 
   # - - - - - - - - - - - - - - -
 
-  test '4FF', %w(
-  assert_exec raises
-    when status is non-zero
+  test '4FF',
+  %w( when status is non-zero
+      assert_exec raises
   ) do
     shell = ShellMocker.new(nil)
     shell.mock_exec('false', '', '', 1)
@@ -117,19 +119,24 @@ class ShellMockerTest < TestBase
 
   # - - - - - - - - - - - - - - -
 
-  test '3BE', %w(
-  success has a value of zero
-  ) do
+  test '3BE',
+  %w( success has a value of zero ) do
     shell = ShellMocker.new(nil)
     assert_equal 0, shell.success
   end
 
-  # - - - - - - - - - - - - - - -
-
   private
 
-  def pwd; 'pwd'; end
-  def wd; '/Users/jonjagger/repos/web'; end
-  def success; 0; end
+  def pwd
+    'pwd'
+  end
+
+  def wd
+    '/Users/jonjagger/repos/web'
+  end
+
+  def success
+    0
+  end
 
 end

@@ -245,15 +245,11 @@ class TestBase < HexMiniTest
     kata_old
   end
 
-  def as(avatar_name, starting_files=nil)
-    if starting_files == nil
-      avatar_new(avatar_name)
-    else
-      avatar_new(avatar_name, starting_files)
-    end
+  def as_avatar(name, starting_files=files)
+    avatar_new(name, starting_files)
     yield
   ensure
-    avatar_old(avatar_name)
+    avatar_old(name)
   end
 
 end

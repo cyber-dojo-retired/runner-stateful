@@ -37,7 +37,7 @@ class FileBombTest < TestBase
       '  return 6 * 7;',
       '}'
     ].join("\n")
-    as('lion') {
+    as_avatar('lion') {
       sss_run({
           avatar_name:'lion',
         changed_files:{ 'hiker.c' => hiker_c }

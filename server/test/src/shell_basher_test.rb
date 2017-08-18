@@ -3,7 +3,9 @@ require_relative '../../src/logger_spy'
 
 class ShellBasherTest < TestBase
 
-  def self.hex_prefix; 'C89'; end
+  def self.hex_prefix
+    'C89'
+  end
 
   def hex_setup
     @log = LoggerSpy.new(self)
@@ -14,7 +16,7 @@ class ShellBasherTest < TestBase
   # - - - - - - - - - - - - - - - - -
 
   test '14B',
-  'assert_exec(cmd) logs and raises when command fails' do
+  %w( assert_exec(cmd) logs and raises when command fails ) do
     error = assert_raises(ArgumentError) {
       shell.assert_exec('false')
     }
@@ -45,7 +47,7 @@ class ShellBasherTest < TestBase
   # - - - - - - - - - - - - - - - - -
 
   test 'DBB',
-  'exec(cmd) succeeds with output, no logging' do
+  %w( exec(cmd) succeeds with output, no logging ) do
     shell_exec('echo Hello')
     assert_status 0
     assert_stdout "Hello\n"
@@ -56,7 +58,7 @@ class ShellBasherTest < TestBase
   # - - - - - - - - - - - - - - - - -
 
   test '490',
-  'exec(cmd) failure (no output) is logged' do
+  %w( exec(cmd) failure (no output) is logged ) do
     shell_exec('false')
     assert_status 1
     assert_stdout ''
@@ -73,7 +75,7 @@ class ShellBasherTest < TestBase
   # - - - - - - - - - - - - - - - - -
 
   test '46B',
-  'exec(cmd) failure (with output) is logged' do
+  %w( exec(cmd) failure (with output) is logged ) do
     shell_exec('sed salmon')
     assert_status 1
     assert_stdout ''
@@ -101,7 +103,7 @@ class ShellBasherTest < TestBase
   # - - - - - - - - - - - - - - - - -
 
   test 'AF6',
-  'exec(cmd) raises with verbose output' do
+  %w( exec(cmd) raises with verbose output ) do
     # some commands fail with simple non-zero exit status...
     # some commands fail with an exception...
     error = assert_raises { shell_exec('zzzz') }
