@@ -29,16 +29,20 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def avatar_exists?(avatar_name = 'salmon')
+  def avatar_exists?(avatar_name = default_avatar_name)
     runner.avatar_exists?(avatar_name)
   end
 
-  def avatar_new(avatar_name = 'salmon', the_files = files)
+  def avatar_new(avatar_name = default_avatar_name, the_files = files)
     runner.avatar_new(avatar_name, the_files)
   end
 
-  def avatar_old(avatar_name = 'salmon')
+  def avatar_old(avatar_name = default_avatar_name)
     runner.avatar_old(avatar_name)
+  end
+
+  def default_avatar_name
+    'salmon'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -46,7 +50,7 @@ class TestBase < HexMiniTest
   def sss_run(named_args = {})
     # don't name this run() as it clashes with MiniTest
     args = []
-    args << defaulted_arg(named_args, :avatar_name, 'salmon')
+    args << defaulted_arg(named_args, :avatar_name, default_avatar_name)
     args << defaulted_arg(named_args, :deleted_filenames, [])
     args << defaulted_arg(named_args, :changed_files, files)
     args << defaulted_arg(named_args, :max_seconds, 10)
@@ -203,7 +207,7 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def ls_cmd;
+  def ls_cmd
     # Works on Ubuntu and Alpine
     'stat -c "%n %A %u %G %s %z" *'
     # hiker.h  -rw-r--r--  40045  cyber-dojo 136  2016-06-05 07:03:14.000000000
@@ -232,6 +236,24 @@ class TestBase < HexMiniTest
     assert_equal group, atts[:group], { filename => atts }
     assert_equal size,  atts[:size ], { filename => atts }
     assert_equal permissions, atts[:permissions], { filename => atts }
+  end
+
+  def in_kata
+    kata_new
+    yield
+  ensure
+    kata_old
+  end
+
+  def as(avatar_name, starting_files=nil)
+    if starting_files == nil
+      avatar_new(avatar_name)
+    else
+      avatar_new(avatar_name, starting_files)
+    end
+    yield
+  ensure
+    avatar_old(avatar_name)
   end
 
 end

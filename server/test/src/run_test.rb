@@ -10,90 +10,79 @@ class RunTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '8A9', %w(
-  run returns red-amber-green traffic-light colour
-  ) do
-    kata_new
-    avatar_new
-    begin
-      sss_run( { kata_id:kata_id })
-      assert_colour 'red'
-    ensure
-      avatar_old
-      kata_old
-    end
+  test '8A9',
+  %w( run returns red-amber-green traffic-light colour ) do
+    in_kata {
+      avatar_new
+      begin
+        sss_run( { kata_id:kata_id })
+        assert_colour 'red'
+      ensure
+        avatar_old
+      end
+    }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test 'B82', %w(
-    files can be in sub-dirs of sandbox
-  ) do
-    kata_new
-    avatar_new
-    begin
-      sss_run( { changed_files: {
-        'cyber-dojo.sh' => ls_cmd,
-        'a/hello.txt' => 'hello world'
-      }})
-      ls_files = ls_parse(stdout)
-      salmon_uid = runner.user_id('salmon')
-      assert_equal_atts('a', 'drwxr-xr-x', salmon_uid, runner.group, 4096, ls_files)
-    ensure
-      avatar_old
-      kata_old
-    end
+  test 'B82',
+  %w( files can be in sub-dirs of sandbox ) do
+    in_kata {
+      avatar_new
+      begin
+        sss_run( { changed_files: {
+          'cyber-dojo.sh' => ls_cmd,
+          'a/hello.txt' => 'hello world'
+        }})
+        ls_files = ls_parse(stdout)
+        salmon_uid = runner.user_id('salmon')
+        assert_equal_atts('a', 'drwxr-xr-x', salmon_uid, runner.group, 4096, ls_files)
+      ensure
+        avatar_old
+      end
+    }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '12B', %w(
-    files in sub-dirs of sandbox can be deleted
-  ) do
-    kata_new
-    avatar_new
-    begin
-      sss_run( { changed_files: {
-        'cyber-dojo.sh' => "cd a && #{ls_cmd}",
-        'a/hello.txt' => 'hello world'
-      }})
-      ls_files = ls_parse(stdout)
-      salmon_uid = runner.user_id('salmon')
-      assert_equal_atts('hello.txt', '-rw-r--r--', salmon_uid, runner.group, 11, ls_files)
+  test '12B',
+  %w( files in sub-dirs of sandbox can be deleted ) do
+    in_kata {
+      as('salmon') {
+        sss_run({
+          changed_files: {
+            'cyber-dojo.sh' => "cd a && #{ls_cmd}",
+            'a/hello.txt'   => 'hello world'
+          }
+        })
+        ls_files = ls_parse(stdout)
+        uid = runner.user_id('salmon')
+        assert_equal_atts('hello.txt', '-rw-r--r--', uid, runner.group, 11, ls_files)
 
-      sss_run( { deleted_filenames: [ 'a/hello.txt' ],
-                 changed_files: {}
-      })
-      assert_equal '', stdout
-    ensure
-      avatar_old
-      kata_old
-    end
+        sss_run({
+          deleted_filenames: [ 'a/hello.txt' ],
+              changed_files: {}
+        })
+        assert_equal '', stdout
+      }
+    }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '1DC', %w(
-  run with valid kata_id that does not exist
-    raises
-  ) do
+  test '1DC',
+  %w( run with valid kata_id that does not exist raises ) do
     kata_id = '0C67EC0416'
     assert_raises_kata_id(kata_id, '!exists')
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '7FE', %w(
-  run with kata_id that exists
-    but invalid avatar_name
-      raises
-  ) do
-    kata_new
-    begin
+  test '7FE',
+  %w( run with kata_id that exists but invalid avatar_name raises ) do
+    in_kata {
       assert_raises_avatar_name(kata_id, 'scissors', 'invalid')
-    ensure
-      kata_old
-    end
+    }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -103,19 +92,16 @@ class RunTest < TestBase
     and valid avatar_name that does not exist yet
       raises
   ) do
-    kata_new
-    begin
+    in_kata {
       assert_raises_avatar_name(kata_id, 'salmon', '!exists')
-    ensure
-      kata_old
-    end
+    }
   end
 
   private
 
   def assert_raises_kata_id(kata_id, message)
     error = assert_raises(ArgumentError) {
-      sss_run( { kata_id:kata_id })
+      sss_run({ kata_id:kata_id })
     }
     assert_equal "kata_id:#{message}", error.message
   end
@@ -124,7 +110,7 @@ class RunTest < TestBase
 
   def assert_raises_avatar_name(kata_id, avatar_name, message)
     error = assert_raises(ArgumentError) {
-      sss_run( {
+      sss_run({
             kata_id:kata_id,
         avatar_name:avatar_name
       })

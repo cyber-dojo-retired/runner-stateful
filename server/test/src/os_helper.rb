@@ -76,8 +76,7 @@ module OsHelper
     # has setup a salmon. So I create a new avatar with
     # known ls-starting-files. Note that kata_teardown
     # calls avatar_old('salmon')
-    avatar_new('lion', ls_starting_files)
-    begin
+    as('lion', ls_starting_files) {
       sss_run({ avatar_name:'lion', changed_files:{} })
       assert_equal success, status
       assert_equal '', stderr
@@ -89,9 +88,7 @@ module OsHelper
       assert_equal_atts('cyber-dojo.sh', '-rw-r--r--', lion_uid, group, 29, ls_files)
       assert_equal_atts('hello.txt',     '-rw-r--r--', lion_uid, group, 11, ls_files)
       assert_equal_atts('hello.sh',      '-rw-r--r--', lion_uid, group, 16, ls_files)
-    ensure
-      avatar_old('lion')
-    end
+    }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -114,7 +111,7 @@ module OsHelper
 
     deleted_filenames = ['hello.txt']
     named_args = {
-      changed_files:{},
+          changed_files:{},
       deleted_filenames:deleted_filenames
     }
     ls_stdout = assert_run_succeeds(named_args)
@@ -123,7 +120,9 @@ module OsHelper
 
     actual_deleted_filenames = before_filenames - after_filenames
     assert_equal deleted_filenames, actual_deleted_filenames
-    after.each { |filename, attr| assert_equal before[filename], attr }
+    after.each { |filename, attr|
+      assert_equal before[filename], attr
+    }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -136,7 +135,9 @@ module OsHelper
 
     new_filename = 'fizz_buzz.h'
     new_file_content = '#ifndef...'
-    named_args = { changed_files:{ new_filename => new_file_content } }
+    named_args = {
+      changed_files:{ new_filename => new_file_content }
+    }
     ls_stdout = assert_run_succeeds(named_args)
     after = ls_parse(ls_stdout)
     after_filenames = after.keys
@@ -148,13 +149,17 @@ module OsHelper
     assert_equal user_id,      attr[:user]
     assert_equal group,        attr[:group]
     assert_equal new_file_content.size, attr[:size]
-    before.each { |filename, attr| assert_equal after[filename], attr }
+    before.each { |filename, attr|
+      assert_equal after[filename], attr
+    }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def changed_file_test
-    named_args = { changed_files:ls_starting_files }
+    named_args = {
+      changed_files:ls_starting_files
+    }
     ls_stdout = assert_run_succeeds(named_args)
     before = ls_parse(ls_stdout)
 
@@ -162,14 +167,18 @@ module OsHelper
 
     hello_txt = ls_starting_files['hello.txt']
     extra = "\ngreetings"
-    named_args = { changed_files:{ 'hello.txt' => hello_txt + extra } }
+    named_args = {
+      changed_files:{ 'hello.txt' => hello_txt + extra }
+    }
     ls_stdout = assert_run_succeeds(named_args)
     after = ls_parse(ls_stdout)
 
     assert_equal before.keys, after.keys
     before.each do |filename, was_attr|
       now_attr = after[filename]
-      same = lambda { |sym| assert_equal was_attr[sym], now_attr[sym] }
+      same = lambda { |sym|
+        assert_equal was_attr[sym], now_attr[sym]
+      }
       same.call(:permissions)
       same.call(:user)
       same.call(:group)
