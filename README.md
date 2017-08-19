@@ -30,7 +30,7 @@ speed/sharing/security tradeoffs. They use the same tests.
 
 - - - -
 
-# image_pulled?
+# GET image_pulled?
 Asks whether the image with the given image_name has been pulled.
 - parameters, eg
 ```
@@ -44,8 +44,8 @@ Asks whether the image with the given image_name has been pulled.
   { "image_pulled?": false }
 ```
 
-# image_pull
-Pull the image with the given image_name.
+# POST image_pull
+Pulls the image with the given image_name.
 - parameters, eg
 ```
   { "image_name": "cyberdojofoundation/gcc_assert",
@@ -60,7 +60,7 @@ Pull the image with the given image_name.
 
 - - - -
 
-# kata_exists?
+# GET kata_exists?
 Asks whether the kata with the given kata_id exists.
 - parameters, eg
 ```
@@ -74,8 +74,8 @@ Asks whether the kata with the given kata_id exists.
   { "kata_exists?": false }
 ```
 
-# kata_new
-The kata with the given kata_id has been set up.
+# POST kata_new
+Sets up the kata with the given kata_id.
 Must be called once before any call to avatar_new with the same kata_id.
 - parameters, eg
 ```
@@ -84,8 +84,8 @@ Must be called once before any call to avatar_new with the same kata_id.
   }
 ```
 
-# kata_old
-The kata with the given kata_id has been torn down.
+# POST kata_old
+Tears down the kata with the given kata_id.
 - parameters, eg
 ```
   { "image_name": "cyberdojofoundation/gcc_assert",
@@ -95,7 +95,7 @@ The kata with the given kata_id has been torn down.
 
 - - - -
 
-# avatar_exists?
+# GET avatar_exists?
 Asks whether the avatar with the given avatar_name
 has entered the kata with the given kata_id.
 - parameters, eg
@@ -111,9 +111,9 @@ has entered the kata with the given kata_id.
   { "avatar_exists?": false }
 ```
 
-# avatar_new
-The avatar with the given avatar_name has entered the
-kata with the given kata with the given starting files.
+# POST avatar_new
+Sets up the avatar with the given avatar_name, in the
+kata with the given kata_id_, with the given starting files.
 Must be called once before any call to run with the same
 kata_id and avatar_name.
 - parameters, eg
@@ -128,9 +128,9 @@ kata_id and avatar_name.
   }
 ```
 
-# avatar_old
-The avatar with the given avatar_name has left
-the kata with the given kata_id.
+# POST avatar_old
+Tears down the avatar with the given avatar_name,
+in the kata with the given kata_id.
 - parameters, eg
 ```
   {  "image_name": "cyberdojofoundation/gcc_assert",
@@ -141,7 +141,7 @@ the kata with the given kata_id.
 
 - - - -
 
-# run
+# POST run
 For the avatar with the given avatar_name, in the kata with the given kata_id,
 removes the deleted_filenames, saves changed_files, runs cyber-dojo.sh
 Calls to run must be preceeded by one call to kata_new with the same kata_id,
