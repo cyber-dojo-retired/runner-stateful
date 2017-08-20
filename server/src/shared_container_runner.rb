@@ -224,7 +224,7 @@ class SharedContainerRunner
 
   def etc_issue
     @ss ||= assert_docker_exec('cat /etc/issue')
-    @ss[stdout=0]
+    @ss[0] # 0==stdout
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
