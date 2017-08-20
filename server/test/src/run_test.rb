@@ -39,8 +39,8 @@ class RunTest < TestBase
         })
         ls_files = ls_parse(stdout)
         uid = runner.user_id('salmon')
-        gid = runner.group
-        assert_equal_atts('a', 'drwxr-xr-x', uid, gid, 4096, ls_files)
+        group = runner.group
+        assert_equal_atts('a', 'drwxr-xr-x', uid, group, 4096, ls_files)
       }
     }
   end
@@ -59,8 +59,8 @@ class RunTest < TestBase
         })
         ls_files = ls_parse(stdout)
         uid = runner.user_id('salmon')
-        gid = runner.group
-        assert_equal_atts('hello.txt', '-rw-r--r--', uid, gid, 11, ls_files)
+        group = runner.group
+        assert_equal_atts('hello.txt', '-rw-r--r--', uid, group, 11, ls_files)
 
         sss_run({
           deleted_filenames: [ 'a/hello.txt' ],
