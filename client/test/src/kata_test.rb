@@ -4,6 +4,15 @@ class KataTest < TestBase
 
   def self.hex_prefix; 'D2E7E'; end
 
+  test 'D87',
+  %w( kata_exists ) do
+    refute kata_exists?
+    kata_new
+    assert kata_exists?
+    kata_old
+    refute kata_exists?
+  end
+
   # - - - - - - - - - - - - - - - - - - - - - - - -
   # negative test cases: kata_new
   # - - - - - - - - - - - - - - - - - - - - - - - -
