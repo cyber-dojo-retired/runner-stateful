@@ -194,7 +194,9 @@ module DockerRunnerMixIn
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def write_files(cid, avatar_name, files)
-    return if files == {}
+    if files == {}
+      return
+    end
     Dir.mktmpdir('runner') do |tmp_dir|
       files.each do |pathed_filename, content|
         src_dir = tmp_dir + '/' + File.dirname(pathed_filename)
