@@ -54,7 +54,13 @@ class RunnerService
   private
 
   include HttpService
-  def hostname; 'runner'; end
-  def port; '4557'; end
+
+  def hostname
+    'runner'
+  end
+
+  def port
+    '4557'
+  end
 
 end

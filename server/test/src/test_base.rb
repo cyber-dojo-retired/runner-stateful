@@ -18,14 +18,27 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def image_pulled?; runner.image_pulled?; end
-  def image_pull;    runner.image_pull   ; end
+  def image_pulled?
+    runner.image_pulled?
+  end
+
+  def image_pull
+    runner.image_pull
+  end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def kata_exists?; runner.kata_exists?; end
-  def kata_new    ; runner.kata_new    ; end
-  def kata_old    ; runner.kata_old    ; end
+  def kata_exists?
+    runner.kata_exists?
+  end
+
+  def kata_new
+    runner.kata_new
+  end
+
+  def kata_old
+    runner.kata_old
+  end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -64,30 +77,70 @@ class TestBase < HexMiniTest
     named_args.key?(arg_name) ? named_args[arg_name] : arg_default
   end
 
-  def set_image_name(image_name); @image_name = image_name; end
-  def image_name; @image_name; end
-  def kata_id; hex_test_id + '0' * (10-hex_test_id.length); end
-  def avatar_name; 'salmon'; end
+  def set_image_name(image_name)
+    @image_name = image_name
+  end
+
+  def image_name
+    @image_name
+  end
+
+  def kata_id
+    hex_test_id + '0' * (10-hex_test_id.length)
+  end
+
+  def avatar_name
+    'salmon'
+  end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   include Externals
   include Runner
 
-  def sss; @sss; end
+  def sss
+    @sss
+  end
 
-  def stdout; sss[:stdout]; end
-  def stderr; sss[:stderr]; end
-  def status; sss[:status]; end
-  def colour; sss[:colour]; end
+  def stdout
+    sss[:stdout]
+  end
 
-  def assert_stdout(expected); assert_equal expected, stdout, sss; end
-  def assert_stderr(expected); assert_equal expected, stderr, sss; end
-  def assert_status(expected); assert_equal expected, status, sss; end
-  def assert_colour(expected); assert_equal expected, colour, sss; end
+  def stderr
+    sss[:stderr]
+  end
 
-  def assert_stdout_include(text); assert stdout.include?(text), sss; end
-  def assert_stderr_include(text); assert stderr.include?(text), sss; end
+  def status
+    sss[:status]
+  end
+
+  def colour
+    sss[:colour]
+  end
+
+  def assert_stdout(expected)
+    assert_equal expected, stdout, sss
+  end
+
+  def assert_stderr(expected)
+    assert_equal expected, stderr, sss
+  end
+
+  def assert_status(expected)
+    assert_equal expected, status, sss
+  end
+
+  def assert_colour(expected)
+    assert_equal expected, colour, sss
+  end
+
+  def assert_stdout_include(text)
+    assert stdout.include?(text), sss
+  end
+
+  def assert_stderr_include(text)
+    assert stderr.include?(text), sss
+  end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -143,12 +196,29 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def user_id(name = 'salmon'); runner.user_id(name); end
-  def group; runner.group; end
-  def gid; runner.gid; end
-  def sandbox(name = 'salmon'); runner.avatar_dir(name); end
-  def success; shell.success; end
-  def timed_out; runner.timed_out; end
+  def user_id(avatar_name='salmon')
+    runner.user_id(avatar_name)
+  end
+
+  def group
+    runner.group
+  end
+
+  def gid
+    runner.gid
+  end
+
+  def sandbox(avatar_name='salmon')
+    runner.avatar_dir(avatar_name)
+  end
+
+  def success
+    shell.success
+  end
+
+  def timed_out
+    runner.timed_out
+  end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -216,6 +286,8 @@ class TestBase < HexMiniTest
     # 0        1           2      3          4    5          6
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   def ls_parse(ls_stdout)
     Hash[ls_stdout.split("\n").collect { |line|
       attr = line.split
@@ -229,6 +301,8 @@ class TestBase < HexMiniTest
     }]
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   def assert_equal_atts(filename, permissions, user, group, size, ls_files)
     atts = ls_files[filename]
     refute_nil atts, filename
@@ -238,12 +312,16 @@ class TestBase < HexMiniTest
     assert_equal permissions, atts[:permissions], { filename => atts }
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   def in_kata
     kata_new
     yield
   ensure
     kata_old
   end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def as_avatar(name, starting_files=files)
     avatar_new(name, starting_files)
