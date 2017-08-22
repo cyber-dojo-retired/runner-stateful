@@ -1,7 +1,7 @@
 require 'json'
 require 'net/http'
 
-module HttpService # mix-in
+module HttpJsonService # mix-in
 
   def get(method, *args)
     name = method.to_s
