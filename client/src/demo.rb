@@ -55,7 +55,7 @@ class Demo < Sinatra::Base
   end
 
   def read(filename)
-    IO.read("/app/start_files/gcc_assert/#{filename}")
+    IO.read("/app/test/start_files/gcc_assert/#{filename}")
   end
 
   def timed
