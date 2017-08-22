@@ -16,34 +16,49 @@ class Demo < Sinatra::Base
     sss = nil
     html = '<div style="font-size:0.5em">'
 
-    runner.kata_new(image_name, kata_id)
-    runner.avatar_new(image_name, kata_id, avatar_name, files)
+    duration = timed { runner.kata_new(image_name, kata_id) }
+    html += pre('kata_new', duration)
+
+    duration = timed { runner.avatar_new(image_name, kata_id, avatar_name, files) }
+    html += pre('avatar_new', duration)
+
     duration = timed { sss = run({}) }
-    html += pre('run', duration, sss, 'Red')
+    html += pre('run', duration, 'Red', sss)
 
     syntax_error = { 'hiker.c' => 'sdsdsdsd' }
     duration = timed { sss = run(syntax_error) }
-    html += pre('run', duration, sss, 'Yellow')
+    html += pre('run', duration, 'Yellow', sss)
 
     tests_run_and_pass = { 'hiker.c' => hiker_c.sub('6 * 9', '6 * 7') }
     duration = timed { sss = run(tests_run_and_pass) }
-    html += pre('run', duration, sss, 'Lime')
+    html += pre('run', duration, 'Lime', sss)
 
     times_out = { 'hiker.c' => hiker_c.sub('return', "for(;;);\n    return") }
     duration = timed { sss = run(times_out, 3) }
-    html += pre('run', duration, sss, 'LightGray')
+    html += pre('run', duration, 'LightGray', sss)
 
-    runner.avatar_old(image_name, kata_id, avatar_name)
-    runner.kata_old(image_name, kata_id)
+    duration = timed { runner.avatar_old(image_name, kata_id, avatar_name) }
+    html += pre('avatar_old', duration)
+
+    duration = timed { runner.kata_old(image_name, kata_id) }
+    html += pre('kata_old', duration)
 
     html += '</div>'
   end
 
   private
 
-  def image_name; 'cyberdojofoundation/gcc_assert'; end
-  def kata_id; 'D4C8A65D61'; end
-  def avatar_name; 'lion'; end
+  def image_name
+    'cyberdojofoundation/gcc_assert'
+  end
+
+  def kata_id
+    'D4C8A65D61'
+  end
+
+  def avatar_name
+    'lion'
+  end
 
   def run(files, max_seconds = 10)
     deleted_filenames = []
@@ -65,14 +80,18 @@ class Demo < Sinatra::Base
     '%.2f' % (finished - started)
   end
 
-  def pre(name, duration, sss, colour = 'white')
+  def pre(name, duration, colour='white', sss=nil)
     border = 'border:1px solid black'
     padding = 'padding:10px'
+    margin = 'margin-left:20px'
     background = "background:#{colour}"
-    "<pre>/#{name}(#{duration}s)</pre>" +
-    "<pre style='#{border};#{padding};#{background}'>" +
-    "#{JSON.pretty_unparse(sss)}" +
-    '</pre>'
+    html = "<pre>/#{name}(#{duration}s)</pre>"
+    unless sss == nil
+      html += "<pre style='#{margin};#{border};#{padding};#{background}'>" +
+              "#{JSON.pretty_unparse(sss)}" +
+              '</pre>'
+    end
+    html
   end
 
 end
