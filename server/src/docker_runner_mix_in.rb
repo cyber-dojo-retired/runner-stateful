@@ -133,15 +133,15 @@ module DockerRunnerMixIn
   # and then retire creating the groups in the runner.
 
   def alpine_add_group_cmd
-    group_exists = "[ id -g #{group} == #{gid} ]"
+    #group_exists = "[ id -g #{group} == #{gid} ]"
     add_group = "addgroup -g #{gid} #{group}"
-    "{ #{group_exists} || #{add_group}; }"
+    #"{ #{group_exists} || #{add_group}; }"
   end
 
   def ubuntu_add_group_cmd
-    group_exists = "[ id -g #{group} == #{gid} ]"
+    #group_exists = "[ id -g #{group} == #{gid} ]"
     add_group = "addgroup --gid #{gid} #{group}"
-    "{ #{group_exists} || #{add_group}; }"
+    #"{ #{group_exists} || #{add_group}; }"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
@@ -156,7 +156,7 @@ module DockerRunnerMixIn
     # See avatar_exists?() in docker_avatar_volume_runner.rb
     home = home_dir(avatar_name)
     uid = user_id(avatar_name)
-    user_exists = "[ id -u #{avatar_name} == #{uid} ]"
+    #user_exists = "[ id -u #{avatar_name} == #{uid} ]"
     del_user = "deluser #{avatar_name}"
     add_user = [
        'adduser',
@@ -167,7 +167,7 @@ module DockerRunnerMixIn
          "-u #{uid}",
          avatar_name
     ].join(space)
-    "{ #{user_exists} || { #{del_user}; #{add_user}; } }"
+    "(#{del_user}; #{add_user})"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
@@ -175,7 +175,7 @@ module DockerRunnerMixIn
   def ubuntu_add_user_cmd(avatar_name)
     home = home_dir(avatar_name)
     uid = user_id(avatar_name)
-    user_exists = "[ id -u #{avatar_name} == #{uid} ]"
+    #user_exists = "[ id -u #{avatar_name} == #{uid} ]"
     add_user = [
         'adduser',
         '--disabled-password',
@@ -185,7 +185,7 @@ module DockerRunnerMixIn
         "--uid #{uid}",
         avatar_name
     ].join(space)
-    "{ #{user_exists} || #{add_user}; }"
+    #"{ #{user_exists} || #{add_user}; }"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
