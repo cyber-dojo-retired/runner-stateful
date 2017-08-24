@@ -136,7 +136,10 @@ class SharedVolumeRunner
     ].join(space)
     stdout,_ = assert_exec("docker run #{args} #{image_name} sh")
     cid = stdout.strip
-    add_user_and_group(cid, avatar_name)
+
+    assert_docker_exec(cid, add_group_cmd(cid))
+    assert_docker_exec(cid, add_user_cmd(cid, avatar_name))
+
     cid
   end
 
@@ -183,15 +186,6 @@ class SharedVolumeRunner
 
   # - - - - - - - - - - - - - - - - - - - - - -
   # - - - - - - - - - - - - - - - - - - - - - -
-
-  def add_user_and_group(cid, avatar_name)
-    assert_docker_exec(cid,
-      [
-        add_group_cmd(cid),
-        add_user_cmd(cid, avatar_name)
-      ].join(' && ')
-    )
-  end
 
   def add_group_cmd(cid)
     if alpine? cid
