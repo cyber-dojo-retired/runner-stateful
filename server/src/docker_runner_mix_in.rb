@@ -127,6 +127,10 @@ module DockerRunnerMixIn
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
+  # Adding a group currently checks if the group exists.
+  # The plan is to add the group to the language images
+  # (using cyber-dojo-languages/image_builder)
+  # and then retire creating the groups in the runner.
 
   def alpine_add_group_cmd
     group_exists = "[ id -g #{group} == #{gid} ]"
@@ -141,6 +145,10 @@ module DockerRunnerMixIn
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
+  # Adding a user currently checks if the user exists.
+  # The plan is to add all the users to the language images
+  # (using cyber-dojo-languages/image_builder)
+  # and then retire creating the user in the runner.
 
   def alpine_add_user_cmd(avatar_name)
     # Alpine linux has an existing web-proxy user
