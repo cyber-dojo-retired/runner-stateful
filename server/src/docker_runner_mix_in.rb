@@ -129,11 +129,15 @@ module DockerRunnerMixIn
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def alpine_add_group_cmd
-    "addgroup -g #{gid} #{group}"
+    group_exists = "[ id -g #{group} == #{gid} ]"
+    add_group = "addgroup -g #{gid} #{group}"
+    "{ #{group_exists} || #{add_group}; }"
   end
 
   def ubuntu_add_group_cmd
-    "addgroup --gid #{gid} #{group}"
+    group_exists = "[ id -g #{group} == #{gid} ]"
+    add_group = "addgroup --gid #{gid} #{group}"
+    "{ #{group_exists} || #{add_group}; }"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
@@ -148,14 +152,14 @@ module DockerRunnerMixIn
     del_user = "deluser #{avatar_name}"
     add_user = [
        'adduser',
-         '-D',             # don't assign a password
+         '-D',          # don't assign a password
          "-G #{group}",
          "-h #{home}",
-         '-s /bin/sh',     # shell
+         '-s /bin/sh',  # shell
          "-u #{uid}",
          avatar_name
     ].join(space)
-    "#{user_exists} || { #{del_user}; #{add_user}; }"
+    "{ #{user_exists} || { #{del_user}; #{add_user}; } }"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
@@ -173,7 +177,7 @@ module DockerRunnerMixIn
         "--uid #{uid}",
         avatar_name
     ].join(space)
-    "#{user_exists} || #{add_user}"
+    "{ #{user_exists} || #{add_user}; }"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
