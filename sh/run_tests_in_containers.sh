@@ -36,6 +36,7 @@ run_client_tests ${*}
 if [[ ( ${server_status} == 0 && ${client_status} == 0 ) ]];  then
   echo "------------------------------------------------------"
   echo "All passed"
+  ${ROOT_DIR}/sh/docker_containers_down.sh
   exit 0
 else
   echo
