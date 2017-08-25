@@ -2,6 +2,7 @@
 
 readonly ROOT_DIR="$( cd "$( dirname "${0}" )" && cd .. && pwd )"
 readonly MY_NAME="${ROOT_DIR##*/}"
+
 readonly SERVER_CID=`docker ps --all --quiet --filter "name=${MY_NAME}_server"`
 readonly CLIENT_CID=`docker ps --all --quiet --filter "name=${MY_NAME}_client"`
 
