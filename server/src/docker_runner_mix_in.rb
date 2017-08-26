@@ -231,7 +231,7 @@ module DockerRunnerMixIn
       end
       dir = avatar_dir(avatar_name)
       uid = user_id(avatar_name)
-      cmd = [
+      tar_pipe_cmd = [
         "chmod 755 #{tmp_dir}",
         "&& cd #{tmp_dir}",
         '&& tar',
@@ -241,7 +241,7 @@ module DockerRunnerMixIn
               '-',                # write it to stdout
               '.',                # tar the current directory
               '|',
-                  'docker exec',
+                  'docker exec',  # pipe the tarfile into docker container
                     "--user=#{uid}:#{gid}",
                     '--interactive',
                     cid,
@@ -255,7 +255,7 @@ module DockerRunnerMixIn
                           '.',    # the current directory
                           "'"     # close quote
       ].join(space)
-      assert_exec(cmd)
+      assert_exec(tar_pipe_cmd)
     end
   end
 
