@@ -240,7 +240,7 @@ class SharedVolumeRunner
       "--user=#{uid}:#{gid}",
       '--interactive',
       cid,
-      "sh -c 'cd #{dir} && chmod 755 . && sh ./cyber-dojo.sh'"
+      "sh -c 'cd #{dir} && sh ./cyber-dojo.sh'"
     ].join(space)
 
     run_timeout(docker_cmd, max_seconds)
