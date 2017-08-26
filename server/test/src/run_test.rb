@@ -33,14 +33,34 @@ class RunTest < TestBase
       as_avatar('salmon') {
         sss_run({
           changed_files: {
-            'cyber-dojo.sh' => ls_cmd,
-            'a/hello.txt'   => 'hello world'
+            'a/hello.txt'   => 'hello world',
+            'cyber-dojo.sh' => ls_cmd
           }
         })
         ls_files = ls_parse(stdout)
         uid = runner.user_id('salmon')
         group = runner.group
         assert_equal_atts('a', 'drwxr-xr-x', uid, group, 4096, ls_files)
+      }
+    }
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test 'B83',
+  %w( files can be in sub-sub-dirs of sandbox ) do
+    in_kata {
+      as_avatar('salmon') {
+        sss_run({
+          changed_files: {
+            'a/b/hello.txt' => 'hello world',
+            'cyber-dojo.sh' => "cd a && #{ls_cmd}"
+          }
+        })
+        ls_files = ls_parse(stdout)
+        uid = runner.user_id('salmon')
+        group = runner.group
+        assert_equal_atts('b', 'drwxr-xr-x', uid, group, 4096, ls_files)
       }
     }
   end
