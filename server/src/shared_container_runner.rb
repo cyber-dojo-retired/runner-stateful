@@ -70,8 +70,6 @@ class SharedContainerRunner
       "#{name}:/usr/local/bin"
     ].join(space)
     assert_exec(docker_cp)
-
-    assert_docker_exec(add_group_cmd)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -109,7 +107,6 @@ class SharedContainerRunner
     refute_avatar_exists(avatar_name)
     make_shared_dir
     chown_shared_dir
-    add_avatar_user(avatar_name)
     make_avatar_dir(avatar_name)
     chown_avatar_dir(avatar_name)
     write_files(avatar_name, starting_files)
@@ -120,7 +117,6 @@ class SharedContainerRunner
   def avatar_old(avatar_name)
     assert_kata_exists
     assert_avatar_exists(avatar_name)
-    delete_avatar_user(avatar_name)
     remove_avatar_dir(avatar_name)
   end
 
@@ -139,16 +135,6 @@ class SharedContainerRunner
   end
 
   private
-
-  def add_avatar_user(avatar_name)
-    assert_docker_exec(add_user_cmd(avatar_name))
-  end
-
-  def delete_avatar_user(avatar_name)
-    assert_docker_exec(del_user_cmd(avatar_name))
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def make_avatar_dir(avatar_name)
     dir = avatar_dir(avatar_name)
@@ -193,38 +179,6 @@ class SharedContainerRunner
       max_seconds
     ].join(space)
     run_timeout(docker_cmd(sh_cmd), max_seconds)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def add_group_cmd
-    return alpine_add_group_cmd if alpine?
-    return ubuntu_add_group_cmd if ubuntu?
-  end
-
-  def add_user_cmd(avatar_name)
-    return alpine_add_user_cmd(avatar_name) if alpine?
-    return ubuntu_add_user_cmd(avatar_name) if ubuntu?
-  end
-
-  def del_user_cmd(avatar_name)
-    return "deluser --remove-home #{avatar_name}" if alpine?
-    return "userdel --remove #{avatar_name}"      if ubuntu?
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def alpine?
-    etc_issue.include?('Alpine')
-  end
-
-  def ubuntu?
-    etc_issue.include?('Ubuntu')
-  end
-
-  def etc_issue
-    @ss ||= assert_docker_exec('cat /etc/issue')
-    @ss[0] # 0==stdout
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -

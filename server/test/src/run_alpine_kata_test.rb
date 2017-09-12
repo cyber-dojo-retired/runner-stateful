@@ -27,14 +27,6 @@ class RunAlpineKataTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '267', %w( [Alpine]
-  none of the 64 avatar's uid's are already taken
-  ) do
-    refute_avatar_users_exist
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   test '214', %w( [Alpine]
   image has tini installed to do zombie reaping
   ) do

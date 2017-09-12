@@ -118,10 +118,6 @@ class TestBase < HexMiniTest
     sss[:colour]
   end
 
-  def assert_stdout(expected)
-    assert_equal expected, stdout, sss
-  end
-
   def assert_stderr(expected)
     assert_equal expected, stderr, sss
   end

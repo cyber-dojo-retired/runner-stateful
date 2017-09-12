@@ -13,7 +13,7 @@ class LanguageTest < TestBase
     sss_run({
       changed_files: files('gcc_assert')
     })
-    assert_stdout "makefile:14: recipe for target 'test.output' failed\n"
+    assert_stderr_include "[makefile:14: test.output] Aborted\n"
     assert_stderr_include 'Assertion failed: answer() == 42'
     assert_status 2
   end

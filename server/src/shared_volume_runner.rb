@@ -135,12 +135,7 @@ class SharedVolumeRunner
       "--volume #{volume_name}:#{volume_root}:rw"
     ].join(space)
     stdout,_ = assert_exec("docker run #{args} #{image_name} sh")
-    cid = stdout.strip
-
-    assert_docker_exec(cid, add_group_cmd(cid))
-    assert_docker_exec(cid, add_user_cmd(cid, avatar_name))
-
-    cid
+    stdout.strip # cid
   end
 
   def uuid
@@ -185,41 +180,6 @@ class SharedVolumeRunner
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
-  # - - - - - - - - - - - - - - - - - - - - - -
-
-  def add_group_cmd(cid)
-    if alpine? cid
-      return alpine_add_group_cmd
-    end
-    if ubuntu? cid
-      return ubuntu_add_group_cmd
-    end
-  end
-
-  def add_user_cmd(cid, avatar_name)
-    if alpine? cid
-      return alpine_add_user_cmd(avatar_name)
-    end
-    if ubuntu? cid
-      return ubuntu_add_user_cmd(avatar_name)
-    end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - -
-
-  def alpine?(cid)
-    etc_issue(cid).include?('Alpine')
-  end
-
-  def ubuntu?(cid)
-    etc_issue(cid).include?('Ubuntu')
-  end
-
-  def etc_issue(cid)
-    @ss ||= assert_docker_exec(cid, 'cat /etc/issue')
-    @ss[0] # 0==stdout
-  end
-
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def chown_avatar_dir(cid, avatar_name)

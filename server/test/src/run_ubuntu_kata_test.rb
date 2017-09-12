@@ -20,17 +20,10 @@ class RunUbuntuKataTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test 'CA1',
-  %w( [Ubuntu] image is indeed based on Ubuntu ) do
+  test 'CA1', %w( [Ubuntu]
+  image is indeed based on Ubuntu ) do
     etc_issue = assert_docker_run 'cat /etc/issue'
     assert etc_issue.include?('Ubuntu'), etc_issue
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test '268',
-  %w( [Ubuntu] none of the 64 avatar's uid's are already taken ) do
-    refute_avatar_users_exist
   end
 
 end

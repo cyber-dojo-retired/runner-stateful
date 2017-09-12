@@ -40,8 +40,11 @@ class RunTest < TestBase
   'red-traffic-light' do
     sss_run
     assert_colour 'red'
-    assert_stdout "makefile:14: recipe for target 'test.output' failed\n"
-    assert stderr.start_with?('Assertion failed: answer() == 42'), sss.to_s
+    lines = [
+      'Assertion failed: answer() == 42',
+      "make: *** [makefile:14: test.output] Aborted\n"
+    ]
+    lines.each { |line| assert stderr.include?(line), sss.to_s }
     assert_status 2
   end
 
@@ -69,7 +72,6 @@ class RunTest < TestBase
       'return 6 * 9sss'
     ]
     lines.each { |line| assert stderr.include?(line), sss.to_s }
-    assert_stdout "makefile:17: recipe for target 'test' failed\n"
     assert_status 2
   end
 
