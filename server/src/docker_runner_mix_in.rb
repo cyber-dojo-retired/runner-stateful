@@ -139,8 +139,9 @@ module DockerRunnerMixIn
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def delete_files(cid, avatar_name, pathed_filenames)
-    dir = avatar_dir(avatar_name)
+    # most of the time pathed_filenames == []
     pathed_filenames.each do |pathed_filename|
+      dir = avatar_dir(avatar_name)
       assert_docker_exec(cid, "rm #{dir}/#{pathed_filename}")
     end
   end
