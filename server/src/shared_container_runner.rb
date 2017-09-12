@@ -88,16 +88,8 @@ class SharedContainerRunner
   def avatar_exists?(avatar_name)
     assert_kata_exists
     assert_valid_avatar_name(avatar_name)
-    id_cmd = docker_cmd("id -u #{avatar_name}")
-    stdout,_,status = quiet_exec(id_cmd)
-    # Alpine Linux has an existing proxy-server user
-    # called squid (uid=31) which I have to work around.
-    # See alpine_add_user_cmd() in docker_runner_mix_in.rb
-    if avatar_name == 'squid' && stdout.strip == '31'
-      false
-    else
-      status == success
-    end
+    _,_,status = quiet_exec(docker_cmd("id #{avatar_name}"))
+    status == success
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
