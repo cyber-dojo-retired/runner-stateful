@@ -120,9 +120,11 @@ class SharedContainerRunner
     assert_kata_exists
     assert_avatar_exists(avatar_name)
     delete_files(container_name, avatar_name, deleted_filenames)
+    # TODO: write_files() no longer exists. It has been merged into
+    # run_cyber_dojo_sh() in docker_runner_mix_in.rb
     write_files(container_name, avatar_name, changed_files)
     stdout,stderr,status = run_cyber_dojo_sh(avatar_name, max_seconds)
-    colour = red_amber_green(cid, stdout, stderr, status)
+    colour = red_amber_green(container_name, stdout, stderr, status)
     { stdout:stdout, stderr:stderr, status:status, colour:colour }
   end
 
