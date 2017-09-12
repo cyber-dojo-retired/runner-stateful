@@ -194,9 +194,9 @@ module DockerRunnerMixIn
           cid,
           "sh -c 'cd #{dir} && sh ./cyber-dojo.sh'"
         ].join(space)
-        return run_timeout(cyber_dojo_sh, max_seconds)
+        run_timeout(cyber_dojo_sh, max_seconds)
       else
-        return run_timeout(tar_pipe, max_seconds)
+        run_timeout(tar_pipe, max_seconds)
       end
     end
   end
