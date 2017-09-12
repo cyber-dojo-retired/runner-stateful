@@ -42,7 +42,7 @@ class RunTest < TestBase
     assert_colour 'red'
     lines = [
       'Assertion failed: answer() == 42',
-      "make: *** [makefile:14: test.output] Aborted\n"
+      "make: *** [makefile:14: test.output] Aborted"
     ]
     lines.each { |line| assert stderr.include?(line), sss.to_s }
     assert_status 2
