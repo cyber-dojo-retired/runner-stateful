@@ -147,10 +147,7 @@ module DockerRunnerMixIn
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def write_files(cid, avatar_name, files)
-    if files == {}
-      return
-    end
+  def run_cyber_dojo_sh(cid, avatar_name, files, max_seconds)
     Dir.mktmpdir('runner') do |tmp_dir|
       files.each do |pathed_filename, content|
         sub_dir = File.dirname(pathed_filename)
@@ -163,7 +160,7 @@ module DockerRunnerMixIn
       end
       dir = avatar_dir(avatar_name)
       uid = user_id(avatar_name)
-      tar_pipe_cmd = [
+      tar_pipe = [
         "chmod 755 #{tmp_dir}",
         "&& cd #{tmp_dir}",
         '&& tar',
@@ -185,9 +182,21 @@ module DockerRunnerMixIn
                           '-',    # which is read from stdin
                           '-C',   # save the extracted files to
                           '.',    # the current directory
-                          "'"     # close quote
+                    '&& sh ./cyber-dojo.sh',
+                    "'"           # close quote
       ].join(space)
-      assert_exec(tar_pipe_cmd)
+      if files == {}
+        cyber_dojo_sh = [
+          'docker exec',
+          "--user=#{uid}:#{gid}",
+          '--interactive',
+          cid,
+          "sh -c 'cd #{dir} && sh ./cyber-dojo.sh'"
+        ].join(space)
+        return run_timeout(cyber_dojo_sh, max_seconds)
+      else
+        return run_timeout(tar_pipe, max_seconds)
+      end
     end
   end
 

@@ -58,7 +58,7 @@ class SharedVolumeRunner
       chown_shared_dir(cid)
       make_avatar_dir(cid, avatar_name)
       chown_avatar_dir(cid, avatar_name)
-      write_files(cid, avatar_name, starting_files)
+      run(avatar_name, [], starting_files, 10)
     end
   end
 
@@ -85,8 +85,7 @@ class SharedVolumeRunner
     in_container(avatar_name) do |cid|
       assert_avatar_exists(cid, avatar_name)
       delete_files(cid, avatar_name, deleted_filenames)
-      write_files(cid, avatar_name, changed_files)
-      stdout,stderr,status = run_cyber_dojo_sh(cid, avatar_name, max_seconds)
+      stdout,stderr,status = run_cyber_dojo_sh(cid, avatar_name, changed_files, max_seconds)
       colour = red_amber_green(cid, stdout, stderr, status)
       { stdout:stdout, stderr:stderr, status:status, colour:colour }
     end
@@ -186,24 +185,6 @@ class SharedVolumeRunner
     uid = user_id(avatar_name)
     dir = avatar_dir(avatar_name)
     assert_docker_exec(cid, "chown #{uid}:#{gid} #{dir}")
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - -
-
-  def run_cyber_dojo_sh(cid, avatar_name, max_seconds)
-    # I thought doing [chmod 755] in avatar_new() would
-    # be "sticky" and remain 755 but it appears not...
-    uid = user_id(avatar_name)
-    dir = avatar_dir(avatar_name)
-    docker_cmd = [
-      'docker exec',
-      "--user=#{uid}:#{gid}",
-      '--interactive',
-      cid,
-      "sh -c 'cd #{dir} && sh ./cyber-dojo.sh'"
-    ].join(space)
-
-    run_timeout(docker_cmd, max_seconds)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
