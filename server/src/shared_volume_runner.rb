@@ -263,6 +263,9 @@ class SharedVolumeRunner
   end
 
   def avatar_exists_cid?(cid, avatar_name)
+    # check for avatar's sandboxes/ subdir
+    # and not its /home/ subdir which is pre-created
+    # in the docker image.
     dir = avatar_dir(avatar_name)
     _,_,status = quiet_exec("docker exec #{cid} sh -c '[ -d #{dir} ]'")
     status == success
