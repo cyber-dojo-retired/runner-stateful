@@ -28,25 +28,31 @@ class AvatarTest < TestBase
     refute avatar_exists?
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test '9BD', %w( [Alpine]
+  in a pristine Alpine image there is an existing user called squid
+  (who knew eh) which clashes with the squid avatar and has to be handled
+  somehow, either by an explicit runtime work-around (what it did at first)
+  or by replacing the user in the built docker image (what it does now)
+  ) do
+    refute avatar_exists?('squid')
+    avatar_new('squid')
+    assert avatar_exists?('squid')
+    avatar_old('squid')
+    refute avatar_exists?('squid')
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   test 'A64', %w(
-  because of resurrection
+  avatar resurrection requires
   avatar_new() has to work after avatar_old()
   ) do
     avatar_new
     avatar_old
     avatar_new
     avatar_old
-  end
-
-  test '9BD', %w( [Alpine]
-  in Alpine there is an existing user called squid
-  which would clash with the squid avatar and has to be
-  worked around using deluser
-  ) do
-    refute avatar_exists?('squid')
-    avatar_new('squid')
-    assert avatar_exists?('squid')
-    avatar_old('squid')
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
