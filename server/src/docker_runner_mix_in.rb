@@ -150,6 +150,7 @@ module DockerRunnerMixIn
 
   def run_cyber_dojo_sh(cid, avatar_name, files, max_seconds)
     Dir.mktmpdir('runner') do |tmp_dir|
+      # save the files onto the host...
       files.each do |pathed_filename, content|
         sub_dir = File.dirname(pathed_filename)
         if sub_dir != '.'
@@ -159,6 +160,8 @@ module DockerRunnerMixIn
         host_filename = tmp_dir + '/' + pathed_filename
         disk.write(host_filename, content)
       end
+      # ...then tar-pipe them into the container
+      # and run cyber-dojo.sh
       dir = avatar_dir(avatar_name)
       uid = user_id(avatar_name)
       tar_pipe = [
@@ -186,6 +189,10 @@ module DockerRunnerMixIn
                     '&& sh ./cyber-dojo.sh',
                     "'"           # close quote
       ].join(space)
+      # Note: this tar-pipe stores file date-stamps to the second.
+      # In other words, the microseconds are always zero.
+      # This is very unlikely to matter for a real test-event from
+      # the browser but could matter in tests.
       if files == {}
         cyber_dojo_sh = [
           'docker exec',
