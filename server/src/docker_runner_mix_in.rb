@@ -149,6 +149,7 @@ module DockerRunnerMixIn
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run_cyber_dojo_sh(cid, avatar_name, files, max_seconds)
+    # See comment at end of file about slower alternative.
     Dir.mktmpdir('runner') do |tmp_dir|
       # save the files onto the host...
       files.each do |pathed_filename, content|
@@ -313,3 +314,30 @@ module DockerRunnerMixIn
 
 end
 
+# - - - - - - - - - - - - - - - - - - - - - - - -
+# The implementation of run_cyber_dojo_sh is
+#   o) Create copies of all (changed) files off /tmp
+#   o) Tar pipe the /tmp files into the container
+#   o) Run cyber-dojo.sh inside the container
+#
+# An alternative implementation is
+#   o) Tar pipe each file's content directly into the container
+#   o) Run cyber-dojo.sh inside the container
+#
+# If only one file has changed you might image this is quicker
+# but testing shows its actually a bit slower.
+#
+# For interest's sake here's how you tar pipe from a string and
+# avoid the intermediate /tmp files:
+#
+# require 'open3'
+# files.each do |name,content|
+#   filename = avatar_dir + '/' + name
+#   dir = File.dirname(filename)
+#   shell_cmd = "mkdir -p #{dir};"
+#   shell_cmd += "cat >#{filename} && chown #{uid}:#{gid} #{filename}"
+#   cmd = "docker exec --interactive --user=root #{cid} sh -c '#{shell_cmd}'"
+#   stdout,stderr,ps = Open3.capture3(cmd, :stdin_data => content)
+#   assert ps.success?
+# end
+# - - - - - - - - - - - - - - - - - - - - - - - -
