@@ -1,5 +1,11 @@
-require_relative 'docker_runner_mix_in'
+require_relative 'all_avatars_names'
+require_relative 'logger_null'
+require_relative 'nearest_ancestors'
+require_relative 'string_cleaner'
+require_relative 'string_truncater'
+require_relative 'valid_image_name'
 require 'securerandom'
+require 'timeout'
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Uses a new short-lived docker container per run().
@@ -17,7 +23,40 @@ require 'securerandom'
 
 class SharedVolumeRunner
 
-  include DockerRunnerMixIn
+  def initialize(parent, image_name, kata_id)
+    @parent = parent
+    @image_name = image_name
+    @kata_id = kata_id
+    assert_valid_image_name
+    assert_valid_kata_id
+  end
+
+  attr_reader :parent # For nearest_ancestors()
+
+  attr_reader :image_name
+  attr_reader :kata_id
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # image
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def image_pulled?
+    image_names.include? image_name
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def image_pull
+    # [1] The contents of stderr vary depending on Docker version
+    _stdout,stderr,status = quiet_exec("docker pull #{image_name}")
+    if status == shell.success
+      return true
+    elsif stderr.include?('not found') || stderr.include?('not exist')
+      return false # [1]
+    else
+      fail_image_name('invalid')
+    end
+  end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # kata
@@ -91,6 +130,39 @@ class SharedVolumeRunner
     end
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def group
+    'cyber-dojo'
+  end
+
+  def gid
+    5000
+  end
+
+  def user_id(avatar_name)
+    assert_valid_avatar_name(avatar_name)
+    40000 + all_avatars_names.index(avatar_name)
+  end
+
+  def home_dir(avatar_name)
+    assert_valid_avatar_name(avatar_name)
+    "/home/#{avatar_name}"
+  end
+
+  def avatar_dir(avatar_name)
+    assert_valid_avatar_name(avatar_name)
+    "#{sandboxes_root_dir}/#{avatar_name}"
+  end
+
+  def sandboxes_root_dir
+    '/sandboxes'
+  end
+
+  def timed_out
+    'timed_out'
+  end
+
   private
 
   def in_container(avatar_name, &block)
@@ -101,6 +173,8 @@ class SharedVolumeRunner
       remove_container(cid)
     end
   end
+
+  # - - - - - - - - - - - - - - - - - - - - - -
 
   def create_container(avatar_name, volume_name, volume_root)
     # The [docker run] must be guarded by argument checks
@@ -137,8 +211,114 @@ class SharedVolumeRunner
     stdout.strip # cid
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - -
+
   def uuid
     SecureRandom.hex[0..10].upcase
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - -
+
+  def run_cyber_dojo_sh(cid, avatar_name, files, max_seconds)
+    # See comment at end of file about slower alternative.
+    Dir.mktmpdir('runner') do |tmp_dir|
+      # save the files onto the host...
+      files.each do |pathed_filename, content|
+        sub_dir = File.dirname(pathed_filename)
+        if sub_dir != '.'
+          src_dir = tmp_dir + '/' + sub_dir
+          shell.exec("mkdir -p #{src_dir}")
+        end
+        host_filename = tmp_dir + '/' + pathed_filename
+        disk.write(host_filename, content)
+      end
+      # ...then tar-pipe them into the container
+      # and run cyber-dojo.sh
+      dir = avatar_dir(avatar_name)
+      uid = user_id(avatar_name)
+      tar_pipe = [
+        "chmod 755 #{tmp_dir}",
+        "&& cd #{tmp_dir}",
+        '&& tar',
+              "--owner=#{uid}",
+              "--group=#{gid}",
+              '-zcf',             # create a compressed tar file
+              '-',                # write it to stdout
+              '.',                # tar the current directory
+              '|',
+                  'docker exec',  # pipe the tarfile into docker container
+                    "--user=#{uid}:#{gid}",
+                    '--interactive',
+                    cid,
+                    'sh -c',
+                    "'",          # open quote
+                    "cd #{dir}",
+                    '&& tar',
+                          '-zxf', # extract from a compressed tar file
+                          '-',    # which is read from stdin
+                          '-C',   # save the extracted files to
+                          '.',    # the current directory
+                    '&& sh ./cyber-dojo.sh',
+                    "'"           # close quote
+      ].join(space)
+      # Note: this tar-pipe stores file date-stamps to the second.
+      # In other words, the microseconds are always zero.
+      # This is very unlikely to matter for a real test-event from
+      # the browser but could matter in tests.
+      if files == {}
+        cyber_dojo_sh = [
+          'docker exec',
+          "--user=#{uid}:#{gid}",
+          '--interactive',
+          cid,
+          "sh -c 'cd #{dir} && sh ./cyber-dojo.sh'"
+        ].join(space)
+        run_timeout(cyber_dojo_sh, max_seconds)
+      else
+        run_timeout(tar_pipe, max_seconds)
+      end
+    end
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - -
+
+  include StringCleaner
+  include StringTruncater
+
+  def run_timeout(docker_cmd, max_seconds)
+    r_stdout, w_stdout = IO.pipe
+    r_stderr, w_stderr = IO.pipe
+    pid = Process.spawn(docker_cmd, {
+      pgroup:true,
+         out:w_stdout,
+         err:w_stderr
+    })
+    begin
+      Timeout::timeout(max_seconds) do
+        Process.waitpid(pid)
+        status = $?.exitstatus
+        w_stdout.close
+        w_stderr.close
+        stdout = truncated(cleaned(r_stdout.read))
+        stderr = truncated(cleaned(r_stderr.read))
+        [stdout, stderr, status]
+      end
+    rescue Timeout::Error
+      # Kill the [docker exec] processes running
+      # on the host. This does __not__ kill the
+      # cyber-dojo.sh process running __inside__
+      # the docker container. See
+      # https://github.com/docker/docker/issues/9098
+      # The container is killed by remove_container().
+      Process.kill(-9, pid)
+      Process.detach(pid)
+      ['', '', timed_out]
+    ensure
+      w_stdout.close unless w_stdout.closed?
+      w_stderr.close unless w_stderr.closed?
+      r_stdout.close
+      r_stderr.close
+    end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
@@ -179,15 +359,27 @@ class SharedVolumeRunner
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
-  # - - - - - - - - - - - - - - - - - - - - - -
 
-  def chown_avatar_dir(cid, avatar_name)
-    uid = user_id(avatar_name)
-    dir = avatar_dir(avatar_name)
-    assert_docker_exec(cid, "chown #{uid}:#{gid} #{dir}")
+  def delete_files(cid, avatar_name, pathed_filenames)
+    # most of the time pathed_filenames == []
+    pathed_filenames.each do |pathed_filename|
+      dir = avatar_dir(avatar_name)
+      assert_docker_exec(cid, "rm #{dir}/#{pathed_filename}")
+    end
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def red_amber_green(cid, stdout_arg, stderr_arg, status_arg)
+    cmd = 'cat /usr/local/bin/red_amber_green.rb'
+    out,_err = assert_exec("docker exec #{cid} sh -c '#{cmd}'")
+    rag = eval(out)
+    rag.call(stdout_arg, stderr_arg, status_arg).to_s
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+  # volumes
+  # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def volume_exists?(name)
     cmd = "docker volume ls --quiet --filter 'name=#{name}'"
@@ -203,24 +395,20 @@ class SharedVolumeRunner
     assert_exec(remove_volume_cmd(name))
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def assert_kata_exists
-    unless kata_exists?
-      fail_kata_id('!exists')
-    end
+  def kata_volume_name
+    'cyber_dojo_kata_volume_runner_' + kata_id
   end
 
-  def refute_kata_exists
-    if kata_exists?
-      fail_kata_id('exists')
-    end
+  def create_volume_cmd(name)
+    "docker volume create --name #{name}"
   end
 
-  def assert_docker_exec(cid, cmd)
-    assert_exec("docker exec #{cid} sh -c '#{cmd}'")
+  def remove_volume_cmd(name)
+    "docker volume rm #{name}"
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # dirs
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def make_avatar_dir(cid, avatar_name)
@@ -228,12 +416,16 @@ class SharedVolumeRunner
     assert_docker_exec(cid, "mkdir -m 755 #{dir}")
   end
 
+  def chown_avatar_dir(cid, avatar_name)
+    uid = user_id(avatar_name)
+    dir = avatar_dir(avatar_name)
+    assert_docker_exec(cid, "chown #{uid}:#{gid} #{dir}")
+  end
+
   def remove_avatar_dir(cid, avatar_name)
     dir = avatar_dir(avatar_name)
     assert_docker_exec(cid, "rm -rf #{dir}")
   end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def make_shared_dir(cid)
     # first avatar makes the shared dir
@@ -249,6 +441,69 @@ class SharedVolumeRunner
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def image_names
+    cmd = 'docker images --format "{{.Repository}}"'
+    stdout,_ = assert_exec(cmd)
+    names = stdout.split("\n")
+    names.uniq - ['<none>']
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+  # validation
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def assert_valid_image_name
+    unless valid_image_name?(image_name)
+      fail_image_name('invalid')
+    end
+  end
+
+  include ValidImageName
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def assert_kata_exists
+    unless kata_exists?
+      fail_kata_id('!exists')
+    end
+  end
+
+  def refute_kata_exists
+    if kata_exists?
+      fail_kata_id('exists')
+    end
+  end
+
+  def assert_valid_kata_id
+    unless valid_kata_id?
+      fail_kata_id('invalid')
+    end
+  end
+
+  def valid_kata_id?
+    kata_id.class.name == 'String' &&
+      kata_id.length == 10 &&
+        kata_id.chars.all? { |char| hex?(char) }
+  end
+
+  def hex?(char)
+    '0123456789ABCDEF'.include?(char)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def assert_valid_avatar_name(avatar_name)
+    unless valid_avatar_name?(avatar_name)
+      fail_avatar_name('invalid')
+    end
+  end
+
+  def valid_avatar_name?(avatar_name)
+    all_avatars_names.include?(avatar_name)
+  end
+
+  include AllAvatarsNames
 
   def assert_avatar_exists(cid, avatar_name)
     unless avatar_exists_cid?(cid, avatar_name)
@@ -271,10 +526,90 @@ class SharedVolumeRunner
     status == success
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def kata_volume_name
-    'cyber_dojo_kata_volume_runner_' + kata_id
+  def fail_kata_id(message)
+    fail bad_argument("kata_id:#{message}")
+  end
+
+  def fail_image_name(message)
+    fail bad_argument("image_name:#{message}")
+  end
+
+  def fail_avatar_name(message)
+    fail bad_argument("avatar_name:#{message}")
+  end
+
+  def bad_argument(message)
+    ArgumentError.new(message)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def assert_docker_exec(cid, cmd)
+    assert_exec("docker exec #{cid} sh -c '#{cmd}'")
+  end
+
+  def assert_exec(cmd)
+    shell.assert_exec(cmd)
+  end
+
+  def quiet_exec(cmd)
+    shell.exec(cmd, LoggerNull.new(self))
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def success
+    shell.success
+  end
+
+  def space
+    ' '
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  include NearestAncestors
+
+  def shell
+    nearest_ancestors(:shell)
+  end
+
+  def disk
+    nearest_ancestors(:disk)
+  end
+
+  def log
+    nearest_ancestors(:log)
   end
 
 end
+
+# - - - - - - - - - - - - - - - - - - - - - - - -
+# The implementation of run_cyber_dojo_sh is
+#   o) Create copies of all (changed) files off /tmp
+#   o) Tar pipe the /tmp files into the container
+#   o) Run cyber-dojo.sh inside the container
+#
+# An alternative implementation is
+#   o) Tar pipe each file's content directly into the container
+#   o) Run cyber-dojo.sh inside the container
+#
+# If only one file has changed you might image this is quicker
+# but testing shows its actually a bit slower.
+#
+# For interest's sake here's how you tar pipe from a string and
+# avoid the intermediate /tmp files:
+#
+# require 'open3'
+# files.each do |name,content|
+#   filename = avatar_dir + '/' + name
+#   dir = File.dirname(filename)
+#   shell_cmd = "mkdir -p #{dir};"
+#   shell_cmd += "cat >#{filename} && chown #{uid}:#{gid} #{filename}"
+#   cmd = "docker exec --interactive --user=root #{cid} sh -c '#{shell_cmd}'"
+#   stdout,stderr,ps = Open3.capture3(cmd, :stdin_data => content)
+#   assert ps.success?
+# end
+# - - - - - - - - - - - - - - - - - - - - - - - -
