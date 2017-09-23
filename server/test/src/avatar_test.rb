@@ -64,7 +64,8 @@ class AvatarTest < TestBase
   ) do
     error = assert_raises(ArgumentError) {
       kata_id = '92BB3FE5B6'
-      new_runner(image_name, kata_id).avatar_new('salmon', {})
+      runner = SharedVolumeRunner.new(self, image_name, kata_id)
+      runner.avatar_new('salmon', {})
     }
     assert_equal 'kata_id:!exists', error.message
   end
@@ -106,7 +107,8 @@ class AvatarTest < TestBase
   ) do
     error = assert_raises(ArgumentError) {
       kata_id = '92BB3FE5B6'
-      new_runner(image_name, kata_id).avatar_old('salmon')
+      runner = SharedVolumeRunner.new(self, image_name, kata_id)
+      runner.avatar_old('salmon')
     }
     assert_equal 'kata_id:!exists', error.message
   end
