@@ -17,6 +17,7 @@ module DockerRunnerMixIn
   end
 
   attr_reader :parent # For nearest_ancestors()
+
   attr_reader :image_name
   attr_reader :kata_id
 
