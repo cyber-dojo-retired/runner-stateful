@@ -1,6 +1,6 @@
 require_relative '../hex_mini_test'
 require_relative '../../src/externals'
-require_relative '../../src/shared_volume_runner'
+require_relative '../../src/runner'
 require 'json'
 
 class TestBase < HexMiniTest
@@ -98,7 +98,7 @@ class TestBase < HexMiniTest
   include Externals
 
   def runner
-    SharedVolumeRunner.new(self, image_name, kata_id)
+    Runner.new(self, image_name, kata_id)
   end
 
   def sss

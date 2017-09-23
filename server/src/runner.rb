@@ -21,7 +21,7 @@ require 'timeout'
 #   o) bit slower than SharedContainerRunner.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-class SharedVolumeRunner
+class Runner
 
   def initialize(parent, image_name, kata_id)
     @parent = parent

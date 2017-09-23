@@ -2,7 +2,9 @@ require_relative 'test_base'
 
 class AvatarTest < TestBase
 
-  def self.hex_prefix; '20A7A'; end
+  def self.hex_prefix
+    '20A7A'
+  end
 
   def hex_setup
     set_image_name 'cyberdojofoundation/gcc_assert'
@@ -64,7 +66,7 @@ class AvatarTest < TestBase
   ) do
     error = assert_raises(ArgumentError) {
       kata_id = '92BB3FE5B6'
-      runner = SharedVolumeRunner.new(self, image_name, kata_id)
+      runner = Runner.new(self, image_name, kata_id)
       runner.avatar_new('salmon', {})
     }
     assert_equal 'kata_id:!exists', error.message
@@ -107,7 +109,7 @@ class AvatarTest < TestBase
   ) do
     error = assert_raises(ArgumentError) {
       kata_id = '92BB3FE5B6'
-      runner = SharedVolumeRunner.new(self, image_name, kata_id)
+      runner = Runner.new(self, image_name, kata_id)
       runner.avatar_old('salmon')
     }
     assert_equal 'kata_id:!exists', error.message

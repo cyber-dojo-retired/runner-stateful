@@ -1,5 +1,5 @@
 require_relative 'externals'
-require_relative 'shared_volume_runner'
+require_relative 'runner'
 require 'sinatra/base'
 require 'json'
 
@@ -73,7 +73,7 @@ class MicroService < Sinatra::Base
   include Externals
 
   def runner
-    SharedVolumeRunner.new(self, image_name, kata_id)
+    Runner.new(self, image_name, kata_id)
   end
 
   def self.request_args(*names)
