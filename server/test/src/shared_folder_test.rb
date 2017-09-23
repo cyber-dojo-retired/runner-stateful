@@ -22,7 +22,7 @@ class SharedFolderTest < TestBase
 
   test 'B33',
   %w( [Alpine] first avatar_new event in a kata causes creation of /sandboxes/shared ) do
-    as_avatar('salmon') {
+    as('salmon') {
       shared = '/sandboxes/shared'
       assert_cyber_dojo_sh "[ -d #{shared} ]"
     }
@@ -32,8 +32,8 @@ class SharedFolderTest < TestBase
 
   test 'A54',
   %w( [Alpine] shared sandbox creation is idempotent ) do
-    as_avatar('salmon') {
-      as_avatar('lion') {
+    as('salmon') {
+      as('lion') {
         shared = '/sandboxes/shared'
         assert_cyber_dojo_sh "[ -d #{shared} ]"
       }
@@ -44,7 +44,7 @@ class SharedFolderTest < TestBase
 
   test '893',
   %w( [Alpine] /sandboxes/shared is writable by any avatar ) do
-    as_avatar('salmon') {
+    as('salmon') {
       shared = '/sandboxes/shared'
       # sandbox's is owned by cyber-dojo
       stat_group = assert_cyber_dojo_sh("stat -c '%G' #{shared}").strip

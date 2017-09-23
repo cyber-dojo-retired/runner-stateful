@@ -24,7 +24,7 @@ class ForkBombTest < TestBase
   test 'CD5',
   %w( [Alpine] fork-bomb in C fails to go off ) do
     hiker_c = '#include "hiker.h"' + "\n" + fork_bomb_definition
-    as_avatar('lion') {
+    as('lion') {
       sss_run({ avatar_name: 'lion',
               changed_files: {'hiker.c' => hiker_c }
       })
@@ -42,7 +42,7 @@ class ForkBombTest < TestBase
   test 'CD6',
   %w( [Ubuntu] fork-bomb in C++ fails to go off ) do
     hiker_cpp = '#include "hiker.hpp"' + "\n" + fork_bomb_definition
-    as_avatar('lion') {
+    as('lion') {
       sss_run({ avatar_name: 'lion',
               changed_files: {'hiker.cpp' => hiker_cpp }
       })
@@ -85,7 +85,7 @@ class ForkBombTest < TestBase
     # Sometimes, it throws an ArgumentError exception.
     # The nocov markers keep coverage at 100%
     @log = LoggerSpy.new(nil)
-    as_avatar('lion') {
+    as('lion') {
       begin
         sss_run_shell_fork_bomb
       # :nocov:
@@ -112,7 +112,7 @@ class ForkBombTest < TestBase
     # Sometimes, it throws an ArgumentError exception.
     # The nocov markers keep coverage at 100%
     @log = LoggerSpy.new(nil)
-    as_avatar('lion') {
+    as('lion') {
       begin
         sss_run_shell_fork_bomb
       # :nocov:

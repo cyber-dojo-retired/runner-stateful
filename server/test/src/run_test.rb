@@ -15,7 +15,7 @@ class RunTest < TestBase
   test '8A9',
   %w( run returns red-amber-green traffic-light colour ) do
     in_kata {
-      as_avatar('lion') {
+      as('lion') {
         sss_run({
           avatar_name:'lion',
               kata_id:kata_id
@@ -30,7 +30,7 @@ class RunTest < TestBase
   test 'B82',
   %w( files can be in sub-dirs of sandbox ) do
     in_kata {
-      as_avatar('salmon') {
+      as('salmon') {
         sss_run({
           changed_files: {
             'a/hello.txt'   => 'hello world',
@@ -50,7 +50,7 @@ class RunTest < TestBase
   test 'B83',
   %w( files can be in sub-sub-dirs of sandbox ) do
     in_kata {
-      as_avatar('salmon') {
+      as('salmon') {
         sss_run({
           changed_files: {
             'a/b/hello.txt' => 'hello world',
@@ -70,7 +70,7 @@ class RunTest < TestBase
   test '12B',
   %w( files in sub-dirs of sandbox can be deleted ) do
     in_kata {
-      as_avatar('salmon') {
+      as('salmon') {
         sss_run({
           changed_files: {
             'cyber-dojo.sh' => "cd a && #{ls_cmd}",

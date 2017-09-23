@@ -77,7 +77,7 @@ module OsHelper
     # has setup a salmon. So I create a new avatar with
     # known ls-starting-files. Note that kata_teardown
     # calls avatar_old('salmon')
-    as_avatar('lion', ls_starting_files) {
+    as('lion', ls_starting_files) {
       sss_run({
           avatar_name:'lion',
         changed_files:{}
