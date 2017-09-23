@@ -32,8 +32,8 @@ class SharedFolderTest < TestBase
 
   test 'A54',
   %w( [Alpine] shared sandbox creation is idempotent ) do
-    as('salmon') {
-      as('lion') {
+    as('lion') {
+      as('salmon') {
         shared = '/sandboxes/shared'
         assert_cyber_dojo_sh "[ -d #{shared} ]"
       }

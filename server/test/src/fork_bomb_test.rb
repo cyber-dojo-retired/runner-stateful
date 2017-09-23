@@ -90,8 +90,8 @@ class ForkBombTest < TestBase
         sss_run_shell_fork_bomb
       # :nocov:
         assert_status success
-        assert_equal '', stdout
-        assert stderr.include? "./cyber-dojo.sh: line 1: can't fork"
+        assert_stdout ''
+        assert_stderr_include "./cyber-dojo.sh: line 1: can't fork"
       rescue ArgumentError
         rag_filename = '/usr/local/bin/red_amber_green.rb'
         cmd = "'cat #{rag_filename}'"
@@ -117,8 +117,8 @@ class ForkBombTest < TestBase
         sss_run_shell_fork_bomb
       # :nocov:
         assert_status success
-        assert_equal '', stdout
-        assert stderr.include? "./cyber-dojo.sh: Cannot fork"
+        assert_stdout ''
+        assert_stderr_include "./cyber-dojo.sh: Cannot fork"
       rescue ArgumentError
         rag_filename = '/usr/local/bin/red_amber_green.rb'
         cmd = "'cat #{rag_filename}'"
