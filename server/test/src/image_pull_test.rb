@@ -88,8 +88,8 @@ class ImagePullTest < TestBase
     ].join(' ')
     shell.mock_exec(cmd, stdout, stderr, status=1)
     @image_name = image_name
-    error = assert_raises { image_pull }
-    assert_equal stderr, error.message
+    error = assert_raises(ArgumentError) { image_pull }
+    assert_equal 'image_name:invalid', error.message
   end
 
   private

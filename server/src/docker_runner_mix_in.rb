@@ -29,17 +29,14 @@ module DockerRunnerMixIn
   # - - - - - - - - - - - - - - - - - -
 
   def image_pull
-    # [1] The contents of stderr seem to vary depending
-    # on what your running on, eg DockerToolbox or not
-    # and where, eg Travis or not. I'm using 'not found'
-    # as that always seems to be present.
+    # [1] The contents of stderr vary depending on Docker version
     _stdout,stderr,status = quiet_exec("docker pull #{image_name}")
     if status == shell.success
       return true
-    elsif stderr.include?('not found') # [1]
-      return false
+    elsif stderr.include?('not found') || stderr.include?('not exist')
+      return false # [1]
     else
-      fail stderr
+      fail_image_name('invalid')
     end
   end
 
