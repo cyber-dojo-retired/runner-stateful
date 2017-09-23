@@ -3,7 +3,9 @@ require_relative '../../src/logger_stdout'
 
 class LoggerStdoutTest < TestBase
 
-  def self.hex_prefix; '1B6'; end
+  def self.hex_prefix
+    '1B6'
+  end
 
   test '962',
   '<< writes to stdout with added trailing newline' do

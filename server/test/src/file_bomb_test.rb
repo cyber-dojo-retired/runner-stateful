@@ -5,10 +5,17 @@ class FileBombTest < TestBase
 
   include OsHelper
 
-  def self.hex_prefix; '1988B'; end
+  def self.hex_prefix
+    '1988B'
+  end
 
-  def hex_setup; kata_setup; end
-  def hex_teardown; kata_teardown; end
+  def hex_setup
+    kata_setup
+  end
+
+  def hex_teardown
+    kata_teardown
+  end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 

@@ -28,3 +28,5 @@ end
 # Allows classes representing external objects to easily
 # access each other as well.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# blog.cyber-dojo.org/2017/04/service-locator-pattern-with-no-central.html
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

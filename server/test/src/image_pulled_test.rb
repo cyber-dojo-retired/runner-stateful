@@ -3,10 +3,17 @@ require_relative 'shell_mocker'
 
 class ImagePulledTest < TestBase
 
-  def self.hex_prefix; '109807'; end
+  def self.hex_prefix
+    '109807'
+  end
 
-  def hex_setup; @shell ||= ShellMocker.new(nil); end
-  def hex_teardown; shell.teardown; end
+  def hex_setup
+    @shell ||= ShellMocker.new(nil)
+  end
+
+  def hex_teardown
+    shell.teardown
+  end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 

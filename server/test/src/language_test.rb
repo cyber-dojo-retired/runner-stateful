@@ -2,9 +2,17 @@ require_relative 'test_base'
 
 class LanguageTest < TestBase
 
-  def self.hex_prefix; '9D930'; end
-  def hex_setup; kata_setup; end
-  def hex_teardown; kata_teardown; end
+  def self.hex_prefix
+    '9D930'
+  end
+
+  def hex_setup
+    kata_setup
+  end
+
+  def hex_teardown
+    kata_teardown
+  end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 

@@ -2,7 +2,9 @@ require_relative 'test_base'
 
 class KataTest < TestBase
 
-  def self.hex_prefix; 'FB0D4'; end
+  def self.hex_prefix
+    'FB0D4'
+  end
 
   def hex_setup
     set_image_name "#{cdf}/gcc_assert"

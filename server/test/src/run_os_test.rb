@@ -5,10 +5,17 @@ class RunAlpineTest < TestBase
 
   include OsHelper
 
-  def self.hex_prefix; '3759D'; end
+  def self.hex_prefix
+    '3759D'
+  end
 
-  def hex_setup; kata_setup; end
-  def hex_teardown; kata_teardown; end
+  def hex_setup
+    kata_setup
+  end
+
+  def hex_teardown
+    kata_teardown
+  end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 

@@ -2,7 +2,9 @@ require_relative 'test_base'
 
 class CustomAssertTest < TestBase
 
-  def self.hex_prefix; '7D428'; end
+  def self.hex_prefix
+    '7D428'
+  end
 
   def hex_setup
     set_image_name image_for_test

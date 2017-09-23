@@ -5,7 +5,9 @@ class RunAlpineKataTest < TestBase
 
   include OsHelper
 
-  def self.hex_prefix; '89079'; end
+  def self.hex_prefix
+    '89079'
+  end
 
   def hex_setup
     set_image_name image_for_test

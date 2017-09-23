@@ -42,6 +42,8 @@ class StringTruncaterTest < TestBase
     assert_equal s + "\n" + message, truncated(s + 'x')
   end
 
+  private
+
   def max_length
     10*1024
   end

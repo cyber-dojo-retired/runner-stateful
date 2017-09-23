@@ -1,55 +1,10 @@
 require_relative 'test_base'
 
-class DummyDisk
-  def initialize(who); @who = who; end
-  def read; 'hello world:' + @who; end
-end
-
-# - - - - - - - - - - - - - - - - - - - - - - - -
-
-class DummyStorer
-  def initialize(who); @who = who; end
-  def save; @who + ':42'; end
-end
-
-# - - - - - - - - - - - - - - - - - - - - - - - -
-
-class Anna
-  def disk;  @disk  ||=  DummyDisk.new('anna'); end
-  def store; @store ||= DummyStore.new('anna'); end
-end
-
-# - - - - - - - - - - - - - - - - - - - - - - - -
-
-class Natalie
-  def initialize(anna);@parent = anna; end
-  attr_reader :parent
-  def store; @store ||= DummyStorer.new('natalie'); end
-end
-
-# - - - - - - - - - - - - - - - - - - - - - - - -
-
-class Ellie
-  def initialize(natalie); @parent = natalie; end
-  attr_reader :parent
-  def uses_disk ;  disk.read ; end
-  def uses_store; store.save ; end
-  def uses_log  ;   log.write; end
-
-  private
-
-  include NearestAncestors
-
-  def disk ; nearest_ancestors(:disk ); end
-  def store; nearest_ancestors(:store); end
-  def log  ; nearest_ancestors(:log  ); end
-end
-
-# - - - - - - - - - - - - - - - - - - - - - - - -
-
 class TestNearestAncestors < TestBase
 
-  def self.hex_prefix; '9D4'; end
+  def self.hex_prefix
+    '9D4'
+  end
 
   def hex_setup
     anna = Anna.new
@@ -70,3 +25,75 @@ class TestNearestAncestors < TestBase
   end
 
 end
+
+# - - - - - - - - - - - - - - - - - - - - - - - -
+
+class DummyDisk
+  def initialize(who)
+    @who = who
+  end
+  def read
+    'hello world:' + @who
+  end
+end
+
+# - - - - - - - - - - - - - - - - - - - - - - - -
+
+class DummyStorer
+  def initialize(who)
+    @who = who
+  end
+  def save
+    @who + ':42'
+  end
+end
+
+# - - - - - - - - - - - - - - - - - - - - - - - -
+
+class Anna
+  def disk
+    @disk  ||=  DummyDisk.new('anna')
+  end
+end
+
+# - - - - - - - - - - - - - - - - - - - - - - - -
+
+class Natalie
+  def initialize(anna)
+    @parent = anna
+  end
+  attr_reader :parent
+  def store
+    @store ||= DummyStorer.new('natalie')
+  end
+end
+
+# - - - - - - - - - - - - - - - - - - - - - - - -
+
+class Ellie
+  def initialize(natalie)
+    @parent = natalie
+  end
+  attr_reader :parent
+  def uses_disk
+    disk.read
+  end
+  def uses_store
+    store.save
+  end
+  def uses_log
+    log.write
+  end
+  private
+  include NearestAncestors
+  def disk
+    nearest_ancestors(:disk)
+  end
+  def store
+    nearest_ancestors(:store)
+  end
+  def log
+    nearest_ancestors(:log)
+  end
+end
+
