@@ -61,17 +61,17 @@ class Runner
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def kata_exists?
-    volume_exists?(kata_volume_name)
+    kata_volume_exists?
   end
 
   def kata_new
     refute_kata_exists
-    create_volume(kata_volume_name)
+    create_kata_volume
   end
 
   def kata_old
     assert_kata_exists
-    remove_volume(kata_volume_name)
+    remove_kata_volume
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -384,30 +384,24 @@ class Runner
   # volumes
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def volume_exists?(name)
-    cmd = "docker volume ls --quiet --filter 'name=#{name}'"
+  def kata_volume_exists?
+    cmd = "docker volume ls --quiet --filter 'name=#{kata_volume_name}'"
     stdout,_ = assert_exec(cmd)
     stdout.strip != ''
   end
 
-  def create_volume(name)
-    assert_exec(create_volume_cmd(name))
+  def create_kata_volume
+    cmd = "docker volume create --name #{kata_volume_name}"
+    assert_exec(cmd)
   end
 
-  def remove_volume(name)
-    assert_exec(remove_volume_cmd(name))
+  def remove_kata_volume
+    cmd = "docker volume rm #{kata_volume_name}"
+    assert_exec(cmd)
   end
 
   def kata_volume_name
     'cyber_dojo_kata_volume_runner_' + kata_id
-  end
-
-  def create_volume_cmd(name)
-    "docker volume create --name #{name}"
-  end
-
-  def remove_volume_cmd(name)
-    "docker volume rm #{name}"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -447,13 +441,13 @@ class Runner
   # validation
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
+  include ValidImageName
+
   def assert_valid_image_name
     unless valid_image_name?(image_name)
       fail_image_name('invalid')
     end
   end
-
-  include ValidImageName
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -493,11 +487,11 @@ class Runner
     end
   end
 
+  include AllAvatarsNames
+
   def valid_avatar_name?(avatar_name)
     all_avatars_names.include?(avatar_name)
   end
-
-  include AllAvatarsNames
 
   def assert_avatar_exists(cid, avatar_name)
     unless avatar_exists_cid?(cid, avatar_name)
