@@ -10,15 +10,13 @@ require 'timeout'
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Uses a new short-lived docker container per run().
 # Uses a long-lived docker volume per kata.
-#
 # Positives:
-#   o) long-lived container per run() is harder to secure.
-#   o) avatars can share state (eg sqlite database
-#      in /sandboxes/shared)
-#
+#   o) long-lived container per run() is easier to secure.
+#   o) avatars can share state
+#      (eg sqlite database in /sandboxes/shared)
 # Negatives:
 #   o) avatars cannot share processes.
-#   o) bit slower than SharedContainerRunner.
+#   o) bit slower than a shared-container-runner.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 class Runner
@@ -166,7 +164,7 @@ class Runner
   private
 
   def in_container(avatar_name, &block)
-    cid = create_container(avatar_name, kata_volume_name, sandboxes_root_dir)
+    cid = create_container(avatar_name)
     begin
       block.call(cid)
     ensure
@@ -176,7 +174,7 @@ class Runner
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  def create_container(avatar_name, volume_name, volume_root)
+  def create_container(avatar_name)
     # The [docker run] must be guarded by argument checks
     # because it volume mounts...
     #     [docker run ... --volume ...]
@@ -185,36 +183,30 @@ class Runner
     # will nevertheless succeed, create the container,
     # and create a temporary /sandboxes/ folder in it!
     # See https://github.com/docker/docker/issues/13121
-
     dir = avatar_dir(avatar_name)
     home = home_dir(avatar_name)
+    uuid = SecureRandom.hex[0..10].upcase
     name = "test_run__runner_stateful_#{kata_id}_#{avatar_name}_#{uuid}"
     max = 128
     args = [
       '--detach',                          # get the cid
+      "--env CYBER_DOJO_AVATAR_NAME=#{avatar_name}",
+      "--env CYBER_DOJO_KATA_ID=#{kata_id}",
+      "--env CYBER_DOJO_SANDBOX=#{dir}",
+      "--env HOME=#{home}",
       '--interactive',                     # for later execs
       "--name=#{name}",                    # for easy clean up
       '--net=none',                        # for security
-      '--security-opt=no-new-privileges',  # no escalation
       "--pids-limit=#{max}",               # no fork bombs
-      "--ulimit nproc=#{max}:#{max}",      # max number processes
-      "--ulimit nofile=#{max}:#{max}",     # max number of files
+      '--security-opt=no-new-privileges',  # no escalation
       '--ulimit core=0:0',                 # max core file size = 0 blocks
-      "--env CYBER_DOJO_KATA_ID=#{kata_id}",
-      "--env CYBER_DOJO_AVATAR_NAME=#{avatar_name}",
-      "--env CYBER_DOJO_SANDBOX=#{dir}",
-      "--env HOME=#{home}",
+      "--ulimit nofile=#{max}:#{max}",     # max number of files
+      "--ulimit nproc=#{max}:#{max}",      # max number processes
       '--user=root',
-      "--volume #{volume_name}:#{volume_root}:rw"
+      "--volume #{kata_volume_name}:#{sandboxes_root_dir}:rw"
     ].join(space)
     stdout,_ = assert_exec("docker run #{args} #{image_name} sh")
     stdout.strip # cid
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - -
-
-  def uuid
-    SecureRandom.hex[0..10].upcase
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
@@ -261,8 +253,8 @@ class Runner
                     '&& sh ./cyber-dojo.sh',
                     "'"           # close quote
       ].join(space)
-      # Note: this tar-pipe stores file date-stamps to the second.
-      # In other words, the microseconds are always zero.
+      # Note: on Alpine Linux this tar-pipe stores file date-stamps
+      # to the second. Viz, the microseconds are always zero.
       # This is very unlikely to matter for a real test-event from
       # the browser but could matter in tests.
       if files == {}
@@ -361,7 +353,7 @@ class Runner
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def delete_files(cid, avatar_name, pathed_filenames)
-    # most of the time pathed_filenames == []
+    # most of the time, pathed_filenames == []
     pathed_filenames.each do |pathed_filename|
       dir = avatar_dir(avatar_name)
       assert_docker_exec(cid, "rm #{dir}/#{pathed_filename}")
@@ -375,6 +367,17 @@ class Runner
     out,_err = assert_exec("docker exec #{cid} sh -c '#{cmd}'")
     rag = eval(out)
     rag.call(stdout_arg, stderr_arg, status_arg).to_s
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # images
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def image_names
+    cmd = 'docker images --format "{{.Repository}}"'
+    stdout,_ = assert_exec(cmd)
+    names = stdout.split("\n")
+    names.uniq - ['<none>']
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
@@ -427,6 +430,10 @@ class Runner
     assert_docker_exec(cid, "rm -rf #{dir}")
   end
 
+  def shared_dir
+    "#{sandboxes_root_dir}/shared"
+  end
+
   def make_shared_dir(cid)
     # first avatar makes the shared dir
     assert_docker_exec(cid, "mkdir -m 775 #{shared_dir} || true")
@@ -434,19 +441,6 @@ class Runner
 
   def chown_shared_dir(cid)
     assert_docker_exec(cid, "chown root:#{group} #{shared_dir}")
-  end
-
-  def shared_dir
-    "#{sandboxes_root_dir}/shared"
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def image_names
-    cmd = 'docker images --format "{{.Repository}}"'
-    stdout,_ = assert_exec(cmd)
-    names = stdout.split("\n")
-    names.uniq - ['<none>']
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
