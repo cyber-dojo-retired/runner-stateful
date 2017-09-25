@@ -527,11 +527,11 @@ class Runner # stateful
   include NearestAncestors
 
   def shell
-    nearest_ancestors(:shell)
+    @shell ||= nearest_ancestors(:shell)
   end
 
   def disk
-    nearest_ancestors(:disk)
+    @disk ||= nearest_ancestors(:disk)
   end
 
 end

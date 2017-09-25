@@ -49,7 +49,7 @@ class ShellBasher
   end
 
   def log
-    nearest_ancestors(:log)
+    @log ||= nearest_ancestors(:log)
   end
 
   include NearestAncestors

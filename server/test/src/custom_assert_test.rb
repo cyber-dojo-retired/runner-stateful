@@ -54,11 +54,11 @@ class CustomAssertTest < TestBase
 
   test '434',
   '[Alpine] bad assert_docker_exec raises' do
+    @log = LoggerSpy.new(self)
     cmd = "docker run -it --detach --name=#{container_name} #{image_name} sh"
     stdout,_ = assert_exec(cmd)
     cid = stdout.strip
     begin
-      @log = LoggerSpy.new(self)
       error = assert_raises { assert_docker_exec 'xxxx' }
       expected = "docker exec #{container_name} sh -c 'xxxx'"
       assert_equal expected, error.message
