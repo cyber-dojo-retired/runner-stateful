@@ -19,7 +19,7 @@ require 'timeout'
 #   o) bit slower than a shared-container-runner.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-class Runner
+class Runner # stateful
 
   def initialize(parent, image_name, kata_id)
     @parent = parent
