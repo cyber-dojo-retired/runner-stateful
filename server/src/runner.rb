@@ -168,6 +168,9 @@ class Runner
     begin
       block.call(cid)
     ensure
+      # [docker rm] could be backgrounded with a trailing &
+      # but it does not make a test-event discernably
+      # faster when measuring to 100th of a second
       assert_exec("docker rm --force #{cid}")
     end
   end
@@ -277,10 +280,10 @@ class Runner
   include StringCleaner
   include StringTruncater
 
-  def run_timeout(docker_cmd, max_seconds)
+  def run_timeout(cmd, max_seconds)
     r_stdout, w_stdout = IO.pipe
     r_stderr, w_stderr = IO.pipe
-    pid = Process.spawn(docker_cmd, {
+    pid = Process.spawn(cmd, {
       pgroup:true,
          out:w_stdout,
          err:w_stderr
