@@ -187,8 +187,7 @@ class Runner # stateful
     # See https://github.com/docker/docker/issues/13121
     dir = avatar_dir(avatar_name)
     home = home_dir(avatar_name)
-    uuid = SecureRandom.hex[0..10].upcase
-    name = "test_run__runner_stateful_#{kata_id}_#{avatar_name}_#{uuid}"
+    name = container_name(avatar_name)
     max = 128
     args = [
       '--detach',                          # get the cid
@@ -345,6 +344,11 @@ class Runner # stateful
     names.uniq - ['<none>']
   end
 
+  def container_name(avatar_name)
+    uuid = SecureRandom.hex[0..10].upcase
+    "test_run__runner_stateful_#{kata_id}_#{avatar_name}_#{uuid}"
+  end
+
   # - - - - - - - - - - - - - - - - - - - - - - - -
   # volumes
   # - - - - - - - - - - - - - - - - - - - - - - - -
@@ -366,7 +370,7 @@ class Runner # stateful
   end
 
   def kata_volume_name
-    'cyber_dojo_kata_volume_runner_' + kata_id
+    'test_run__runner_stateful_' + kata_id
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -471,7 +475,7 @@ class Runner # stateful
   end
 
   def avatar_exists_cid?(cid, avatar_name)
-    # check for avatar's sandboxes/ subdir
+    # check is for avatar's sandboxes/ subdir
     # and not its /home/ subdir which is pre-created
     # in the docker image.
     dir = avatar_dir(avatar_name)

@@ -8,13 +8,15 @@
 # do a teardown at the end of each test. Instead
 # I do a big teardown before all the tests run.
 
-readonly ZOMBIE_CONTAINERS=$(docker ps --all --filter "name=test_run__runner_stateful_" --format "{{.Names}}")
+readonly PREFIX=test_run__runner_stateful_
+
+readonly ZOMBIE_CONTAINERS=$(docker ps --all --filter "name=${PREFIX}" --format "{{.Names}}")
 if [ "${ZOMBIE_CONTAINERS}" != "" ]; then
   echo "zombie containers being removed..."
   docker rm --force --volumes ${ZOMBIE_CONTAINERS}
 fi
 
-readonly ZOMBIE_VOLUMES=$(docker volume ls --quiet --filter "name=cyber_dojo_kata_volume_runner_")
+readonly ZOMBIE_VOLUMES=$(docker volume ls --quiet --filter "name=${PREFIX}")
 if [ "${ZOMBIE_VOLUMES}" != "" ]; then
   echo "zombie volumes being removed..."
   docker volume rm --force ${ZOMBIE_VOLUMES}
