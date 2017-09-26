@@ -9,12 +9,11 @@ require 'timeout'
 # Uses a new short-lived docker container per run().
 # Uses a long-lived docker volume per kata.
 # Positives:
-#   o) long-lived container per run() is easier to secure.
-#   o) avatars can share state
-#      (eg sqlite database in /sandboxes/shared)
+#   o) avatars can share disk-state (eg sqlite database in /sandboxes/shared)
+#   o) short-lived container per run() is pretty secure.
 # Negatives:
 #   o) avatars cannot share processes.
-#   o) bit slower than a shared-container-runner.
+#   o) bit slower than runner_processful.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 class Runner # stateful
@@ -301,7 +300,8 @@ class Runner # stateful
       # cyber-dojo.sh process running __inside__
       # the docker container. See
       # https://github.com/docker/docker/issues/9098
-      # The container is killed by remove_container().
+      # The container is killed in the ensure
+      # block of in_container()
       Process.kill(-9, pid)
       Process.detach(pid)
       ['', '', timed_out]
@@ -344,6 +344,9 @@ class Runner # stateful
   end
 
   def container_name(avatar_name)
+    # Does not have a trailing uuid. This ensures that
+    # an in_container() call is not accidentally nested inside
+    # another in_container() call.
     [ name_prefix, kata_id, avatar_name ].join('_')
   end
 
