@@ -3,7 +3,6 @@ require_relative 'logger_null'
 require_relative 'string_cleaner'
 require_relative 'string_truncater'
 require_relative 'valid_image_name'
-require 'securerandom'
 require 'timeout'
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -92,7 +91,7 @@ class Runner # stateful
       chown_shared_dir(cid)
       make_avatar_dir(cid, avatar_name)
       chown_avatar_dir(cid, avatar_name)
-      run(avatar_name, [], starting_files, 10)
+      run_cyber_dojo_sh(cid, avatar_name, starting_files, 10)
     end
   end
 
@@ -345,8 +344,7 @@ class Runner # stateful
   end
 
   def container_name(avatar_name)
-    uuid = SecureRandom.hex[0..10].upcase
-    "test_run__runner_stateful_#{kata_id}_#{avatar_name}_#{uuid}"
+    "test_run__runner_stateful_#{kata_id}_#{avatar_name}"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
