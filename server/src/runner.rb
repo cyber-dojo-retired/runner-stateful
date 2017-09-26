@@ -189,7 +189,7 @@ class Runner # stateful
     name = container_name(avatar_name)
     max = 128
     args = [
-      '--detach',                          # get the cid
+      '--detach',
       "--env CYBER_DOJO_AVATAR_NAME=#{avatar_name}",
       "--env CYBER_DOJO_KATA_ID=#{kata_id}",
       "--env CYBER_DOJO_SANDBOX=#{dir}",
@@ -344,7 +344,7 @@ class Runner # stateful
   end
 
   def container_name(avatar_name)
-    "test_run__runner_stateful_#{kata_id}_#{avatar_name}"
+    [ name_prefix, kata_id, avatar_name ].join('_')
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
@@ -368,7 +368,7 @@ class Runner # stateful
   end
 
   def kata_volume_name
-    'test_run__runner_stateful_' + kata_id
+    [ name_prefix, kata_id ].join('_')
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -381,18 +381,14 @@ class Runner # stateful
   end
 
   def chown_avatar_dir(cid, avatar_name)
-    uid = user_id(avatar_name)
     dir = avatar_dir(avatar_name)
+    uid = user_id(avatar_name)
     assert_docker_exec(cid, "chown #{uid}:#{gid} #{dir}")
   end
 
   def remove_avatar_dir(cid, avatar_name)
     dir = avatar_dir(avatar_name)
     assert_docker_exec(cid, "rm -rf #{dir}")
-  end
-
-  def shared_dir
-    "#{sandboxes_root_dir}/shared"
   end
 
   def make_shared_dir(cid)
@@ -402,6 +398,10 @@ class Runner # stateful
 
   def chown_shared_dir(cid)
     assert_docker_exec(cid, "chown root:#{group} #{shared_dir}")
+  end
+
+  def shared_dir
+    "#{sandboxes_root_dir}/shared"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
@@ -473,8 +473,8 @@ class Runner # stateful
   end
 
   def avatar_exists_cid?(cid, avatar_name)
-    # check is for avatar's sandboxes/ subdir
-    # and not its /home/ subdir which is pre-created
+    # check is for avatar's sandboxes/ subdir and
+    # not its /home/ subdir which is pre-created
     # in the docker image.
     dir = avatar_dir(avatar_name)
     _,_,status = quiet_exec("docker exec #{cid} sh -c '[ -d #{dir} ]'")
@@ -514,6 +514,10 @@ class Runner # stateful
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def name_prefix
+    'test_run__runner_stateful_'
+  end
 
   def success
     shell.success
