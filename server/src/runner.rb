@@ -106,10 +106,6 @@ class Runner # stateful
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # run
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # Copes with infinite loops (eg) in the avatar's
-  # code/tests by removing the container - which kills
-  # all processes running inside the container.
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run(avatar_name, deleted_filenames, changed_files, max_seconds)
     assert_kata_exists
@@ -123,6 +119,8 @@ class Runner # stateful
     end
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # properties
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def group
@@ -182,6 +180,7 @@ class Runner # stateful
     # If volume V does _not_ exist the [docker run]
     # will nevertheless succeed, create the container,
     # and create a temporary /sandboxes/ folder in it!
+    # Viz, the runner would be stateless and not stateful.
     # See https://github.com/docker/docker/issues/13121
     dir = avatar_dir(avatar_name)
     home = home_dir(avatar_name)
@@ -213,7 +212,7 @@ class Runner # stateful
   def run_cyber_dojo_sh(cid, avatar_name, files, max_seconds)
     # See comment at end of file about slower alternative.
     Dir.mktmpdir('runner') do |tmp_dir|
-      # save the files onto the host...
+      # Save the files onto the host...
       files.each do |pathed_filename, content|
         sub_dir = File.dirname(pathed_filename)
         if sub_dir != '.'
@@ -255,7 +254,7 @@ class Runner # stateful
       # Note: on Alpine Linux this tar-pipe stores file date-stamps
       # to the second. Viz, the microseconds are always zero.
       # This is very unlikely to matter for a real test-event from
-      # the browser but could matter in tests.
+      # the browser but does matter in some tests.
       if files == {}
         cyber_dojo_sh = [
           'docker exec',
