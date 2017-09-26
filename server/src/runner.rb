@@ -344,6 +344,8 @@ class Runner # stateful
   end
 
   def container_name(avatar_name)
+    # Give containers a name with a specific prefix so they
+    # can be cleaned up if any fail to be removed/reaped.
     # Does not have a trailing uuid. This ensures that
     # an in_container() call is not accidentally nested inside
     # another in_container() call.
