@@ -73,8 +73,8 @@ class RunTest < TestBase
       as('salmon') {
         sss_run({
           changed_files: {
-            'cyber-dojo.sh' => "cd a && #{ls_cmd}",
-            'a/hello.txt'   => 'hello world'
+            'a/hello.txt'   => 'hello world',
+            'cyber-dojo.sh' => "cd a && #{ls_cmd}"
           }
         })
         ls_files = ls_parse(stdout)

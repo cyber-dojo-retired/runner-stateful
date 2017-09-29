@@ -19,9 +19,7 @@ class KataTest < TestBase
   'after kata_new it does exist,',
   'after kata_old it does not exist' do
     refute kata_exists?
-    kata_new
-    assert kata_exists?
-    kata_old
+    in_kata { assert kata_exists? }
     refute kata_exists?
   end
 
@@ -31,13 +29,10 @@ class KataTest < TestBase
 
   test '183',
   'kata_new with kata_id that already exists raises' do
-    kata_new
-    begin
+    in_kata {
       error = assert_raises(ArgumentError) { kata_new }
       assert_equal 'kata_id:exists', error.message
-    ensure
-      kata_old
-    end
+    }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
