@@ -1,72 +1,46 @@
 require_relative 'externals'
 require_relative 'runner'
-require 'sinatra/base'
 require 'json'
 
-class MicroService < Sinatra::Base
+class MicroService
 
-  get '/image_pulled?' do
-    getter(__method__)
-  end
-
-  post '/image_pull' do
-    poster(__method__)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - -
-
-  get  '/kata_exists?' do
-    getter(__method__)
-  end
-
-  post '/kata_new' do
-    poster(__method__)
-  end
-
-  post '/kata_old' do
-    poster(__method__)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - -
-
-  get  '/avatar_exists?' do
-    getter(__method__, avatar_name)
-  end
-
-  post '/avatar_new' do
-    poster(__method__, avatar_name, starting_files)
-  end
-
-  post '/avatar_old' do
-    poster(__method__, avatar_name)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - -
-
-  post '/run' do
-    args  = [ avatar_name ]
-    args += [ deleted_filenames, changed_files ]
-    args += [ max_seconds ]
-    poster(__method__, *args)
+  def call(env)
+    request = Rack::Request.new(env)
+    @args = JSON.parse(request.body.read)
+    case request.path_info
+      when /image_pulled?/
+        body = invoke('image_pulled?')
+      when /image_pull/
+        body = invoke('image_pull')
+      when /kata_exists?/
+        body = invoke('kata_exists?')
+      when /kata_new/
+        body = invoke('kata_new')
+      when /kata_old/
+        body = invoke('kata_old')
+      when /avatar_exists?/
+        body = invoke('avatar_exists?', avatar_name)
+      when /avatar_new/
+        body = invoke('avatar_new', avatar_name, starting_files)
+      when /avatar_old/
+        body = invoke('avatar_old', avatar_name)
+      when /run/
+        args  = [ avatar_name ]
+        args += [ deleted_filenames, changed_files ]
+        args += [ max_seconds ]
+        body = invoke('run', *args)
+    end
+    [ 200, { 'Content-Type' => 'application/json' }, [ body.to_json ] ]
   end
 
   private
 
-  def getter(name, *args)
-    runner_json( 'GET /', name, *args)
-  end
-
-  def poster(name, *args)
-    runner_json('POST /', name, *args)
-  end
-
-  def runner_json(prefix, caller, *args)
+  def invoke(name, *args)
     runner = Runner.new(self, image_name, kata_id)
-    name = caller.to_s[prefix.length .. -1]
-    { name => runner.send(name, *args) }.to_json
+    { name => runner.send(name, *args) }
   rescue Exception => e
     log << "EXCEPTION: #{e.class.name}.#{caller} #{e.message}"
-    { 'exception' => e.message }.to_json
+    { 'exception' => e.message }
   end
 
   # - - - - - - - - - - - - - - - -
@@ -75,16 +49,12 @@ class MicroService < Sinatra::Base
 
   def self.request_args(*names)
     names.each { |name|
-      define_method name, &lambda { args[name.to_s] }
+      define_method name, &lambda { @args[name.to_s] }
     }
   end
 
   request_args :image_name, :kata_id
   request_args :avatar_name, :starting_files
   request_args :deleted_filenames, :changed_files, :max_seconds
-
-  def args
-    @args ||= JSON.parse(request.body.read)
-  end
 
 end
