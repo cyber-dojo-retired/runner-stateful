@@ -18,9 +18,10 @@ class LanguageTest < TestBase
 
   test '76D',
   '[gcc,assert] runs' do
-    sss_run({
+    run4({
       changed_files: files('gcc_assert')
     })
+    assert_colour 'red'
     assert_stderr_include "[makefile:14: test.output] Aborted"
     assert_stderr_include 'Assertion failed: answer() == 42'
     assert_status 2
@@ -30,9 +31,10 @@ class LanguageTest < TestBase
 
   test '358',
   '[Java,Cucumber] runs' do
-    sss_run({
+    run4({
       changed_files: files('java_cucumber')
     })
+    assert_colour 'red'
     assert_stdout_include '1 Scenarios (1 failed)'
     assert_stderr ''
     assert_status 1

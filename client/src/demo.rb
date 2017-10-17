@@ -18,26 +18,26 @@ class Demo < Sinatra::Base
 
   def red
     change = {}
-    duration = timed { @sssc = run(change) }
-    @html += pre('run', duration, 'Red', @sssc)
+    duration = timed { @quad = run(change) }
+    @html += pre('run', duration, 'Red', @quad)
   end
 
   def amber
     change = { 'hiker.c' => 'sdsdsdsd' }
-    duration = timed { @sssc = run(change) }
-    @html += pre('run', duration, 'Yellow', @sssc)
+    duration = timed { @quad = run(change) }
+    @html += pre('run', duration, 'Yellow', @quad)
   end
 
   def green
     change = { 'hiker.c' => hiker_c.sub('6 * 9', '6 * 7') }
-    duration = timed { @sssc = run(change) }
-    @html += pre('run', duration, 'Lime', @sssc)
+    duration = timed { @quad = run(change) }
+    @html += pre('run', duration, 'Lime', @quad)
   end
 
   def time_out
     change = { 'hiker.c' => hiker_c.sub('return', "for(;;);\n return") }
-    duration = timed { @sssc = run(change, 3) }
-    @html += pre('run', duration, 'LightGray', @sssc)
+    duration = timed { @quad = run(change, 3) }
+    @html += pre('run', duration, 'LightGray', @quad)
   end
 
   def in_kata
@@ -108,15 +108,15 @@ class Demo < Sinatra::Base
     'lion'
   end
 
-  def pre(name, duration, colour='white', sssc=nil)
+  def pre(name, duration, colour='white', quad=nil)
     border = 'border:1px solid black'
     padding = 'padding:10px'
     margin = 'margin-left:20px'
     background = "background:#{colour}"
     html = "<pre>/#{name}(#{duration}s)</pre>"
-    unless sssc == nil
+    unless quad == nil
       html += "<pre style='#{margin};#{border};#{padding};#{background}'>" +
-              "#{JSON.pretty_unparse(sssc)}" +
+              "#{JSON.pretty_unparse(quad)}" +
               '</pre>'
     end
     html

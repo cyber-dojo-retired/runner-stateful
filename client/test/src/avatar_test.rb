@@ -2,9 +2,17 @@ require_relative 'test_base'
 
 class AvatarTest < TestBase
 
-  def self.hex_prefix; '4F725'; end
-  def hex_setup; kata_new; end
-  def hex_teardown; kata_old; end
+  def self.hex_prefix
+    '4F725'
+  end
+
+  def hex_setup
+    kata_new
+  end
+
+  def hex_teardown
+    kata_old
+  end
 
   test 'D08',
   %w( avatar_exists ) do

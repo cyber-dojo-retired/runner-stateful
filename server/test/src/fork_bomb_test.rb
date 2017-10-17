@@ -25,7 +25,7 @@ class ForkBombTest < TestBase
   %w( [Alpine] fork-bomb in C fails to go off ) do
     hiker_c = '#include "hiker.h"' + "\n" + fork_bomb_definition
     as('lion') {
-      sss_run({ avatar_name: 'lion',
+      run4({ avatar_name: 'lion',
               changed_files: {'hiker.c' => hiker_c }
       })
     }
@@ -43,7 +43,7 @@ class ForkBombTest < TestBase
   %w( [Ubuntu] fork-bomb in C++ fails to go off ) do
     hiker_cpp = '#include "hiker.hpp"' + "\n" + fork_bomb_definition
     as('lion') {
-      sss_run({ avatar_name: 'lion',
+      run4({ avatar_name: 'lion',
               changed_files: {'hiker.cpp' => hiker_cpp }
       })
     }
@@ -87,7 +87,7 @@ class ForkBombTest < TestBase
     @log = LoggerSpy.new(nil)
     as('lion') {
       begin
-        sss_run_shell_fork_bomb
+        run4_shell_fork_bomb
       # :nocov:
         assert_status success
         assert_stdout ''
@@ -114,7 +114,7 @@ class ForkBombTest < TestBase
     @log = LoggerSpy.new(nil)
     as('lion') {
       begin
-        sss_run_shell_fork_bomb
+        run4_shell_fork_bomb
       # :nocov:
         assert_status success
         assert_stdout ''
@@ -133,9 +133,9 @@ class ForkBombTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def sss_run_shell_fork_bomb
+  def run4_shell_fork_bomb
     cyber_dojo_sh = 'bomb() { bomb | bomb & }; bomb'
-    sss_run({
+    run4({
         avatar_name:'lion',
       changed_files:{'cyber-dojo.sh' => cyber_dojo_sh }
     })

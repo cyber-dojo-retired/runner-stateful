@@ -20,7 +20,7 @@ class FileBombTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'DB3', %w( [Alpine]
-  file() bomb in C fails to go off
+  file-bomb in C fails to go off
   ) do
     hiker_c = [
       '#include "hiker.h"',
@@ -44,13 +44,14 @@ class FileBombTest < TestBase
       '  return 6 * 7;',
       '}'
     ].join("\n")
+
     as('lion') {
-      sss_run({
+      run4({
           avatar_name:'lion',
         changed_files:{ 'hiker.c' => hiker_c }
       })
-      assert_equal success, status
-      assert_equal '', stderr
+      assert_status success
+      assert_stderr ''
       lines = stdout.split("\n")
 
       assert_equal 1, lines.count{ |line|

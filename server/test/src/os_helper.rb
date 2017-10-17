@@ -78,12 +78,12 @@ module OsHelper
     # known ls-starting-files. Note that kata_teardown
     # calls avatar_old('salmon')
     as('lion', ls_starting_files) {
-      sss_run({
+      run4({
           avatar_name:'lion',
         changed_files:{}
       })
-      assert_equal success, status
-      assert_equal '', stderr
+      assert_status success
+      assert_stderr ''
       ls_stdout = stdout
       ls_files = ls_parse(ls_stdout)
       assert_equal ls_starting_files.keys.sort, ls_files.keys.sort
@@ -243,7 +243,7 @@ module OsHelper
 
   def etc_issue
     changed_files = { 'cyber-dojo.sh' => 'cat /etc/issue' }
-    stdout,_,_ = sss_run({ changed_files:changed_files })
+    run4({ changed_files:changed_files })
     stdout
   end
 

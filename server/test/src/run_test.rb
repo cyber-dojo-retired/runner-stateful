@@ -16,7 +16,7 @@ class RunTest < TestBase
   %w( run returns red-amber-green traffic-light colour ) do
     in_kata {
       as('lion') {
-        sss_run({
+        run4({
           avatar_name:'lion',
               kata_id:kata_id
         })
@@ -31,7 +31,7 @@ class RunTest < TestBase
   %w( files can be in sub-dirs of sandbox ) do
     in_kata {
       as('salmon') {
-        sss_run({
+        run4({
           changed_files: {
             'a/hello.txt'   => 'hello world',
             'cyber-dojo.sh' => ls_cmd
@@ -51,7 +51,7 @@ class RunTest < TestBase
   %w( files can be in sub-sub-dirs of sandbox ) do
     in_kata {
       as('salmon') {
-        sss_run({
+        run4({
           changed_files: {
             'a/b/hello.txt' => 'hello world',
             'cyber-dojo.sh' => "cd a && #{ls_cmd}"
@@ -71,7 +71,7 @@ class RunTest < TestBase
   %w( files in sub-dirs of sandbox can be deleted ) do
     in_kata {
       as('salmon') {
-        sss_run({
+        run4({
           changed_files: {
             'a/hello.txt'   => 'hello world',
             'cyber-dojo.sh' => "cd a && #{ls_cmd}"
@@ -82,7 +82,7 @@ class RunTest < TestBase
         group = runner.group
         assert_equal_atts('hello.txt', '-rw-r--r--', uid, group, 11, ls_files)
 
-        sss_run({
+        run4({
           deleted_filenames: [ 'a/hello.txt' ],
               changed_files: {}
         })
@@ -124,7 +124,7 @@ class RunTest < TestBase
 
   def assert_raises_kata_id(kata_id, message)
     error = assert_raises(ArgumentError) {
-      sss_run({ kata_id:kata_id })
+      run4({ kata_id:kata_id })
     }
     assert_equal "kata_id:#{message}", error.message
   end
@@ -133,7 +133,7 @@ class RunTest < TestBase
 
   def assert_raises_avatar_name(kata_id, avatar_name, message)
     error = assert_raises(ArgumentError) {
-      sss_run({
+      run4({
             kata_id:kata_id,
         avatar_name:avatar_name
       })

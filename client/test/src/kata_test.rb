@@ -2,7 +2,9 @@ require_relative 'test_base'
 
 class KataTest < TestBase
 
-  def self.hex_prefix; 'D2E7E'; end
+  def self.hex_prefix
+    'D2E7E'
+  end
 
   test 'D87',
   %w( kata_exists ) do

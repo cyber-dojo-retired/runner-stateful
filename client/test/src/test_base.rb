@@ -47,29 +47,53 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - -
 
-  def sss_run(named_args={})
+  def run4(named_args={})
     # don't call this run() as it clashes with MiniTest
-    @sss = runner.run(*defaulted_args(__method__, named_args))
-  end
-
-  def sss
-    @sss
+    @quad = runner.run(*defaulted_args(__method__, named_args))
   end
 
   def status
-    sss['status']
+    quad['status']
   end
 
   def stdout
-    sss['stdout']
+    quad['stdout']
   end
 
   def stderr
-    sss['stderr']
+    quad['stderr']
   end
 
   def colour
-    sss['colour']
+    quad['colour']
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - -
+
+  def assert_stdout(expected)
+    assert_equal expected, stdout, quad
+  end
+
+  def assert_stderr(expected)
+    assert_equal expected, stderr, quad
+  end
+
+  def assert_status(expected)
+    assert_equal expected, status, quad
+  end
+
+  def assert_colour(expected)
+    assert_equal expected, colour, quad
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - -
+
+  def assert_stdout_include(text)
+    assert stdout.include?(text), quad
+  end
+
+  def assert_stderr_include(text)
+    assert stderr.include?(text), quad
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - -
@@ -97,7 +121,7 @@ class TestBase < HexMiniTest
     args << defaulted_arg(named_args, :deleted_filenames, [])
     args << defaulted_arg(named_args, :changed_files, files)
     args << defaulted_arg(named_args, :max_seconds, 10)
-    return args if method == :sss_run
+    return args if method == :run4
   end
 
   def defaulted_arg(named_args, arg_name, arg_default)
@@ -139,30 +163,14 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_timed_out
-    assert_equal timed_out, colour, sss.to_s
-  end
-
-  def assert_stdout(expected)
-    assert_equal expected, stdout, sss.to_s
-  end
-
-  def assert_stderr(expected)
-    assert_equal expected, stderr, sss.to_s
-  end
-
-  def assert_status(expected)
-    assert_equal expected, status, sss.to_s
-  end
-
-  def assert_colour(expected)
-    assert_equal expected, colour, sss.to_s
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - -
-
   def timed_out
     'timed_out'
+  end
+
+  private
+
+  def quad
+    @quad
   end
 
 end
