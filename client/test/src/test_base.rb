@@ -140,7 +140,7 @@ class TestBase < HexMiniTest
   # - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_timed_out
-    assert_equal timed_out, status, sss.to_s
+    assert_equal timed_out, colour, sss.to_s
   end
 
   def assert_stdout(expected)

@@ -39,9 +39,7 @@ class TimeoutTest < TestBase
       changed_files:gcc_assert_files,
         max_seconds:2
     }
-    stdout,stderr = assert_run_times_out(named_args)
-    assert_equal '', stdout
-    assert_equal '', stderr
+    assert_run_times_out(named_args)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -71,9 +69,7 @@ class TimeoutTest < TestBase
       changed_files:gcc_assert_files,
         max_seconds:2
     }
-    stdout,stderr = assert_run_times_out(named_args)
-    assert_equal '', stdout
-    assert_equal '', stderr
+    assert_run_times_out(named_args)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -

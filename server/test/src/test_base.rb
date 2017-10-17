@@ -153,16 +153,19 @@ class TestBase < HexMiniTest
   end
 
   def assert_run_succeeds(named_args)
-    stdout,stderr,status = sss_run(named_args)
+    stdout,stderr,status,colour = sss_run(named_args)
+    refute_equal timed_out, colour, [stdout,stderr]
     assert_equal success, status, [stdout,stderr]
     assert_equal '', stderr, stdout
     stdout
   end
 
   def assert_run_times_out(named_args)
-    stdout,stderr,status = sss_run(named_args)
-    assert_equal timed_out, status, [stdout,stderr]
-    [stdout,stderr]
+    stdout,stderr,status,colour = sss_run(named_args)
+    assert_equal timed_out, colour, [stdout,stderr]
+    assert_equal 137, status, [stdout, stderr]
+    assert_stdout ''
+    assert_stderr ''
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
