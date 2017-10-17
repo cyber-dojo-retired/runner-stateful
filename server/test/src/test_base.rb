@@ -75,7 +75,7 @@ class TestBase < HexMiniTest
     args << defaulted_arg(named_args, :changed_files, files)
     args << defaulted_arg(named_args, :max_seconds, 10)
     @quad = runner.run(*args)
-    [stdout,stderr,status,colour]
+    nil
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
