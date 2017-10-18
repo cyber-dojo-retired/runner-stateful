@@ -19,5 +19,5 @@ check_up()
 docker-compose --file ${ROOT_DIR}/docker-compose.yml up -d
 # crude wait for services
 sleep 1
-check_up 'runner_server'
-check_up 'runner_client'
+check_up 'runner_stateful_server'
+check_up 'runner_stateful_client'

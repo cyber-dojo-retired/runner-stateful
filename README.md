@@ -6,12 +6,12 @@
 
 - - - -
 
-[![Build Status](https://travis-ci.org/cyber-dojo/runner.svg?branch=master)](https://travis-ci.org/cyber-dojo/runner)
+[![Build Status](https://travis-ci.org/cyber-dojo/runner_stateful.svg?branch=master)](https://travis-ci.org/cyber-dojo/runner_stateful)
 
 <img src="https://raw.githubusercontent.com/cyber-dojo/nginx/master/images/home_page_logo.png"
 alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
 
-# cyberdojo/runner docker image
+# cyberdojo/runner_stateful docker image
 
 - A stateful micro-service for [cyber-dojo](http://cyber-dojo.org)
 - Runs an avatar's tests.
@@ -21,12 +21,6 @@ API:
   * All methods return a json hash with a single key.
     * If the method completes, the key equals the method's name.
     * If the method raises an exception, the key equals "exception".
-
-The default runner is SharedVolumeRunner.
-There are two runner implementations in this repo with different
-speed/sharing/security tradeoffs. They use the same tests.
-  * [SharedVolumeRunner](https://github.com/cyber-dojo/runner/blob/master/server/src/shared_volume_runner.rb)
-  * [SharedContainerRunner](https://github.com/cyber-dojo/runner/blob/master/server/src/shared_container_runner.rb)
 
 - - - -
 

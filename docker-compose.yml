@@ -2,57 +2,57 @@
 version: '2'
 
 services:
-  runner_client:
+  runner_stateful_client:
     user: nobody
-    image: cyberdojo/runner_client
-    container_name: runner_client
+    image: cyberdojo/runner_stateful_client
+    container_name: runner_stateful_client
     read_only: true
     tmpfs: /tmp
     depends_on:
-      - runner
-      - runner-client-coverage-container
+      - runner_stateful
+      - runner-stateful-client-coverage-container
     volumes_from:
-      - runner-client-coverage-container:rw
+      - runner-stateful-client-coverage-container:rw
     environment:
       - CYBER_DOJO_COVERAGE_ROOT
     build:
       context: client
       args:
-        - PORT=${CYBER_DOJO_RUNNER_CLIENT_PORT}
+        - PORT=${CYBER_DOJO_RUNNER_STATEFUL_CLIENT_PORT}
     ports:
-      - ${CYBER_DOJO_RUNNER_CLIENT_PORT}:${CYBER_DOJO_RUNNER_CLIENT_PORT}
+      - ${CYBER_DOJO_RUNNER_STATEFUL_CLIENT_PORT}:${CYBER_DOJO_RUNNER_STATEFUL_CLIENT_PORT}
 
-  runner:
+  runner_stateful:
     user: root
-    image: cyberdojo/runner
-    container_name: runner_server
+    image: cyberdojo/runner_stateful
+    container_name: runner_stateful_server
     read_only: true
     tmpfs: /tmp
     depends_on:
-      - runner-server-coverage-container
+      - runner-stateful-server-coverage-container
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
     volumes_from:
-      - runner-server-coverage-container:rw
+      - runner-stateful-server-coverage-container:rw
     environment:
       - CYBER_DOJO_COVERAGE_ROOT
     build:
       context: server
       args:
-        - PORT=${CYBER_DOJO_RUNNER_SERVER_PORT}
+        - PORT=${CYBER_DOJO_RUNNER_STATEFUL_SERVER_PORT}
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  runner-client-coverage-container:
-    image: cyberdojo/runner_client
-    container_name: runner-client-coverage-container
+  runner-stateful-client-coverage-container:
+    image: cyberdojo/runner_stateful_client
+    container_name: runner-stateful-client-coverage-container
     volumes:
       - /${CYBER_DOJO_COVERAGE_ROOT}
     command: "chown nobody:nobody ${CYBER_DOJO_COVERAGE_ROOT}"
 
 
-  runner-server-coverage-container:
-    image: cyberdojo/runner
-    container_name: runner-server-coverage-container
+  runner-stateful-server-coverage-container:
+    image: cyberdojo/runner_stateful
+    container_name: runner-stateful-server-coverage-container
     volumes:
       - /${CYBER_DOJO_COVERAGE_ROOT}

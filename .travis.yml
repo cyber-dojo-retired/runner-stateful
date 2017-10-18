@@ -9,9 +9,9 @@ before_script:
 
 script:
     # pull images used by tests
+    - docker pull cyberdojofoundation/clangpp_assert
     - docker pull cyberdojofoundation/gcc_assert
     - docker pull cyberdojofoundation/java_cucumber_pico
-    - docker pull cyberdojofoundation/clangpp_assert
 
     #
     - ./pipe_build_up_test.sh \
