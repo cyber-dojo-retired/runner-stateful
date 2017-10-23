@@ -82,6 +82,7 @@ module OsHelper
           avatar_name:'lion',
         changed_files:{}
       })
+      assert_colour 'amber' # doing an ls
       assert_status success
       assert_stderr ''
       ls_stdout = stdout
