@@ -34,12 +34,8 @@ module OsHelper
   def assert_group_exists
     stdout = assert_cyber_dojo_sh("getent group #{group}").strip
     entries = stdout.split(':')  # cyber-dojo:x:5000
-    ent = {
-      group:entries[0],
-      gid:entries[2].to_i
-    }
-    assert_equal group, ent[:group], stdout
-    assert_equal gid,   ent[:gid],   stdout
+    assert_equal group, entries[0], stdout
+    assert_equal gid, entries[2].to_i, stdout
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
