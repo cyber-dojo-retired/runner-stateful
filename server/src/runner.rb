@@ -184,7 +184,9 @@ class Runner # stateful
     dir = avatar_dir(avatar_name)
     home = home_dir(avatar_name)
     name = container_name(avatar_name)
-    max = 128
+    mb4 = 4 * 1024 * 1024
+    mb16 = 16 * 1024 * 1024
+    gb4 = mb4 * 1024
     args = [
       '--detach',
       "--env CYBER_DOJO_AVATAR_NAME=#{avatar_name}",
@@ -194,11 +196,16 @@ class Runner # stateful
       '--interactive',                     # for later execs
       "--name=#{name}",                    # for easy clean up
       '--net=none',                        # for security
-      "--pids-limit=#{max}",               # no fork bombs
+      '--pids-limit=128',                  # no fork bombs
       '--security-opt=no-new-privileges',  # no escalation
-      '--ulimit core=0:0',                 # max core file size = 0 blocks
-      "--ulimit nofile=#{max}:#{max}",     # max number of files
-      "--ulimit nproc=#{max}:#{max}",      # max number processes
+      "--ulimit data=#{gb4}:#{gb4}",       # max data segment size
+      '--ulimit core=0:0',                 # max core file size
+      '--ulimit cpu=10:10',                # max cpu time (seconds)
+      "--ulimit fsize=#{mb16}:#{mb16}",    # max file size
+      '--ulimit locks=128:128',            # max number of file locks
+      '--ulimit nofile=128:128',           # max number of files
+      '--ulimit nproc=128:128',            # max number processes
+      "--ulimit stack=#{mb4}:#{mb4}",      # max stack size
       '--user=root',
       "--volume #{kata_volume_name}:#{sandboxes_root_dir}:rw"
     ].join(space)

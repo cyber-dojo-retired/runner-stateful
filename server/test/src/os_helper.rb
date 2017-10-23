@@ -199,23 +199,44 @@ module OsHelper
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def ulimit_test
+    etc_issue = assert_cyber_dojo_sh('cat /etc/issue')
     lines = assert_cyber_dojo_sh('ulimit -a').split("\n")
-    max = 128
-    assert_equal max, ulimit(lines, :max_processes)
-    assert_equal   0, ulimit(lines, :max_core_size)
-    assert_equal max, ulimit(lines, :max_no_files)
+
+    assert_equal    0, ulimit(lines, :core_size,  etc_issue)
+    assert_equal   10, ulimit(lines, :cpu_time,   etc_issue)
+    assert_equal  128, ulimit(lines, :file_locks, etc_issue)
+    assert_equal  128, ulimit(lines, :no_files,   etc_issue)
+    assert_equal  128, ulimit(lines, :processes,  etc_issue)
+
+    expected_data_size = 4 * gb / kb
+    assert_equal expected_data_size,  ulimit(lines, :data_size,  etc_issue)
+
+    expected_file_size = 16 * mb / (block_size = 512)
+    assert_equal expected_file_size,  ulimit(lines, :file_size,  etc_issue)
+
+    expected_stack_size = 4 * mb / kb
+    assert_equal expected_stack_size, ulimit(lines, :stack_size, etc_issue)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def ulimit(lines, key)
+  def ulimit(lines, key, etc_issue)
     table = {             # alpine,                       ubuntu
-      :max_processes => [ '-p: processes',               'process'         ],
-      :max_core_size => [ '-c: core file size (blocks)', 'coredump(blocks)'],
-      :max_no_files  => [ '-n: file descriptors',        'nofiles'         ],
+      :core_size  => [ '-c: core file size (blocks)', 'coredump(blocks)'],
+      :cpu_time   => [ '-t: cpu time (seconds)',      'time(seconds)'   ],
+      :data_size  => [ '-d: data seg size (kb)',      'data(kbytes)'    ],
+      :file_locks => [ '-w: locks',                   'locks'           ],
+      :file_size  => [ '-f: file size (blocks)',      'file(blocks)'    ],
+      :no_files   => [ '-n: file descriptors',        'nofiles'         ],
+      :processes  => [ '-p: processes',               'process'         ],
+      :stack_size => [ '-s: stack size (kb)',         'stack(kbytes)'   ],
     }
-    if alpine?; txt = table[key][0]; end
-    if ubuntu?; txt = table[key][1]; end
+    if alpine?(etc_issue)
+      txt = table[key][0]
+    end
+    if ubuntu?(etc_issue)
+      txt = table[key][1]
+    end
     line = lines.detect { |limit| limit.start_with? txt }
     line.split[-1].to_i
   end
@@ -233,18 +254,26 @@ module OsHelper
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def alpine?
+  def alpine?(etc_issue)
     etc_issue.include? 'Alpine'
   end
 
-  def ubuntu?
+  def ubuntu?(etc_issue)
     etc_issue.include? 'Ubuntu'
   end
 
-  def etc_issue
-    changed_files = { 'cyber-dojo.sh' => 'cat /etc/issue' }
-    run4({ changed_files:changed_files })
-    stdout
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def kb
+    1024
+  end
+
+  def mb
+    kb * 1024
+  end
+
+  def gb
+    mb * 1024
   end
 
 end
