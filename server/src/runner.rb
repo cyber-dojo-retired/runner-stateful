@@ -191,6 +191,7 @@ class Runner # stateful
       '--detach',
       "--env CYBER_DOJO_AVATAR_NAME=#{avatar_name}",
       "--env CYBER_DOJO_KATA_ID=#{kata_id}",
+      '--env CYBER_DOJO_RUNNER=stateful',
       "--env CYBER_DOJO_SANDBOX=#{dir}",
       "--env HOME=#{home}",
       '--interactive',                     # for later execs
