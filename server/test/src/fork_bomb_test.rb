@@ -44,7 +44,7 @@ class ForkBombTest < TestBase
     hiker_cpp = '#include "hiker.hpp"' + "\n" + fork_bomb_definition
     as('lion') {
       run4({ avatar_name: 'lion',
-              changed_files: {'hiker.cpp' => hiker_cpp }
+              changed_files: { 'hiker.cpp' => hiker_cpp }
       })
     }
     assert success == success || status == 2
