@@ -1,4 +1,6 @@
 {
+  "display_name": "Java, Cucumber",
+
   "visible_filenames": [
     "README",
     "Hiker.feature",
@@ -8,11 +10,11 @@
     "cyber-dojo.sh"
   ],
 
-  "filename_extension" : ".java",
-
-  "display_name": "Java, Cucumber",
-
   "image_name": "cyberdojofoundation/java_cucumber_pico",
+
+  "runner_choice": "stateful",
+
+  "filename_extension" : ".java",
 
   "red_amber_green" : [
     "lambda { |output|",
