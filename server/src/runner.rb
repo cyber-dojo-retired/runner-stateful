@@ -194,6 +194,7 @@ class Runner # stateful
       '--env CYBER_DOJO_RUNNER=stateful',
       "--env CYBER_DOJO_SANDBOX=#{dir}",
       "--env HOME=#{home}",
+      '--init',                            # pid-1 process
       '--interactive',                     # for later execs
       "--name=#{name}",                    # for easy clean up
       '--net=none',                        # for security
