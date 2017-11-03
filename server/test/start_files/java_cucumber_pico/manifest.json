@@ -14,13 +14,5 @@
 
   "runner_choice": "stateful",
 
-  "filename_extension" : ".java",
-
-  "red_amber_green" : [
-    "lambda { |output|",
-    "  return :red   if /FAILURES!!!/.match(output)",
-    "  return :green if /OK \\((\\d*) tests\\)/.match(output)",
-    "  return :amber",
-    "}"
-  ]
+  "filename_extension" : ".java"
 }

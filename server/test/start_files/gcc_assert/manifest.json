@@ -13,13 +13,5 @@
 
   "runner_choice": "stateful",
 
-  "filename_extension" : ".c",
-
-  "red_amber_green" : [
-    "lambda { |output|",
-    "  return :red   if /(.*)Assertion(.*)failed./.match(output)",
-    "  return :green if /(All|\\d*) tests passed/.match(output)",
-    "  return :amber",
-    "}"
-  ]
+  "filename_extension" : ".c"
 }

@@ -12,13 +12,5 @@
 
   "runner_choice": "stateful",
 
-  "filename_extension" : ".vb",
-
-  "red_amber_green" : [
-    "lambda { |output|",
-    "  return :red   if /^Errors and Failures:/.match(output)",
-    "  return :green if /^Tests run: (\\d*), Errors: 0, Failures: 0/.match(output)",
-    "  return :amber",
-    "}"
-  ]
+  "filename_extension" : ".vb"
 }
