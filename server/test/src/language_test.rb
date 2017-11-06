@@ -7,20 +7,18 @@ class LanguageTest < TestBase
   end
 
   def hex_setup
-    kata_setup
-  end
-
-  def hex_teardown
-    kata_teardown
+    set_image_name image_for_test
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '76D',
   '[gcc,assert] runs' do
-    run4({
-      changed_files: files('gcc_assert')
-    })
+    in_kata {
+      as('salmon') {
+        run_cyber_dojo_sh
+      }
+    }
     assert_colour 'red'
     assert_stderr_include "[makefile:14: test.output] Aborted"
     assert_stderr_include 'Assertion failed: answer() == 42'
@@ -31,9 +29,11 @@ class LanguageTest < TestBase
 
   test '358',
   '[Java,Cucumber] runs' do
-    run4({
-      changed_files: files('java_cucumber')
-    })
+    in_kata {
+      as('salmon') {
+        run_cyber_dojo_sh
+      }
+    }
     assert_colour 'red'
     assert_stdout_include '1 Scenarios (1 failed)'
     assert_stderr ''

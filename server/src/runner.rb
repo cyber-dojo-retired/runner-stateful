@@ -107,6 +107,11 @@ class Runner # stateful
   # run
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  def run_cyber_dojo_sh(avatar_name, deleted_filenames,
+    unchanged_files, changed_files, new_files, max_seconds)
+    run(avatar_name, deleted_filenames, new_files.merge(changed_files), max_seconds)
+  end
+
   def run(avatar_name, deleted_filenames, changed_files, max_seconds)
     assert_kata_exists
     assert_valid_avatar_name(avatar_name)

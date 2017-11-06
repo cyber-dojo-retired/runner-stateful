@@ -16,10 +16,7 @@ class RunTest < TestBase
   %w( run returns red-amber-green traffic-light colour ) do
     in_kata {
       as('lion') {
-        run4({
-          avatar_name:'lion',
-              kata_id:kata_id
-        })
+        run_cyber_dojo_sh({ avatar_name:'lion' })
         assert_colour 'red'
       }
     }
@@ -31,7 +28,7 @@ class RunTest < TestBase
   %w( files can be in sub-dirs of sandbox ) do
     in_kata {
       as('salmon') {
-        run4({
+        run_cyber_dojo_sh({
           changed_files: {
             'a/hello.txt'   => 'hello world',
             'cyber-dojo.sh' => ls_cmd
@@ -51,7 +48,7 @@ class RunTest < TestBase
   %w( files can be in sub-sub-dirs of sandbox ) do
     in_kata {
       as('salmon') {
-        run4({
+        run_cyber_dojo_sh({
           changed_files: {
             'a/b/hello.txt' => 'hello world',
             'cyber-dojo.sh' => "cd a && #{ls_cmd}"
@@ -59,7 +56,6 @@ class RunTest < TestBase
         })
         ls_files = ls_parse(stdout)
         uid = runner.user_id('salmon')
-        group = runner.group
         assert_equal_atts('b', 'drwxr-xr-x', uid, group, 4096, ls_files)
       }
     }
@@ -71,7 +67,7 @@ class RunTest < TestBase
   %w( files in sub-dirs of sandbox can be deleted ) do
     in_kata {
       as('salmon') {
-        run4({
+        run_cyber_dojo_sh({
           changed_files: {
             'a/hello.txt'   => 'hello world',
             'cyber-dojo.sh' => "cd a && #{ls_cmd}"
@@ -82,9 +78,8 @@ class RunTest < TestBase
         group = runner.group
         assert_equal_atts('hello.txt', '-rw-r--r--', uid, group, 11, ls_files)
 
-        run4({
-          deleted_filenames: [ 'a/hello.txt' ],
-              changed_files: {}
+        run_cyber_dojo_sh({
+          deleted_filenames: [ 'a/hello.txt' ]
         })
         assert_equal '', stdout
       }
@@ -124,7 +119,7 @@ class RunTest < TestBase
 
   def assert_raises_kata_id(kata_id, message)
     error = assert_raises(ArgumentError) {
-      run4({ kata_id:kata_id })
+      run_cyber_dojo_sh({ kata_id:kata_id })
     }
     assert_equal "kata_id:#{message}", error.message
   end
@@ -133,7 +128,7 @@ class RunTest < TestBase
 
   def assert_raises_avatar_name(kata_id, avatar_name, message)
     error = assert_raises(ArgumentError) {
-      run4({
+      run_cyber_dojo_sh({
             kata_id:kata_id,
         avatar_name:avatar_name
       })

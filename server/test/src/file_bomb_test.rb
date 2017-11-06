@@ -10,11 +10,7 @@ class FileBombTest < TestBase
   end
 
   def hex_setup
-    kata_setup
-  end
-
-  def hex_teardown
-    kata_teardown
+    set_image_name image_for_test
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -45,24 +41,25 @@ class FileBombTest < TestBase
       '}'
     ].join("\n")
 
-    as('lion') {
-      run4({
-          avatar_name:'lion',
-        changed_files:{ 'hiker.c' => hiker_c }
-      })
-      assert_status success
-      assert_stderr ''
-      lines = stdout.split("\n")
+    in_kata {
+      as('salmon') {
+        run_cyber_dojo_sh({
+          changed_files:{ 'hiker.c' => hiker_c }
+        })
+      }
+    }
+    assert_status success
+    assert_stderr ''
+    lines = stdout.split("\n")
 
-      assert_equal 1, lines.count{ |line|
-        line == 'All tests passed'
-      }
-      assert lines.count{ |line|
-        line.start_with? 'fopen() != NULL'
-      } > 42
-      assert_equal 1, lines.count{ |line|
-        line.start_with? 'fopen() == NULL'
-      }
+    assert_equal 1, lines.count{ |line|
+      line == 'All tests passed'
+    }
+    assert lines.count{ |line|
+      line.start_with? 'fopen() != NULL'
+    } > 42
+    assert_equal 1, lines.count{ |line|
+      line.start_with? 'fopen() == NULL'
     }
   end
 

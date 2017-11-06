@@ -66,15 +66,15 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def run4(named_args = {})
-    # Don't name this run() as it clashes with MiniTest.
-    # The name run4 mimics open3
+  def run_cyber_dojo_sh(named_args={})
     args = []
     args << defaulted_arg(named_args, :avatar_name, default_avatar_name)
     args << defaulted_arg(named_args, :deleted_filenames, [])
-    args << defaulted_arg(named_args, :changed_files, files)
+    args << defaulted_arg(named_args, :unchanged_files, {})
+    args << defaulted_arg(named_args, :changed_files, {})
+    args << defaulted_arg(named_args, :new_files, {})
     args << defaulted_arg(named_args, :max_seconds, 10)
-    @quad = runner.run(*args)
+    @quad = runner.run_cyber_dojo_sh(*args)
     nil
   end
 
@@ -154,7 +154,7 @@ class TestBase < HexMiniTest
   end
 
   def assert_run_succeeds(named_args)
-    run4(named_args)
+    run_cyber_dojo_sh(named_args)
     refute_equal timed_out, colour, quad
     assert_status success
     assert_stderr ''
@@ -162,7 +162,7 @@ class TestBase < HexMiniTest
   end
 
   def assert_run_times_out(named_args)
-    run4(named_args)
+    run_cyber_dojo_sh(named_args)
     assert_colour timed_out
     assert_status 137
     assert_stdout ''

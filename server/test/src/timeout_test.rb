@@ -7,11 +7,7 @@ class TimeoutTest < TestBase
   end
 
   def hex_setup
-    kata_setup
-  end
-
-  def hex_teardown
-    kata_teardown
+    set_image_name image_for_test
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -25,21 +21,25 @@ class TimeoutTest < TestBase
       then
         the output is empty
           and
-        the status is timed_out
+        the colour is timed_out
   ) do
-    gcc_assert_files['hiker.c'] = [
-      '#include "hiker.h"',
-      'int answer(void)',
-      '{',
-      '    for(;;); ',
-      '    return 6 * 7;',
-      '}'
-    ].join("\n")
-    named_args = {
-      changed_files:gcc_assert_files,
-        max_seconds:2
+    in_kata {
+      as('salmon') {
+        hiker_c_content = [
+          '#include "hiker.h"',
+          'int answer(void)',
+          '{',
+          '    for(;;); ',
+          '    return 6 * 7;',
+          '}'
+        ].join("\n")
+        named_args = {
+          changed_files: { 'hiker.c' => hiker_c_content },
+            max_seconds: 2
+        }
+        assert_run_times_out(named_args)
+      }
     }
-    assert_run_times_out(named_args)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -53,29 +53,27 @@ class TimeoutTest < TestBase
       then
         the output is nonetheless empty
           and
-        the status is timed_out
+        the colour is timed_out
     ) do
-    gcc_assert_files['hiker.c'] = [
-      '#include "hiker.h"',
-      '#include <stdio.h>',
-      'int answer(void)',
-      '{',
-      '    for(;;)',
-      '        puts("Hello");',
-      '    return 6 * 7;',
-      '}'
-    ].join("\n")
-    named_args = {
-      changed_files:gcc_assert_files,
-        max_seconds:2
+      in_kata {
+        as('salmon') {
+          hiker_c_content = [
+          '#include "hiker.h"',
+          '#include <stdio.h>',
+          'int answer(void)',
+          '{',
+          '    for(;;)',
+          '        puts("Hello");',
+          '    return 6 * 7;',
+          '}'
+        ].join("\n")
+        named_args = {
+          changed_files: { 'hiker.c' => hiker_c_content },
+            max_seconds: 2
+        }
+        assert_run_times_out(named_args)
+      }
     }
-    assert_run_times_out(named_args)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def gcc_assert_files
-    files('gcc_assert')
   end
 
 end
