@@ -90,7 +90,7 @@ class Runner # stateful
       chown_shared_dir(cid)
       make_avatar_dir(cid, avatar_name)
       chown_avatar_dir(cid, avatar_name)
-      run_cyber_dojo_sh(cid, avatar_name, starting_files, 10)
+      run_timeout_cyber_dojo_sh(cid, avatar_name, starting_files, 10)
     end
   end
 
@@ -113,7 +113,7 @@ class Runner # stateful
     in_container(avatar_name) do |cid|
       assert_avatar_exists(cid, avatar_name)
       delete_files(cid, avatar_name, deleted_filenames)
-      stdout,stderr,status,colour = run_cyber_dojo_sh(cid, avatar_name, changed_files, max_seconds)
+      stdout,stderr,status,colour = run_timeout_cyber_dojo_sh(cid, avatar_name, changed_files, max_seconds)
       { stdout:stdout, stderr:stderr, status:status, colour:colour }
     end
   end
@@ -216,7 +216,7 @@ class Runner # stateful
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  def run_cyber_dojo_sh(cid, avatar_name, files, max_seconds)
+  def run_timeout_cyber_dojo_sh(cid, avatar_name, files, max_seconds)
     # See comment at end of file about slower alternative.
     Dir.mktmpdir('runner') do |tmp_dir|
       # Save the files onto the host...
@@ -550,7 +550,7 @@ class Runner # stateful
 end
 
 # - - - - - - - - - - - - - - - - - - - - - - - -
-# The implementation of run_cyber_dojo_sh is
+# The implementation of run_timeout_cyber_dojo_sh is
 #   o) Create copies of all (changed) files off /tmp
 #   o) Tar pipe the /tmp files into the container
 #   o) Run cyber-dojo.sh inside the container
