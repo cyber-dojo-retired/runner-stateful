@@ -4,6 +4,21 @@ module OsHelper
 
   module_function
 
+  def datetime_stamps_granularity_test
+    named_args = {
+      changed_files:ls_starting_files
+    }
+    ls_stdout = assert_run_succeeds(named_args)
+    ls_parse(ls_stdout).each do |filename, attr|
+      diagnostic = "#{filename} #{attr[:time_stamp]}"
+      # 08:03:40.133785971 (has sub-microsecond granularity)
+      microseconds = attr[:time_stamp].split('.')[1]
+      refute_equal '000000000', microseconds, diagnostic
+    end
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   def pid_1_process_test
     cmd = 'cat /proc/1/cmdline'
     proc1 = assert_cyber_dojo_sh(cmd).strip
@@ -176,8 +191,6 @@ module OsHelper
     }
     ls_stdout = assert_run_succeeds(named_args)
     before = ls_parse(ls_stdout)
-
-    sleep 2
 
     hello_txt = ls_starting_files['hello.txt']
     extra = "\ngreetings"

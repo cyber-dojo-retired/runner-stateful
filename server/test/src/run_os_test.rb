@@ -118,4 +118,11 @@ class RunAlpineTest < TestBase
     ulimit_test
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  os_test 'B25',
+  'file date-time stamps have sub-microsecond granularity' do
+    datetime_stamps_granularity_test
+  end
+
 end
