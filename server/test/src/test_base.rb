@@ -319,7 +319,7 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def as(name, starting_files=files)
+  def as(name, starting_files = files)
     avatar_new(name, starting_files)
     yield
   ensure
