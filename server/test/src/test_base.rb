@@ -66,7 +66,7 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def run_cyber_dojo_sh(named_args={})
+  def run_cyber_dojo_sh(named_args = {})
     args = []
     args << defaulted_arg(named_args, :avatar_name, default_avatar_name)
     args << defaulted_arg(named_args, :deleted_filenames, [])
@@ -78,11 +78,11 @@ class TestBase < HexMiniTest
     nil
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   def defaulted_arg(named_args, arg_name, arg_default)
     named_args.key?(arg_name) ? named_args[arg_name] : arg_default
   end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def set_image_name(image_name)
     @image_name = image_name
@@ -92,12 +92,16 @@ class TestBase < HexMiniTest
     @image_name
   end
 
-  def kata_id
-    hex_test_id + '0' * (10-hex_test_id.length)
-  end
-
-  def avatar_name
-    'salmon'
+  def image_for_test
+    rows = {
+      '[gcc,assert]'    => 'gcc_assert',
+      '[Java,Cucumber]' => 'java_cucumber_pico',
+      '[Alpine]'        => 'gcc_assert',
+      '[Ubuntu]'        => 'clangpp_assert'
+    }
+    row = rows.detect { |key,_| hex_test_name.start_with? key }
+    fail 'cannot find image_name from hex_test_name' if row.nil?
+    "#{cdf}/" + row[1]
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -148,7 +152,7 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_cyber_dojo_sh(script, named_args={})
+  def assert_cyber_dojo_sh(script, named_args = {})
     named_args[:changed_files] = { 'cyber-dojo.sh' => script }
     assert_run_succeeds(named_args)
   end
@@ -171,28 +175,11 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def image_for_test
-    rows = {
-      '[gcc,assert]'    => 'gcc_assert',
-      '[Java,Cucumber]' => 'java_cucumber_pico',
-      '[Alpine]'        => 'gcc_assert',
-      '[Ubuntu]'        => 'clangpp_assert'
-    }
-    row = rows.detect { |key,_| hex_test_name.start_with? key }
-    fail 'cannot find image_name from hex_test_name' if row.nil?
-    "#{cdf}/" + row[1]
-  end
-
   def files(language_dir = language_dir_from_image_name)
-    @files ||= load_files(language_dir)
+    @files ||= read_files(language_dir)
   end
 
-  def language_dir_from_image_name
-    fail 'image_name.nil? so cannot set language_dir' if image_name.nil?
-    image_name.split('/')[1]
-  end
-
-  def load_files(language_dir)
+  def read_files(language_dir)
     dir = "/app/test/start_files/#{language_dir}"
     json = JSON.parse(IO.read("#{dir}/manifest.json"))
     set_image_name json['image_name']
@@ -201,9 +188,22 @@ class TestBase < HexMiniTest
     }]
   end
 
+  def language_dir_from_image_name
+    fail 'image_name.nil? so cannot set language_dir' if image_name.nil?
+    image_name.split('/')[1]
+  end
+
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def user_id(avatar_name='salmon')
+  def kata_id
+    hex_test_id + '0' * (10-hex_test_id.length)
+  end
+
+  def avatar_name
+    'salmon'
+  end
+
+  def user_id(avatar_name = 'salmon')
     runner.user_id(avatar_name)
   end
 
@@ -215,7 +215,7 @@ class TestBase < HexMiniTest
     runner.gid
   end
 
-  def sandbox(avatar_name='salmon')
+  def sandbox(avatar_name = 'salmon')
     runner.avatar_dir(avatar_name)
   end
 

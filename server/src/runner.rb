@@ -118,7 +118,8 @@ class Runner # stateful
     in_container(avatar_name) do |cid|
       assert_avatar_exists(cid, avatar_name)
       delete_files(cid, avatar_name, deleted_filenames)
-      stdout,stderr,status,colour = run_timeout_cyber_dojo_sh(cid, avatar_name, changed_files, max_seconds)
+      args = [ avatar_name, changed_files, max_seconds ]
+      stdout,stderr,status,colour = run_timeout_cyber_dojo_sh(cid, *args)
       { stdout:stdout, stderr:stderr, status:status, colour:colour }
     end
   end
