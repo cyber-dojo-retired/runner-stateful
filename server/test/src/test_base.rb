@@ -5,19 +5,6 @@ require 'json'
 
 class TestBase < HexMiniTest
 
-  def kata_setup
-    set_image_name image_for_test
-    kata_new
-    avatar_new
-  end
-
-  def kata_teardown
-    avatar_old
-    kata_old
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   def runner
     Runner.new(self, image_name, kata_id)
   end

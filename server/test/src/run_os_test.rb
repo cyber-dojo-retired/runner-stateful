@@ -10,11 +10,14 @@ class RunOSTest < TestBase
   end
 
   def hex_setup
-    kata_setup
+    set_image_name image_for_test
+    kata_new
+    avatar_new
   end
 
   def hex_teardown
-    kata_teardown
+    avatar_old
+    kata_old
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
