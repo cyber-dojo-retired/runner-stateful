@@ -195,9 +195,6 @@ class Runner # stateful
     dir = avatar_dir(avatar_name)
     home = home_dir(avatar_name)
     name = container_name(avatar_name)
-    mb8 = 8 * 1024 * 1024
-    mb16 = 16 * 1024 * 1024
-    gb4 = 4 * 1024 * 1024 * 1024
     args = [
       '--detach',
       "--env CYBER_DOJO_AVATAR_NAME=#{avatar_name}",
@@ -212,19 +209,23 @@ class Runner # stateful
       '--net=none',                        # for security
       '--pids-limit=128',                  # no fork bombs
       '--security-opt=no-new-privileges',  # no escalation
-      "--ulimit data=#{gb4}:#{gb4}",       # max data segment size
+      "--ulimit data=#{4*GB}:#{4*GB}",     # max data segment size
       '--ulimit core=0:0',                 # max core file size
-      "--ulimit fsize=#{mb16}:#{mb16}",    # max file size
+      "--ulimit fsize=#{16*MB}:#{16*MB}",  # max file size
       '--ulimit locks=128:128',            # max number of file locks
       '--ulimit nofile=128:128',           # max number of files
       '--ulimit nproc=128:128',            # max number processes
-      "--ulimit stack=#{mb8}:#{mb8}",      # max stack size
+      "--ulimit stack=#{8*MB}:#{8*MB}",    # max stack size
       '--user=root',
       "--volume #{kata_volume_name}:#{sandboxes_root_dir}:rw"
     ].join(space)
     stdout,_ = assert_exec("docker run #{args} #{image_name} sh")
     stdout.strip # cid
   end
+
+  KB = 1024
+  MB = 1024 * KB
+  GB = 1024 * MB
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
