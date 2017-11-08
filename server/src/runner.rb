@@ -248,8 +248,6 @@ class Runner # stateful
         "chmod 755 #{tmp_dir}",
         "&& cd #{tmp_dir}",
         '&& tar',
-              "--owner=#{uid}",
-              "--group=#{gid}",
               '-zcf',             # create a compressed tar file
               '-',                # write it to stdout
               '.',                # tar the current directory
