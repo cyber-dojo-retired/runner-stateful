@@ -35,6 +35,7 @@ class ForkBombTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+=begin
   test 'CD6',
   %w( [Ubuntu] fork-bomb in C++ fails to go off ) do
     content = '#include "hiker.hpp"' + "\n" + fork_bomb_definition
@@ -60,6 +61,7 @@ class ForkBombTest < TestBase
     diagnostic = "#{msg}\ncount==:#{count}:"
     assert count > 5, diagnostic
   end
+=end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
