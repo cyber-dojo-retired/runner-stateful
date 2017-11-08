@@ -207,6 +207,7 @@ class Runner # stateful
       "--env HOME=#{home}",
       '--init',                            # pid-1 process
       '--interactive',                     # for later execs
+      '--memory=384m',
       "--name=#{name}",                    # for easy clean up
       '--net=none',                        # for security
       '--pids-limit=128',                  # no fork bombs
