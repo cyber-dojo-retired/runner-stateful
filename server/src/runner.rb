@@ -248,27 +248,39 @@ class Runner # stateful
         "chmod 755 #{tmp_dir}",
         "&& cd #{tmp_dir}",
         '&& tar',
-              '-zcf',             # create a compressed tar file
-              '-',                # write it to stdout
-              '.',                # tar the current directory
-              '|',
-                  'docker exec',  # pipe the tarfile into docker container
-                    "--user=#{uid}:#{gid}",
+              '-zcf', # create tar file
+              '-',    # write it to stdout
+              '.',    # tar the current directory
+              '|',    # pipe the tarfile...
+                  'docker exec',  # ...into docker container
+                    "--user=#{uid}:#{gid}", # [1]
                     '--interactive',
                     cid,
                     'sh -c',
                     "'",          # open quote
                     "cd #{dir}",
                     '&& tar',
-                          '--touch',
-                          '-zxf', # extract from a compressed tar file
+                          '--touch', # [2]
+                          '-zxf', # extract tar file
                           '-',    # which is read from stdin
                           '-C',   # save the extracted files to
                           '.',    # the current directory
                     '&& sh ./cyber-dojo.sh',
                     "'"           # close quote
       ].join(space)
-
+      # The files written into the container need the correct
+      # content, ownership, and date-time file-stamps.
+      # [1] is for the correct ownership.
+      # [2] is for the date-time stamps, in particular the
+      #     modification-date (stat %y). The tar --touch option
+      #     is not available in a default Alpine container.
+      #     So the test-framework container needs to update tar:
+      #        $ apk add --update tar
+      #     Also, in a default Alpine container the date-time
+      #     file-stamps have a granularity of one second. In other
+      #     words the microseconds value is always zero.
+      #     So the test-framework container also needs to fix this:
+      #        $ apk add --update coreutils
       if files == {}
         cyber_dojo_sh = [
           'docker exec',
@@ -292,7 +304,7 @@ class Runner # stateful
   def run_timeout(cid, cmd, max_seconds)
     # This kills the container from the "outside".
     # Originally I also time-limited the cpu-time from the "inside"
-    # using the cpu ulimit. However a cpu-limit of 10 seconds could
+    # using the cpu ulimit. However a cpu-ulimit of 10 seconds could
     # kill the container after only 5 seconds. This is because the
     # cpu-ulimit assumes one core. The host system running the docker
     # container can have multiple cores or use hyperthreading. So a
