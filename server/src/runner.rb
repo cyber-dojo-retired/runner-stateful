@@ -270,10 +270,7 @@ class Runner # stateful
                     '&& sh ./cyber-dojo.sh',
                     "'"           # close quote
       ].join(space)
-      # Note: on Alpine Linux this tar-pipe stores file date-stamps
-      # to the second. Viz, the microseconds are always zero.
-      # This is very unlikely to matter for a real test-event from
-      # the browser but does matter in some tests.
+
       if files == {}
         cyber_dojo_sh = [
           'docker exec',
