@@ -18,50 +18,32 @@ class ForkBombTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'CD5',
-  %w( [Alpine] fork-bomb in C fails to go off ) do
-    hiker_c = '#include "hiker.h"' + "\n" + fork_bomb_definition
+  %w( [Alpine] fork-bomb does not run indefinitely ) do
+    content = '#include "hiker.h"' + "\n" + fork_bomb_definition
     in_kata {
       as('salmon') {
-        run_cyber_dojo_sh({ changed_files: { 'hiker.c' => hiker_c } })
+        run_cyber_dojo_sh({
+          changed_files: { 'hiker.c' => content },
+            max_seconds: 5
+        })
       }
     }
-    assert_colour 'green'
-    assert_stderr ''
-    lines = stdout.split("\n")
-    assert lines.count{ |line| line == 'All tests passed' } > 42
-    assert lines.count{ |line| line == 'fork() => 0' } > 42
-    assert lines.count{ |line| line == 'fork() => -1' } > 42
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-=begin
   test 'CD6',
-  %w( [Ubuntu] fork-bomb in C++ fails to go off ) do
+  %w( [Ubuntu] fork-bomb does not run indefinitely ) do
     content = '#include "hiker.hpp"' + "\n" + fork_bomb_definition
     in_kata {
       as('salmon') {
-        run_cyber_dojo_sh({ changed_files: { 'hiker.cpp' => content } })
+        run_cyber_dojo_sh({
+          changed_files: { 'hiker.cpp' => content },
+            max_seconds: 5
+        })
       }
     }
-    lines = stdout.split("\n")
-
-    msg = 'All tests passed'
-    count = lines.count{ |line| line.include? msg }
-    diagnostic = "#{msg}\ncount==:#{count}:"
-    assert count > 5, diagnostic
-
-    msg = 'fork() => 0'
-    count = lines.count{ |line| line == fork }
-    diagnostic = "#{msg}\ncount==:#{count}:"
-    assert  count > 5, diagnostic
-
-    msg = 'fork() => -1'
-    count = lines.count{ |line| line == msg }
-    diagnostic = "#{msg}\ncount==:#{count}:"
-    assert count > 5, diagnostic
   end
-=end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -149,7 +131,8 @@ class ForkBombTest < TestBase
   def run_shell_fork_bomb
     cyber_dojo_sh = 'bomb() { bomb | bomb & }; bomb'
     run_cyber_dojo_sh({
-      changed_files: { 'cyber-dojo.sh' => cyber_dojo_sh }
+      changed_files: { 'cyber-dojo.sh' => cyber_dojo_sh },
+        max_seconds: 5
     })
   end
 
