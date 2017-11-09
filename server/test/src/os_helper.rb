@@ -30,20 +30,16 @@ module OsHelper
   include AllAvatarsNames
 
   def kata_id_env_vars_test
-    env = {}
-    cmd = 'printenv CYBER_DOJO_KATA_ID'
-    env[:kata_id] = assert_cyber_dojo_sh(cmd).strip
-    cmd = 'printenv CYBER_DOJO_AVATAR_NAME'
-    env[:avatar_name] = assert_cyber_dojo_sh(cmd).strip
-    cmd = 'printenv CYBER_DOJO_SANDBOX'
-    env[:sandbox] = assert_cyber_dojo_sh(cmd).strip
-    cmd = 'printenv CYBER_DOJO_RUNNER'
-    env[:runner]      = assert_cyber_dojo_sh(cmd).strip
+    assert_equal avatar_name, env_var('AVATAR_NAME')
+    assert_equal image_name,  env_var('IMAGE_NAME')
+    assert_equal kata_id,     env_var('KATA_ID')
+    assert_equal 'stateful',  env_var('RUNNER')
+    assert_equal sandbox,     env_var('SANDBOX')
+  end
 
-    assert_equal kata_id,     env[:kata_id]
-    assert_equal avatar_name, env[:avatar_name]
-    assert_equal sandbox,     env[:sandbox]
-    assert_equal 'stateful',  env[:runner]
+  def env_var(name)
+    cmd = "printenv CYBER_DOJO_#{name}"
+    assert_cyber_dojo_sh(cmd).strip
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
