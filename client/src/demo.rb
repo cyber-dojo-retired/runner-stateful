@@ -1,17 +1,15 @@
 require_relative 'runner_service'
-require 'sinatra'
-require 'sinatra/base'
 
-class Demo < Sinatra::Base
+class Demo
 
-  get '/' do
+  def call(_env)
     @html = ''
     in_kata {
       as_avatar {
         red; amber; green; time_out
       }
     }
-    "<div style='font-size:0.5em'>#{@html}</div>"
+    [ 200, { 'Content-Type' => 'text/html' }, [ @html ] ]
   end
 
   private

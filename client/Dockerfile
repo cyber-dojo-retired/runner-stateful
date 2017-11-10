@@ -6,9 +6,8 @@ LABEL maintainer=jon@jaggersoft.com
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 RUN apk --update --no-cache add \
-    openssl ca-certificates \
-    ruby ruby-io-console ruby-dev ruby-irb ruby-bundler ruby-bigdecimal \
-    bash tzdata
+    ruby ruby-dev ruby-bundler \
+    bash
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # install ruby gems
@@ -44,5 +43,6 @@ COPY . /app
 ARG PORT
 EXPOSE ${PORT}
 ENV PORT=${PORT}
-ENTRYPOINT ["/sbin/tini", "--"]
+
+ENTRYPOINT [ "/sbin/tini", "--" ]
 CMD [ "./up.sh" ]
