@@ -129,14 +129,14 @@ module OsHelper
     before = ls_parse(ls_stdout)
     before_filenames = before.keys
 
-    deleted_filenames = ['hello.txt']
-    named_args = { deleted_filenames:deleted_filenames }
+    deleted_files = { 'hello.txt' => '...' }
+    named_args = { deleted_files:deleted_files }
     ls_stdout = assert_run_succeeds(named_args)
     after = ls_parse(ls_stdout)
     after_filenames = after.keys
 
     actual_deleted_filenames = before_filenames - after_filenames
-    assert_equal deleted_filenames, actual_deleted_filenames
+    assert_equal deleted_files.keys, actual_deleted_filenames
     after.each { |filename, attr|
       assert_equal before[filename], attr
     }

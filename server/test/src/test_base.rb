@@ -56,7 +56,7 @@ class TestBase < HexMiniTest
   def run_cyber_dojo_sh(named_args = {})
     args = []
     args << defaulted_arg(named_args, :avatar_name, default_avatar_name)
-    args << defaulted_arg(named_args, :deleted_filenames, [])
+    args << defaulted_arg(named_args, :deleted_files, {})
     args << defaulted_arg(named_args, :unchanged_files, {})
     args << defaulted_arg(named_args, :changed_files, {})
     args << defaulted_arg(named_args, :new_files, {})

@@ -28,16 +28,17 @@ class RunTest < TestBase
   %w( files can be in sub-dirs of sandbox ) do
     in_kata {
       as('salmon') {
+        sub_dir = 'a'
+        filename = 'hello.txt'
+        content = 'hello world'
         run_cyber_dojo_sh({
-          changed_files: {
-            'a/hello.txt'   => 'hello world',
-            'cyber-dojo.sh' => ls_cmd
-          }
+              new_files:{ "#{sub_dir}/#{filename}" => content },
+          changed_files:{ 'cyber-dojo.sh' => "cd #{sub_dir} && #{ls_cmd}" }
         })
         ls_files = ls_parse(stdout)
         uid = runner.user_id('salmon')
         group = runner.group
-        assert_equal_atts('a', 'drwxr-xr-x', uid, group, 4096, ls_files)
+        assert_equal_atts(filename, '-rw-r--r--', uid, group, content.length, ls_files)
       }
     }
   end
@@ -48,15 +49,16 @@ class RunTest < TestBase
   %w( files can be in sub-sub-dirs of sandbox ) do
     in_kata {
       as('salmon') {
+        sub_dir = 'a/b'
+        filename = 'hello.txt'
+        content = 'hello, world'
         run_cyber_dojo_sh({
-          changed_files: {
-            'a/b/hello.txt' => 'hello world',
-            'cyber-dojo.sh' => "cd a && #{ls_cmd}"
-          }
+              new_files:{ "#{sub_dir}/#{filename}" => content },
+          changed_files:{ 'cyber-dojo.sh' => "cd #{sub_dir} && #{ls_cmd}" }
         })
         ls_files = ls_parse(stdout)
         uid = runner.user_id('salmon')
-        assert_equal_atts('b', 'drwxr-xr-x', uid, group, 4096, ls_files)
+        assert_equal_atts(filename, '-rw-r--r--', uid, group, content.length, ls_files)
       }
     }
   end
@@ -67,21 +69,21 @@ class RunTest < TestBase
   %w( files in sub-dirs of sandbox can be deleted ) do
     in_kata {
       as('salmon') {
+        sub_dir = 'a'
+        filename = 'goodbye.txt'
+        content = 'goodbye, world'
         run_cyber_dojo_sh({
-          changed_files: {
-            'a/hello.txt'   => 'hello world',
-            'cyber-dojo.sh' => "cd a && #{ls_cmd}"
-          }
+              new_files: { "#{sub_dir}/#{filename}" => content },
+          changed_files: { 'cyber-dojo.sh' => "cd #{sub_dir} && #{ls_cmd}" }
         })
-        ls_files = ls_parse(stdout)
-        uid = runner.user_id('salmon')
-        group = runner.group
-        assert_equal_atts('hello.txt', '-rw-r--r--', uid, group, 11, ls_files)
-
+        filenames = ls_parse(stdout).keys
+        assert filenames.include? filename
         run_cyber_dojo_sh({
-          deleted_filenames: [ 'a/hello.txt' ]
+          deleted_files: { "#{sub_dir}/#{filename}" => content },
+          changed_files: { 'cyber-dojo.sh' => "cd #{sub_dir} && #{ls_cmd}" }
         })
-        assert_equal '', stdout
+        filenames = ls_parse(stdout).keys
+        refute filenames.include? filename
       }
     }
   end
