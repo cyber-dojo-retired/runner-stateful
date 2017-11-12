@@ -107,9 +107,9 @@ in the kata with the given kata_id.
 - - - -
 
 # POST run_cyber_dojo_sh
-Deletes the deleted_files, saves the changed_files, saves new files,
+Deletes the deleted_files, saves the changed_files, saves the new_files,
 runs cyber-dojo.sh as the avatar with the given avatar_name.
-Calls to run_cyber_dojo_sh must be preceeded by one call to kata_new
+Calls to run_cyber_dojo_sh must be preceded by one call to kata_new
 with the same kata_id, and one call to avatar_new with the same kata_id
 and avatar_name.
 - parameters, eg
