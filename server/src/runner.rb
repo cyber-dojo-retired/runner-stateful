@@ -90,10 +90,10 @@ class Runner # stateful
       chown_shared_dir(cid)
       make_avatar_dir(cid, avatar_name)
       chown_avatar_dir(cid, avatar_name)
-      # THIS IS WRONG.
-      # It needs to copy the files only.
-      # It should not run cyber-dojo.sh
-      run_timeout_cyber_dojo_sh(cid, avatar_name, starting_files, 10)
+      Dir.mktmpdir('runner') do |tmp_dir|
+        save_to(starting_files, tmp_dir)
+        assert_exec tar_pipe_cmd(tmp_dir, cid, avatar_name, 'true')
+      end
     end
   end
 
@@ -262,7 +262,7 @@ class Runner # stateful
         run_timeout(cid, cyber_dojo_sh, max_seconds)
       else
         save_to(files, tmp_dir)
-        tar_pipe = tar_pipe_cmd(tmp_dir, cid, avatar_name, uid)
+        tar_pipe = tar_pipe_cmd(tmp_dir, cid, avatar_name)
         run_timeout(cid, tar_pipe, max_seconds)
       end
     end
@@ -284,7 +284,8 @@ class Runner # stateful
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  def tar_pipe_cmd(tmp_dir, cid, avatar_name, uid, cmd = 'sh ./cyber-dojo.sh')
+  def tar_pipe_cmd(tmp_dir, cid, avatar_name, cmd = 'sh ./cyber-dojo.sh')
+    uid = user_id(avatar_name)
     dir = avatar_dir(avatar_name)
     [
       "chmod 755 #{tmp_dir}",
