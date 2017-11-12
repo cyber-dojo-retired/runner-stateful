@@ -13,7 +13,7 @@ alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
 
 # cyberdojo/runner_stateful docker image
 
-- A docker-containerized stateful micro-service for [cyber-dojo](http://cyber-dojo.org)
+- A docker-containerized stateful micro-service for [cyber-dojo](http://cyber-dojo.org).
 - A docker-volume holds the state of each kata.
 - Runs an avatar's tests.
 
@@ -78,9 +78,9 @@ Tears down the kata with the given kata_id.
 
 # POST avatar_new
 Sets up the avatar with the given avatar_name, in the
-kata with the given kata_id_, with the given starting files.
-Must be called once before any call to run with the same
-kata_id and avatar_name.
+kata with the given kata_id, with the given starting files.
+Must be called once before any call to run_cyber_dojo_sh with the
+same kata_id and avatar_name.
 - parameters, eg
 ```
   {     "image_name": "cyberdojofoundation/gcc_assert",
@@ -107,10 +107,11 @@ in the kata with the given kata_id.
 - - - -
 
 # POST run_cyber_dojo_sh
-Deletes the deleted_files, saves the changed_files and new files in a docker
-container run from image_name and runs cyber-dojo.sh as the given avatar.
-Calls to run_cyber_dojo_sh must be preceeded by one call to kata_new with the same kata_id,
-and one call to avatar_new with the same kata_id and avatar_name.
+Deletes the deleted_files, saves the changed_files, saves new files,
+runs cyber-dojo.sh as the avatar with the given avatar_name.
+Calls to run_cyber_dojo_sh must be preceeded by one call to kata_new
+with the same kata_id, and one call to avatar_new with the same kata_id
+and avatar_name.
 - parameters, eg
 ```
   {        "image_name": "cyberdojofoundation/gcc_assert",
