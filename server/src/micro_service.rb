@@ -24,6 +24,11 @@ class MicroService
         body = invoke('avatar_new', avatar_name, starting_files)
       when /avatar_old/
         body = invoke('avatar_old', avatar_name)
+      when /run_cyber_dojo_sh/
+        body = invoke('run_cyber_dojo_sh',
+          avatar_name,
+          deleted_files, unchanged_files, changed_files, new_files,
+          max_seconds)
       when /run/
         args  = [ avatar_name ]
         args += [ deleted_filenames, changed_files ]
@@ -53,8 +58,16 @@ class MicroService
     }
   end
 
-  request_args :image_name, :kata_id
-  request_args :avatar_name, :starting_files
-  request_args :deleted_filenames, :changed_files, :max_seconds
+  request_args :image_name
+  request_args :kata_id
+  request_args :avatar_name
+  request_args :starting_files
+  request_args :deleted_files
+  request_args :unchanged_files
+  request_args :changed_files
+  request_args :new_files
+  request_args :max_seconds
+
+  request_args :deleted_filenames
 
 end

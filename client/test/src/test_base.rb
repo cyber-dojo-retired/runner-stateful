@@ -134,7 +134,7 @@ class TestBase < HexMiniTest
   end
 
   def default_kata_id
-    test_id + '0' * (10-test_id.length)
+    hex_test_id + '0' * (10 - hex_test_id.length)
   end
 
   def default_avatar_name

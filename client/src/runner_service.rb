@@ -40,6 +40,19 @@ class RunnerService
 
   # - - - - - - - - - - - - - - - - - - -
 
+=begin
+  def run_cyber_dojo_sh(
+        image_name, kata_id, avatar_name,
+        deleted_files, unchanged_files, changed_files, new_files,
+        max_seconds
+    )
+    args = [image_name, kata_id, avatar_name]
+    args += [deleted_files, unchanged_files, changed_files, new_files]
+    args += [max_seconds]
+    post(__method__, *args)
+  end
+=end
+
   def run(image_name, kata_id, avatar_name, deleted_filenames, changed_files, max_seconds)
     args = []
     args << image_name
