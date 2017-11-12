@@ -14,13 +14,15 @@ services:
     volumes_from:
       - runner-stateful-client-coverage-container:rw
     environment:
+      - CYBER_DOJO_RUNNER_SERVER_NAME
+      - CYBER_DOJO_RUNNER_SERVER_PORT
       - CYBER_DOJO_COVERAGE_ROOT
     build:
       context: client
       args:
-        - PORT=${CYBER_DOJO_RUNNER_STATEFUL_CLIENT_PORT}
+        - PORT=${CYBER_DOJO_RUNNER_CLIENT_PORT}
     ports:
-      - ${CYBER_DOJO_RUNNER_STATEFUL_CLIENT_PORT}:${CYBER_DOJO_RUNNER_STATEFUL_CLIENT_PORT}
+      - ${CYBER_DOJO_RUNNER_CLIENT_PORT}:${CYBER_DOJO_RUNNER_CLIENT_PORT}
 
   runner_stateful:
     user: root
@@ -39,7 +41,7 @@ services:
     build:
       context: server
       args:
-        - PORT=${CYBER_DOJO_RUNNER_STATEFUL_SERVER_PORT}
+        - PORT=${CYBER_DOJO_RUNNER_SERVER_PORT}
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
