@@ -284,7 +284,7 @@ class Runner # stateful
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  def tar_pipe_cmd(tmp_dir, cid, avatar_name, uid)
+  def tar_pipe_cmd(tmp_dir, cid, avatar_name, uid, cmd = 'sh ./cyber-dojo.sh')
     dir = avatar_dir(avatar_name)
     [
       "chmod 755 #{tmp_dir}",
@@ -307,7 +307,7 @@ class Runner # stateful
                         '-',       # which is read from stdin
                         '-C',      # save the extracted files to
                         '.',       # the current directory
-                  '&& sh ./cyber-dojo.sh',
+                  "&& #{cmd}",
                   "'"          # close quote
     ].join(space)
     # The files written into the container need the correct
