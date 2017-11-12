@@ -1,4 +1,4 @@
-CFLAGS += -I. -Wall -Wextra -Werror -std=c11
+CFLAGS += -I. -Wall -Wextra -std=c11
 CFLAGS +=	-Wsequence-point
 CFLAGS +=	-Wstrict-prototypes
 CFLAGS +=	-Wshadow -Wfloat-equal -O

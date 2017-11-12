@@ -198,7 +198,6 @@ class ApiTest < TestBase2
   # fork-bombs
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-=begin
   multi_os_test 'CD5',
   'fork-bomb does not run indefinitely' do
     in_kata_as(salmon) {
@@ -208,6 +207,7 @@ class ApiTest < TestBase2
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+=begin
   multi_os_test '4DE',
   'shell fork-bomb does not run indefinitely' do
     in_kata_as(salmon) {
@@ -475,19 +475,19 @@ class ApiTest < TestBase2
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def fork_bomb_test
-    in_kata_as(salmon) {
-      begin
-        run_cyber_dojo_sh({
-          changed_files: { 'hiker.c' => fork_bomb_definition }
-        })
-        # :nocov:
-        assert_timed_out_or_printed 'All tests passed'
-        assert_timed_out_or_printed 'fork()'
-        # :nocov:
-      rescue StandardError
-      end
-    }
+    begin
+      run_cyber_dojo_sh({
+        changed_files: { 'hiker.c' => fork_bomb_definition }
+      })
+      # :nocov:
+      assert_timed_out_or_printed 'All tests passed'
+      assert_timed_out_or_printed 'fork()'
+      # :nocov:
+    rescue StandardError
+    end
   end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def fork_bomb_definition
     [ '#include <stdio.h>',
@@ -534,6 +534,8 @@ class ApiTest < TestBase2
     }
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   def assert_timed_out_or_printed(text)
     count = (stdout+stderr).lines.count { |line| line.include?(text) }
     assert (timed_out? || count > 0), ":#{text}:#{quad}:"
@@ -551,6 +553,8 @@ class ApiTest < TestBase2
     assert seen?('fopen() != NULL'), quad
     assert seen?('fopen() == NULL'), quad
   end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def c_file_bomb
     [

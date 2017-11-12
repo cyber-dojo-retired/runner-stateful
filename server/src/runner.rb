@@ -423,7 +423,7 @@ class Runner # stateful
   def kata_volume_exists?
     cmd = "docker volume ls --quiet --filter 'name=#{kata_volume_name}'"
     stdout,_ = assert_exec(cmd)
-    stdout.strip != ''
+    stdout.strip == kata_volume_name
   end
 
   def create_kata_volume
