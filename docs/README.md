@@ -14,6 +14,7 @@ alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
 # cyberdojo/runner_stateful docker image
 
 - A docker-containerized stateful micro-service for [cyber-dojo](http://cyber-dojo.org)
+- A docker-volume holds the state of each kata.
 - Runs an avatar's tests.
 
 API:
@@ -39,7 +40,7 @@ Asks whether the image with the given image_name has been pulled.
 ```
 
 # POST image_pull
-Pulls the image with the given image_name.
+Pull the image with the given image_name.
 - parameters, eg
 ```
   { "image_name": "cyberdojofoundation/gcc_assert",
@@ -53,20 +54,6 @@ Pulls the image with the given image_name.
 ```
 
 - - - -
-
-# GET kata_exists?
-Asks whether the kata with the given kata_id exists.
-- parameters, eg
-```
-  { "image_name": "cyberdojofoundation/gcc_assert",
-       "kata_id": "15B9AD6C42"
-  }
-```
-- returns true if it does, false if it doesn't.
-```
-  { "kata_exists?": true  }
-  { "kata_exists?": false }
-```
 
 # POST kata_new
 Sets up the kata with the given kata_id.
@@ -88,22 +75,6 @@ Tears down the kata with the given kata_id.
 ```
 
 - - - -
-
-# GET avatar_exists?
-Asks whether the avatar with the given avatar_name
-has entered the kata with the given kata_id.
-- parameters, eg
-```
-  {  "image_name": "cyberdojofoundation/gcc_assert",
-        "kata_id": "15B9AD6C42",
-    "avatar_name": "salmon"
-  }
-```
-- returns true if it does, false if it doesn't
-```
-  { "avatar_exists?": true  }
-  { "avatar_exists?": false }
-```
 
 # POST avatar_new
 Sets up the avatar with the given avatar_name, in the
@@ -135,7 +106,53 @@ in the kata with the given kata_id.
 
 - - - -
 
+# POST run_cyber_dojo_sh
+Deletes the deleted_files, saves the changed_files and new files in a docker
+container run from image_name and runs cyber-dojo.sh as the given avatar.
+Calls to run_cyber_dojo_sh must be preceeded by one call to kata_new with the same kata_id,
+and one call to avatar_new with the same kata_id and avatar_name.
+- parameters, eg
+```
+  {        "image_name": "cyberdojofoundation/gcc_assert",
+              "kata_id": "15B9AD6C42",
+          "avatar_name": "salmon",
+        "deleted_files": { "instructions" => 'your task...' },
+      "unchanged_files": { "cyber-dojo.sh" => "make" },
+        "changed_files": { "fizz_buzz.c" => "#include...",
+                           "fizz_buzz.h" => "#ifndef FIZZ_BUZZ_INCLUDED..."
+                         },
+            "new_files": {},
+          "max_seconds": 10
+  }
+```
+- returns status, stdout, stderr, and colour.
+If the run completed in max_seconds,
+the [traffic-light colour](http://blog.cyber-dojo.org/2014/10/cyber-dojo-traffic-lights.html)
+will be "red", "amber", or "green". eg
+```
+    { "run": {
+        "status": 2,
+        "stdout": "makefile:17: recipe for target 'test' failed\n",
+        "stderr": "invalid suffix sss on integer constant",
+        "colour": "red"
+    }
+```
+If the run did not complete in max_seconds,
+the [traffic-light colour](http://blog.cyber-dojo.org/2014/10/cyber-dojo-traffic-lights.html)
+will be "timed_out". eg
+```
+    { "run": {
+        "status": 137,
+        "stdout": "",
+        "stderr": "",
+        "colour": "timed_out"
+    }
+```
+
+- - - -
+
 # POST run
+Deprecated.
 For the avatar with the given avatar_name, in the kata with the given kata_id,
 removes the deleted_filenames, saves changed_files, runs cyber-dojo.sh
 Calls to run must be preceeded by one call to kata_new with the same kata_id,
@@ -146,8 +163,8 @@ and one call to avatar_new with the same kata_id and avatar_name.
               "kata_id": "15B9AD6C42",
           "avatar_name": "salmon",
     "deleted_filenames": [ "hiker.h", "hiker.c", ... ],
-        "changed_files": { "fizz_buzz.h": "#ifndef FIZZ_BUZZ_INCLUDED...",
-                           "fizz_buzz.c": "#include...",
+        "changed_files": { "fizz_buzz.h" => "#ifndef FIZZ_BUZZ_INCLUDED...",
+                           "fizz_buzz.c" => "#include...",
                            ...
                          },
           "max_seconds": 10
