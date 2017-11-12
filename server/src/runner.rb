@@ -159,7 +159,7 @@ class Runner # stateful
   end
 
   def sandboxes_root_dir
-    '/sandboxes'
+    '/tmp/sandboxes'
   end
 
   def timed_out

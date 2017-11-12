@@ -142,7 +142,6 @@ class ApiTest < TestBase2
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-=begin
   multi_os_test '8A3',
   'container environment properties' do
     in_kata_as(salmon) {
@@ -157,7 +156,7 @@ class ApiTest < TestBase2
       assert_ulimits
     }
   end
-=end
+
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   multi_os_test 'F45',
@@ -244,7 +243,7 @@ class ApiTest < TestBase2
     assert_equal avatar_name, env_var('AVATAR_NAME')
     assert_equal image_name,  env_var('IMAGE_NAME')
     assert_equal kata_id,     env_var('KATA_ID')
-    assert_equal 'stateless', env_var('RUNNER')
+    assert_equal 'stateful',  env_var('RUNNER')
     assert_equal sandbox_dir, env_var('SANDBOX')
   end
 
