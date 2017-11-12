@@ -90,6 +90,9 @@ class Runner # stateful
       chown_shared_dir(cid)
       make_avatar_dir(cid, avatar_name)
       chown_avatar_dir(cid, avatar_name)
+      # THIS IS WRONG.
+      # It needs to copy the files only.
+      # It should not run cyber-dojo.sh
       run_timeout_cyber_dojo_sh(cid, avatar_name, starting_files, 10)
     end
   end
