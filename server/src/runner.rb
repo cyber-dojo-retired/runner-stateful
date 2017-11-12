@@ -245,19 +245,22 @@ class Runner # stateful
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
+  def save_to(files, tmp_dir)
+    files.each do |pathed_filename, content|
+      sub_dir = File.dirname(pathed_filename)
+      if sub_dir != '.'
+        src_dir = tmp_dir + '/' + sub_dir
+        shell.exec("mkdir -p #{src_dir}")
+      end
+      host_filename = tmp_dir + '/' + pathed_filename
+      disk.write(host_filename, content)
+    end
+  end
+
   def run_timeout_cyber_dojo_sh(cid, avatar_name, files, max_seconds)
     # See comment at end of file about slower alternative.
     Dir.mktmpdir('runner') do |tmp_dir|
-      # Save the files onto the host...
-      files.each do |pathed_filename, content|
-        sub_dir = File.dirname(pathed_filename)
-        if sub_dir != '.'
-          src_dir = tmp_dir + '/' + sub_dir
-          shell.exec("mkdir -p #{src_dir}")
-        end
-        host_filename = tmp_dir + '/' + pathed_filename
-        disk.write(host_filename, content)
-      end
+      save_to(files, tmp_dir)
       # ...then tar-pipe them into the container
       # and run cyber-dojo.sh
       dir = avatar_dir(avatar_name)
