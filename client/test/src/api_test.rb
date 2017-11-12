@@ -207,7 +207,6 @@ class ApiTest < TestBase2
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-=begin
   multi_os_test '4DE',
   'shell fork-bomb does not run indefinitely' do
     in_kata_as(salmon) {
@@ -217,6 +216,7 @@ class ApiTest < TestBase2
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+=begin
   multi_os_test 'DB3',
   'file-bomb in exhaust file-handles fails to go off' do
     in_kata_as(salmon) {
@@ -512,26 +512,24 @@ class ApiTest < TestBase2
 
   def shell_fork_bomb_test
     cant_fork = (os == :Alpine ? "can't fork" : 'Cannot fork')
-    in_kata_as(salmon) {
-      begin
-        shell_fork_bomb = [
-          'bomb()',
-          '{',
-          '   echo "bomb"',
-          '   bomb | bomb &',
-          '}',
-          'bomb'
-        ].join("\n")
-        run_cyber_dojo_sh({
-          changed_files: { 'cyber-dojo.sh' => shell_fork_bomb }
-        })
-        # :nocov:
-        assert_timed_out_or_printed 'bomb'
-        assert_timed_out_or_printed cant_fork
-        # :nocov:
-      rescue StandardError
-      end
-    }
+    begin
+      shell_fork_bomb = [
+        'bomb()',
+        '{',
+        '   echo "bomb"',
+        '   bomb | bomb &',
+        '}',
+        'bomb'
+      ].join("\n")
+      run_cyber_dojo_sh({
+        changed_files: { 'cyber-dojo.sh' => shell_fork_bomb }
+      })
+      # :nocov:
+      assert_timed_out_or_printed 'bomb'
+      assert_timed_out_or_printed cant_fork
+      # :nocov:
+    rescue StandardError
+    end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
