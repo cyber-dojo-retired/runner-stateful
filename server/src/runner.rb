@@ -249,12 +249,7 @@ class Runner # stateful
   def run_timeout_cyber_dojo_sh(cid, avatar_name, files, max_seconds)
     # See comment at end of file about slower alternative.
     Dir.mktmpdir('runner') do |tmp_dir|
-      save_to(files, tmp_dir)
-      # ...then tar-pipe them into the container
-      # and run cyber-dojo.sh
       uid = user_id(avatar_name)
-      tar_pipe = tar_pipe_cmd(tmp_dir, cid, avatar_name, uid)
-
       if files == {}
         dir = avatar_dir(avatar_name)
         cyber_dojo_sh = [
@@ -266,6 +261,8 @@ class Runner # stateful
         ].join(space)
         run_timeout(cid, cyber_dojo_sh, max_seconds)
       else
+        save_to(files, tmp_dir)
+        tar_pipe = tar_pipe_cmd(tmp_dir, cid, avatar_name, uid)
         run_timeout(cid, tar_pipe, max_seconds)
       end
     end
