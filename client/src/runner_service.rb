@@ -12,10 +12,6 @@ class RunnerService
 
   # - - - - - - - - - - - - - - - - - - -
 
-  def kata_exists?(image_name, kata_id)
-    get(__method__, image_name, kata_id)
-  end
-
   def kata_new(image_name, kata_id)
     post(__method__, image_name, kata_id)
   end
@@ -25,10 +21,6 @@ class RunnerService
   end
 
   # - - - - - - - - - - - - - - - - - - -
-
-  def avatar_exists?(image_name, kata_id, avatar_name)
-    get(__method__, image_name, kata_id, avatar_name)
-  end
 
   def avatar_new(image_name, kata_id, avatar_name, starting_files)
     post(__method__, image_name, kata_id, avatar_name, starting_files)
@@ -48,17 +40,6 @@ class RunnerService
     args = [image_name, kata_id, avatar_name]
     args += [deleted_files, unchanged_files, changed_files, new_files]
     args += [max_seconds]
-    post(__method__, *args)
-  end
-
-  def run(image_name, kata_id, avatar_name, deleted_filenames, changed_files, max_seconds)
-    args = []
-    args << image_name
-    args << kata_id
-    args << avatar_name
-    args << deleted_filenames
-    args << changed_files
-    args << max_seconds
     post(__method__, *args)
   end
 

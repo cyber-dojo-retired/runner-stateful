@@ -1,6 +1,6 @@
-require_relative 'test_base2'
+require_relative 'test_base'
 
-class ApiTest < TestBase2
+class ApiTest < TestBase
 
   def self.hex_prefix
     '3759D'
@@ -138,6 +138,28 @@ class ApiTest < TestBase2
       })
     }
     assert red?
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  multi_os_test 'ED4',
+  'stdout greater than 10K is truncated' do
+    # fold limit is 10000 so I do two smaller folds
+    five_K_plus_1 = 5*1024+1
+    command = [
+      'cat /dev/urandom',
+      "tr -dc 'a-zA-Z0-9'",
+      "fold -w #{five_K_plus_1}",
+      'head -n 1'
+    ].join('|')
+    in_kata_as(salmon) {
+      run_cyber_dojo_sh({
+        changed_files: {
+          'cyber-dojo.sh' => "seq 2 | xargs -I{} sh -c '#{command}'"
+        }
+      })
+    }
+    assert stdout.include? 'output truncated by cyber-dojo'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -

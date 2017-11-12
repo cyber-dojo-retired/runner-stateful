@@ -12,14 +12,10 @@ class MicroService
         body = invoke('image_pulled?')
       when /image_pull/
         body = invoke('image_pull')
-      when /kata_exists?/
-        body = invoke('kata_exists?')
       when /kata_new/
         body = invoke('kata_new')
       when /kata_old/
         body = invoke('kata_old')
-      when /avatar_exists?/
-        body = invoke('avatar_exists?', avatar_name)
       when /avatar_new/
         body = invoke('avatar_new', avatar_name, starting_files)
       when /avatar_old/

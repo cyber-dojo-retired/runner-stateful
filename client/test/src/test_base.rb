@@ -3,7 +3,7 @@ require_relative 'hex_mini_test'
 require_relative '../../src/runner_service'
 require 'json'
 
-class TestBase2 < HexMiniTest
+class TestBase < HexMiniTest
 
   def self.multi_os_test(hex_suffix, *lines, &block)
     alpine_lines = ['[Alpine]'] + lines
