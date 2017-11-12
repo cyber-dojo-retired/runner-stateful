@@ -480,8 +480,8 @@ class ApiTest < TestBase2
       # :nocov:
       assert_timed_out_or_printed 'All tests passed'
       assert_timed_out_or_printed 'fork()'
-      # :nocov:
     rescue StandardError
+      # :nocov:
     end
   end
 
@@ -525,8 +525,8 @@ class ApiTest < TestBase2
       # :nocov:
       assert_timed_out_or_printed 'bomb'
       assert_timed_out_or_printed cant_fork
-      # :nocov:
     rescue StandardError
+      # :nocov:
     end
   end
 
