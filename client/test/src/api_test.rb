@@ -216,14 +216,12 @@ class ApiTest < TestBase2
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-=begin
   multi_os_test 'DB3',
   'file-bomb in exhaust file-handles fails to go off' do
     in_kata_as(salmon) {
       file_bomb_test
     }
   end
-=end
 
   private
 
@@ -542,11 +540,9 @@ class ApiTest < TestBase2
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def file_bomb_test
-    in_kata_as(salmon) {
-      run_cyber_dojo_sh({
-        changed_files: { 'hiker.c' => c_file_bomb }
-      })
-    }
+    run_cyber_dojo_sh({
+      changed_files: { 'hiker.c' => c_file_bomb }
+    })
     assert seen?('All tests passed'), quad
     assert seen?('fopen() != NULL'), quad
     assert seen?('fopen() == NULL'), quad
