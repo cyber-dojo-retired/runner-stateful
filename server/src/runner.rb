@@ -194,17 +194,13 @@ class Runner # stateful
     # and create a temporary /sandboxes/ folder in it!
     # Viz, the runner would be stateless and not stateful.
     # See https://github.com/docker/docker/issues/13121
-    dir = avatar_dir(avatar_name)
-    home = home_dir(avatar_name)
+
+    #dir = avatar_dir(avatar_name)
+    #home = home_dir(avatar_name)
     name = container_name(avatar_name)
     args = [
       '--detach',
-      "--env CYBER_DOJO_AVATAR_NAME=#{avatar_name}",
-      "--env CYBER_DOJO_IMAGE_NAME=#{image_name}",
-      "--env CYBER_DOJO_KATA_ID=#{kata_id}",
-      '--env CYBER_DOJO_RUNNER=stateful',
-      "--env CYBER_DOJO_SANDBOX=#{dir}",
-      "--env HOME=#{home}",
+      env_vars(avatar_name),
       '--init',                            # pid-1 process
       '--interactive',                     # for later execs
       '--memory=384m',
@@ -212,18 +208,35 @@ class Runner # stateful
       '--net=none',                        # for security
       '--pids-limit=128',                  # no fork bombs
       '--security-opt=no-new-privileges',  # no escalation
-      "--ulimit data=#{4*GB}:#{4*GB}",     # max data segment size
-      '--ulimit core=0:0',                 # max core file size
-      "--ulimit fsize=#{16*MB}:#{16*MB}",  # max file size
-      '--ulimit locks=128:128',            # max number of file locks
-      '--ulimit nofile=128:128',           # max number of files
-      '--ulimit nproc=128:128',            # max number processes
-      "--ulimit stack=#{8*MB}:#{8*MB}",    # max stack size
+      ulimits,
       '--user=root',
       "--volume #{kata_volume_name}:#{sandboxes_root_dir}:rw"
     ].join(space)
     stdout,_ = assert_exec("docker run #{args} #{image_name} sh")
     stdout.strip # cid
+  end
+
+  def env_vars(avatar_name)
+    [
+      "--env CYBER_DOJO_AVATAR_NAME=#{avatar_name}",
+      "--env CYBER_DOJO_IMAGE_NAME=#{image_name}",
+      "--env CYBER_DOJO_KATA_ID=#{kata_id}",
+      '--env CYBER_DOJO_RUNNER=stateful',
+      "--env CYBER_DOJO_SANDBOX=#{avatar_dir(avatar_name)}",
+      "--env HOME=#{home_dir(avatar_name)}"
+    ].join(space)
+  end
+
+  def ulimits
+    [
+      "--ulimit data=#{4*GB}:#{4*GB}",    # max data segment size
+      '--ulimit core=0:0',                # max core file size
+      "--ulimit fsize=#{16*MB}:#{16*MB}", # max file size
+      '--ulimit locks=128:128',           # max number of file locks
+      '--ulimit nofile=128:128',          # max number of files
+      '--ulimit nproc=128:128',           # max number processes
+      "--ulimit stack=#{8*MB}:#{8*MB}"    # max stack size
+    ].join(space)
   end
 
   KB = 1024
