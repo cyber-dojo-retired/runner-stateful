@@ -252,11 +252,11 @@ class Runner # stateful
       save_to(files, tmp_dir)
       # ...then tar-pipe them into the container
       # and run cyber-dojo.sh
-      dir = avatar_dir(avatar_name)
       uid = user_id(avatar_name)
       tar_pipe = tar_pipe_cmd(tmp_dir, cid, avatar_name, uid)
 
       if files == {}
+        dir = avatar_dir(avatar_name)
         cyber_dojo_sh = [
           'docker exec',
           "--user=#{uid}:#{gid}",
