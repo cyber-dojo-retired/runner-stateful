@@ -157,20 +157,24 @@ class ApiTest < TestBase2
       assert_ulimits
     }
   end
-
+=end
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  multi_is_test 'F45',
+  multi_os_test 'F45',
   %w( cyber_dojo.sh is in starting files but is not run ) do
     files = starting_files
-    files['cyber-dojo.sh'] = 'cat "Hello" > hello.txt'
+    new_filename = 'hello.txt'
+    files['cyber-dojo.sh'] = "cat 'Hello' > #{new_filename}"
     in_kata {
       as(salmon, files) {
-
+        run_cyber_dojo_sh({
+          changed_files: { 'cyber-dojo.sh' => stat_cmd }
+        })
+        filenames = stdout_stats.keys
+        refute filenames.include? new_filename
       }
     }
   end
-=end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
