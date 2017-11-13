@@ -76,36 +76,36 @@ class Runner # stateful
     @avatar_name = avatar_name
     assert_kata_exists
     assert_valid_avatar_name
-    in_container do |cid|
-      avatar_exists_cid?(cid)
-    end
+    in_container {
+      avatar_exists_cid?
+    }
   end
 
   def avatar_new(avatar_name, starting_files)
     @avatar_name = avatar_name
     assert_kata_exists
     assert_valid_avatar_name
-    in_container do |cid|
-      refute_avatar_exists(cid)
-      make_shared_dir(cid)
-      chown_shared_dir(cid)
-      make_avatar_dir(cid)
-      chown_avatar_dir(cid)
-      Dir.mktmpdir('runner') do |tmp_dir|
+    in_container {
+      refute_avatar_exists
+      make_shared_dir
+      chown_shared_dir
+      make_avatar_dir
+      chown_avatar_dir
+      Dir.mktmpdir { |tmp_dir|
         save_to(starting_files, tmp_dir)
-        assert_exec tar_pipe_cmd(tmp_dir, cid, 'true')
-      end
-    end
+        assert_exec tar_pipe_cmd(tmp_dir, 'true')
+      }
+    }
   end
 
   def avatar_old(avatar_name)
     @avatar_name = avatar_name
     assert_kata_exists
     assert_valid_avatar_name
-    in_container do |cid|
-      assert_avatar_exists(cid)
-      remove_avatar_dir(cid)
-    end
+    in_container {
+      assert_avatar_exists
+      remove_avatar_dir
+    }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -126,26 +126,27 @@ class Runner # stateful
     @avatar_name = avatar_name
     assert_kata_exists
     assert_valid_avatar_name
-    in_container do |cid|
-      assert_avatar_exists(cid)
-      delete_files(cid, deleted_filenames)
+    in_container {
+      assert_avatar_exists
+      delete_files(deleted_filenames)
       args = [ changed_files, max_seconds ]
-      stdout,stderr,status,colour = run_timeout_cyber_dojo_sh(cid, *args)
-      { stdout:stdout, stderr:stderr, status:status, colour:colour }
-    end
+      stdout,stderr,status,colour = run_timeout_cyber_dojo_sh(*args)
+      { stdout:stdout,
+        stderr:stderr,
+        status:status,
+        colour:colour
+      }
+    }
   end
 
   private # = = = = = = = = = = = = = = = = = = = = = = = =
 
-  def in_container(&block)
-    cid = create_container
+  def in_container
+    create_container
     begin
-      block.call(cid)
+      yield
     ensure
-      # [docker rm] could be backgrounded with a trailing &
-      # but it does not make a test-event discernably
-      # faster when measuring to 100th of a second
-      assert_exec("docker rm --force #{cid}")
+      remove_container
     end
   end
 
@@ -171,8 +172,16 @@ class Runner # stateful
       '--user=root',
       "--volume #{kata_volume_name}:#{sandboxes_root_dir}:rw"
     ].join(space)
-    stdout,_ = assert_exec("docker run #{args} #{image_name} sh")
-    stdout.strip # cid
+    assert_exec("docker run #{args} #{image_name} sh")
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - -
+
+  def remove_container
+    # [docker rm] could be backgrounded with a trailing &
+    # but it does not make a test-event discernably
+    # faster when measuring to 100th of a second
+    assert_exec("docker rm --force #{container_name}")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
@@ -225,32 +234,33 @@ class Runner # stateful
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  def run_timeout_cyber_dojo_sh(cid, files, max_seconds)
+  def run_timeout_cyber_dojo_sh(files, max_seconds)
     # See comment at end of file about slower alternative.
     Dir.mktmpdir('runner') do |tmp_dir|
-      if files == {}
-        cyber_dojo_sh = [
+      if files == {} # possible nothing has changed
+        cmd = [
           'docker exec',
           "--user=#{uid}:#{gid}",
           '--interactive',
-          cid,
+          container_name,
           "sh -c 'cd #{avatar_dir} && sh ./cyber-dojo.sh'"
         ].join(space)
-        run_timeout(cid, cyber_dojo_sh, max_seconds)
+        #run_timeout(cyber_dojo_sh, max_seconds)
       else
         save_to(files, tmp_dir)
-        tar_pipe = tar_pipe_cmd(tmp_dir, cid)
-        run_timeout(cid, tar_pipe, max_seconds)
+        cmd = tar_pipe_cmd(tmp_dir)
+        #run_timeout(tar_pipe, max_seconds)
       end
+      run_timeout(cmd, max_seconds)
     end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  def delete_files(cid, pathed_filenames)
+  def delete_files(pathed_filenames)
     # most of the time, pathed_filenames == []
     pathed_filenames.each do |pathed_filename|
-      assert_docker_exec(cid, "rm #{avatar_dir}/#{pathed_filename}")
+      assert_docker_exec("rm #{avatar_dir}/#{pathed_filename}")
     end
   end
 
@@ -270,7 +280,7 @@ class Runner # stateful
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  def tar_pipe_cmd(tmp_dir, cid, cmd = 'sh ./cyber-dojo.sh')
+  def tar_pipe_cmd(tmp_dir, cmd = 'sh ./cyber-dojo.sh')
     [
       "chmod 755 #{tmp_dir}",
       "&& cd #{tmp_dir}",
@@ -282,7 +292,7 @@ class Runner # stateful
                 'docker exec',  # ...into docker container
                   "--user=#{uid}:#{gid}", # [1]
                   '--interactive',
-                  cid,
+                  container_name,
                   'sh -c',
                   "'",         # open quote
                   "cd #{avatar_dir}",
@@ -315,7 +325,7 @@ class Runner # stateful
   include StringCleaner
   include StringTruncater
 
-  def run_timeout(cid, cmd, max_seconds)
+  def run_timeout(cmd, max_seconds)
     # This kills the container from the "outside".
     # Originally I also time-limited the cpu-time from the "inside"
     # using the cpu ulimit. However a cpu-ulimit of 10 seconds could
@@ -339,7 +349,7 @@ class Runner # stateful
         w_stderr.close
         stdout = truncated(cleaned(r_stdout.read))
         stderr = truncated(cleaned(r_stderr.read))
-        colour = red_amber_green(cid, stdout, stderr, status)
+        colour = red_amber_green(stdout, stderr, status)
         [stdout, stderr, status, colour]
       end
     rescue Timeout::Error
@@ -363,7 +373,7 @@ class Runner # stateful
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  def red_amber_green(cid, stdout_arg, stderr_arg, status_arg)
+  def red_amber_green(stdout_arg, stderr_arg, status_arg)
     # If cyber-dojo.sh has crippled the container (eg fork-bomb)
     # then the [docker exec] will mostly likely raise.
     # Not worth creating a new container for this.
@@ -373,7 +383,7 @@ class Runner # stateful
       #   lambda { |stdout, stderr, status| ... }
       # so avoid using stdout,stderr,status as identifiers
       # or you'll get shadowing outer local variables warnings.
-      out,_err = assert_exec("docker exec #{cid} sh -c '#{cmd}'")
+      out,_err = assert_exec("docker exec #{container_name} sh -c '#{cmd}'")
       # :nocov:
       rag = eval(out)
       rag.call(stdout_arg, stderr_arg, status_arg).to_s
@@ -457,25 +467,25 @@ class Runner # stateful
   # dirs
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def make_avatar_dir(cid)
-    assert_docker_exec(cid, "mkdir -m 755 #{avatar_dir}")
+  def make_avatar_dir
+    assert_docker_exec("mkdir -m 755 #{avatar_dir}")
   end
 
-  def chown_avatar_dir(cid)
-    assert_docker_exec(cid, "chown #{uid}:#{gid} #{avatar_dir}")
+  def chown_avatar_dir
+    assert_docker_exec("chown #{uid}:#{gid} #{avatar_dir}")
   end
 
-  def remove_avatar_dir(cid)
-    assert_docker_exec(cid, "rm -rf #{avatar_dir}")
+  def remove_avatar_dir
+    assert_docker_exec("rm -rf #{avatar_dir}")
   end
 
-  def make_shared_dir(cid)
+  def make_shared_dir
     # first avatar makes the shared dir
-    assert_docker_exec(cid, "mkdir -m 775 #{shared_dir} || true")
+    assert_docker_exec("mkdir -m 775 #{shared_dir} || true")
   end
 
-  def chown_shared_dir(cid)
-    assert_docker_exec(cid, "chown root:#{group} #{shared_dir}")
+  def chown_shared_dir
+    assert_docker_exec("chown root:#{group} #{shared_dir}")
   end
 
   def shared_dir
@@ -556,24 +566,25 @@ class Runner # stateful
   # avatar
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_avatar_exists(cid)
-    unless avatar_exists_cid?(cid)
+  def assert_avatar_exists
+    unless avatar_exists_cid?
       fail_avatar_name('!exists')
     end
   end
 
-  def refute_avatar_exists(cid)
-    if avatar_exists_cid?(cid)
+  def refute_avatar_exists
+    if avatar_exists_cid?
       fail_avatar_name('exists')
     end
   end
 
-  def avatar_exists_cid?(cid)
+  def avatar_exists_cid?
     # check is for avatar's sandboxes/ subdir and
     # not its /home/ subdir which is pre-created
     # in the docker image.
-    dir = avatar_dir
-    _,_,status = quiet_exec("docker exec #{cid} sh -c '[ -d #{dir} ]'")
+    shell_cmd = "[ -d #{avatar_dir} ]"
+    cmd = "docker exec #{container_name} sh -c '#{shell_cmd}'"
+    _,_,status = quiet_exec(cmd)
     status == success
   end
 
@@ -601,8 +612,8 @@ class Runner # stateful
   # assertions
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_docker_exec(cid, cmd)
-    assert_exec("docker exec #{cid} sh -c '#{cmd}'")
+  def assert_docker_exec(cmd)
+    assert_exec("docker exec #{container_name} sh -c '#{cmd}'")
   end
 
   def assert_exec(cmd)
@@ -652,8 +663,15 @@ end
 #   filename = avatar_dir + '/' + name
 #   dir = File.dirname(filename)
 #   shell_cmd = "mkdir -p #{dir};"
-#   shell_cmd += "cat >#{filename} && chown #{uid}:#{gid} #{filename}"
-#   cmd = "docker exec --interactive --user=root #{cid} sh -c '#{shell_cmd}'"
+#   shell_cmd += "cat >#{filename}"
+#   shell_cmd += " && chown #{uid}:#{gid} #{filename}"
+#   cmd = [
+#     'docker exec',
+#     '--interactive',
+#     '--user=root',
+#     container_name,
+#     "sh -c '#{shell_cmd}'"
+#   ].join(space)
 #   stdout,stderr,ps = Open3.capture3(cmd, :stdin_data => content)
 #   assert ps.success?
 # end
