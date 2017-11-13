@@ -200,11 +200,9 @@ class Runner # stateful
           container_name,
           "sh -c 'cd #{avatar_dir} && sh ./cyber-dojo.sh'"
         ].join(space)
-        #run_timeout(cyber_dojo_sh, max_seconds)
       else
         save_to(files, tmp_dir)
         cmd = tar_pipe_cmd(tmp_dir)
-        #run_timeout(tar_pipe, max_seconds)
       end
       run_timeout(cmd, max_seconds)
     end
@@ -213,7 +211,6 @@ class Runner # stateful
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def delete_files(pathed_filenames)
-    # most of the time, pathed_filenames == []
     pathed_filenames.each do |pathed_filename|
       assert_docker_exec("rm #{avatar_dir}/#{pathed_filename}")
     end
