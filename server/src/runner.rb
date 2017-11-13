@@ -184,7 +184,6 @@ class Runner # stateful
       env_var('CYBER_DOJO_KATA_ID',     kata_id),
       env_var('CYBER_DOJO_RUNNER',      'stateful'),
       env_var('CYBER_DOJO_SANDBOX',     avatar_dir),
-      env_var('HOME', home_dir)
     ].join(space)
   end
 
