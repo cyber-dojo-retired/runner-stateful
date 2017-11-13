@@ -46,7 +46,7 @@ class Runner # stateful
     elsif stderr.include?('not found') || stderr.include?('not exist')
       return false # [1]
     else
-      fail_image_name('invalid')
+      argument_error('image_name', 'invalid')
     end
   end
 
@@ -483,7 +483,7 @@ class Runner # stateful
 
   def assert_valid_image_name
     unless valid_image_name?(image_name)
-      fail_image_name('invalid')
+      argument_error('image_name', 'invalid')
     end
   end
 
@@ -497,7 +497,7 @@ class Runner # stateful
 
   def assert_valid_kata_id
     unless valid_kata_id?
-      fail_kata_id('invalid')
+      argument_error('kata_id', 'invalid')
     end
   end
 
@@ -517,13 +517,13 @@ class Runner # stateful
 
   def assert_kata_exists
     unless kata_exists?
-      fail_kata_id('!exists')
+      argument_error('kata_id', '!exists')
     end
   end
 
   def refute_kata_exists
     if kata_exists?
-      fail_kata_id('exists')
+      argument_error('kata_id', 'exists')
     end
   end
 
@@ -535,15 +535,15 @@ class Runner # stateful
 
   def assert_valid_avatar_name
     unless valid_avatar_name?
-      fail_avatar_name('invalid')
+      argument_error('avatar_name', 'invalid')
     end
   end
-
-  include AllAvatarsNames
 
   def valid_avatar_name?
     all_avatars_names.include?(avatar_name)
   end
+
+  include AllAvatarsNames
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
   # avatar
@@ -551,13 +551,13 @@ class Runner # stateful
 
   def assert_avatar_exists
     unless avatar_exists_cid?
-      fail_avatar_name('!exists')
+      argument_error('avatar_name', '!exists')
     end
   end
 
   def refute_avatar_exists
     if avatar_exists_cid?
-      fail_avatar_name('exists')
+      argument_error('avatar_name', 'exists')
     end
   end
 
@@ -569,26 +569,6 @@ class Runner # stateful
     cmd = "docker exec #{container_name} sh -c '#{shell_cmd}'"
     _,_,status = quiet_exec(cmd)
     status == success
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - -
-  # errors
-  # - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def fail_kata_id(message)
-    fail bad_argument("kata_id:#{message}")
-  end
-
-  def fail_image_name(message)
-    fail bad_argument("image_name:#{message}")
-  end
-
-  def fail_avatar_name(message)
-    fail bad_argument("avatar_name:#{message}")
-  end
-
-  def bad_argument(message)
-    ArgumentError.new(message)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
@@ -605,6 +585,10 @@ class Runner # stateful
 
   def quiet_exec(cmd)
     shell.exec(cmd, LoggerNull.new(self))
+  end
+
+  def argument_error(name, message)
+    fail ArgumentError.new("#{name}:#{message}")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - -
