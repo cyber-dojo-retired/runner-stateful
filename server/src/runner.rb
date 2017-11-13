@@ -370,9 +370,13 @@ class Runner # stateful
     # Not worth creating a new container for this.
     cmd = 'cat /usr/local/bin/red_amber_green.rb'
     begin
-      cout,_cerr = assert_exec("docker exec #{cid} sh -c '#{cmd}'")
+      # The rag lambda tends to look like this:
+      #   lambda { |stdout, stderr, status| ... }
+      # so avoid using stdout,stderr,status as identifiers
+      # or you'll get shadowing outer local variables warnings.
+      out,_err = assert_exec("docker exec #{cid} sh -c '#{cmd}'")
       # :nocov:
-      rag = eval(cout)
+      rag = eval(out)
       rag.call(stdout_arg, stderr_arg, status_arg).to_s
     rescue
       :amber
