@@ -42,13 +42,7 @@ if [[ ( ${server_status} == 0 && ${client_status} == 0 ) ]];  then
 else
   echo
   echo "server: cid = ${server_cid}, status = ${server_status}"
-  if [ "${server_status}" != "0" ]; then
-    docker logs ${MY_NAME}_server
-  fi
   echo "client: cid = ${client_cid}, status = ${client_status}"
-  if [ "${client_status}" != "0" ]; then
-    docker logs ${MY_NAME}_client
-  fi
   echo
   exit 1
 fi
