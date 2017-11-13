@@ -206,7 +206,7 @@ class TestBase < HexMiniTest
   end
 
   def sandbox(avatar_name = 'salmon')
-    "/tmp/sandboxes/#{avatar_name}"
+    "/sandboxes/#{avatar_name}"
   end
 
   def success

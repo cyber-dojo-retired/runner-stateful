@@ -429,7 +429,7 @@ class Runner # stateful
   end
 
   def sandboxes_root_dir
-    '/tmp/sandboxes'
+    '/sandboxes'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
