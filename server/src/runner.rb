@@ -141,51 +141,6 @@ class Runner # stateful
 
   private # = = = = = = = = = = = = = = = = = = = = = = = =
 
-  def in_container
-    create_container
-    begin
-      yield
-    ensure
-      remove_container
-    end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - -
-
-  def create_container
-    # The [docker run] must be guarded by argument checks
-    # because it volume mounts...
-    #     [docker run ... --volume ...]
-    # Volume V must already exist.
-    # If volume V does _not_ exist the [docker run]
-    # will nevertheless succeed, create the container,
-    # and create a _temporary_ sandboxes dir in it!
-    # Viz, the runner would be stateless and not stateful.
-    # See https://github.com/docker/docker/issues/13121
-    args = [
-      '--detach',                 # for later execs
-      env_vars,
-      '--init',                   # pid-1 process
-      '--interactive',            # for tar-pipe
-      "--name=#{container_name}", # for easy clean up
-      limits,
-      '--user=root',
-      "--volume #{kata_volume_name}:#{sandboxes_root_dir}:rw"
-    ].join(space)
-    assert_exec("docker run #{args} #{image_name} sh")
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - -
-
-  def remove_container
-    # [docker rm] could be backgrounded with a trailing &
-    # but it does not make a test-event discernably
-    # faster when measuring to 100th of a second
-    assert_exec("docker rm --force #{container_name}")
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - -
-
   def env_vars
     [
       env_var('AVATAR_NAME', avatar_name),
@@ -409,8 +364,53 @@ class Runner # stateful
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # container properties
+  # container
   # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def in_container
+    create_container
+    begin
+      yield
+    ensure
+      remove_container
+    end
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - -
+
+  def create_container
+    # The [docker run] must be guarded by argument checks
+    # because it volume mounts...
+    #     [docker run ... --volume ...]
+    # Volume V must already exist.
+    # If volume V does _not_ exist the [docker run]
+    # will nevertheless succeed, create the container,
+    # and create a _temporary_ sandboxes dir in it!
+    # Viz, the runner would be stateless and not stateful.
+    # See https://github.com/docker/docker/issues/13121
+    args = [
+      '--detach',                 # for later execs
+      env_vars,
+      '--init',                   # pid-1 process
+      '--interactive',            # for tar-pipe
+      "--name=#{container_name}", # for easy clean up
+      limits,
+      '--user=root',
+      "--volume #{kata_volume_name}:#{sandboxes_root_dir}:rw"
+    ].join(space)
+    assert_exec("docker run #{args} #{image_name} sh")
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - -
+
+  def remove_container
+    # [docker rm] could be backgrounded with a trailing &
+    # but it does not make a test-event discernably
+    # faster when measuring to 100th of a second
+    assert_exec("docker rm --force #{container_name}")
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - -
 
   def container_name
     # Give containers a name with a specific prefix so they
