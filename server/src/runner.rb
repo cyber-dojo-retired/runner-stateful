@@ -87,10 +87,7 @@ class Runner # stateful
     assert_valid_avatar_name
     in_container {
       refute_avatar_exists
-      make_shared_dir
-      chown_shared_dir
-      make_avatar_dir
-      chown_avatar_dir
+      make_and_chown_dirs
       Dir.mktmpdir { |tmp_dir|
         save_to(starting_files, tmp_dir)
         assert_exec tar_pipe_cmd(tmp_dir, 'true')
@@ -344,7 +341,7 @@ class Runner # stateful
       rag = eval(out)
       rag.call(stdout_arg, stderr_arg, status_arg).to_s
     rescue
-      :amber
+      'amber'
       # :nocov:
     end
   end
@@ -410,13 +407,13 @@ class Runner # stateful
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def container_name
-    # Give containers a name with a specific prefix so they
-    # can be cleaned up if any fail to be removed/reaped.
-    # Does not have a trailing uuid. This ensures that
-    # an in_container() call is not accidentally nested inside
-    # another in_container() call.
-    [ name_prefix, kata_id, avatar_name ].join('_')
+    @container_name ||=
+      [ name_prefix, kata_id, avatar_name ].join('_')
   end
+
+  # - - - - - - - - - - - - - - - - - - - - - -
+  # container properties
+  # - - - - - - - - - - - - - - - - - - - - - -
 
   def group
     'cyber-dojo'
@@ -457,36 +454,25 @@ class Runner # stateful
   end
 
   def kata_volume_name
-    [ name_prefix, kata_id ].join('_')
+    @kata_volume_name ||=
+      [ name_prefix, kata_id ].join('_')
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # dirs
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def make_avatar_dir
+  def make_and_chown_dirs
+    # first avatar makes the shared dir
+    shared_dir = "#{sandboxes_root_dir}/shared"
+    assert_docker_exec("mkdir -m 775 #{shared_dir} || true")
     assert_docker_exec("mkdir -m 755 #{avatar_dir}")
-  end
-
-  def chown_avatar_dir
+    assert_docker_exec("chown root:#{group} #{shared_dir}")
     assert_docker_exec("chown #{uid}:#{gid} #{avatar_dir}")
   end
 
   def remove_avatar_dir
     assert_docker_exec("rm -rf #{avatar_dir}")
-  end
-
-  def make_shared_dir
-    # first avatar makes the shared dir
-    assert_docker_exec("mkdir -m 775 #{shared_dir} || true")
-  end
-
-  def chown_shared_dir
-    assert_docker_exec("chown root:#{group} #{shared_dir}")
-  end
-
-  def shared_dir
-    "#{sandboxes_root_dir}/shared"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
