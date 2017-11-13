@@ -117,7 +117,7 @@ class Runner # stateful
     deleted_files, unchanged_files, changed_files, new_files,
     max_seconds
     )
-    unchanged_files = nil # we are stateful!
+    unchanged_files = nil # we're stateful!
     all_files = [*changed_files, *new_files].to_h
     run(avatar_name, deleted_files.keys, all_files, max_seconds)
   end
@@ -158,15 +158,15 @@ class Runner # stateful
     # Volume V must already exist.
     # If volume V does _not_ exist the [docker run]
     # will nevertheless succeed, create the container,
-    # and create a temporary /sandboxes/ folder in it!
+    # and create a _temporary_ sandboxes dir in it!
     # Viz, the runner would be stateless and not stateful.
     # See https://github.com/docker/docker/issues/13121
     args = [
-      '--detach',
+      '--detach',                 # for later execs
       env_vars,
-      '--init',                            # pid-1 process
-      '--interactive',                     # for later execs
-      "--name=#{container_name}",          # for easy clean up
+      '--init',                   # pid-1 process
+      '--interactive',            # for tar-pipe
+      "--name=#{container_name}", # for easy clean up
       limits,
       '--user=root',
       "--volume #{kata_volume_name}:#{sandboxes_root_dir}:rw"
@@ -247,6 +247,15 @@ class Runner # stateful
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
+
+  def delete_files(cid, pathed_filenames)
+    # most of the time, pathed_filenames == []
+    pathed_filenames.each do |pathed_filename|
+      assert_docker_exec(cid, "rm #{avatar_dir}/#{pathed_filename}")
+    end
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def save_to(files, tmp_dir)
     files.each do |pathed_filename, content|
@@ -354,15 +363,6 @@ class Runner # stateful
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
-
-  def delete_files(cid, pathed_filenames)
-    # most of the time, pathed_filenames == []
-    pathed_filenames.each do |pathed_filename|
-      assert_docker_exec(cid, "rm #{avatar_dir}/#{pathed_filename}")
-    end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def red_amber_green(cid, stdout_arg, stderr_arg, status_arg)
     # If cyber-dojo.sh has crippled the container (eg fork-bomb)
