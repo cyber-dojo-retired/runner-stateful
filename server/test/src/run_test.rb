@@ -36,8 +36,7 @@ class RunTest < TestBase
           changed_files:{ 'cyber-dojo.sh' => "cd #{sub_dir} && #{ls_cmd}" }
         })
         ls_files = ls_parse(stdout)
-        uid = runner.user_id('salmon')
-        group = runner.group
+        uid = user_id('salmon')
         assert_equal_atts(filename, '-rw-r--r--', uid, group, content.length, ls_files)
       }
     }
@@ -57,7 +56,7 @@ class RunTest < TestBase
           changed_files:{ 'cyber-dojo.sh' => "cd #{sub_dir} && #{ls_cmd}" }
         })
         ls_files = ls_parse(stdout)
-        uid = runner.user_id('salmon')
+        uid = user_id('salmon')
         assert_equal_atts(filename, '-rw-r--r--', uid, group, content.length, ls_files)
       }
     }

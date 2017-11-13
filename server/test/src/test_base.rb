@@ -1,4 +1,5 @@
 require_relative 'hex_mini_test'
+require_relative '../../src/all_avatars_names'
 require_relative '../../src/externals'
 require_relative '../../src/runner'
 require 'json'
@@ -191,19 +192,21 @@ class TestBase < HexMiniTest
   end
 
   def user_id(avatar_name = 'salmon')
-    runner.user_id(avatar_name)
+    40000 + all_avatars_names.index(avatar_name)
   end
 
+  include AllAvatarsNames
+
   def group
-    runner.group
+    'cyber-dojo'
   end
 
   def gid
-    runner.gid
+    5000
   end
 
   def sandbox(avatar_name = 'salmon')
-    runner.avatar_dir(avatar_name)
+    "/tmp/sandboxes/#{avatar_name}"
   end
 
   def success
@@ -211,7 +214,7 @@ class TestBase < HexMiniTest
   end
 
   def timed_out
-    runner.timed_out
+    'timed_out'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

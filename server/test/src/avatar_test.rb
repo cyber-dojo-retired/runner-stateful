@@ -136,38 +136,7 @@ class AvatarTest < TestBase
     assert_equal 'avatar_name:!exists', error.message
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # negative test case: user_id
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test 'A10', %w(
-  user_id with invalid avatar_name raises
-  ) do
-    invalid_avatar_names.each do |invalid_avatar_name|
-      error = assert_raises(ArgumentError) {
-        runner.user_id(invalid_avatar_name)
-      }
-      assert_equal 'avatar_name:invalid', error.message
-    end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # negative test case: user_id
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  test '0C8', %w(
-  sandbox_path with invalid avatar_name raises
-  ) do
-    invalid_avatar_names.each do |invalid_avatar_name|
-      error = assert_raises(ArgumentError) {
-        runner.avatar_dir(invalid_avatar_name)
-      }
-      assert_equal 'avatar_name:invalid', error.message
-    end
-  end
-
-
-  private
+  private # = = = = = = = = = = = = = = = = = = = = = =
 
   def assert_method_raises(method, kata_ids, avatar_names, message)
     [*kata_ids].each do |kata_id|

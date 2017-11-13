@@ -47,7 +47,7 @@ module OsHelper
   def assert_avatar_users_exist
     etc_passwd = assert_docker_run 'cat /etc/passwd'
     all_avatars_names.each do |name|
-      uid = runner.user_id(name).to_s
+      uid = user_id(name).to_s
       assert etc_passwd.include?(uid),
         "#{name}:#{uid}\n\n#{etc_passwd}\n\n#{image_name}"
     end

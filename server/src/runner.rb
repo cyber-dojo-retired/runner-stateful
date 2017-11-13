@@ -6,10 +6,11 @@ require_relative 'valid_image_name'
 require 'timeout'
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# Uses a new short-lived docker container per run().
+# Uses a new short-lived docker container per run.
 # Uses a long-lived docker volume per kata.
 # Positives:
-#   o) avatars can share disk-state (eg sqlite database in /sandboxes/shared)
+#   o) avatars can share disk-state
+#      (eg sqlite database in /tmp/sandboxes/shared)
 #   o) short-lived container per run() is pretty secure.
 # Negatives:
 #   o) avatars cannot share processes.
@@ -27,8 +28,6 @@ class Runner # stateful
     assert_valid_kata_id
   end
 
-  attr_reader :image_name, :kata_id
-
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # image
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -42,7 +41,7 @@ class Runner # stateful
   def image_pull
     # [1] The contents of stderr vary depending on Docker version
     _stdout,stderr,status = quiet_exec("docker pull #{image_name}")
-    if status == shell.success
+    if status == success
       return true
     elsif stderr.include?('not found') || stderr.include?('not exist')
       return false # [1]
@@ -74,35 +73,38 @@ class Runner # stateful
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def avatar_exists?(avatar_name)
+    @avatar_name = avatar_name
     assert_kata_exists
-    assert_valid_avatar_name(avatar_name)
-    in_container(avatar_name) do |cid|
-      avatar_exists_cid?(cid, avatar_name)
+    assert_valid_avatar_name
+    in_container do |cid|
+      avatar_exists_cid?(cid)
     end
   end
 
   def avatar_new(avatar_name, starting_files)
+    @avatar_name = avatar_name
     assert_kata_exists
-    assert_valid_avatar_name(avatar_name)
-    in_container(avatar_name) do |cid|
-      refute_avatar_exists(cid, avatar_name)
+    assert_valid_avatar_name
+    in_container do |cid|
+      refute_avatar_exists(cid)
       make_shared_dir(cid)
       chown_shared_dir(cid)
-      make_avatar_dir(cid, avatar_name)
-      chown_avatar_dir(cid, avatar_name)
+      make_avatar_dir(cid)
+      chown_avatar_dir(cid)
       Dir.mktmpdir('runner') do |tmp_dir|
         save_to(starting_files, tmp_dir)
-        assert_exec tar_pipe_cmd(tmp_dir, cid, avatar_name, 'true')
+        assert_exec tar_pipe_cmd(tmp_dir, cid, 'true')
       end
     end
   end
 
   def avatar_old(avatar_name)
+    @avatar_name = avatar_name
     assert_kata_exists
-    assert_valid_avatar_name(avatar_name)
-    in_container(avatar_name) do |cid|
-      assert_avatar_exists(cid, avatar_name)
-      remove_avatar_dir(cid, avatar_name)
+    assert_valid_avatar_name
+    in_container do |cid|
+      assert_avatar_exists(cid)
+      remove_avatar_dir(cid)
     end
   end
 
@@ -112,66 +114,31 @@ class Runner # stateful
 
   def run_cyber_dojo_sh(
     avatar_name,
-    deleted_files, _unchanged_files, changed_files, new_files,
+    deleted_files, unchanged_files, changed_files, new_files,
     max_seconds
     )
+    unchanged_files = nil # we are stateful!
     all_files = [*changed_files, *new_files].to_h
     run(avatar_name, deleted_files.keys, all_files, max_seconds)
   end
 
   def run(avatar_name, deleted_filenames, changed_files, max_seconds)
+    @avatar_name = avatar_name
     assert_kata_exists
-    assert_valid_avatar_name(avatar_name)
-    in_container(avatar_name) do |cid|
-      assert_avatar_exists(cid, avatar_name)
-      delete_files(cid, avatar_name, deleted_filenames)
-      args = [ avatar_name, changed_files, max_seconds ]
+    assert_valid_avatar_name
+    in_container do |cid|
+      assert_avatar_exists(cid)
+      delete_files(cid, deleted_filenames)
+      args = [ changed_files, max_seconds ]
       stdout,stderr,status,colour = run_timeout_cyber_dojo_sh(cid, *args)
       { stdout:stdout, stderr:stderr, status:status, colour:colour }
     end
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # properties
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  private # = = = = = = = = = = = = = = = = = = = = = = = =
 
-  def group
-    'cyber-dojo'
-  end
-
-  def gid
-    5000
-  end
-
-  def user_id(avatar_name)
-    assert_valid_avatar_name(avatar_name)
-    40000 + all_avatars_names.index(avatar_name)
-  end
-
-  def home_dir(avatar_name)
-    assert_valid_avatar_name(avatar_name)
-    "/home/#{avatar_name}"
-  end
-
-  def avatar_dir(avatar_name)
-    assert_valid_avatar_name(avatar_name)
-    "#{sandboxes_root_dir}/#{avatar_name}"
-  end
-
-  def sandboxes_root_dir
-    '/tmp/sandboxes'
-  end
-
-  def timed_out
-    'timed_out'
-  end
-
-  private
-
-  attr_reader :disk, :shell
-
-  def in_container(avatar_name, &block)
-    cid = create_container(avatar_name)
+  def in_container(&block)
+    cid = create_container
     begin
       block.call(cid)
     ensure
@@ -184,7 +151,7 @@ class Runner # stateful
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  def create_container(avatar_name)
+  def create_container
     # The [docker run] must be guarded by argument checks
     # because it volume mounts...
     #     [docker run ... --volume ...]
@@ -194,14 +161,13 @@ class Runner # stateful
     # and create a temporary /sandboxes/ folder in it!
     # Viz, the runner would be stateless and not stateful.
     # See https://github.com/docker/docker/issues/13121
-    name = container_name(avatar_name)
     args = [
       '--detach',
-      env_vars(avatar_name),
+      env_vars,
       '--init',                            # pid-1 process
       '--interactive',                     # for later execs
       '--memory=384m',
-      "--name=#{name}",                    # for easy clean up
+      "--name=#{container_name}",          # for easy clean up
       '--net=none',                        # for security
       '--pids-limit=128',                  # no fork bombs
       '--security-opt=no-new-privileges',  # no escalation
@@ -215,14 +181,14 @@ class Runner # stateful
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  def env_vars(avatar_name)
+  def env_vars
     [
       "--env CYBER_DOJO_AVATAR_NAME=#{avatar_name}",
       "--env CYBER_DOJO_IMAGE_NAME=#{image_name}",
       "--env CYBER_DOJO_KATA_ID=#{kata_id}",
       '--env CYBER_DOJO_RUNNER=stateful',
-      "--env CYBER_DOJO_SANDBOX=#{avatar_dir(avatar_name)}",
-      "--env HOME=#{home_dir(avatar_name)}"
+      "--env CYBER_DOJO_SANDBOX=#{avatar_dir}",
+      "--env HOME=#{home_dir}"
     ].join(space)
   end
 
@@ -246,12 +212,12 @@ class Runner # stateful
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  def run_timeout_cyber_dojo_sh(cid, avatar_name, files, max_seconds)
+  def run_timeout_cyber_dojo_sh(cid, files, max_seconds)
     # See comment at end of file about slower alternative.
     Dir.mktmpdir('runner') do |tmp_dir|
-      uid = user_id(avatar_name)
+      uid = user_id
       if files == {}
-        dir = avatar_dir(avatar_name)
+        dir = avatar_dir
         cyber_dojo_sh = [
           'docker exec',
           "--user=#{uid}:#{gid}",
@@ -262,7 +228,7 @@ class Runner # stateful
         run_timeout(cid, cyber_dojo_sh, max_seconds)
       else
         save_to(files, tmp_dir)
-        tar_pipe = tar_pipe_cmd(tmp_dir, cid, avatar_name)
+        tar_pipe = tar_pipe_cmd(tmp_dir, cid)
         run_timeout(cid, tar_pipe, max_seconds)
       end
     end
@@ -284,9 +250,9 @@ class Runner # stateful
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  def tar_pipe_cmd(tmp_dir, cid, avatar_name, cmd = 'sh ./cyber-dojo.sh')
-    uid = user_id(avatar_name)
-    dir = avatar_dir(avatar_name)
+  def tar_pipe_cmd(tmp_dir, cid, cmd = 'sh ./cyber-dojo.sh')
+    uid = user_id
+    dir = avatar_dir
     [
       "chmod 755 #{tmp_dir}",
       "&& cd #{tmp_dir}",
@@ -368,7 +334,7 @@ class Runner # stateful
       # block of in_container()
       Process.kill(-9, pid)
       Process.detach(pid)
-      ['', '', 137, timed_out]
+      [ '', '', 137, 'timed_out' ]
     ensure
       w_stdout.close unless w_stdout.closed?
       w_stderr.close unless w_stderr.closed?
@@ -379,10 +345,10 @@ class Runner # stateful
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  def delete_files(cid, avatar_name, pathed_filenames)
+  def delete_files(cid, pathed_filenames)
     # most of the time, pathed_filenames == []
     pathed_filenames.each do |pathed_filename|
-      dir = avatar_dir(avatar_name)
+      dir = avatar_dir
       assert_docker_exec(cid, "rm #{dir}/#{pathed_filename}")
     end
   end
@@ -407,7 +373,7 @@ class Runner # stateful
     names.uniq - ['<none>']
   end
 
-  def container_name(avatar_name)
+  def container_name
     # Give containers a name with a specific prefix so they
     # can be cleaned up if any fail to be removed/reaped.
     # Does not have a trailing uuid. This ensures that
@@ -444,19 +410,19 @@ class Runner # stateful
   # dirs
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def make_avatar_dir(cid, avatar_name)
-    dir = avatar_dir(avatar_name)
+  def make_avatar_dir(cid)
+    dir = avatar_dir
     assert_docker_exec(cid, "mkdir -m 755 #{dir}")
   end
 
-  def chown_avatar_dir(cid, avatar_name)
-    dir = avatar_dir(avatar_name)
-    uid = user_id(avatar_name)
+  def chown_avatar_dir(cid)
+    dir = avatar_dir
+    uid = user_id
     assert_docker_exec(cid, "chown #{uid}:#{gid} #{dir}")
   end
 
-  def remove_avatar_dir(cid, avatar_name)
-    dir = avatar_dir(avatar_name)
+  def remove_avatar_dir(cid)
+    dir = avatar_dir
     assert_docker_exec(cid, "rm -rf #{dir}")
   end
 
@@ -474,10 +440,10 @@ class Runner # stateful
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
-  # validation
+  # image_name
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
-  include ValidImageName
+  attr_reader :image_name
 
   def assert_valid_image_name
     unless valid_image_name?(image_name)
@@ -485,19 +451,41 @@ class Runner # stateful
     end
   end
 
+  include ValidImageName
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # container properties
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def group
+    'cyber-dojo'
+  end
+
+  def gid
+    5000
+  end
+
+  def user_id
+    40000 + all_avatars_names.index(avatar_name)
+  end
+
+  def home_dir
+    "/home/#{avatar_name}"
+  end
+
+  def avatar_dir
+    "#{sandboxes_root_dir}/#{avatar_name}"
+  end
+
+  def sandboxes_root_dir
+    '/tmp/sandboxes'
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+  # kata_id
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_kata_exists
-    unless kata_exists?
-      fail_kata_id('!exists')
-    end
-  end
-
-  def refute_kata_exists
-    if kata_exists?
-      fail_kata_id('exists')
-    end
-  end
+  attr_reader :kata_id
 
   def assert_valid_kata_id
     unless valid_kata_id?
@@ -516,40 +504,66 @@ class Runner # stateful
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
+  # kata
+  # - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_valid_avatar_name(avatar_name)
-    unless valid_avatar_name?(avatar_name)
+  def assert_kata_exists
+    unless kata_exists?
+      fail_kata_id('!exists')
+    end
+  end
+
+  def refute_kata_exists
+    if kata_exists?
+      fail_kata_id('exists')
+    end
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+  # avatar_name
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  attr_reader :avatar_name
+
+  def assert_valid_avatar_name
+    unless valid_avatar_name?
       fail_avatar_name('invalid')
     end
   end
 
   include AllAvatarsNames
 
-  def valid_avatar_name?(avatar_name)
+  def valid_avatar_name?
     all_avatars_names.include?(avatar_name)
   end
 
-  def assert_avatar_exists(cid, avatar_name)
-    unless avatar_exists_cid?(cid, avatar_name)
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+  # avatar
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def assert_avatar_exists(cid)
+    unless avatar_exists_cid?(cid)
       fail_avatar_name('!exists')
     end
   end
 
-  def refute_avatar_exists(cid, avatar_name)
-    if avatar_exists_cid?(cid, avatar_name)
+  def refute_avatar_exists(cid)
+    if avatar_exists_cid?(cid)
       fail_avatar_name('exists')
     end
   end
 
-  def avatar_exists_cid?(cid, avatar_name)
+  def avatar_exists_cid?(cid)
     # check is for avatar's sandboxes/ subdir and
     # not its /home/ subdir which is pre-created
     # in the docker image.
-    dir = avatar_dir(avatar_name)
+    dir = avatar_dir
     _,_,status = quiet_exec("docker exec #{cid} sh -c '[ -d #{dir} ]'")
     status == success
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+  # errors
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def fail_kata_id(message)
@@ -568,6 +582,8 @@ class Runner # stateful
     ArgumentError.new(message)
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+  # assertions
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_docker_exec(cid, cmd)
@@ -595,6 +611,8 @@ class Runner # stateful
   def space
     ' '
   end
+
+  attr_reader :disk, :shell # externals
 
 end
 
