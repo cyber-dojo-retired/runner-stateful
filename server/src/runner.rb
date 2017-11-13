@@ -179,16 +179,16 @@ class Runner # stateful
 
   def env_vars
     [
-      env_var('CYBER_DOJO_AVATAR_NAME', avatar_name),
-      env_var('CYBER_DOJO_IMAGE_NAME',  image_name),
-      env_var('CYBER_DOJO_KATA_ID',     kata_id),
-      env_var('CYBER_DOJO_RUNNER',      'stateful'),
-      env_var('CYBER_DOJO_SANDBOX',     avatar_dir),
+      env_var('AVATAR_NAME', avatar_name),
+      env_var('IMAGE_NAME',  image_name),
+      env_var('KATA_ID',     kata_id),
+      env_var('RUNNER',      'stateful'),
+      env_var('SANDBOX',     avatar_dir),
     ].join(space)
   end
 
   def env_var(name, value)
-    "--env #{name}=#{value}"
+    "--env CYBER_DOJO_#{name}=#{value}"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
