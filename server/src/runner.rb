@@ -166,12 +166,8 @@ class Runner # stateful
       env_vars,
       '--init',                            # pid-1 process
       '--interactive',                     # for later execs
-      '--memory=384m',
       "--name=#{container_name}",          # for easy clean up
-      '--net=none',                        # for security
-      '--pids-limit=128',                  # no fork bombs
-      '--security-opt=no-new-privileges',  # no escalation
-      ulimits,
+      limits,
       '--user=root',
       "--volume #{kata_volume_name}:#{sandboxes_root_dir}:rw"
     ].join(space)
@@ -183,27 +179,45 @@ class Runner # stateful
 
   def env_vars
     [
-      "--env CYBER_DOJO_AVATAR_NAME=#{avatar_name}",
-      "--env CYBER_DOJO_IMAGE_NAME=#{image_name}",
-      "--env CYBER_DOJO_KATA_ID=#{kata_id}",
-      '--env CYBER_DOJO_RUNNER=stateful',
-      "--env CYBER_DOJO_SANDBOX=#{avatar_dir}",
-      "--env HOME=#{home_dir}"
+      env_var('CYBER_DOJO_AVATAR_NAME', avatar_name),
+      env_var('CYBER_DOJO_IMAGE_NAME',  image_name),
+      env_var('CYBER_DOJO_KATA_ID',     kata_id),
+      env_var('CYBER_DOJO_RUNNER',      'stateful'),
+      env_var('CYBER_DOJO_SANDBOX',     avatar_dir),
+      env_var('HOME', home_dir)
     ].join(space)
+  end
+
+  def env_var(name, value)
+    "--env #{name}=#{value}"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  def ulimits
-    [
-      "--ulimit data=#{4*GB}:#{4*GB}",    # max data segment size
-      '--ulimit core=0:0',                # max core file size
-      "--ulimit fsize=#{16*MB}:#{16*MB}", # max file size
-      '--ulimit locks=128:128',           # max number of file locks
-      '--ulimit nofile=128:128',          # max number of files
-      '--ulimit nproc=128:128',           # max number processes
-      "--ulimit stack=#{8*MB}:#{8*MB}"    # max stack size
+  def limits
+    [                          # max
+      ulimit('data',   4*GB),  # data segment size
+      ulimit('core',   0),     # core file size
+      ulimit('fsize',  16*MB), # file size
+      ulimit('locks',  128),   # number of file locks
+      ulimit('nofile', 128),   # number of files
+      ulimit('nproc',  128),   # number of processes
+      ulimit('stack',  8*MB),  # stack size
+      '--memory=384m',         # ram
+      '--net=none',                      # no network
+      '--pids-limit=128',                # no fork bombs
+      '--security-opt=no-new-privileges' # no escalation
     ].join(space)
+    # There is no cpu-ulimit. This is because a cpu-ulimit of 10
+    # seconds could kill a container after only 5 seconds...
+    # The cpu-ulimit assumes one core. The host system running the
+    # docker container can have multiple cores or use hyperthreading.
+    # So a piece of code running on 2 cores, both 100% utilized could
+    # be killed after 5 seconds.
+  end
+
+  def ulimit(name, limit)
+    "--ulimit #{name}=#{limit}:#{limit}"
   end
 
   KB = 1024
@@ -215,15 +229,13 @@ class Runner # stateful
   def run_timeout_cyber_dojo_sh(cid, files, max_seconds)
     # See comment at end of file about slower alternative.
     Dir.mktmpdir('runner') do |tmp_dir|
-      uid = user_id
       if files == {}
-        dir = avatar_dir
         cyber_dojo_sh = [
           'docker exec',
           "--user=#{uid}:#{gid}",
           '--interactive',
           cid,
-          "sh -c 'cd #{dir} && sh ./cyber-dojo.sh'"
+          "sh -c 'cd #{avatar_dir} && sh ./cyber-dojo.sh'"
         ].join(space)
         run_timeout(cid, cyber_dojo_sh, max_seconds)
       else
@@ -239,20 +251,18 @@ class Runner # stateful
   def save_to(files, tmp_dir)
     files.each do |pathed_filename, content|
       sub_dir = File.dirname(pathed_filename)
-      if sub_dir != '.'
+      unless sub_dir == '.'
         src_dir = tmp_dir + '/' + sub_dir
         shell.exec("mkdir -p #{src_dir}")
       end
-      host_filename = tmp_dir + '/' + pathed_filename
-      disk.write(host_filename, content)
+      src_filename = tmp_dir + '/' + pathed_filename
+      disk.write(src_filename, content)
     end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def tar_pipe_cmd(tmp_dir, cid, cmd = 'sh ./cyber-dojo.sh')
-    uid = user_id
-    dir = avatar_dir
     [
       "chmod 755 #{tmp_dir}",
       "&& cd #{tmp_dir}",
@@ -267,7 +277,7 @@ class Runner # stateful
                   cid,
                   'sh -c',
                   "'",         # open quote
-                  "cd #{dir}",
+                  "cd #{avatar_dir}",
                   '&& tar',
                         '--touch', # [2]
                         '-zxf',    # extract tar file
@@ -348,18 +358,26 @@ class Runner # stateful
   def delete_files(cid, pathed_filenames)
     # most of the time, pathed_filenames == []
     pathed_filenames.each do |pathed_filename|
-      dir = avatar_dir
-      assert_docker_exec(cid, "rm #{dir}/#{pathed_filename}")
+      assert_docker_exec(cid, "rm #{avatar_dir}/#{pathed_filename}")
     end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def red_amber_green(cid, stdout_arg, stderr_arg, status_arg)
+    # If cyber-dojo.sh has crippled the container (eg fork-bomb)
+    # then the [docker exec] will mostly likely raise.
+    # Not worth creating a new container for this.
     cmd = 'cat /usr/local/bin/red_amber_green.rb'
-    out,_err = assert_exec("docker exec #{cid} sh -c '#{cmd}'")
-    rag = eval(out)
-    rag.call(stdout_arg, stderr_arg, status_arg).to_s
+    begin
+      cout,_cerr = assert_exec("docker exec #{cid} sh -c '#{cmd}'")
+      # :nocov:
+      rag = eval(cout)
+      rag.call(stdout_arg, stderr_arg, status_arg).to_s
+    rescue
+      :amber
+      # :nocov:
+    end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -373,6 +391,10 @@ class Runner # stateful
     names.uniq - ['<none>']
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # container properties
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
   def container_name
     # Give containers a name with a specific prefix so they
     # can be cleaned up if any fail to be removed/reaped.
@@ -382,24 +404,46 @@ class Runner # stateful
     [ name_prefix, kata_id, avatar_name ].join('_')
   end
 
+  def group
+    'cyber-dojo'
+  end
+
+  def gid
+    5000
+  end
+
+  def uid
+    40000 + all_avatars_names.index(avatar_name)
+  end
+
+  def home_dir
+    "/home/#{avatar_name}"
+  end
+
+  def avatar_dir
+    "#{sandboxes_root_dir}/#{avatar_name}"
+  end
+
+  def sandboxes_root_dir
+    '/tmp/sandboxes'
+  end
+
   # - - - - - - - - - - - - - - - - - - - - - - - -
   # volumes
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def kata_volume_exists?
     cmd = "docker volume ls --quiet --filter 'name=#{kata_volume_name}'"
-    stdout,_ = assert_exec(cmd)
+    stdout,_stderr = assert_exec(cmd)
     stdout.strip == kata_volume_name
   end
 
   def create_kata_volume
-    cmd = "docker volume create --name #{kata_volume_name}"
-    assert_exec(cmd)
+    assert_exec "docker volume create --name #{kata_volume_name}"
   end
 
   def remove_kata_volume
-    cmd = "docker volume rm #{kata_volume_name}"
-    assert_exec(cmd)
+    assert_exec "docker volume rm #{kata_volume_name}"
   end
 
   def kata_volume_name
@@ -411,19 +455,15 @@ class Runner # stateful
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def make_avatar_dir(cid)
-    dir = avatar_dir
-    assert_docker_exec(cid, "mkdir -m 755 #{dir}")
+    assert_docker_exec(cid, "mkdir -m 755 #{avatar_dir}")
   end
 
   def chown_avatar_dir(cid)
-    dir = avatar_dir
-    uid = user_id
-    assert_docker_exec(cid, "chown #{uid}:#{gid} #{dir}")
+    assert_docker_exec(cid, "chown #{uid}:#{gid} #{avatar_dir}")
   end
 
   def remove_avatar_dir(cid)
-    dir = avatar_dir
-    assert_docker_exec(cid, "rm -rf #{dir}")
+    assert_docker_exec(cid, "rm -rf #{avatar_dir}")
   end
 
   def make_shared_dir(cid)
@@ -452,34 +492,6 @@ class Runner # stateful
   end
 
   include ValidImageName
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # container properties
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def group
-    'cyber-dojo'
-  end
-
-  def gid
-    5000
-  end
-
-  def user_id
-    40000 + all_avatars_names.index(avatar_name)
-  end
-
-  def home_dir
-    "/home/#{avatar_name}"
-  end
-
-  def avatar_dir
-    "#{sandboxes_root_dir}/#{avatar_name}"
-  end
-
-  def sandboxes_root_dir
-    '/tmp/sandboxes'
-  end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
   # kata_id

@@ -229,7 +229,7 @@ class ApiTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  multi_os_test '4DE',
+  multi_os_test 'CD6',
   'shell fork-bomb does not run indefinitely' do
     in_kata_as(salmon) {
       shell_fork_bomb_test
@@ -495,21 +495,16 @@ class ApiTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def fork_bomb_test
-    begin
-      run_cyber_dojo_sh({
-        changed_files: { 'hiker.c' => fork_bomb_definition }
-      })
-      # :nocov:
-      assert_timed_out_or_printed 'All tests passed'
-      assert_timed_out_or_printed 'fork()'
-    rescue StandardError
-      # :nocov:
-    end
+    run_cyber_dojo_sh({
+      changed_files: { 'hiker.c' => fork_bomb }
+    })
+    assert_timed_out_or_printed 'All tests passed'
+    assert_timed_out_or_printed 'fork()'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def fork_bomb_definition
+  def fork_bomb
     [ '#include <stdio.h>',
       '#include <unistd.h>',
       '',
@@ -531,25 +526,23 @@ class ApiTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def shell_fork_bomb_test
+    run_cyber_dojo_sh({
+      changed_files: { 'cyber-dojo.sh' => shell_fork_bomb }
+    })
     cant_fork = (os == :Alpine ? "can't fork" : 'Cannot fork')
-    begin
-      shell_fork_bomb = [
-        'bomb()',
-        '{',
-        '   echo "bomb"',
-        '   bomb | bomb &',
-        '}',
-        'bomb'
-      ].join("\n")
-      run_cyber_dojo_sh({
-        changed_files: { 'cyber-dojo.sh' => shell_fork_bomb }
-      })
-      # :nocov:
-      assert_timed_out_or_printed 'bomb'
-      assert_timed_out_or_printed cant_fork
-    rescue StandardError
-      # :nocov:
-    end
+    assert_timed_out_or_printed cant_fork
+    assert_timed_out_or_printed 'bomb'
+  end
+
+  def shell_fork_bomb
+    [
+      'bomb()',
+      '{',
+      '   echo "bomb"',
+      '   bomb | bomb &',
+      '}',
+      'bomb'
+    ].join("\n")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
