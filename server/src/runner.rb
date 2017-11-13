@@ -131,8 +131,8 @@ class Runner # stateful
       delete_files(deleted_filenames)
       args = [ changed_files, max_seconds ]
       stdout,stderr,status,colour = run_timeout_cyber_dojo_sh(*args)
-      { stdout:stdout,
-        stderr:stderr,
+      { stdout:truncated(stdout),
+        stderr:truncated(stderr),
         status:status,
         colour:colour
       }
@@ -347,10 +347,10 @@ class Runner # stateful
         status = $?.exitstatus
         w_stdout.close
         w_stderr.close
-        stdout = truncated(cleaned(r_stdout.read))
-        stderr = truncated(cleaned(r_stderr.read))
+        stdout = cleaned(r_stdout.read)
+        stderr = cleaned(r_stderr.read)
         colour = red_amber_green(stdout, stderr, status)
-        [stdout, stderr, status, colour]
+        [ stdout, stderr, status, colour ]
       end
     rescue Timeout::Error
       # Kill the [docker exec] processes running
@@ -362,7 +362,11 @@ class Runner # stateful
       # block of in_container()
       Process.kill(-9, pid)
       Process.detach(pid)
-      [ '', '', 137, 'timed_out' ]
+      stdout = ''
+      stderr = ''
+      status = 137
+      colour = 'timed_out'
+      [ stdout, stderr, status, colour ]
     ensure
       w_stdout.close unless w_stdout.closed?
       w_stderr.close unless w_stderr.closed?
