@@ -430,10 +430,6 @@ class Runner # stateful
     40000 + all_avatars_names.index(avatar_name)
   end
 
-  def home_dir
-    "/home/#{avatar_name}"
-  end
-
   def avatar_dir
     "#{sandboxes_root_dir}/#{avatar_name}"
   end
