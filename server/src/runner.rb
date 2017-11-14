@@ -131,14 +131,10 @@ class Runner # stateful
     in_container {
       assert_avatar_exists
       delete_files(deleted_filenames)
-      args = [ changed_files, max_seconds ]
-      stdout,stderr,status,colour = run_timeout_cyber_dojo_sh(*args)
-      { stdout:truncated(stdout),
-        stderr:truncated(stderr),
-        status:status,
-        colour:colour
-      }
+      run_timeout_cyber_dojo_sh(changed_files, max_seconds)
+      set_colour
     }
+    { stdout:@stdout, stderr:@stderr, status:@status, colour:@colour }
   end
 
   private # = = = = = = = = = = = = = = = = = = = = = = = =
@@ -195,7 +191,7 @@ class Runner # stateful
   def run_timeout_cyber_dojo_sh(files, max_seconds)
     # See comment at end of file about slower alternative.
     Dir.mktmpdir('runner') do |tmp_dir|
-      if files == {} # possible nothing has changed
+      if files == {} # nothing has changed!
         cmd = [
           'docker exec',
           "--user=#{uid}:#{gid}",
@@ -279,9 +275,6 @@ class Runner # stateful
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  include StringCleaner
-  include StringTruncater
-
   def run_timeout(cmd, max_seconds)
     # The [docker exec] running on the _host_ is
     # killed by Process.kill. This does _not_ kill
@@ -292,34 +285,41 @@ class Runner # stateful
     r_stdout, w_stdout = IO.pipe
     r_stderr, w_stderr = IO.pipe
     pid = Process.spawn(cmd, {
-      pgroup:true,
-         out:w_stdout,
-         err:w_stderr
+      pgroup:true,     # become process leader
+         out:w_stdout, # redirection
+         err:w_stderr  # redirection
     })
     begin
       Timeout::timeout(max_seconds) do
-        Process.waitpid(pid)
-        status = $?.exitstatus
-        w_stdout.close
-        w_stderr.close
-        stdout = cleaned(r_stdout.read)
-        stderr = cleaned(r_stderr.read)
-        colour = red_amber_green(stdout, stderr, status)
-        [ stdout, stderr, status, colour ]
+        _, ps = Process.waitpid2(pid)
+        @status = ps.exitstatus
+        @timed_out = false
       end
     rescue Timeout::Error
-      Process.kill(-9, pid)
-      Process.detach(pid)
-      stdout = ''
-      stderr = ''
-      status = 137
-      colour = 'timed_out'
-      [ stdout, stderr, status, colour ]
+      Process.kill(-9, pid) # -ve means kill process-group
+      Process.detach(pid)   # prevent zombie-child
+      @status = 137         # we are not waiting
+      @timed_out = true
     ensure
       w_stdout.close unless w_stdout.closed?
       w_stderr.close unless w_stderr.closed?
+      @stdout = truncated(cleaned(r_stdout.read))
+      @stderr = truncated(cleaned(r_stderr.read))
       r_stdout.close
       r_stderr.close
+    end
+  end
+
+  include StringCleaner
+  include StringTruncater
+
+  # - - - - - - - - - - - - - - - - - - - - - -
+
+  def set_colour
+    if @timed_out
+      @colour = 'timed_out'
+    else # truncated and cleaned earlier
+      @colour = red_amber_green(@stdout, @stderr, @status)
     end
   end
 

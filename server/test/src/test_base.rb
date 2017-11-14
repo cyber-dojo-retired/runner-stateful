@@ -149,7 +149,7 @@ class TestBase < HexMiniTest
     run_cyber_dojo_sh(named_args)
     refute_equal timed_out, colour, quad
     assert_status success
-    assert_stderr ''
+    assert_equal '', stderr
     stdout
   end
 
@@ -157,8 +157,6 @@ class TestBase < HexMiniTest
     run_cyber_dojo_sh(named_args)
     assert_colour timed_out
     assert_status 137
-    assert_stdout ''
-    assert_stderr ''
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
