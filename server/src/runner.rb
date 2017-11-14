@@ -160,7 +160,14 @@ class Runner # stateful
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def limits
-    [                          # max
+    # There is no cpu-ulimit... a cpu-ulimit of 10
+    # seconds could kill a container after only 5
+    # seconds... The cpu-ulimit assumes one core.
+    # The host system running the docker container
+    # can have multiple cores or use hyperthreading.
+    # So a piece of code running on 2 cores, both 100%
+    # utilized could be killed after 5 seconds.
+    [
       ulimit('data',   4*GB),  # data segment size
       ulimit('core',   0),     # core file size
       ulimit('fsize',  16*MB), # file size
@@ -173,12 +180,6 @@ class Runner # stateful
       '--pids-limit=128',                # no fork bombs
       '--security-opt=no-new-privileges' # no escalation
     ].join(space)
-    # There is no cpu-ulimit. This is because a cpu-ulimit of 10
-    # seconds could kill a container after only 5 seconds...
-    # The cpu-ulimit assumes one core. The host system running the
-    # docker container can have multiple cores or use hyperthreading.
-    # So a piece of code running on 2 cores, both 100% utilized could
-    # be killed after 5 seconds.
   end
 
   def ulimit(name, limit)
@@ -235,6 +236,21 @@ class Runner # stateful
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def tar_pipe_cmd(tmp_dir, cmd = 'sh ./cyber-dojo.sh')
+    # [1] is for file-stamp date-time granularity
+    # This relates to the modification-date (stat %y).
+    # The tar --touch option is not available in a default Alpine
+    # container. To add it:
+    #    $ apk add --update tar
+    # Also, in a default Alpine container the date-time
+    # file-stamps have a granularity of one second. In other
+    # words the microseconds value is always zero.
+    # To add microsecond granularity:
+    #    $ apk add --update coreutils
+    # See the file builder/image_builder.rb on
+    # https://github.com/cyber-dojo-languages/image_builder/blob/master/
+    # In particular the methods
+    #    o) update_tar_command
+    #    o) install_coreutils_command
     [
       "chmod 755 #{tmp_dir}",
       "&& cd #{tmp_dir}",
@@ -244,14 +260,14 @@ class Runner # stateful
             '.',    # tar the current directory
             '|',    # pipe the tarfile...
                 'docker exec',  # ...into docker container
-                  "--user=#{uid}:#{gid}", # [1]
+                  "--user=#{uid}:#{gid}", # ownership
                   '--interactive',
                   container_name,
                   'sh -c',
                   "'",         # open quote
                   "cd #{avatar_dir}",
                   '&& tar',
-                        '--touch', # [2]
+                        '--touch', # [1]
                         '-zxf',    # extract tar file
                         '-',       # which is read from stdin
                         '-C',      # save the extracted files to
@@ -259,19 +275,6 @@ class Runner # stateful
                   "&& #{cmd}",
                   "'"          # close quote
     ].join(space)
-    # The files written into the container need the correct
-    # content, ownership, and date-time file-stamps.
-    # [1] is for the correct ownership.
-    # [2] is for the date-time stamps, in particular the
-    #     modification-date (stat %y). The tar --touch option
-    #     is not available in a default Alpine container.
-    #     So the test-framework container needs to update tar:
-    #        $ apk add --update tar
-    #     Also, in a default Alpine container the date-time
-    #     file-stamps have a granularity of one second. In other
-    #     words the microseconds value is always zero.
-    #     So the test-framework container also needs to fix this:
-    #        $ apk add --update coreutils
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
@@ -280,14 +283,12 @@ class Runner # stateful
   include StringTruncater
 
   def run_timeout(cmd, max_seconds)
-    # This kills the container from the "outside".
-    # Originally I also time-limited the cpu-time from the "inside"
-    # using the cpu ulimit. However a cpu-ulimit of 10 seconds could
-    # kill the container after only 5 seconds. This is because the
-    # cpu-ulimit assumes one core. The host system running the docker
-    # container can have multiple cores or use hyperthreading. So a
-    # piece of code running on 2 cores, both 100% utilized could be
-    # killed after 5 seconds. So there is no longer a cpu-ulimit.
+    # The [docker exec] running on the _host_ is
+    # killed by Process.kill. This does _not_ kill
+    # the cyber-dojo.sh running _inside_ the docker
+    # container. The container is killed in the ensure
+    # block of in_container()
+    # See https://github.com/docker/docker/issues/9098
     r_stdout, w_stdout = IO.pipe
     r_stderr, w_stderr = IO.pipe
     pid = Process.spawn(cmd, {
@@ -307,13 +308,6 @@ class Runner # stateful
         [ stdout, stderr, status, colour ]
       end
     rescue Timeout::Error
-      # Kill the [docker exec] processes running
-      # on the host. This does __not__ kill the
-      # cyber-dojo.sh process running __inside__
-      # the docker container. See
-      # https://github.com/docker/docker/issues/9098
-      # The container is killed in the ensure
-      # block of in_container()
       Process.kill(-9, pid)
       Process.detach(pid)
       stdout = ''
@@ -332,15 +326,16 @@ class Runner # stateful
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def red_amber_green(stdout_arg, stderr_arg, status_arg)
-    # If cyber-dojo.sh has crippled the container (eg fork-bomb)
-    # then the [docker exec] will mostly likely raise.
+    # The rag lambda tends to look like this:
+    #   lambda { |stdout, stderr, status| ... }
+    # so avoid using stdout,stderr,status as variable
+    # names or you'll get shadowing warnings.
+    #
+    # In a crippled container (eg fork-bomb)
+    # the [docker exec] will mostly likely raise.
     # Not worth creating a new container for this.
     cmd = 'cat /usr/local/bin/red_amber_green.rb'
     begin
-      # The rag lambda tends to look like this:
-      #   lambda { |stdout, stderr, status| ... }
-      # so avoid using stdout,stderr,status as identifiers
-      # or you'll get shadowing outer local variables warnings.
       out,_err = assert_exec("docker exec #{container_name} sh -c '#{cmd}'")
       # :nocov:
       rag = eval(out)
