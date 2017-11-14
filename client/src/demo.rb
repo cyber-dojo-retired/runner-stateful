@@ -90,8 +90,8 @@ class Demo
 
   def run_cyber_dojo_sh(colour)
     quad = nil
-    args = [ image_name, kata_id, avatar_name ]
-    args += [ deleted_files, unchanged_files, changed_files, new_files ]
+    args  = [ image_name, kata_id, avatar_name ]
+    args += [ new_files, deleted_files, unchanged_files, changed_files ]
     args << 10
     duration = timed {
       quad = runner.run_cyber_dojo_sh(*args)

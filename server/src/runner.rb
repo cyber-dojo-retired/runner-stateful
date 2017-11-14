@@ -113,9 +113,9 @@ class Runner # stateful
 
   def run_cyber_dojo_sh(
     avatar_name,
-    deleted_files, unchanged_files, changed_files, new_files,
+    new_files, deleted_files, unchanged_files, changed_files,
     max_seconds
-    )
+  )
     unchanged_files = nil # we're stateful!
     all_files = [*changed_files, *new_files].to_h
     run(avatar_name, deleted_files.keys, all_files, max_seconds)
