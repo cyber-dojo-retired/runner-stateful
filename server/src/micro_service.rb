@@ -6,7 +6,7 @@ class MicroService
 
   def call(env)
     request = Rack::Request.new(env)
-    @json = JSON.parse(request.body.read)
+    @json_args = json_args(request)
     @name = request.path_info[1..-1] # lose leading /
     @args = case @name
       when /^image_pulled$/
@@ -31,11 +31,11 @@ class MicroService
       else
         @name = nil
         []
-    end
+      end
     [ 200, { 'Content-Type' => 'application/json' }, [ invoke.to_json ] ]
   end
 
-  private
+  private # = = = = = = = = = = = =
 
   def invoke
     runner = Runner.new(self, image_name, kata_id)
@@ -47,11 +47,22 @@ class MicroService
 
   # - - - - - - - - - - - - - - - -
 
+  def json_args(request)
+    JSON.parse(request.body.read)
+  rescue StandardError => e
+    log << "EXCEPTION: #{e.class.name}.#{__method__} #{e.message}"
+    {}
+  end
+
+  # - - - - - - - - - - - - - - - -
+
   include Externals
 
   def self.request_args(*names)
     names.each { |name|
-      define_method name, &lambda { @json[name.to_s] }
+      define_method name, &lambda {
+        @json_args[name.to_s]
+      }
     }
   end
 
