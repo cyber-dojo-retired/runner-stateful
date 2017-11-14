@@ -8,10 +8,12 @@ require 'timeout'
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Uses a new short-lived docker container per run.
 # Uses a long-lived docker volume per kata.
+#
 # Positives:
 #   o) avatars can share disk-state
 #      (eg sqlite database in /tmp/sandboxes/shared)
 #   o) short-lived container per run() is pretty secure.
+#
 # Negatives:
 #   o) avatars cannot share processes.
 #   o) bit slower than runner_processful.
@@ -622,7 +624,7 @@ end
 # If only one file has changed you might image this is quicker
 # but testing shows its actually a bit slower.
 #
-# For interest's sake here's how you tar pipe from a string and
+# For interests sake here's how you tar pipe from a string and
 # avoid the intermediate /tmp files:
 #
 # require 'open3'
