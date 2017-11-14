@@ -22,6 +22,62 @@ class ApiTest < TestBase
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # robustness
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  multi_os_test '2F0',
+  'call to non existent method becomes exception' do
+    assert_exception('does_not_exist', {}.to_json)
+  end
+
+  multi_os_test '2F1',
+  'call to existing method with bad json becomes exception' do
+    assert_exception('does_not_exist', '{x}')
+  end
+
+  multi_os_test '2F2',
+  'call to existing method with missing argument becomes exception' do
+    in_kata {
+      args = { image_name:image_name, kata_id:kata_id }
+      assert_exception('avatar_new', args.to_json)
+    }
+  end
+
+  multi_os_test '2F3',
+  'call to existing method with bad argument type becomes exception' do
+    in_kata_as(salmon) {
+      args = {
+        image_name:image_name,
+        kata_id:kata_id,
+        avatar_name:avatar_name,
+        new_files:2, # <=====
+        deleted_files:{},
+        unchanged_files:{},
+        changed_files:{},
+        max_seconds:2
+      }
+      assert_exception('run_cyber_dojo_sh', args.to_json)
+    }
+  end
+
+  include HttpJsonService
+
+  def hostname
+    ENV['CYBER_DOJO_RUNNER_SERVER_NAME']
+  end
+
+  def port
+    ENV['CYBER_DOJO_RUNNER_SERVER_PORT']
+  end
+
+  def assert_exception(method_name, jsoned_args)
+    json = http(method_name, jsoned_args) { |uri|
+      Net::HTTP::Post.new(uri)
+    }
+    refute_nil json['exception']
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
   # invalid arguments
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -163,6 +219,8 @@ class ApiTest < TestBase
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # container properties
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   multi_os_test '8A3',
   'container environment properties' do
@@ -217,13 +275,30 @@ class ApiTest < TestBase
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # fork-bombs
+  # bombs
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  multi_os_test 'CD4',
+  'print-bomb does not run indefinitely and some output is returned' do
+    in_kata_as(salmon) {
+      run_cyber_dojo_sh({
+        changed_files: { 'hiker.c' => print_bomb }
+      })
+      assert timed_out?
+      refute_equal '', stdout+stderr
+    }
+  end
+
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   multi_os_test 'CD5',
   'fork-bomb does not run indefinitely' do
     in_kata_as(salmon) {
-      fork_bomb_test
+      run_cyber_dojo_sh({
+        changed_files: { 'hiker.c' => fork_bomb }
+      })
+      assert_timed_out_or_printed 'All tests passed'
+      assert_timed_out_or_printed 'fork()'
     }
   end
 
@@ -232,7 +307,12 @@ class ApiTest < TestBase
   multi_os_test 'CD6',
   'shell fork-bomb does not run indefinitely' do
     in_kata_as(salmon) {
-      shell_fork_bomb_test
+      run_cyber_dojo_sh({
+        changed_files: { 'cyber-dojo.sh' => shell_fork_bomb }
+      })
+      cant_fork = (os == :Alpine ? "can't fork" : 'Cannot fork')
+      assert_timed_out_or_printed cant_fork
+      assert_timed_out_or_printed 'bomb'
     }
   end
 
@@ -241,7 +321,12 @@ class ApiTest < TestBase
   multi_os_test 'DB3',
   'file-bomb in exhaust file-handles fails to go off' do
     in_kata_as(salmon) {
-      file_bomb_test
+      run_cyber_dojo_sh({
+        changed_files: { 'hiker.c' => exhaust_file_handles }
+      })
+      assert seen?('All tests passed'), quad
+      assert seen?('fopen() != NULL'),  quad
+      assert seen?('fopen() == NULL'),  quad
     }
   end
 
@@ -494,12 +579,21 @@ class ApiTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def fork_bomb_test
-    run_cyber_dojo_sh({
-      changed_files: { 'hiker.c' => fork_bomb }
-    })
-    assert_timed_out_or_printed 'All tests passed'
-    assert_timed_out_or_printed 'fork()'
+  def print_bomb
+    [ '#include <stdio.h>',
+      '',
+      'int answer(void)',
+      '{',
+      '    for(;;)',
+      '    {',
+      '        fputs("Hello, world on stdout", stdout);',
+      '        fflush(stdout);',
+      '        fputs("Hello, world on stderr", stderr);',
+      '        fflush(stderr);',
+      '    }',
+      '    return 6 * 7;',
+      '}'
+    ].join("\n")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -525,15 +619,6 @@ class ApiTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def shell_fork_bomb_test
-    run_cyber_dojo_sh({
-      changed_files: { 'cyber-dojo.sh' => shell_fork_bomb }
-    })
-    cant_fork = (os == :Alpine ? "can't fork" : 'Cannot fork')
-    assert_timed_out_or_printed cant_fork
-    assert_timed_out_or_printed 'bomb'
-  end
-
   def shell_fork_bomb
     [
       'bomb()',
@@ -554,18 +639,7 @@ class ApiTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def file_bomb_test
-    run_cyber_dojo_sh({
-      changed_files: { 'hiker.c' => c_file_bomb }
-    })
-    assert seen?('All tests passed'), quad
-    assert seen?('fopen() != NULL'), quad
-    assert seen?('fopen() == NULL'), quad
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def c_file_bomb
+  def exhaust_file_handles
     [
       '#include <stdio.h>',
       '',
