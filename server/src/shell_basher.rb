@@ -8,7 +8,7 @@ class ShellBasher
 
   def assert_exec(command)
     stdout,stderr,status = exec(command)
-    if status != success
+    unless status == success
       fail ArgumentError.new("command:#{command}")
     end
     [stdout,stderr]
@@ -18,7 +18,7 @@ class ShellBasher
     begin
       stdout,stderr,r = Open3.capture3(command)
       status = r.exitstatus
-      if status != success
+      unless status == success
         verbose << line
         verbose << "COMMAND:#{command}"
         verbose << "STATUS:#{status}"
