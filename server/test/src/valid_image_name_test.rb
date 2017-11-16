@@ -13,6 +13,7 @@ class ValidImageNameTest < TestBase
   %w( invalid image_names are invalid ) do
     hex = '9'*32
     [
+      nil,
       '',              # nothing!
       '_',             # cannot start with separator
       'name_',         # cannot end with separator
