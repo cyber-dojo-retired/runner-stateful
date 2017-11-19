@@ -21,9 +21,8 @@ require 'timeout'
 
 class Runner # stateful
 
-  def initialize(parent, image_name, kata_id)
-    @disk = parent.disk
-    @shell = parent.shell
+  def initialize(external, image_name, kata_id)
+    @external = external
     @image_name = image_name
     @kata_id = kata_id
     assert_valid_image_name
@@ -46,7 +45,7 @@ class Runner # stateful
   def image_pull
     # [1] The contents of stderr vary depending on Docker version
     _stdout,stderr,status = quiet_exec("docker pull #{image_name}")
-    if status == success
+    if status == shell.success
       return true
     elsif stderr.include?('not found') || stderr.include?('not exist')
       return false # [1]
@@ -543,7 +542,7 @@ class Runner # stateful
     shell_cmd = "[ -d #{avatar_dir} ]"
     cmd = "docker exec #{container_name} sh -c '#{shell_cmd}'"
     _,_,status = quiet_exec(cmd)
-    status == success
+    status == shell.success
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
@@ -572,15 +571,19 @@ class Runner # stateful
     'test_run__runner_stateful_'
   end
 
-  def success
-    shell.success
-  end
-
   def space
     ' '
   end
 
-  attr_reader :disk, :shell # externals
+  # - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def disk
+    @external.disk
+  end
+
+  def shell
+    @external.shell
+  end
 
 end
 
