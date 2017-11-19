@@ -90,9 +90,7 @@ class ShellMockerTest < TestBase
   # - - - - - - - - - - - - - - -
 
   test '470',
-  %w( when there is an uncaught exception
-      teardown does not raise
-  ) do
+  %w( when there is an uncaught exception, teardown does not raise ) do
     shell = ShellMocker.new(nil)
     shell.mock_exec(pwd, wd, stderr='', success)
     error = assert_raises {
@@ -107,13 +105,18 @@ class ShellMockerTest < TestBase
 
   # - - - - - - - - - - - - - - -
 
+  test '4FE',
+  %w( when status is zero, assert returns stdout ) do
+    shell = ShellMocker.new(nil)
+    shell.mock_exec('false', 'so', 'se', 0)
+    assert_equal 'so', shell.assert('false')
+  end
+
   test '4FF',
-  %w( when status is non-zero
-      assert_exec raises
-  ) do
+  %w( when status is non-zero, assert raises ) do
     shell = ShellMocker.new(nil)
     shell.mock_exec('false', '', '', 1)
-    error = assert_raises { shell.assert_exec('false') }
+    error = assert_raises { shell.assert('false') }
     assert_equal 'command:false', error.message
   end
 

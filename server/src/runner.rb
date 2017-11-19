@@ -35,9 +35,7 @@ class Runner # stateful
 
   def image_pulled?
     cmd = 'docker images --format "{{.Repository}}"'
-    stdout,_ = assert_exec(cmd)
-    names = stdout.split("\n")
-    (names.uniq - ['<none>']).include? image_name
+    shell.assert(cmd).split("\n").include? image_name
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -94,7 +92,7 @@ class Runner # stateful
       make_and_chown_dirs
       Dir.mktmpdir { |tmp_dir|
         save_to(starting_files, tmp_dir)
-        assert_exec tar_pipe_cmd(tmp_dir, 'true')
+        shell.assert(tar_pipe_cmd(tmp_dir, 'true'))
       }
     }
   end
@@ -130,7 +128,7 @@ class Runner # stateful
     in_container {
       assert_avatar_exists
       deleted_filenames.each do |pathed_filename|
-        assert_docker_exec("rm #{avatar_dir}/#{pathed_filename}")
+        shell.assert(docker_exec("rm #{avatar_dir}/#{pathed_filename}"))
       end
       run_timeout_cyber_dojo_sh(changed_files, max_seconds)
       @colour = @timed_out ? 'timed_out' : red_amber_green
@@ -245,10 +243,13 @@ class Runner # stateful
     # Not worth creating a new container for this.
     cmd = 'cat /usr/local/bin/red_amber_green.rb'
     begin
-      out,_err = assert_exec("docker exec #{container_name} sh -c '#{cmd}'")
       # :nocov:
-      rag = eval(out)
-      rag.call(@stdout, @stderr, @status).to_s
+      rag = eval(shell.assert(docker_exec(cmd)))
+      colour = rag.call(@stdout, @stderr, @status).to_s
+      unless ['red','amber','green'].include? colour
+        colour = 'amber'
+      end
+      colour
     rescue
       'amber'
       # :nocov:
@@ -323,7 +324,7 @@ class Runner # stateful
       '--user=root',
       "--volume #{kata_volume_name}:#{sandboxes_root_dir}:rw"
     ].join(space)
-    assert_exec("docker run #{args} #{image_name} sh")
+    shell.assert("docker run #{args} #{image_name} sh")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
@@ -332,7 +333,7 @@ class Runner # stateful
     # [docker rm] could be backgrounded with a trailing &
     # but it does not make a test-event discernably
     # faster when measuring to 100th of a second
-    assert_exec("docker rm --force #{container_name}")
+    shell.assert("docker rm --force #{container_name}")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
@@ -434,16 +435,15 @@ class Runner # stateful
 
   def kata_volume_exists?
     cmd = "docker volume ls --quiet --filter 'name=#{kata_volume_name}'"
-    stdout,_stderr = assert_exec(cmd)
-    stdout.strip == kata_volume_name
+    shell.assert(cmd).strip == kata_volume_name
   end
 
   def create_kata_volume
-    assert_exec "docker volume create --name #{kata_volume_name}"
+    shell.assert("docker volume create --name #{kata_volume_name}")
   end
 
   def remove_kata_volume
-    assert_exec "docker volume rm #{kata_volume_name}"
+    shell.assert("docker volume rm #{kata_volume_name}")
   end
 
   def kata_volume_name
@@ -508,9 +508,7 @@ class Runner # stateful
     # check is for avatar's sandboxes/ subdir and
     # not its /home/ subdir which is pre-created
     # in the docker image.
-    shell_cmd = "[ -d #{avatar_dir} ]"
-    cmd = "docker exec #{container_name} sh -c '#{shell_cmd}'"
-    _,_,status = quiet_exec(cmd)
+    _,_,status = quiet_exec(docker_exec("[ -d #{avatar_dir} ]"))
     status == shell.success
   end
 
@@ -519,26 +517,22 @@ class Runner # stateful
   def make_and_chown_dirs
     # first avatar makes the shared dir
     shared_dir = "#{sandboxes_root_dir}/shared"
-    assert_docker_exec("mkdir -m 775 #{shared_dir} || true")
-    assert_docker_exec("mkdir -m 755 #{avatar_dir}")
-    assert_docker_exec("chown root:#{group} #{shared_dir}")
-    assert_docker_exec("chown #{uid}:#{gid} #{avatar_dir}")
+    shell.assert(docker_exec("mkdir -m 775 #{shared_dir} || true"))
+    shell.assert(docker_exec("mkdir -m 755 #{avatar_dir}"))
+    shell.assert(docker_exec("chown root:#{group} #{shared_dir}"))
+    shell.assert(docker_exec("chown #{uid}:#{gid} #{avatar_dir}"))
   end
 
   def remove_avatar_dir
-    assert_docker_exec("rm -rf #{avatar_dir}")
+    shell.assert(docker_exec("rm -rf #{avatar_dir}"))
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
   # assertions
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_docker_exec(cmd)
-    assert_exec("docker exec #{container_name} sh -c '#{cmd}'")
-  end
-
-  def assert_exec(cmd)
-    shell.assert_exec(cmd)
+  def docker_exec(cmd)
+    "docker exec #{container_name} sh -c '#{cmd}'"
   end
 
   def quiet_exec(cmd)
@@ -546,7 +540,7 @@ class Runner # stateful
   end
 
   def argument_error(name, message)
-    fail ArgumentError.new("#{name}:#{message}")
+    raise ArgumentError.new("#{name}:#{message}")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - -
