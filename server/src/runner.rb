@@ -11,7 +11,7 @@ require 'timeout'
 #
 # Positives:
 #   o) avatars can share disk-state
-#      (eg sqlite database in /tmp/sandboxes/shared)
+#      (eg sqlite database in /sandboxes/shared)
 #   o) short-lived container per run() is pretty secure.
 #
 # Negatives:
@@ -129,7 +129,9 @@ class Runner # stateful
     assert_valid_avatar_name
     in_container {
       assert_avatar_exists
-      delete_files(deleted_filenames)
+      deleted_filenames.each do |pathed_filename|
+        assert_docker_exec("rm #{avatar_dir}/#{pathed_filename}")
+      end
       run_timeout_cyber_dojo_sh(changed_files, max_seconds)
       @colour = @timed_out ? 'timed_out' : red_amber_green
     }
@@ -137,84 +139,6 @@ class Runner # stateful
   end
 
   private # = = = = = = = = = = = = = = = = = = = = = = = =
-
-  def env_vars
-    [
-      env_var('AVATAR_NAME', avatar_name),
-      env_var('IMAGE_NAME',  image_name),
-      env_var('KATA_ID',     kata_id),
-      env_var('RUNNER',      'stateful'),
-      env_var('SANDBOX',     avatar_dir),
-    ].join(space)
-  end
-
-  def env_var(name, value)
-    "--env CYBER_DOJO_#{name}=#{value}"
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - -
-
-  def limits
-    # There is no cpu-ulimit... a cpu-ulimit of 10
-    # seconds could kill a container after only 5
-    # seconds... The cpu-ulimit assumes one core.
-    # The host system running the docker container
-    # can have multiple cores or use hyperthreading.
-    # So a piece of code running on 2 cores, both 100%
-    # utilized could be killed after 5 seconds.
-    [
-      ulimit('data',   4*GB),  # data segment size
-      ulimit('core',   0),     # core file size
-      ulimit('fsize',  16*MB), # file size
-      ulimit('locks',  128),   # number of file locks
-      ulimit('nofile', 128),   # number of files
-      ulimit('nproc',  128),   # number of processes
-      ulimit('stack',  8*MB),  # stack size
-      '--memory=512m',         # ram
-      '--net=none',                      # no network
-      '--pids-limit=128',                # no fork bombs
-      '--security-opt=no-new-privileges' # no escalation
-    ].join(space)
-  end
-
-  def ulimit(name, limit)
-    "--ulimit #{name}=#{limit}:#{limit}"
-  end
-
-  KB = 1024
-  MB = 1024 * KB
-  GB = 1024 * MB
-
-  # - - - - - - - - - - - - - - - - - - - - - -
-
-  def run_timeout_cyber_dojo_sh(files, max_seconds)
-    # See comment at end of file about slower alternative.
-    Dir.mktmpdir('runner') do |tmp_dir|
-      if files == {} # nothing has changed!
-        cmd = [
-          'docker exec',
-          "--user=#{uid}:#{gid}",
-          '--interactive',
-          container_name,
-          "sh -c 'cd #{avatar_dir} && sh ./cyber-dojo.sh'"
-        ].join(space)
-      else
-        save_to(files, tmp_dir)
-        cmd = tar_pipe_cmd(tmp_dir)
-      end
-      run_timeout(cmd, max_seconds)
-    end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - -
-
-  def delete_files(pathed_filenames)
-    pathed_filenames.each do |pathed_filename|
-      assert_docker_exec("rm #{avatar_dir}/#{pathed_filename}")
-    end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def save_to(files, tmp_dir)
     files.each do |pathed_filename, content|
@@ -331,8 +255,41 @@ class Runner # stateful
     end
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # container
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def run_timeout_cyber_dojo_sh(files, max_seconds)
+    # See comment at end of file about slower alternative.
+    Dir.mktmpdir('runner') do |tmp_dir|
+      if files == {} # nothing has changed!
+        cmd = [
+          'docker exec',
+          "--user=#{uid}:#{gid}",
+          '--interactive',
+          container_name,
+          "sh -c 'cd #{avatar_dir} && sh ./cyber-dojo.sh'"
+        ].join(space)
+      else
+        save_to(files, tmp_dir)
+        cmd = tar_pipe_cmd(tmp_dir)
+      end
+      run_timeout(cmd, max_seconds)
+    end
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+  # image/container
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  attr_reader :image_name
+
+  def assert_valid_image_name
+    unless valid_image_name?(image_name)
+      argument_error('image_name', 'invalid')
+    end
+  end
+
+  include ValidImageName
+
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def in_container
@@ -381,90 +338,64 @@ class Runner # stateful
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def container_name
-    @container_name ||=
-      [ name_prefix, kata_id, avatar_name ].join('_')
+    [ name_prefix, kata_id, avatar_name ].join('_')
+  end
+
+  def name_prefix
+    'test_run__runner_stateful_'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
-  # container properties
+
+  def env_vars
+    [
+      env_var('AVATAR_NAME', avatar_name),
+      env_var('IMAGE_NAME',  image_name),
+      env_var('KATA_ID',     kata_id),
+      env_var('RUNNER',      'stateful'),
+      env_var('SANDBOX',     avatar_dir),
+    ].join(space)
+  end
+
+  def env_var(name, value)
+    "--env CYBER_DOJO_#{name}=#{value}"
+  end
+
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  def group
-    'cyber-dojo'
+  def limits
+    # There is no cpu-ulimit... a cpu-ulimit of 10
+    # seconds could kill a container after only 5
+    # seconds... The cpu-ulimit assumes one core.
+    # The host system running the docker container
+    # can have multiple cores or use hyperthreading.
+    # So a piece of code running on 2 cores, both 100%
+    # utilized could be killed after 5 seconds.
+    [
+      ulimit('data',   4*GB),  # data segment size
+      ulimit('core',   0),     # core file size
+      ulimit('fsize',  16*MB), # file size
+      ulimit('locks',  128),   # number of file locks
+      ulimit('nofile', 128),   # number of files
+      ulimit('nproc',  128),   # number of processes
+      ulimit('stack',  8*MB),  # stack size
+      '--memory=512m',         # ram
+      '--net=none',                      # no network
+      '--pids-limit=128',                # no fork bombs
+      '--security-opt=no-new-privileges' # no escalation
+    ].join(space)
   end
 
-  def gid
-    5000
+  def ulimit(name, limit)
+    "--ulimit #{name}=#{limit}:#{limit}"
   end
 
-  def uid
-    40000 + all_avatars_names.index(avatar_name)
-  end
-
-  def avatar_dir
-    "#{sandboxes_root_dir}/#{avatar_name}"
-  end
-
-  def sandboxes_root_dir
-    '/sandboxes'
-  end
+  KB = 1024
+  MB = 1024 * KB
+  GB = 1024 * MB
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
-  # volumes
-  # - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def kata_volume_exists?
-    cmd = "docker volume ls --quiet --filter 'name=#{kata_volume_name}'"
-    stdout,_stderr = assert_exec(cmd)
-    stdout.strip == kata_volume_name
-  end
-
-  def create_kata_volume
-    assert_exec "docker volume create --name #{kata_volume_name}"
-  end
-
-  def remove_kata_volume
-    assert_exec "docker volume rm #{kata_volume_name}"
-  end
-
-  def kata_volume_name
-    @kata_volume_name ||=
-      [ name_prefix, kata_id ].join('_')
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # dirs
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def make_and_chown_dirs
-    # first avatar makes the shared dir
-    shared_dir = "#{sandboxes_root_dir}/shared"
-    assert_docker_exec("mkdir -m 775 #{shared_dir} || true")
-    assert_docker_exec("mkdir -m 755 #{avatar_dir}")
-    assert_docker_exec("chown root:#{group} #{shared_dir}")
-    assert_docker_exec("chown #{uid}:#{gid} #{avatar_dir}")
-  end
-
-  def remove_avatar_dir
-    assert_docker_exec("rm -rf #{avatar_dir}")
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - -
-  # image_name
-  # - - - - - - - - - - - - - - - - - - - - - - - -
-
-  attr_reader :image_name
-
-  def assert_valid_image_name
-    unless valid_image_name?(image_name)
-      argument_error('image_name', 'invalid')
-    end
-  end
-
-  include ValidImageName
-
-  # - - - - - - - - - - - - - - - - - - - - - - - -
-  # kata_id
+  # kata
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   attr_reader :kata_id
@@ -486,8 +417,6 @@ class Runner # stateful
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
-  # kata
-  # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_kata_exists
     unless kata_exists?
@@ -502,7 +431,27 @@ class Runner # stateful
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
-  # avatar_name
+
+  def kata_volume_exists?
+    cmd = "docker volume ls --quiet --filter 'name=#{kata_volume_name}'"
+    stdout,_stderr = assert_exec(cmd)
+    stdout.strip == kata_volume_name
+  end
+
+  def create_kata_volume
+    assert_exec "docker volume create --name #{kata_volume_name}"
+  end
+
+  def remove_kata_volume
+    assert_exec "docker volume rm #{kata_volume_name}"
+  end
+
+  def kata_volume_name
+    [ name_prefix, kata_id ].join('_')
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+  # avatar
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   attr_reader :avatar_name
@@ -520,7 +469,27 @@ class Runner # stateful
   include AllAvatarsNames
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
-  # avatar
+
+  def group
+    'cyber-dojo'
+  end
+
+  def gid
+    5000
+  end
+
+  def uid
+    40000 + all_avatars_names.index(avatar_name)
+  end
+
+  def avatar_dir
+    "#{sandboxes_root_dir}/#{avatar_name}"
+  end
+
+  def sandboxes_root_dir
+    '/sandboxes'
+  end
+
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_avatar_exists
@@ -546,6 +515,21 @@ class Runner # stateful
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def make_and_chown_dirs
+    # first avatar makes the shared dir
+    shared_dir = "#{sandboxes_root_dir}/shared"
+    assert_docker_exec("mkdir -m 775 #{shared_dir} || true")
+    assert_docker_exec("mkdir -m 755 #{avatar_dir}")
+    assert_docker_exec("chown root:#{group} #{shared_dir}")
+    assert_docker_exec("chown #{uid}:#{gid} #{avatar_dir}")
+  end
+
+  def remove_avatar_dir
+    assert_docker_exec("rm -rf #{avatar_dir}")
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
   # assertions
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -566,10 +550,6 @@ class Runner # stateful
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def name_prefix
-    'test_run__runner_stateful_'
-  end
 
   def space
     ' '
