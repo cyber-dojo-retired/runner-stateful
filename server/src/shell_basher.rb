@@ -2,8 +2,8 @@ require 'open3'
 
 class ShellBasher
 
-  def initialize(parent)
-    @log = parent.log
+  def initialize(external)
+    @external = external
   end
 
   def assert(command)
@@ -41,7 +41,9 @@ class ShellBasher
 
   private
 
-  attr_reader :log
+  def log
+    @external.log
+  end
 
   def line
     '-' * 40
