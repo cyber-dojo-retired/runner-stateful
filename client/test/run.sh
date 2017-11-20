@@ -17,7 +17,7 @@ cd ${my_dir}/src
 files=(*_test.rb)
 args=(${*})
 
-ruby -e "([ '../coverage.rb' ] + %w(${files[*]}).shuffle).each{ |file| require './'+file }" \
+ruby -e "([ '../coverage.rb' ] + %w(${files[*]})).each{ |file| require './'+file }" \
   -- ${args[@]} | tee ${test_log}
 
 cd ${my_dir} \
