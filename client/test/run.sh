@@ -6,19 +6,20 @@ if [ ! -f /.dockerenv ]; then
   exit 1
 fi
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# client
+readonly MY_DIR="$( cd "$( dirname "${0}" )" && pwd )"
+readonly TEST_LOG=${CYBER_DOJO_COVERAGE_ROOT}/test.log
 
-cov_dir=${CYBER_DOJO_COVERAGE_ROOT}
-test_log=${cov_dir}/test.log
+mkdir ${CYBER_DOJO_COVERAGE_ROOT}
+cd ${MY_DIR}/src
 
-my_dir="$( cd "$( dirname "${0}" )" && pwd )"
-cd ${my_dir}/src
-files=(*_test.rb)
-args=(${*})
+readonly FILES=(*_test.rb)
+readonly ARGS=(${*})
 
-ruby -e "([ '../coverage.rb' ] + %w(${files[*]})).each{ |file| require './'+file }" \
-  -- ${args[@]} | tee ${test_log}
+ruby -e "([ '../coverage.rb' ] + %w(${FILES[*]})).each{ |file| require './'+file }" \
+  -- ${ARGS[@]} | tee ${TEST_LOG}
 
-cd ${my_dir} \
-  && ruby ./check_test_results.rb ${test_log} ${cov_dir}/index.html > ${cov_dir}/done.txt
+cd ${MY_DIR} \
+  && ruby ./check_test_results.rb \
+       ${TEST_LOG} \
+       ${CYBER_DOJO_COVERAGE_ROOT}/index.html \
+          > ${CYBER_DOJO_COVERAGE_ROOT}/done.txt

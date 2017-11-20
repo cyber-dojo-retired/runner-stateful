@@ -11,9 +11,6 @@ services:
     tmpfs: /tmp
     depends_on:
       - runner_stateful
-      - runner-stateful-client-coverage-container
-    volumes_from:
-      - runner-stateful-client-coverage-container:rw
     environment:
       - CYBER_DOJO_RUNNER_SERVER_NAME
       - CYBER_DOJO_RUNNER_SERVER_PORT
@@ -32,31 +29,11 @@ services:
     container_name: runner_stateful_server
     read_only: true
     tmpfs: /tmp
-    depends_on:
-      - runner-stateful-server-coverage-container
     volumes:
       - '/var/run/docker.sock:/var/run/docker.sock'
-    volumes_from:
-      - runner-stateful-server-coverage-container:rw
     environment:
       - CYBER_DOJO_COVERAGE_ROOT
     build:
       context: server
       args:
         - PORT=${CYBER_DOJO_RUNNER_SERVER_PORT}
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  runner-stateful-client-coverage-container:
-    image: cyberdojo/runner_stateful_client
-    container_name: runner-stateful-client-coverage-container
-    volumes:
-      - /${CYBER_DOJO_COVERAGE_ROOT}
-    command: "chown nobody:nobody ${CYBER_DOJO_COVERAGE_ROOT}"
-
-
-  runner-stateful-server-coverage-container:
-    image: cyberdojo/runner_stateful
-    container_name: runner-stateful-server-coverage-container
-    volumes:
-      - /${CYBER_DOJO_COVERAGE_ROOT}
