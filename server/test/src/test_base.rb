@@ -129,10 +129,6 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_stdout_include(text)
-    assert stdout.include?(text), quad
-  end
-
   def assert_stderr_include(text)
     assert stderr.include?(text), quad
   end
