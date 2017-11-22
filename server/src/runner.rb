@@ -119,6 +119,13 @@ class Runner # stateful
     unchanged_files = nil # we're stateful!
     all_files = [*changed_files, *new_files].to_h
     run(avatar_name, deleted_files.keys, all_files, max_seconds)
+    { stdout:@stdout,
+      stderr:@stderr,
+      status:@status,
+      timed_out:@timed_out,
+      rag:@rag,
+      colour:@colour # temporary?
+    }
   end
 
   def run(avatar_name, deleted_filenames, changed_files, max_seconds)
@@ -131,7 +138,8 @@ class Runner # stateful
         shell.assert(docker_exec("rm #{avatar_dir}/#{pathed_filename}"))
       end
       run_timeout_cyber_dojo_sh(changed_files, max_seconds)
-      @colour = @timed_out ? 'timed_out' : red_amber_green
+      @rag = rag_lambda
+      @colour = @timed_out ? 'timed_out' : red_amber_green(@rag)
     }
     { stdout:@stdout, stderr:@stderr, status:@status, colour:@colour }
   end
@@ -236,15 +244,11 @@ class Runner # stateful
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  def red_amber_green
+  def red_amber_green(rag_lambda)
     # @stdout and @stderr have been truncated and cleaned.
-    # In a crippled container (eg fork-bomb)
-    # the [docker exec] will mostly likely raise.
-    # Not worth creating a new container for this.
-    cmd = 'cat /usr/local/bin/red_amber_green.rb'
     begin
       # :nocov:
-      rag = eval(shell.assert(docker_exec(cmd)))
+      rag = eval(rag_lambda)
       colour = rag.call(@stdout, @stderr, @status).to_s
       unless ['red','amber','green'].include? colour
         colour = 'amber'
@@ -253,6 +257,20 @@ class Runner # stateful
     rescue
       'amber'
       # :nocov:
+    end
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def rag_lambda
+    # In a crippled container (eg fork-bomb)
+    # the [docker exec] will mostly likely raise.
+    # Not worth creating a new container for this.
+    cmd = 'cat /usr/local/bin/red_amber_green.rb'
+    begin
+      shell.assert(docker_exec(cmd))
+    rescue
+      nil
     end
   end
 
