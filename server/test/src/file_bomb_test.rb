@@ -9,10 +9,6 @@ class FileBombTest < TestBase
     '1988B'
   end
 
-  def hex_setup
-    set_image_name image_for_test
-  end
-
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'DB3', %w( [Alpine]

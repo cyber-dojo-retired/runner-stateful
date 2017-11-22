@@ -10,7 +10,6 @@ class SharedFolderTest < TestBase
   end
 
   def hex_setup
-    set_image_name image_for_test
     kata_new
   end
 

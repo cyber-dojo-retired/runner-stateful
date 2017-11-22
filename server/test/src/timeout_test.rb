@@ -6,14 +6,10 @@ class TimeoutTest < TestBase
     '45B57'
   end
 
-  def hex_setup
-    set_image_name image_for_test
-  end
-
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'B2B',
-  %w( [gcc,assert]
+  %w( [Alpine]
       when run
         does not complete in max_seconds
           and
@@ -49,7 +45,7 @@ class TimeoutTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '4D7',
-  %w( [gcc,assert]
+  %w( [Alpine]
       when run
         does not complete in max_seconds
           and

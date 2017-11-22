@@ -77,18 +77,7 @@ class TestBase < HexMiniTest
   end
 
   def image_name
-    @image_name
-  end
-
-  def image_for_test
-    rows = {
-      '[gcc,assert]'    => 'gcc_assert',
-      '[Alpine]'        => 'gcc_assert',
-      '[Ubuntu]'        => 'clangpp_assert'
-    }
-    row = rows.detect { |key,_| hex_test_name.start_with? key }
-    fail 'cannot find image_name from hex_test_name' if row.nil?
-    "#{cdf}/" + row[1]
+    @image_name ||= manifest['image_name']
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -156,22 +145,30 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def files(language_dir = language_dir_from_image_name)
-    @files ||= read_files(language_dir)
+  def files
+    @files ||= read_files
   end
 
-  def read_files(language_dir)
-    dir = "/app/test/start_files/#{language_dir}"
-    json = JSON.parse(IO.read("#{dir}/manifest.json"))
-    set_image_name json['image_name']
-    Hash[json['visible_filenames'].collect { |filename|
-      [filename, IO.read("#{dir}/#{filename}")]
+  def read_files
+    Hash[manifest['visible_filenames'].collect { |filename|
+      [filename, IO.read("#{starting_files_dir}/#{filename}")]
     }]
   end
 
-  def language_dir_from_image_name
-    fail 'image_name.nil? so cannot set language_dir' if image_name.nil?
-    image_name.split('/')[1]
+  def manifest
+    @manifest ||= JSON.parse(IO.read("#{starting_files_dir}/manifest.json"))
+  end
+
+  def starting_files_dir
+    "/app/test/start_files/#{os}"
+  end
+
+  def os
+    if hex_test_name.start_with? '[Ubuntu]'
+      :Ubuntu
+    else # [Alpine] || default
+      :Alpine
+    end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -308,6 +305,16 @@ class TestBase < HexMiniTest
     assert_equal group, atts[:group], { filename => atts }
     assert_equal size,  atts[:size ], { filename => atts }
     assert_equal permissions, atts[:permissions], { filename => atts }
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def in_kata_as(name)
+    in_kata {
+      as(name) {
+        yield
+      }
+    }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -

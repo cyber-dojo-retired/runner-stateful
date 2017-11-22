@@ -9,7 +9,6 @@ class RunAlpineKataTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'CA0', %w( [Alpine] image is indeed based on Alpine ) do
-    set_image_name image_for_test
     etc_issue = assert_docker_run 'cat /etc/issue'
     assert etc_issue.include?('Alpine'), etc_issue
   end

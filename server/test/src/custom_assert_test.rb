@@ -6,10 +6,6 @@ class CustomAssertTest < TestBase
     '7D428'
   end
 
-  def hex_setup
-    set_image_name image_for_test
-  end
-
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '248',
