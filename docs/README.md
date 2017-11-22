@@ -107,50 +107,55 @@ in the kata with the given kata_id.
 - - - -
 
 # POST run_cyber_dojo_sh
-Deletes the deleted_files, saves the changed_files, saves the new_files,
-runs cyber-dojo.sh as the avatar with the given avatar_name.
-Calls to run_cyber_dojo_sh must be preceded by one call to kata_new
-with the same kata_id, and one call to avatar_new with the same kata_id
-and avatar_name.
+Saves the unchanged files, saves the changed_files, saves the new files, and runs
+cyber-dojo.sh as the avatar with the given avatar_name.
 - parameters, eg
 ```
   {        "image_name": "cyberdojofoundation/gcc_assert",
               "kata_id": "15B9AD6C42",
           "avatar_name": "salmon",
-            "new_files": {},
-        "deleted_files": { "instructions" => 'your task...' },
+            "new_files": { ... },
+        "deleted_files": { ... },
       "unchanged_files": { "cyber-dojo.sh" => "make" },
         "changed_files": { "fizz_buzz.c" => "#include...",
-                           "fizz_buzz.h" => "#ifndef FIZZ_BUZZ_INCLUDED..."
+                           "fizz_buzz.h" => "#ifndef FIZZ_BUZZ_INCLUDED...",
+                           ...
                          },
           "max_seconds": 10
   }
 ```
-- returns status, stdout, stderr, and colour.
-If the run completed in max_seconds,
-the [traffic-light colour](http://blog.cyber-dojo.org/2014/10/cyber-dojo-traffic-lights.html)
-will be "red", "amber", or "green". eg
+- returns stdout, stderr, status, as the results of calling
+cyber-dojo.sh, and timed_out, and rag.
+If the run completed in max_seconds, timed_out will be false.
+eg
 ```
     { "run": {
-        "status": 2,
-        "stdout": "makefile:17: recipe for target 'test' failed\n",
-        "stderr": "invalid suffix sss on integer constant",
-        "colour": "red"
+           "stdout": "makefile:17: recipe for target 'test' failed\n",
+           "stderr": "invalid suffix sss on integer constant",
+           "status": 2,
+        "timed_out": false,
+              "rag": "lambda { |stdout, stderr, status| ... }"
       }
     }
 ```
-If the run did not complete in max_seconds,
-the [traffic-light colour](http://blog.cyber-dojo.org/2014/10/cyber-dojo-traffic-lights.html)
-will be "timed_out". eg
+If the run did not complete in max_seconds, timed_out will be true.
+eg
 ```
     { "run": {
-        "status": 137,
-        "stdout": "",
-        "stderr": "",
-        "colour": "timed_out"
+           "stdout": "...",
+           "stderr": "...",
+           "status": 137,
+        "timed_out": true,
+              "rag": "lambda { |stdout, stderr, status| ... }"
       }
     }
 ```
+rag is the source of a Ruby lambda, taken from the image,
+at /usr/local/bin/red_amber_green.rb,
+which can be eval'd and called to find the
+[traffic-light colour](http://blog.cyber-dojo.org/2014/10/cyber-dojo-traffic-lights.html).
+rag is null when the image does not contain a
+/usr/local/bin/red_amber_green.rb file.
 
 - - - -
 
