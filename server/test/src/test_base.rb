@@ -83,7 +83,6 @@ class TestBase < HexMiniTest
   def image_for_test
     rows = {
       '[gcc,assert]'    => 'gcc_assert',
-      '[Java,Cucumber]' => 'java_cucumber_pico',
       '[Alpine]'        => 'gcc_assert',
       '[Ubuntu]'        => 'clangpp_assert'
     }
