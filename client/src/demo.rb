@@ -60,7 +60,7 @@ class Demo
   end
 
   attr_reader :avatar_name
-  attr_reader :deleted_files, :unchanged_files, :changed_files, :new_files
+  attr_reader  :new_files, :deleted_files, :unchanged_files, :changed_files
 
   # - - - - - - - - - - - - - - - - - - - - -
 
@@ -127,7 +127,7 @@ class Demo
   end
 
   def read(filename)
-    IO.read("/app/test/start_files/gcc_assert/#{filename}")
+    IO.read("/app/test/start_files/Alpine/#{filename}")
   end
 
   def pre(name, duration, colour = 'white', quad = nil)
