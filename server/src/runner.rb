@@ -119,13 +119,6 @@ class Runner # stateful
     unchanged_files = nil # we're stateful!
     all_files = [*changed_files, *new_files].to_h
     run(avatar_name, deleted_files.keys, all_files, max_seconds)
-    { stdout:@stdout,
-      stderr:@stderr,
-      status:@status,
-      timed_out:@timed_out,
-      rag:@rag,
-      colour:@colour # temporary?
-    }
   end
 
   def run(avatar_name, deleted_filenames, changed_files, max_seconds)
