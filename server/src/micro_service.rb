@@ -21,7 +21,7 @@ class MicroService
          new_files, deleted_files, unchanged_files, changed_files,
          max_seconds]
       when /^run$/
-        [avatar_name, deleted_filenames, visible_files, max_seconds]
+        [avatar_name, deleted_filenames, changed_files, max_seconds]
       else
         @name = nil
         []
@@ -98,10 +98,6 @@ class MicroService
   end
 
   def deleted_filenames # deprecated
-    @json_args[__method__.to_s]
-  end
-
-  def visible_files # deprecated
     @json_args[__method__.to_s]
   end
 
