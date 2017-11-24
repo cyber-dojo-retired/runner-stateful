@@ -122,8 +122,7 @@ class Runner # stateful
         shell.assert(docker_exec("rm #{avatar_dir}/#{pathed_filename}"))
       end
       run_timeout_cyber_dojo_sh(changed_files, max_seconds)
-      @rag = rag_lambda
-      @colour = @timed_out ? 'timed_out' : red_amber_green(@rag)
+      @colour = @timed_out ? 'timed_out' : red_amber_green
     }
     { stdout:@stdout, stderr:@stderr, status:@status, colour:@colour }
   end
@@ -228,7 +227,7 @@ class Runner # stateful
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  def red_amber_green(rag_lambda)
+  def red_amber_green
     # @stdout and @stderr have been truncated and cleaned.
     begin
       rag = eval(rag_lambda)
