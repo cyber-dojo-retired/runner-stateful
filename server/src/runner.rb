@@ -1,5 +1,4 @@
 require_relative 'all_avatars_names'
-require_relative 'logger_null'
 require_relative 'string_cleaner'
 require_relative 'string_truncater'
 require_relative 'valid_image_name'
@@ -42,7 +41,8 @@ class Runner # stateful
 
   def image_pull
     # [1] The contents of stderr vary depending on Docker version
-    _stdout,stderr,status = quiet_exec("docker pull #{image_name}")
+    docker_pull = "docker pull #{image_name}"
+    _stdout,stderr,status = shell.exec(docker_pull)
     if status == shell.success
       return true
     elsif stderr.include?('not found') || stderr.include?('not exist')
@@ -511,8 +511,9 @@ class Runner # stateful
     # check is for avatar's sandboxes/ subdir and
     # not its /home/ subdir which is pre-created
     # in the docker image.
-    _,_,status = quiet_exec(docker_exec("[ -d #{avatar_dir} ]"))
-    status == shell.success
+    cmd = "[ -d #{avatar_dir} ] || printf 'not_found'"
+    stdout = shell.assert(docker_exec(cmd))
+    stdout != 'not_found'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
@@ -536,10 +537,6 @@ class Runner # stateful
 
   def docker_exec(cmd)
     "docker exec #{container_name} sh -c '#{cmd}'"
-  end
-
-  def quiet_exec(cmd)
-    shell.exec(cmd, LoggerNull.new(self))
   end
 
   def argument_error(name, message)

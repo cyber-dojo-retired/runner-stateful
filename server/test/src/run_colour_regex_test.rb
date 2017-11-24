@@ -109,9 +109,6 @@ class RunColourRegexTest < TestBase
     def fired?
       @fired
     end
-    def success
-      @adaptee.success
-    end
     def assert(command)
       if command.end_with? "cat /usr/local/bin/red_amber_green.rb'"
         @fired = true
@@ -119,9 +116,6 @@ class RunColourRegexTest < TestBase
       else
         @adaptee.assert(command)
       end
-    end
-    def exec(command, verbose = log)
-      @adaptee.exec(command, verbose)
     end
   end
 
@@ -136,9 +130,6 @@ class RunColourRegexTest < TestBase
     def fired?
       @fired
     end
-    def success
-      @adaptee.success
-    end
     def assert(command)
       if command.end_with? "cat /usr/local/bin/red_amber_green.rb'"
         @fired = true
@@ -146,9 +137,6 @@ class RunColourRegexTest < TestBase
       else
         @adaptee.assert(command)
       end
-    end
-    def exec(command, verbose = log)
-      @adaptee.exec(command, verbose)
     end
   end
 

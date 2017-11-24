@@ -5,6 +5,7 @@ class LoggerStdout
   end
 
   def <<(message)
+    #STDERR.puts "LoggerStdout<<:#{message}:"
     p message
   end
 
