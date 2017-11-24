@@ -6,6 +6,17 @@ require 'json'
 
 class TestBase < HexMiniTest
 
+  include Externals
+
+  def self.multi_os_test(hex_suffix, *lines, &block)
+    alpine_lines = ['[Alpine]'] + lines
+    test(hex_suffix+'0', *alpine_lines, &block)
+    ubuntu_lines = ['[Ubuntu]'] + lines
+    test(hex_suffix+'1', *ubuntu_lines, &block)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   def runner
     Runner.new(self, image_name, kata_id)
   end
@@ -22,10 +33,6 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def kata_exists?
-    runner.kata_exists?
-  end
-
   def kata_new
     runner.kata_new
   end
@@ -36,48 +43,48 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def avatar_exists?(avatar_name = default_avatar_name)
-    runner.avatar_exists?(avatar_name)
+  def avatar_new(name = 'salmon')
+    runner.avatar_new(@avatar_name = name, @previous_files = starting_files)
   end
 
-  def avatar_new(avatar_name = default_avatar_name, the_files = files)
-    runner.avatar_new(avatar_name, the_files)
-  end
-
-  def avatar_old(avatar_name = default_avatar_name)
-    runner.avatar_old(avatar_name)
-  end
-
-  def default_avatar_name
-    'salmon'
+  def avatar_old(name = avatar_name)
+    runner.avatar_old(name)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run_cyber_dojo_sh(named_args = {})
-    args = []
-    args << defaulted_arg(named_args, :avatar_name, default_avatar_name)
-    args << defaulted_arg(named_args, :new_files, {})
-    args << defaulted_arg(named_args, :deleted_files, {})
-    args << defaulted_arg(named_args, :unchanged_files, {})
-    args << defaulted_arg(named_args, :changed_files, {})
-    args << defaulted_arg(named_args, :max_seconds, 10)
-    @quad = runner.run_cyber_dojo_sh(*args)
+
+    unchanged_files = @previous_files
+
+    new_files = defaulted_arg(named_args, :new_files, {})
+    new_files.keys.each do |filename|
+      diagnostic = "#{filename} is not a new_file (it already exists)"
+      refute unchanged_files.keys.include?(filename), diagnostic
+    end
+
+    deleted_files = defaulted_arg(named_args, :deleted_files, {})
+    deleted_files.keys.each do |filename|
+      diagnostic = "#{filename} is not a deleted_file (it does not already exist)"
+      assert unchanged_files.keys.include?(filename), diagnostic
+      unchanged_files.delete(filename)
+    end
+
+    changed_files = defaulted_arg(named_args, :changed_files, {})
+    changed_files.keys.each do |filename|
+      diagnostic = "#{filename} is not a changed_file (it does not already exist)"
+      assert unchanged_files.keys.include?(filename), diagnostic
+      unchanged_files.delete(filename)
+    end
+
+    @quad = runner.run_cyber_dojo_sh(
+      defaulted_arg(named_args, :avatar_name, avatar_name),
+      new_files, deleted_files, unchanged_files, changed_files,
+      defaulted_arg(named_args, :max_seconds, 10)
+    )
+
+    @previous_files = [ *unchanged_files, *changed_files, *new_files ].to_h
     nil
-  end
-
-  def defaulted_arg(named_args, arg_name, arg_default)
-    named_args.key?(arg_name) ? named_args[arg_name] : arg_default
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def set_image_name(image_name)
-    @image_name = image_name
-  end
-
-  def image_name
-    @image_name ||= manifest['image_name']
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -103,6 +110,9 @@ class TestBase < HexMiniTest
   def assert_stdout(expected)
     assert_equal expected, stdout, quad
   end
+  def refute_stdout(unexpected)
+    refute_equal unexpected, stdout, quad
+  end
 
   def assert_stderr(expected)
     assert_equal expected, stderr, quad
@@ -112,44 +122,63 @@ class TestBase < HexMiniTest
     assert_equal expected, status, quad
   end
 
+  def timed_out?
+    colour == 'timed_out'
+  end
+
+  def assert_timed_out
+    assert timed_out?, quad
+  end
+
+  def refute_timed_out
+    refute timed_out?, quad
+  end
+
   def assert_colour(expected)
     assert_equal expected, colour, quad
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_stderr_include(text)
-    assert stderr.include?(text), quad
+  def assert_cyber_dojo_sh(script)
+    named_args = {
+      :changed_files => { 'cyber-dojo.sh' => script }
+    }
+    run_cyber_dojo_sh(named_args)
+    refute timed_out?, quad
+    stdout.strip
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_cyber_dojo_sh(script, named_args = {})
-    named_args[:changed_files] = { 'cyber-dojo.sh' => script }
-    assert_run_succeeds(named_args)
+  #TODO?: change to image_name=
+  def set_image_name(image_name)
+    @image_name = image_name
   end
 
-  def assert_run_succeeds(named_args)
-    run_cyber_dojo_sh(named_args)
-    refute_equal timed_out, colour, quad
-    assert_status success
-    assert_equal '', stderr
-    stdout
+  def image_name
+    @image_name ||= manifest['image_name']
   end
 
-  def assert_run_times_out(named_args)
-    run_cyber_dojo_sh(named_args)
-    assert_colour timed_out
-    assert_status 137
+  def kata_id
+    hex_test_id + '0' * (10-hex_test_id.length)
+  end
+
+  def avatar_name
+    @avatar_name
+  end
+
+  def uid
+    40000 + all_avatars_names.index(avatar_name)
+  end
+
+  def group
+    'cyber-dojo'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def files
-    @files ||= read_files
-  end
-
-  def read_files
+  def starting_files
     Hash[manifest['visible_filenames'].collect { |filename|
       [filename, IO.read("#{starting_files_dir}/#{filename}")]
     }]
@@ -173,84 +202,10 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def kata_id
-    hex_test_id + '0' * (10-hex_test_id.length)
-  end
-
-  def avatar_name
-    'salmon'
-  end
-
-  def user_id(avatar_name = 'salmon')
-    40000 + all_avatars_names.index(avatar_name)
-  end
-
-  include AllAvatarsNames
-
-  def group
-    'cyber-dojo'
-  end
-
-  def gid
-    5000
-  end
-
-  def sandbox(avatar_name = 'salmon')
-    "/sandboxes/#{avatar_name}"
-  end
-
-  def success
-    shell.success
-  end
-
-  def timed_out
-    'timed_out'
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def assert_docker_run(cmd)
-    docker_run = [
-      'docker run',
-      '--rm',
-      '--tty',
-      image_name,
-      "sh -c '#{cmd}'"
-    ].join(space = ' ')
-    stdout,stderr = assert_exec(docker_run)
-    assert_equal '', stderr, stdout
-    stdout
-  end
-
-  def assert_docker_exec(cmd)
-    # child class provides (container_name)
-    cid = container_name
-    stdout,stderr = assert_exec("docker exec #{cid} sh -c '#{cmd}'")
-    assert_equal '', stderr, stdout
-    stdout
-  end
-
-  def assert_exec(cmd)
-    stdout,stderr,status = exec(cmd)
-    unless status == success
-      fail StandardError.new(cmd)
-    end
-    [stdout,stderr]
-  end
-
-  def exec(cmd, *args)
-    shell.exec(cmd, *args)
-  end
-
-  include Externals # eg shell
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   def with_captured_stdout
     begin
       old_stdout = $stdout
-      $stdout = StringIO.new('','w')
+      $stdout = StringIO.new('', 'w')
       yield
       $stdout.string
     ensure
@@ -260,55 +215,6 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def cdf
-    'cyberdojofoundation'
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def ls_cmd
-    # Works on Ubuntu and Alpine
-    'stat -c "%n %A %u %G %s %y" *'
-    # hiker.h  -rw-r--r--  40045  cyber-dojo 136  2016-06-05 07:03:14.539952547
-    # |        |           |      |          |    |          |
-    # filename permissions user   group      size date       time
-    # 0        1           2      3          4    5          6
-
-    # Stat
-    #  %z == time of last status change
-    #  %y == time of last data modification <<=====
-    #  %x == time of last access
-    #  %w == time of file birth
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def ls_parse(ls_stdout)
-    Hash[ls_stdout.split("\n").collect { |line|
-      attr = line.split
-      [filename = attr[0], {
-        permissions: attr[1],
-               user: attr[2].to_i,
-              group: attr[3],
-               size: attr[4].to_i,
-         time_stamp: attr[6],
-      }]
-    }]
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def assert_equal_atts(filename, permissions, user, group, size, ls_files)
-    atts = ls_files[filename]
-    refute_nil atts, filename
-    assert_equal user,  atts[:user ], { filename => atts }
-    assert_equal group, atts[:group], { filename => atts }
-    assert_equal size,  atts[:size ], { filename => atts }
-    assert_equal permissions, atts[:permissions], { filename => atts }
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   def in_kata_as(name)
     in_kata {
       as(name) {
@@ -317,25 +223,43 @@ class TestBase < HexMiniTest
     }
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def in_kata
     kata_new
-    yield
-  ensure
-    kata_old
+    begin
+      yield
+    ensure
+      kata_old
+    end
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def as(name, starting_files = files)
-    avatar_new(name, starting_files)
+  def as(name)
+    avatar_new(name)
     yield
   ensure
     avatar_old(name)
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def cdf
+    'cyberdojofoundation'
+  end
+
   private
+
+  include AllAvatarsNames
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def defaulted_arg(named_args, arg_name, arg_default)
+    named_args.key?(arg_name) ? named_args[arg_name] : arg_default
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def quad
     @quad

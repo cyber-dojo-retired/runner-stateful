@@ -1,7 +1,7 @@
 require_relative 'test_base'
 require_relative 'shell_mocker'
 
-class ImagePullTest < TestBase
+class PullTest < TestBase
 
   def self.hex_prefix
     '0D5713'
@@ -17,20 +17,31 @@ class ImagePullTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  test '9C3',
+  'false when image_name is valid but not in [docker images]' do
+    mock_docker_images_prints "#{cdf}/gcc_assert"
+    set_image_name "#{cdf}/ruby_mini_test:1.9.3"
+    refute image_pulled?
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  test 'A44',
+  'true when image_name is valid and in [docker images]' do
+    mock_docker_images_prints "#{cdf}/gcc_assert"
+    assert image_pulled?
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   test '91C',
   'true when image_name is valid and exists' do
-    image_name = "#{cdf}/ruby_mini_test"
+    set_image_name "#{cdf}/ruby_mini_test"
 
     mock_docker_pull_success image_name, tag=''
-    @image_name = image_name
     assert image_pull
 
     mock_docker_pull_success image_name, tag='latest'
-    @image_name = "#{image_name}:#{tag}"
-    assert image_pull
-
-    mock_docker_pull_success image_name, tag='1.9.3'
-    @image_name = "#{image_name}:#{tag}"
     assert image_pull
   end
 
@@ -51,18 +62,8 @@ class ImagePullTest < TestBase
 
   test 'D80',
   'false when image_name is valid but does not exist' do
-    image_name = "#{cdf}/does_not_exist"
-
+    set_image_name "#{cdf}/does_not_exist"
     mock_docker_pull_not_exist image_name, tag=''
-    @image_name = image_name
-    refute image_pull
-
-    mock_docker_pull_not_exist image_name, tag='latest'
-    @image_name = "#{image_name}:#{tag}"
-    refute image_pull
-
-    mock_docker_pull_not_exist image_name, tag='1.9.3'
-    @image_name = "#{image_name}:#{tag}"
     refute image_pull
   end
 
@@ -75,14 +76,14 @@ class ImagePullTest < TestBase
     ].join
     image_name = repo
     image_name += ":#{tag}" unless tag == ''
-    mock_docker_pull(image_name, stdout, stderr, status=1)
+    mock_docker_pull(image_name, stdout, stderr, 1)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '933',
   'raises when there is no network connectivitity' do
-    image_name = "#{cdf}/gcc_assert"
+    set_image_name "#{cdf}/gcc_assert"
     cmd = "docker pull #{image_name}"
     stdout = [
       'Using default tag: latest',
@@ -94,7 +95,6 @@ class ImagePullTest < TestBase
       'dial tcp: lookup index.docker.io on 10.0.2.3:53: no such host'
     ].join(' ')
     shell.mock_exec(cmd, stdout, stderr, status=1)
-    @image_name = image_name
     error = assert_raises(ArgumentError) { image_pull }
     assert_equal 'image_name:invalid', error.message
   end
@@ -102,8 +102,14 @@ class ImagePullTest < TestBase
   private
 
   def mock_docker_pull(image_name, stdout, stderr, status)
+    set_image_name image_name
     cmd = "docker pull #{image_name}"
     shell.mock_exec(cmd, stdout, stderr, status)
+  end
+
+  def mock_docker_images_prints(image_name)
+    cmd = 'docker images --format "{{.Repository}}"'
+    shell.mock_exec(cmd, stdout=image_name, stderr='', shell.success)
   end
 
 end

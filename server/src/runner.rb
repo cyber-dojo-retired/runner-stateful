@@ -56,32 +56,21 @@ class Runner # stateful
   # kata
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def kata_exists?
-    kata_volume_exists?
-  end
-
   def kata_new
     refute_kata_exists
     create_kata_volume
+    nil
   end
 
   def kata_old
     assert_kata_exists
     remove_kata_volume
+    nil
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # avatar
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def avatar_exists?(avatar_name)
-    @avatar_name = avatar_name
-    assert_kata_exists
-    assert_valid_avatar_name
-    in_container {
-      avatar_exists_cid?
-    }
-  end
 
   def avatar_new(avatar_name, starting_files)
     @avatar_name = avatar_name
@@ -95,6 +84,7 @@ class Runner # stateful
         shell.assert(tar_pipe_cmd(tmp_dir, 'true'))
       }
     }
+    nil
   end
 
   def avatar_old(avatar_name)
@@ -105,6 +95,7 @@ class Runner # stateful
       assert_avatar_exists
       remove_avatar_dir
     }
+    nil
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -240,7 +231,6 @@ class Runner # stateful
   def red_amber_green(rag_lambda)
     # @stdout and @stderr have been truncated and cleaned.
     begin
-      # :nocov:
       rag = eval(rag_lambda)
       colour = rag.call(@stdout, @stderr, @status).to_s
       unless ['red','amber','green'].include? colour
@@ -249,7 +239,6 @@ class Runner # stateful
       colour
     rescue
       'amber'
-      # :nocov:
     end
   end
 
@@ -440,6 +429,10 @@ class Runner # stateful
     if kata_exists?
       argument_error('kata_id', 'exists')
     end
+  end
+
+  def kata_exists?
+    kata_volume_exists?
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -

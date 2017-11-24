@@ -3,8 +3,10 @@ class ShellMocker
 
   def initialize(_parent)
     hex_test_id = ENV['CYBER_DOJO_HEX_TEST_ID']
-    @filename = Dir.tmpdir + '/cyber_dojo_shell_mocker_' + hex_test_id + '.json'
-    write([]) unless File.file?(filename)
+    @filename = Dir.tmpdir + '/cyber_dojo_mock_sheller_' + hex_test_id + '.json'
+    unless File.file?(filename)
+      write([])
+    end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - -
@@ -13,7 +15,9 @@ class ShellMocker
     unless uncaught_exception?
       mocks = read
       pretty = JSON.pretty_generate(mocks)
-      raise "#{filename}: uncalled mocks(#{pretty})" unless mocks == []
+      unless mocks == []
+        raise "#{filename}: uncalled mocks(#{pretty})"
+      end
     end
   end
 
@@ -33,7 +37,7 @@ class ShellMocker
 
   def assert(command)
     stdout,_stderr,status = exec(command)
-    if status != success
+    unless status == success
       raise ArgumentError.new("command:#{command}")
     end
     stdout
@@ -41,7 +45,7 @@ class ShellMocker
 
   # - - - - - - - - - - - - - - - - - - - - - - -
 
-  def exec(command, _log = nil)
+  def exec(command, _ = nil)
     mocks = read
     mock = mocks.shift
     write(mocks)
@@ -52,12 +56,12 @@ class ShellMocker
         "actual-command: #{command}",
       ].join("\n") + "\n"
     end
-    if command != mock['command']
+    unless command == mock['command']
       raise [
         self.class.name,
         "exec(command) - does not match mock",
         "actual-command: #{command}",
-        "mocked-command: #{mock['command']}}"
+        "mocked-command: #{mock['command']}"
       ].join("\n") + "\n"
     end
     [mock['stdout'], mock['stderr'], mock['status']]

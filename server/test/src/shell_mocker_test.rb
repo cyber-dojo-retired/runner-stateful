@@ -10,10 +10,15 @@ class ShellMockerTest < TestBase
   # - - - - - - - - - - - - - - -
 
   test 'B51',
-  %w( when file does not already exist
-      MockSheller ctor only sets mocks=[]
-  ) do
+  %w( MockSheller ctor only sets mocks=[]
+      when file does not already exist
+  )do
     # has to work when it is "re-created" in different threads
+
+    hex_test_id = ENV['CYBER_DOJO_HEX_TEST_ID']
+    filename = Dir.tmpdir + '/cyber_dojo_mock_sheller_' + hex_test_id + '.json'
+    `rm #{filename} 2> /dev/null`
+
     shell_1 = ShellMocker.new(nil)
     shell_1.mock_exec(pwd, wd, stderr='', success)
 
@@ -29,9 +34,9 @@ class ShellMockerTest < TestBase
   # - - - - - - - - - - - - - - -
 
   test '4A5',
-  %w( when no mock_exec's are setup
+  %w( teardown does not raise
+      when no mock_exec's are setup
       and no exec's are made
-      teardown does not raise
   ) do
     shell = ShellMocker.new(nil)
     shell.teardown
@@ -40,9 +45,9 @@ class ShellMockerTest < TestBase
   # - - - - - - - - - - - - - - -
 
   test '652',
-  %w( when an exec is made
+  %w( exec(command) raises
+      when an exec is made
       and there are no mock_exec's
-      exec(command) raises
   ) do
     shell = ShellMocker.new(nil)
     assert_raises { shell.exec(pwd) }
@@ -51,8 +56,8 @@ class ShellMockerTest < TestBase
   # - - - - - - - - - - - - - - -
 
   test '181',
-  %w( when mock_exec is for a different command
-      exec(command) raises
+  %w( exec(command) raises
+      when mock_exec is for a different command
   ) do
     shell = ShellMocker.new(nil)
     shell.mock_exec(pwd, wd, stderr='', success)
@@ -62,9 +67,9 @@ class ShellMockerTest < TestBase
   # - - - - - - - - - - - - - - -
 
   test 'B4E',
-  %w( when one mock_exec is setup
+  %w( teardown does not raise
+      when one mock_exec is setup
       and a matching exec is made
-      teardown does not raise
   ) do
     shell = ShellMocker.new(nil)
     shell.mock_exec(pwd, wd, stderr='', success)
@@ -78,9 +83,9 @@ class ShellMockerTest < TestBase
   # - - - - - - - - - - - - - - -
 
   test 'D0C',
-  %w( when one mock_exec setup
+  %w( teardown raises
+      when one mock_exec setup
       and no calls are made
-      teardown raises
   ) do
     shell = ShellMocker.new(nil)
     shell.mock_exec(pwd, wd, stderr='', success)
@@ -90,12 +95,14 @@ class ShellMockerTest < TestBase
   # - - - - - - - - - - - - - - -
 
   test '470',
-  %w( when there is an uncaught exception, teardown does not raise ) do
+  %w( teardown does not raise
+      when there is an uncaught exception
+  ) do
     shell = ShellMocker.new(nil)
     shell.mock_exec(pwd, wd, stderr='', success)
     error = assert_raises {
       begin
-        fail 'forced'
+        raise 'forced'
       ensure
         shell.teardown
       end
@@ -106,14 +113,18 @@ class ShellMockerTest < TestBase
   # - - - - - - - - - - - - - - -
 
   test '4FE',
-  %w( when status is zero, assert returns stdout ) do
+  %w( assert does not raise
+      when status is zero
+  ) do
     shell = ShellMocker.new(nil)
-    shell.mock_exec('false', 'so', 'se', 0)
-    assert_equal 'so', shell.assert('false')
+    shell.mock_exec('true', 'so', 'se', 0)
+    assert_equal 'so', shell.assert('true')
   end
 
   test '4FF',
-  %w( when status is non-zero, assert raises ) do
+  %w( assert raises
+      when status is non-zero
+  ) do
     shell = ShellMocker.new(nil)
     shell.mock_exec('false', '', '', 1)
     error = assert_raises { shell.assert('false') }
@@ -123,10 +134,12 @@ class ShellMockerTest < TestBase
   # - - - - - - - - - - - - - - -
 
   test '3BE',
-  %w( success has a value of zero ) do
+  %w( success is zero ) do
     shell = ShellMocker.new(nil)
     assert_equal 0, shell.success
   end
+
+  # - - - - - - - - - - - - - - -
 
   private
 

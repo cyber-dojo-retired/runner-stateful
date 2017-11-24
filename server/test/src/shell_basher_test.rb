@@ -8,24 +8,29 @@ class ShellBasherTest < TestBase
   end
 
   def hex_setup
-    @log = LoggerSpy.new(self)
+    @log = LoggerSpy.new(nil)
   end
 
   attr_reader :log
 
   # - - - - - - - - - - - - - - - - -
 
-  test '14A',
-  %w( assert(cmd) returns stdout when command's status is zero ) do
-    assert_equal "hello\n", shell.assert('echo hello')
+  test '243', %w(
+    when assert(cmd) status is zero
+    it returns stdout
+    and logs nothing
+  ) do
+    stdout = shell.assert('echo Hello')
+    assert_equal "Hello\n", stdout
+    assert_log []
   end
 
   # - - - - - - - - - - - - - - - - -
 
   test '14B',
-  %w( assert(cmd) logs and raises when command's status is non-zero ) do
+  'assert(cmd) logs and raises when command fails' do
     error = assert_raises(ArgumentError) {
-      shell_assert('false')
+      shell.assert('false')
     }
     assert_log [
       line,
@@ -35,7 +40,7 @@ class ShellBasherTest < TestBase
       'STDERR:'
     ]
     error = assert_raises(ArgumentError) {
-      shell_assert('sed salmon')
+      shell.assert('sed salmon')
     }
     assert_log [
       line,
@@ -54,22 +59,22 @@ class ShellBasherTest < TestBase
   # - - - - - - - - - - - - - - - - -
 
   test 'DBB',
-  %w( exec(cmd) succeeds with output, no logging ) do
-    shell_exec('echo Hello')
-    assert_status 0
-    assert_stdout "Hello\n"
-    assert_stderr ''
+  'exec(cmd) succeeds with output, no logging' do
+    stdout,stderr,status = shell.exec('echo Hello')
+    assert_equal 0, status
+    assert_equal "Hello\n", stdout
+    assert_equal '', stderr
     assert_log []
   end
 
   # - - - - - - - - - - - - - - - - -
 
   test '490',
-  %w( exec(cmd) failure (no output) is logged ) do
-    shell_exec('false')
-    assert_status 1
-    assert_stdout ''
-    assert_stderr ''
+  'exec(cmd) failure (no output) is logged' do
+    stdout,stderr,status = shell.exec('false')
+    assert_equal 1, status
+    assert_equal '', stdout
+    assert_equal '', stderr
     assert_log [
       line,
       'COMMAND:false',
@@ -82,11 +87,11 @@ class ShellBasherTest < TestBase
   # - - - - - - - - - - - - - - - - -
 
   test '46B',
-  %w( exec(cmd) failure (with output) is logged ) do
-    shell_exec('sed salmon')
-    assert_status 1
-    assert_stdout ''
-    assert_stderr "sed: unmatched 'a'\n"
+  'exec(cmd) failure (with output) is logged' do
+    stdout,stderr,status = shell.exec('sed salmon')
+    assert_equal 1, status
+    assert_equal '', stdout
+    assert_equal "sed: unmatched 'a'\n", stderr
     assert_log [
       line,
       'COMMAND:sed salmon',
@@ -98,22 +103,11 @@ class ShellBasherTest < TestBase
 
   # - - - - - - - - - - - - - - - - -
 
-  test '6D5',
-  'exec(cmd) failure with LoggerNull turns off logging' do
-    shell_exec('sed salmon', LoggerNull.new(self))
-    assert_status 1
-    assert_stdout ''
-    assert_stderr "sed: unmatched 'a'\n"
-    assert_log []
-  end
-
-  # - - - - - - - - - - - - - - - - -
-
   test 'AF6',
-  %w( exec(cmd) raises with verbose output ) do
+  'exec(cmd) raises with verbose output' do
     # some commands fail with simple non-zero exit status...
     # some commands fail with an exception...
-    error = assert_raises { shell_exec('zzzz') }
+    error = assert_raises { shell.exec('zzzz') }
     assert_equal 'Errno::ENOENT', error.class.name
     assert_log [
       line,
@@ -124,28 +118,6 @@ class ShellBasherTest < TestBase
   end
 
   # - - - - - - - - - - - - - - - - -
-
-  def shell_assert(command)
-    @stdout = shell.assert(command)
-  end
-
-  def shell_exec(command, log = @log)
-    @stdout,@stderr,@status = shell.exec(command, log)
-  end
-
-  # - - - - - - - - - - - - - - - - -
-
-  def assert_status(expected)
-    assert_equal expected, @status
-  end
-
-  def assert_stdout(expected)
-    assert_equal expected, @stdout
-  end
-
-  def assert_stderr(expected)
-    assert_equal expected, @stderr
-  end
 
   def assert_log(expected)
     assert_equal expected, log.spied

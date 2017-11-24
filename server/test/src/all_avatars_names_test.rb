@@ -11,19 +11,16 @@ class AllAvatarsNamesTest < TestBase
 
   # - - - - - - - - - - - - - - - - -
 
-  test '229', %w(
-  avatars_names are in sorted order for uid-indexing
-  ) do
+  test '229',
+  'avatars_names are in sorted order for uid-indexing' do
     assert_equal all_avatars_names.sort, all_avatars_names
   end
 
   # - - - - - - - - - - - - - - - - -
 
-  test 'CBC', %w(
-  avatars_names are unique in their first 8 chars
-  which matters because on Alpine
-  [ps] truncates the user name to 8 chars
-  ) do
+  test 'CBC',
+  'avatars_names are unique in their first 8 chars which matters',
+  'because on Alpine, [ps] truncates the user name to 8 chars' do
     # This affects: alligator, butterfly, hummingbird
     # jellyfish, kingfisher, porcupine
     short_names = all_avatars_names.map { |name| name[0..7] }

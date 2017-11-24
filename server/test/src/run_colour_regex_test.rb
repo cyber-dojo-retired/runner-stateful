@@ -7,7 +7,9 @@ class RunColourRegexTest < TestBase
   end
 
   def hex_teardown
-    assert @shell.fired?
+    if @shell.respond_to? :fired?
+      assert @shell.fired?
+    end
   end
 
   # - - - - - - - - - - - - - - - - -
@@ -17,8 +19,8 @@ class RunColourRegexTest < TestBase
     @shell = ShellRaiser.new(shell)
     in_kata_as('salmon') {
       run_cyber_dojo_sh
-      assert_becomes_amber
-       # would like to check log but there is shell-log over-coupling
+      assert_colour 'amber'
+      # would like to check log but there is shell-log over-coupling
     }
   end
 
@@ -75,6 +77,26 @@ class RunColourRegexTest < TestBase
       }
       RUBY
     )
+  end
+
+  # - - - - - - - - - - - - - - - - -
+
+  multi_os_test '6A1',
+  %w( red/amber/green progression test ) do
+    filename = (os == :Alpine) ? 'hiker.c' : 'hiker.cpp'
+    src = starting_files[filename]
+    in_kata_as('salmon') {
+      run_cyber_dojo_sh
+      assert_colour 'red'
+      run_cyber_dojo_sh( {
+        changed_files:{ filename => src.sub('6 * 9', '6 * 7') }
+      })
+      assert_colour 'green'
+      run_cyber_dojo_sh( {
+        changed_files:{ filename => src.sub('6 * 9', '6 * 9sdsd') }
+      })
+      assert_colour 'amber'
+    }
   end
 
   # - - - - - - - - - - - - - - - - -
@@ -136,15 +158,8 @@ class RunColourRegexTest < TestBase
     @shell = ShellCatRagFileStub.new(shell, lambda)
     in_kata_as('salmon') {
       run_cyber_dojo_sh
-      assert_becomes_amber
+      assert_colour 'amber'
     }
-  end
-
-  def assert_becomes_amber
-    assert_equal '', stdout
-    assert stderr.start_with? 'Assertion failed: answer() == 42'
-    assert_equal 2, status
-    assert_equal 'amber', colour
   end
 
 end

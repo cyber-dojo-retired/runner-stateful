@@ -1,5 +1,4 @@
 require_relative 'test_base'
-require_relative '../../src/logger_stdout'
 
 class LoggerStdoutTest < TestBase
 
