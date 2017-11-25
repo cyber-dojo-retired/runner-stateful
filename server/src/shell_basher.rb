@@ -1,3 +1,4 @@
+require_relative 'runner_error'
 require 'open3'
 
 class ShellBasher
@@ -6,33 +7,54 @@ class ShellBasher
     @external = external
   end
 
+  # - - - - - - - - - - - - - - - - - - - - -
+
   def assert(command)
-    stdout,stderr,status = exec(command)
+    stdout,stderr,r = Open3.capture3(command)
+    status = r.exitstatus
     unless status == success
-      raise ArgumentError.new("command:#{command}")
+      raise RunnerError.new({
+        'command':"shell.assert(#{quoted(command)})",
+        'stdout':stdout,
+        'stderr':stderr,
+        'status':status
+      })
     end
     stdout
+  rescue RunnerError => error
+    raise error
+  rescue StandardError => error
+    raise RunnerError.new({
+      'command':"shell.assert(#{quoted(command)})",
+      'stdout':stdout,
+      'stderr':stderr,
+      'status':status,
+      'message':error.message
+    })
   end
 
+  # - - - - - - - - - - - - - - - - - - - - -
+
   def exec(command)
-    begin
-      stdout,stderr,r = Open3.capture3(command)
-      status = r.exitstatus
-      unless status == success
-        log << line
-        log << "COMMAND:#{command}"
-        log << "STATUS:#{status}"
-        log << "STDOUT:#{stdout}"
-        log << "STDERR:#{stderr}"
-      end
-      [stdout, stderr, status]
-    rescue StandardError => error
-      log << line
-      log << "COMMAND:#{command}"
-      log << "RAISED-CLASS:#{error.class.name}"
-      log << "RAISED-TO_S:#{error.to_s}"
-      raise error
+    stdout,stderr,r = Open3.capture3(command)
+    status = r.exitstatus
+    unless status == success
+      log << {
+        'command':"shell.exec(#{quoted(command)})",
+        'stdout':stdout,
+        'stderr':stderr,
+        'status':status
+      }
     end
+    [stdout, stderr, status]
+  rescue StandardError => error
+    raise RunnerError.new({
+      'command':"shell.exec(#{quoted(command)})",
+      'stdout':stdout,
+      'stderr':stderr,
+      'status':status,
+      'message':error.message
+    })
   end
 
   def success
@@ -45,8 +67,8 @@ class ShellBasher
     @external.log
   end
 
-  def line
-    '-' * 40
+  def quoted(s)
+    '"' + s + '"'
   end
 
 end

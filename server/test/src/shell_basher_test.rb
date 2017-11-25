@@ -1,5 +1,6 @@
 require_relative 'test_base'
 require_relative 'logger_spy'
+require_relative '../../src/runner_error'
 require_relative '../../src/logger_stdout'
 
 class ShellBasherTest < TestBase
@@ -12,19 +13,21 @@ class ShellBasherTest < TestBase
   # shell.exec(cmd)
   # - - - - - - - - - - - - - - - - -
 
-  test '243', %w( when exec(cmd) raises the exception is logged ) do
-    @logged = with_captured_stdout {
-      assert_raises(StandardError) {
-        shell.exec('xxx Hello')
-      }
+  test '243', %w( when exec(cmd) raises
+    the exception info is in the exception object
+    and is not logged
+  ) do
+    error = assert_raises(RunnerError) {
+      shell.exec('xxx Hello')
     }
-    assert_logged(
-      line,
-      'COMMAND:xxx Hello',
-      'RAISED-CLASS:Errno::ENOENT', # DROP?
-      'RAISED-TO_S:No such file or directory - xxx'
-     #'MESSAGE:No such file or directory - xxx'
-    )
+    assert_equal({
+        'command':'shell.exec("xxx Hello")',
+        'stdout':nil, #??
+        'stderr':nil, #??
+        'status':nil, #???
+        'message':'No such file or directory - xxx'
+      }, error.info);
+    assert_nothing_logged
   end
 
   # - - - - - - - - - - - - - - - - -
@@ -33,12 +36,10 @@ class ShellBasherTest < TestBase
   %w( when exec(cmd) is zero,
       it return [stdout,stderr,status]
       and does not log ) do
-    @logged = with_captured_stdout {
-      stdout,stderr,status = shell.exec('printf Hello')
-      assert_equal 'Hello', stdout
-      assert_equal '', stderr
-      assert_equal 0, status
-    }
+    stdout,stderr,status = shell.exec('printf Hello')
+    assert_equal 'Hello', stdout
+    assert_equal '', stderr
+    assert_equal 0, status
     assert_nothing_logged
   end
 
@@ -48,19 +49,17 @@ class ShellBasherTest < TestBase
   %w( when exec(cmd) is non-zero,
       it returns [stdout,stderr,status]
       and logs ) do
-    @logged = with_captured_stdout {
-      stdout,stderr,status = shell.exec('printf Bye && false')
-      assert_equal 'Bye', stdout
-      assert_equal '', stderr
-      assert_equal 1, status
-    }
-    assert_logged(
-      line,
-      'COMMAND:printf Bye && false',
-      'STATUS:1',
-      'STDOUT:Bye',
-      'STDERR:'
-    )
+    stdout,stderr,status = shell.exec('printf Bye && false')
+    assert_equal 'Bye', stdout
+    assert_equal '', stderr
+    assert_equal 1, status
+
+    assert_logged({
+      'command':'shell.exec("printf Bye && false")',
+      'stdout':'Bye',
+      'stderr':'',
+      'status':1
+    })
   end
 
   # - - - - - - - - - - - - - - - - -
@@ -68,31 +67,29 @@ class ShellBasherTest < TestBase
   # - - - - - - - - - - - - - - - - -
 
   test '246',
-  %w( when assert(cmd) raises the exception is logged ) do
-    @logged = with_captured_stdout {
-      assert_raises(StandardError) {
-        shell.assert('xxx Hello')
-      }
+  %w( when assert(cmd) raises
+      the exception info is in the exception object
+      and is not logged
+  ) do
+    error = assert_raises(RunnerError) {
+      shell.assert('xxx Hello')
     }
-    assert_logged(
-      line,
-      'COMMAND:xxx Hello',
-      'RAISED-CLASS:Errno::ENOENT', # DROP?
-      'RAISED-TO_S:No such file or directory - xxx'
-     #'MESSAGE:No such file or directory - xxx'
-    )
+    assert_equal({
+        'command':'shell.assert("xxx Hello")',
+        'stdout':nil, #??
+        'stderr':nil, #??
+        'status':nil, #???
+        'message':'No such file or directory - xxx'
+      }, error.info);
+    assert_nothing_logged
   end
 
   # - - - - - - - - - - - - - - - - -
 
   test '247',
-  %w( when assert(cmd) is zero
-      nothing is logged,
-      stdout is returned ) do
-    @logged = with_captured_stdout {
-      stdout = shell.assert('printf Hello')
-      assert_equal 'Hello', stdout
-    }
+  %w( when assert(cmd) is zero, nothing is logged, stdout is returned ) do
+    stdout = shell.assert('printf Hello')
+    assert_equal 'Hello', stdout
     assert_nothing_logged
   end
 
@@ -101,39 +98,29 @@ class ShellBasherTest < TestBase
   test '248',
   %w( when assert(cmd) is non-zero,
       exception is raised,
-      command and stdout,stderr,status is logged ) do
-    @logged = with_captured_stdout {
-      error = assert_raises(StandardError) {
-        shell.assert('printf Hello && false')
-      }
-      assert_equal 'command:printf Hello && false', error.message
+      the exception info is in the exception object
+      and is not logged
+  ) do
+    error = assert_raises(StandardError) {
+      shell.assert('printf Hello && false')
     }
-    assert_logged(
-      line,
-      'COMMAND:printf Hello && false',
-      'STATUS:1',
-      'STDOUT:Hello',
-      'STDERR:'
-    )
+    assert_equal({
+        'command':'shell.assert("printf Hello && false")',
+        'stdout':'Hello',
+        'stderr':'',
+        'status':1
+      }, error.info);
+    assert_nothing_logged
   end
 
   # - - - - - - - - - - - - - - - - -
 
   def assert_nothing_logged
-    assert_logged()
+    assert_equal [], log.messages
   end
 
-  def assert_logged(*lines)
-    lines = lines.map { |line| quoted(line) }
-    if lines == []
-      assert_equal '', @logged
-    else
-      assert_equal(lines.join("\n") + "\n", @logged)
-    end
-  end
-
-  def quoted(s)
-    '"' + s + '"'
+  def assert_logged(hash)
+    assert_equal [hash], log.messages
   end
 
   def line
