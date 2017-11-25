@@ -4,7 +4,7 @@ require 'open3'
 class ShellBasher
 
   def initialize(external)
-    @external = external
+    @log = external.log
   end
 
   # - - - - - - - - - - - - - - - - - - - - -
@@ -22,7 +22,7 @@ class ShellBasher
   def exec(command)
     stdout,stderr,status = open3capture3('exec', command)
     unless status == success
-      log << info('exec', command, stdout, stderr, status)
+      @log << info('exec', command, stdout, stderr, status)
     end
     [stdout, stderr, status]
   end
@@ -40,7 +40,7 @@ class ShellBasher
     [stdout, stderr, r.exitstatus]
   rescue StandardError => error
     raise RunnerError.new({
-      'command':"shell.#{method_name}(#{quoted(command)})",
+      'command':shell_call(method_name, command),
       'message':error.message
     })
   end
@@ -48,19 +48,15 @@ class ShellBasher
   # - - - - - - - - - - - - - - - - - - - - -
 
   def info(method, command, stdout, stderr, status)
-    { 'command':"shell.#{method}(#{quoted(command)})",
+    { 'command':shell_call(method, command),
       'stdout':stdout,
       'stderr':stderr,
       'status':status
     }
   end
 
-  def log
-    @external.log
-  end
-
-  def quoted(s)
-    '"' + s + '"'
+  def shell_call(method, command)
+    "shell.#{method}(\"#{command}\")"
   end
 
 end
