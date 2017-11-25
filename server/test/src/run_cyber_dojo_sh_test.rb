@@ -50,7 +50,6 @@ class RunCyberDojoShTest < TestBase
     assert_timed_out
     assert_stdout ''
     assert_stderr ''
-    assert_timed_out
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -70,7 +69,6 @@ class RunCyberDojoShTest < TestBase
     }
     assert_timed_out
     refute_stdout ''
-    assert_timed_out
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
