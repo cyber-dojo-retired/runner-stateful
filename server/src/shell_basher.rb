@@ -10,58 +10,50 @@ class ShellBasher
   # - - - - - - - - - - - - - - - - - - - - -
 
   def assert(command)
-    stdout,stderr,r = Open3.capture3(command)
-    status = r.exitstatus
+    stdout,stderr,status = open3capture3('assert', command)
     unless status == success
-      raise RunnerError.new({
-        'command':"shell.assert(#{quoted(command)})",
-        'stdout':stdout,
-        'stderr':stderr,
-        'status':status
-      })
+      raise RunnerError.new(info('assert', command, stdout, stderr, status))
     end
     stdout
-  rescue RunnerError => error
-    raise error
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - -
+
+  def exec(command)
+    stdout,stderr,status = open3capture3('exec', command)
+    unless status == success
+      log << info('exec', command, stdout, stderr, status)
+    end
+    [stdout, stderr, status]
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - -
+
+  def success
+    0
+  end
+
+  private # = = = = = = = = = = = = = = = = =
+
+  def open3capture3(method_name, command)
+    stdout,stderr,r = Open3.capture3(command)
+    [stdout, stderr, r.exitstatus]
   rescue StandardError => error
     raise RunnerError.new({
-      'command':"shell.assert(#{quoted(command)})",
-      'stdout':stdout,
-      'stderr':stderr,
-      'status':status,
+      'command':"shell.#{method_name}(#{quoted(command)})",
       'message':error.message
     })
   end
 
   # - - - - - - - - - - - - - - - - - - - - -
 
-  def exec(command)
-    stdout,stderr,r = Open3.capture3(command)
-    status = r.exitstatus
-    unless status == success
-      log << {
-        'command':"shell.exec(#{quoted(command)})",
-        'stdout':stdout,
-        'stderr':stderr,
-        'status':status
-      }
-    end
-    [stdout, stderr, status]
-  rescue StandardError => error
-    raise RunnerError.new({
-      'command':"shell.exec(#{quoted(command)})",
+  def info(method, command, stdout, stderr, status)
+    { 'command':"shell.#{method}(#{quoted(command)})",
       'stdout':stdout,
       'stderr':stderr,
-      'status':status,
-      'message':error.message
-    })
+      'status':status
+    }
   end
-
-  def success
-    0
-  end
-
-  private
 
   def log
     @external.log

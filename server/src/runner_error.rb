@@ -8,9 +8,4 @@ class RunnerError < StandardError
 
   attr_reader :info
 
-  def message
-    #JSON.pretty_print(info)
-    info
-  end
-
 end

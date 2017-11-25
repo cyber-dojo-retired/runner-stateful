@@ -22,9 +22,6 @@ class ShellBasherTest < TestBase
     }
     assert_equal({
         'command':'shell.exec("xxx Hello")',
-        'stdout':nil, #??
-        'stderr':nil, #??
-        'status':nil, #???
         'message':'No such file or directory - xxx'
       }, error.info);
     assert_nothing_logged
@@ -34,7 +31,7 @@ class ShellBasherTest < TestBase
 
   test '244',
   %w( when exec(cmd) is zero,
-      it return [stdout,stderr,status]
+      it returns [stdout,stderr,status]
       and does not log ) do
     stdout,stderr,status = shell.exec('printf Hello')
     assert_equal 'Hello', stdout
@@ -76,9 +73,6 @@ class ShellBasherTest < TestBase
     }
     assert_equal({
         'command':'shell.assert("xxx Hello")',
-        'stdout':nil, #??
-        'stderr':nil, #??
-        'status':nil, #???
         'message':'No such file or directory - xxx'
       }, error.info);
     assert_nothing_logged
@@ -101,7 +95,7 @@ class ShellBasherTest < TestBase
       the exception info is in the exception object
       and is not logged
   ) do
-    error = assert_raises(StandardError) {
+    error = assert_raises(RunnerError) {
       shell.assert('printf Hello && false')
     }
     assert_equal({
@@ -121,10 +115,6 @@ class ShellBasherTest < TestBase
 
   def assert_logged(hash)
     assert_equal [hash], log.messages
-  end
-
-  def line
-    '-' * 40
   end
 
 end
