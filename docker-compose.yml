@@ -2,6 +2,7 @@
 version: '2.2'
 
 services:
+
   runner_stateful_client:
     user: nobody
     image: cyberdojo/runner_stateful_client
@@ -21,6 +22,8 @@ services:
         - PORT=${CYBER_DOJO_RUNNER_CLIENT_PORT}
     ports:
       - ${CYBER_DOJO_RUNNER_CLIENT_PORT}:${CYBER_DOJO_RUNNER_CLIENT_PORT}
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   runner_stateful:
     user: root
