@@ -34,7 +34,7 @@ class Runner # stateful
 
   def image_pulled?
     cmd = 'docker images --format "{{.Repository}}"'
-    shell.assert(cmd).split("\n").include? image_name
+    shell.assert(cmd).split("\n").include?(image_name)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -93,7 +93,7 @@ class Runner # stateful
     assert_valid_avatar_name
     in_container {
       assert_avatar_exists
-      remove_avatar_dir
+      remove_sandbox_dir
     }
     nil
   end
@@ -115,7 +115,7 @@ class Runner # stateful
     in_container {
       assert_avatar_exists
       deleted_files.each_key do |pathed_filename|
-        shell.assert(docker_exec("rm #{avatar_dir}/#{pathed_filename}"))
+        shell.assert(docker_exec("rm #{sandbox_dir}/#{pathed_filename}"))
       end
       run_timeout_cyber_dojo_sh(all_files, max_seconds)
       @colour = @timed_out ? 'timed_out' : red_amber_green
@@ -169,7 +169,7 @@ class Runner # stateful
             #{container_name}                                          \
             sh -c                                                      \
               '                        `# open quote`                  \
-              cd #{avatar_dir} &&                                      \
+              cd #{sandbox_dir} &&                                     \
               tar                                                      \
                 --touch                `# [1]`                         \
                 -zxf                   `# extract tar file`            \
@@ -262,7 +262,7 @@ class Runner # stateful
           "--user=#{uid}:#{gid}",
           '--interactive',
           container_name,
-          "sh -c 'cd #{avatar_dir} && sh ./cyber-dojo.sh'"
+          "sh -c 'cd #{sandbox_dir} && sh ./cyber-dojo.sh'"
         ].join(space)
       else
         save_to(files, tmp_dir)
@@ -349,7 +349,7 @@ class Runner # stateful
       env_var('IMAGE_NAME',  image_name),
       env_var('KATA_ID',     kata_id),
       env_var('RUNNER',      'stateful'),
-      env_var('SANDBOX',     avatar_dir),
+      env_var('SANDBOX',     sandbox_dir),
     ].join(space)
   end
 
@@ -481,7 +481,7 @@ class Runner # stateful
     40000 + all_avatars_names.index(avatar_name)
   end
 
-  def avatar_dir
+  def sandbox_dir
     "#{sandboxes_root_dir}/#{avatar_name}"
   end
 
@@ -507,7 +507,7 @@ class Runner # stateful
     # check is for avatar's sandboxes/ subdir and
     # not its /home/ subdir which is pre-created
     # in the docker image.
-    cmd = "[ -d #{avatar_dir} ] || printf 'not_found'"
+    cmd = "[ -d #{sandbox_dir} ] || printf 'not_found'"
     stdout = shell.assert(docker_exec(cmd))
     stdout != 'not_found'
   end
@@ -518,13 +518,13 @@ class Runner # stateful
     # first avatar makes the shared dir
     shared_dir = "#{sandboxes_root_dir}/shared"
     shell.assert(docker_exec("mkdir -m 775 #{shared_dir} || true"))
-    shell.assert(docker_exec("mkdir -m 755 #{avatar_dir}"))
+    shell.assert(docker_exec("mkdir -m 755 #{sandbox_dir}"))
     shell.assert(docker_exec("chown root:#{group} #{shared_dir}"))
-    shell.assert(docker_exec("chown #{uid}:#{gid} #{avatar_dir}"))
+    shell.assert(docker_exec("chown #{uid}:#{gid} #{sandbox_dir}"))
   end
 
-  def remove_avatar_dir
-    shell.assert(docker_exec("rm -rf #{avatar_dir}"))
+  def remove_sandbox_dir
+    shell.assert(docker_exec("rm -rf #{sandbox_dir}"))
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
@@ -577,7 +577,7 @@ end
 #
 # require 'open3'
 # files.each do |name,content|
-#   filename = avatar_dir + '/' + name
+#   filename = sandbox_dir + '/' + name
 #   dir = File.dirname(filename)
 #   shell_cmd = "mkdir -p #{dir};"
 #   shell_cmd += "cat > #{filename}"
