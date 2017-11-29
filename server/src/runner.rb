@@ -75,7 +75,6 @@ class Runner # stateful
   def avatar_new(avatar_name, starting_files)
     @avatar_name = avatar_name
     assert_kata_exists
-    assert_valid_avatar_name
     in_container {
       refute_avatar_exists
       make_and_chown_dirs
@@ -90,7 +89,6 @@ class Runner # stateful
   def avatar_old(avatar_name)
     @avatar_name = avatar_name
     assert_kata_exists
-    assert_valid_avatar_name
     in_container {
       assert_avatar_exists
       remove_sandbox_dir
@@ -109,7 +107,6 @@ class Runner # stateful
   )
     @avatar_name = avatar_name
     assert_kata_exists
-    assert_valid_avatar_name
     unchanged_files = nil # we're stateful!
     all_files = [*changed_files, *new_files].to_h
     in_container {
@@ -455,6 +452,20 @@ class Runner # stateful
 
   attr_reader :avatar_name
 
+  def assert_avatar_exists
+    assert_valid_avatar_name
+    unless avatar_exists_cid?
+      argument_error('avatar_name', '!exists')
+    end
+  end
+
+  def refute_avatar_exists
+    assert_valid_avatar_name
+    if avatar_exists_cid?
+      argument_error('avatar_name', 'exists')
+    end
+  end
+
   def assert_valid_avatar_name
     unless valid_avatar_name?
       argument_error('avatar_name', 'invalid')
@@ -490,18 +501,6 @@ class Runner # stateful
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def assert_avatar_exists
-    unless avatar_exists_cid?
-      argument_error('avatar_name', '!exists')
-    end
-  end
-
-  def refute_avatar_exists
-    if avatar_exists_cid?
-      argument_error('avatar_name', 'exists')
-    end
-  end
 
   def avatar_exists_cid?
     # check is for avatar's sandboxes/ subdir and
