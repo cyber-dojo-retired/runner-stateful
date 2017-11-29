@@ -107,21 +107,17 @@ class Runner # stateful
     new_files, deleted_files, unchanged_files, changed_files,
     max_seconds
   )
-    unchanged_files = nil # we're stateful!
-    all_files = [*changed_files, *new_files].to_h
-    run(avatar_name, deleted_files.keys, all_files, max_seconds)
-  end
-
-  def run(avatar_name, deleted_filenames, changed_files, max_seconds)
     @avatar_name = avatar_name
     assert_kata_exists
     assert_valid_avatar_name
+    unchanged_files = nil # we're stateful!
+    all_files = [*changed_files, *new_files].to_h
     in_container {
       assert_avatar_exists
-      deleted_filenames.each do |pathed_filename|
+      deleted_files.each_key do |pathed_filename|
         shell.assert(docker_exec("rm #{avatar_dir}/#{pathed_filename}"))
       end
-      run_timeout_cyber_dojo_sh(changed_files, max_seconds)
+      run_timeout_cyber_dojo_sh(all_files, max_seconds)
       @colour = @timed_out ? 'timed_out' : red_amber_green
     }
     { stdout:@stdout, stderr:@stderr, status:@status, colour:@colour }
