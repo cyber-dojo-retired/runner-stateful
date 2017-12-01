@@ -321,7 +321,7 @@ class ApiTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   multi_os_test 'DB3',
-  'file-bomb in exhaust file-handles fails to go off' do
+  'file-handles quickly become exhausted' do
     in_kata_as(salmon) {
       run_cyber_dojo_sh({
         changed_files: { 'hiker.c' => exhaust_file_handles }
