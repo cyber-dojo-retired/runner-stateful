@@ -634,13 +634,6 @@ class ApiTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_timed_out_or_printed(text)
-    count = (stdout+stderr).lines.count { |line| line.include?(text) }
-    assert (timed_out? || count > 0), ":#{text}:#{quad}:"
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   def exhaust_file_handles
     [
       '#include <stdio.h>',
