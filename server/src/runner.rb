@@ -109,7 +109,7 @@ class Runner # stateful
     assert_kata_exists
     unchanged_files = nil # we're stateful!
     all_files = [*changed_files, *new_files].to_h
-    in_container {
+    in_container(max_seconds) {
       assert_avatar_exists
       deleted_files.each_key do |pathed_filename|
         shell.assert(docker_exec("rm #{sandbox_dir}/#{pathed_filename}"))
@@ -193,9 +193,9 @@ class Runner # stateful
     r_stdout, w_stdout = IO.pipe
     r_stderr, w_stderr = IO.pipe
     pid = Process.spawn(cmd, {
-      pgroup:true,     # become process leader
-         out:w_stdout, # redirection
-         err:w_stderr  # redirection
+      pgroup:true,  # become process leader
+      out:w_stdout, # redirection
+      err:w_stderr  # redirection
     })
     begin
       Timeout::timeout(max_seconds) do
@@ -288,8 +288,8 @@ class Runner # stateful
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def in_container
-    create_container
+  def in_container(max_seconds = 10)
+    create_container(max_seconds)
     begin
       yield
     ensure
@@ -299,7 +299,7 @@ class Runner # stateful
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  def create_container
+  def create_container(max_seconds)
     # The [docker run] must be guarded by argument checks
     # because it volume mounts...
     #     [docker run ... --volume ...]
@@ -319,12 +319,14 @@ class Runner # stateful
       '--user=root',
       "--volume #{kata_volume_name}:#{sandboxes_root_dir}:rw"
     ].join(space)
-    shell.assert("docker run #{args} #{image_name} sh -c 'sleep 10'")
+    shell.assert("docker run #{args} #{image_name} sh -c 'sleep #{max_seconds}'")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def remove_container
+    # The [docker run] is --detach'd so even if its [sleep]
+    # has finished the container will still exist.
     # [docker rm] could be backgrounded with a trailing &
     # but it does not make a test-event discernably
     # faster when measuring to 100th of a second
