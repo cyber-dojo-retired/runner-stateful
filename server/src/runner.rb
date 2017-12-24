@@ -317,7 +317,7 @@ class Runner # stateful
       '--user=root',
       "--volume #{kata_volume_name}:#{sandboxes_root_dir}:rw"
     ].join(space)
-    shell.assert("docker run #{args} #{image_name} sh -c 'sleep #{max_seconds}'")
+    shell.assert("docker run #{args} #{image_name} sleep #{max_seconds}")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
