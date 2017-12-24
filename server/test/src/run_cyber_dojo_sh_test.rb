@@ -54,7 +54,7 @@ class RunCyberDojoShTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '4D7', %w( [Alpine]
+  test '4D8', %w( [Alpine]
   when run_cyber_dojo_sh does not complete in max_seconds
   and produces output
   then stdout is not empty,

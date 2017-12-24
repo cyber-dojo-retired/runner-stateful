@@ -187,6 +187,9 @@ class Runner # stateful
     # container. The container is killed in the ensure
     # block of in_container()
     # See https://github.com/docker/docker/issues/9098
+    # 137=128+9 means Fatal error signal "n"
+    @stdout = ''
+    @stderr = ''
     r_stdout, w_stdout = IO.pipe
     r_stderr, w_stderr = IO.pipe
     pid = Process.spawn(cmd, {
@@ -198,7 +201,7 @@ class Runner # stateful
       Timeout::timeout(max_seconds) do
         _, ps = Process.waitpid2(pid)
         @status = ps.exitstatus
-        @timed_out = false
+        @timed_out = (@status == 137)
       end
     rescue Timeout::Error
       Process.kill(-9, pid) # -ve means kill process-group
@@ -316,7 +319,7 @@ class Runner # stateful
       '--user=root',
       "--volume #{kata_volume_name}:#{sandboxes_root_dir}:rw"
     ].join(space)
-    shell.assert("docker run #{args} #{image_name} sh")
+    shell.assert("docker run #{args} #{image_name} sh -c 'sleep 10'")
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
@@ -372,7 +375,7 @@ class Runner # stateful
       ulimit('nofile', 128),   # number of files
       ulimit('nproc',  128),   # number of processes
       ulimit('stack',  8*MB),  # stack size
-      '--memory=512m',         # ram
+      '--memory=512m',                   # max 512MB ram
       '--net=none',                      # no network
       '--pids-limit=128',                # no fork bombs
       '--security-opt=no-new-privileges' # no escalation

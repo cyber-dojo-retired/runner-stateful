@@ -222,7 +222,7 @@ class ApiTest < TestBase
   # container properties
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  multi_os_test '8A3',
+  multi_os_test '9FA',
   'container environment properties' do
     in_kata_as(salmon) {
       assert_pid_1_is_running_init_process
