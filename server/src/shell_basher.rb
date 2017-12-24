@@ -37,6 +37,12 @@ class ShellBasher
 
   def open3capture3(method_name, command)
     stdout,stderr,r = Open3.capture3(command)
+
+    #puts "command:#{command}"
+    #puts "status:#{r.exitstatus}"
+    #puts "stdout:#{stdout}"
+    #puts "stderr:#{stderr}"
+
     [stdout, stderr, r.exitstatus]
   rescue StandardError => error
     raise RunnerError.new({
