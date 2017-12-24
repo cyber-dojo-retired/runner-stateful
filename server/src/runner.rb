@@ -383,7 +383,7 @@ class Runner # stateful
   end
 
   def ulimit(name, limit)
-    "--ulimit #{name}=#{limit}:#{limit}"
+    "--ulimit #{name}=#{limit}"
   end
 
   KB = 1024
