@@ -188,8 +188,6 @@ class Runner # stateful
     # block of in_container()
     # See https://github.com/docker/docker/issues/9098
     # 137=128+9 means Fatal error signal "n"
-    @stdout = ''
-    @stderr = ''
     r_stdout, w_stdout = IO.pipe
     r_stderr, w_stderr = IO.pipe
     pid = Process.spawn(cmd, {
