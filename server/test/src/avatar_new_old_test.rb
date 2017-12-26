@@ -19,22 +19,47 @@ class AvatarNewOldTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '752', %w( avatar_new is not idempotent ) do
-    in_kata_as('squid') {
-      error = assert_raises(StandardError) { avatar_new('squid') }
-      assert_equal 'avatar_name:exists', error.message
-    }
+  test '752', %w( avatar_new is idempotent only if runner is stateless ) do
+    if stateless?
+      in_kata_as('squid') {
+        avatar_new('squid')
+      }
+    else
+      in_kata_as('squid') {
+        error = assert_raises(StandardError) { avatar_new('squid') }
+        assert_equal 'avatar_name:exists', error.message
+      }
+    end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '753', %w( avatar_old is not idempotent ) do
-    in_kata {
-      avatar_new('squid')
-      avatar_old('squid')
-      error = assert_raises(StandardError) { avatar_old('squid') }
-      assert_equal 'avatar_name:!exists', error.message
+  test '753', %w( avatar_old is idempotent only if runner is stateless ) do
+    if stateless?
+      in_kata {
+        avatar_new('squid')
+        avatar_old('squid')
+        avatar_old('squid')
+      }
+    else
+      in_kata {
+        avatar_new('squid')
+        avatar_old('squid')
+        error = assert_raises(StandardError) { avatar_old('squid') }
+        assert_equal 'avatar_name:!exists', error.message
+      }
+    end
+  end
+
+  private
+
+  def stateless?
+    result = nil
+    in_kata_as('lion') {
+      cmd = "printenv CYBER_DOJO_RUNNER"
+      result = assert_cyber_dojo_sh(cmd) == 'stateless'
     }
+    result
   end
 
 end
