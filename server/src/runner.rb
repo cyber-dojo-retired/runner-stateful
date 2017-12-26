@@ -21,7 +21,8 @@ require 'timeout'
 class Runner # stateful
 
   def initialize(external, image_name, kata_id)
-    @external = external
+    @disk = external.disk
+    @shell = external.shell
     @image_name = image_name
     @kata_id = kata_id
     assert_valid_image_name
@@ -121,6 +122,10 @@ class Runner # stateful
   end
 
   private # = = = = = = = = = = = = = = = = = = = = = = = =
+
+  attr_reader :image_name, :kata_id, :avatar_name
+
+  attr_reader :disk, :shell
 
   def save_to(files, tmp_dir)
     files.each do |pathed_filename, content|
@@ -264,8 +269,6 @@ class Runner # stateful
   # image/container
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
-  attr_reader :image_name
-
   def assert_valid_image_name
     unless valid_image_name?(image_name)
       argument_error('image_name', 'invalid')
@@ -383,8 +386,6 @@ class Runner # stateful
   # kata
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
-  attr_reader :kata_id
-
   def assert_valid_kata_id
     unless valid_kata_id?
       argument_error('kata_id', 'invalid')
@@ -441,8 +442,6 @@ class Runner # stateful
   # - - - - - - - - - - - - - - - - - - - - - - - -
   # avatar
   # - - - - - - - - - - - - - - - - - - - - - - - -
-
-  attr_reader :avatar_name
 
   def assert_avatar_exists
     assert_valid_avatar_name
@@ -534,16 +533,6 @@ class Runner # stateful
 
   def space
     ' '
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def disk
-    @external.disk
-  end
-
-  def shell
-    @external.shell
   end
 
 end
