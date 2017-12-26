@@ -75,7 +75,7 @@ class Runner # stateful
   def avatar_new(avatar_name, starting_files)
     @avatar_name = avatar_name
     assert_kata_exists
-    in_container {
+    in_container(max_seconds = 3) {
       refute_avatar_exists
       make_and_chown_dirs
       Dir.mktmpdir { |tmp_dir|
@@ -89,7 +89,7 @@ class Runner # stateful
   def avatar_old(avatar_name)
     @avatar_name = avatar_name
     assert_kata_exists
-    in_container {
+    in_container(max_seconds = 3) {
       assert_avatar_exists
       remove_sandbox_dir
     }
@@ -276,7 +276,7 @@ class Runner # stateful
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def in_container(max_seconds = 10)
+  def in_container(max_seconds)
     create_container(max_seconds)
     begin
       yield
