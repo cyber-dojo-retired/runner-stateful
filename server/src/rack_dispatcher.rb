@@ -1,8 +1,9 @@
 require_relative 'externals'
 require_relative 'runner'
 require 'json'
+require 'rack'
 
-class MicroService
+class RackDispatcher
 
   def call(env, request = Rack::Request.new(env))
     @name = request.path_info[1..-1] # lose leading /

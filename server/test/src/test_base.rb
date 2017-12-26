@@ -240,8 +240,6 @@ class TestBase < HexMiniTest
 
   include AllAvatarsNames
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   def defaulted_arg(named_args, arg_name, arg_default)
     named_args.key?(arg_name) ? named_args[arg_name] : arg_default
   end
