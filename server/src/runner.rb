@@ -311,7 +311,6 @@ class Runner # stateful
       '--detach',                 # for later execs
       env_vars,
       '--init',                   # pid-1 process
-      '--interactive',            # for tar-pipe
       "--name=#{container_name}", # for easy clean up
       limits,
       '--user=root',
