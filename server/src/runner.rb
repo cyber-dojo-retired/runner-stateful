@@ -144,12 +144,12 @@ class Runner # stateful
   def tar_pipe_cmd(tmp_dir, cmd = 'sh ./cyber-dojo.sh')
     # [1] is for file-stamp date-time granularity
     # This relates to the modification-date (stat %y).
-    # The tar --touch option is not available in a default Alpine
-    # container. To add it:
+    # The tar --touch option is not available in a default
+    # Alpine container. To add it:
     #    $ apk add --update tar
     # Also, in a default Alpine container the date-time
-    # file-stamps have a granularity of one second. In other
-    # words the microseconds value is always zero.
+    # file-stamps have a granularity of one second. In
+    # other words the microseconds value is always zero.
     # To add microsecond granularity:
     #    $ apk add --update coreutils
     # See the file builder/image_builder.rb on
@@ -158,28 +158,32 @@ class Runner # stateful
     #    o) update_tar_command
     #    o) install_coreutils_command
     <<~SHELL.strip
-      chmod 755 #{tmp_dir} &&                                          \
-      cd #{tmp_dir} &&                                                 \
-      tar                                                              \
-        -zcf                           `# create tar file`             \
-        -                              `# write it to stdout`          \
-        .                              `# tar the current directory`   \
-        |                              `# pipe the tarfile...`         \
-          docker exec                  `# ...into docker container`    \
-            --user=#{uid}:#{gid}                                       \
-            --interactive                                              \
-            #{container_name}                                          \
-            sh -c                                                      \
-              '                        `# open quote`                  \
-              cd #{sandbox_dir} &&                                     \
-              tar                                                      \
-                --touch                `# [1]`                         \
-                -zxf                   `# extract tar file`            \
-                -                      `# which is read from stdin`    \
-                -C                     `# save the extracted files to` \
-                .                      `# the current directory`       \
-                && #{cmd}                                              \
-              '                        `# close quote`
+      chmod 755 #{tmp_dir}                                 \
+      &&                                                   \
+      cd #{tmp_dir}                                        \
+      &&                                                   \
+      tar                                                  \
+        -zcf                     `# create tar file`       \
+        -                        `# write it to stdout`    \
+        .                        `# tar current directory` \
+        |                        `# pipe the tarfile`      \
+          docker exec            `# into docker container` \
+            --user=#{uid}:#{gid}                           \
+            --interactive                                  \
+            #{container_name}                              \
+            sh -c                                          \
+              '                  `# open quote`            \
+              cd #{sandbox_dir}                            \
+              &&                                           \
+              tar                                          \
+                --touch          `# [1]`                   \
+                -zxf             `# extract tar file`      \
+                -                `# read from stdin`       \
+                -C               `# save to the`           \
+                .                `# current directory`     \
+                &&                                         \
+                #{cmd}                                     \
+              '                  `# close quote`
     SHELL
   end
 
