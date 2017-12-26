@@ -1,4 +1,4 @@
-require_relative 'disk_writer'
+require_relative 'disk'
 require_relative 'shell_basher'
 require_relative 'logger_stdout'
 
@@ -9,7 +9,7 @@ module Externals # mix-in
   end
 
   def disk
-    @disk ||= DiskWriter.new(self)
+    @disk ||= Disk.new
   end
 
   def log

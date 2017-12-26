@@ -1,8 +1,5 @@
 
-class DiskWriter
-
-  def initialize(_parent)
-  end
+class Disk
 
   def write(pathed_filename, content)
     File.open(pathed_filename, 'w') { |fd|
