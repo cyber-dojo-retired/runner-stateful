@@ -449,16 +449,25 @@ class Runner # stateful
 
   def assert_avatar_exists
     assert_valid_avatar_name
-    unless avatar_exists_cid?
+    unless avatar_exists?
       argument_error('avatar_name', '!exists')
     end
   end
 
   def refute_avatar_exists
     assert_valid_avatar_name
-    if avatar_exists_cid?
+    if avatar_exists?
       argument_error('avatar_name', 'exists')
     end
+  end
+
+  def avatar_exists?
+    # check is for avatar's sandboxes/ subdir and
+    # not its /home/ subdir which is pre-created
+    # in the docker image.
+    cmd = "[ -d #{sandbox_dir} ] || printf 'not_found'"
+    stdout = shell.assert(docker_exec(cmd))
+    stdout != 'not_found'
   end
 
   def assert_valid_avatar_name
@@ -493,17 +502,6 @@ class Runner # stateful
 
   def sandboxes_root_dir
     '/sandboxes'
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def avatar_exists_cid?
-    # check is for avatar's sandboxes/ subdir and
-    # not its /home/ subdir which is pre-created
-    # in the docker image.
-    cmd = "[ -d #{sandbox_dir} ] || printf 'not_found'"
-    stdout = shell.assert(docker_exec(cmd))
-    stdout != 'not_found'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
