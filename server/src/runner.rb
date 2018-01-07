@@ -76,7 +76,7 @@ class Runner # stateful
   def avatar_new(avatar_name, starting_files)
     @avatar_name = avatar_name
     assert_kata_exists
-    in_container(3) {
+    in_container(3) { # max_seconds
       refute_avatar_exists
       make_and_chown_dirs
       Dir.mktmpdir { |tmp_dir|
@@ -90,7 +90,7 @@ class Runner # stateful
   def avatar_old(avatar_name)
     @avatar_name = avatar_name
     assert_kata_exists
-    in_container(3) {
+    in_container(3) { # max_seconds
       assert_avatar_exists
       remove_sandbox_dir
     }
@@ -525,6 +525,8 @@ class Runner # stateful
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def docker_exec(cmd)
+    # This is _not_ the main docker-exec
+    # for run_cyber_dojo_sh
     "docker exec --user root #{container_name} sh -c '#{cmd}'"
   end
 
