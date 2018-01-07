@@ -524,7 +524,7 @@ class Runner # stateful
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def docker_exec(cmd)
-    "docker exec #{container_name} sh -c '#{cmd}'"
+    "docker exec --user root #{container_name} sh -c '#{cmd}'"
   end
 
   def argument_error(name, message)
