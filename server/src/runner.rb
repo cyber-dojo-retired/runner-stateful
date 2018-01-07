@@ -509,9 +509,10 @@ class Runner # stateful
   def make_and_chown_dirs
     # first avatar makes the shared dir
     shared_dir = "#{sandboxes_root_dir}/shared"
-    shell.assert(docker_exec("mkdir -m 775 #{shared_dir} || true"))
-    shell.assert(docker_exec("mkdir -m 755 #{sandbox_dir}"))
+    shell.assert(docker_exec("mkdir -p -m 775 #{shared_dir}"))
     shell.assert(docker_exec("chown root:#{group} #{shared_dir}"))
+
+    shell.assert(docker_exec("mkdir -m 755 #{sandbox_dir}"))
     shell.assert(docker_exec("chown #{uid}:#{gid} #{sandbox_dir}"))
   end
 
