@@ -117,6 +117,12 @@ class RunColourRegexTest < TestBase
         @adaptee.assert(command)
       end
     end
+    def exec(command)
+      @adaptee.exec(command)
+    end
+    def success
+      @adaptee.success
+    end
   end
 
   # - - - - - - - - - - - - - - - - -
@@ -137,6 +143,12 @@ class RunColourRegexTest < TestBase
       else
         @adaptee.assert(command)
       end
+    end
+    def exec(command)
+      @adaptee.exec(command)
+    end
+    def success
+      @adaptee.success
     end
   end
 

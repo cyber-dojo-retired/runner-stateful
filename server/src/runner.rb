@@ -144,8 +144,8 @@ class Runner # stateful
   def tar_pipe_cmd(tmp_dir, cmd = 'sh ./cyber-dojo.sh')
     # [1] is for file-stamp date-time granularity
     # This relates to the modification-date (stat %y).
-    # The tar --touch option is not available in a default
-    # Alpine container. To add it:
+    # The tar --touch option is not available in a
+    # default Alpine container. To add it:
     #    $ apk add --update tar
     # Also, in a default Alpine container the date-time
     # file-stamps have a granularity of one second. In
@@ -295,8 +295,8 @@ class Runner # stateful
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def create_container(max_seconds)
-    # The [docker run] must be guarded by argument checks
-    # because it volume mounts...
+    # The [docker run] must be guarded by earlier argument
+    # checks because it volume mounts...
     #     [docker run ... --volume ...]
     # Volume V must already exist.
     # If volume V does _not_ exist the [docker run]
@@ -465,9 +465,9 @@ class Runner # stateful
     # check is for avatar's sandboxes/ subdir and
     # not its /home/ subdir which is pre-created
     # in the docker image.
-    cmd = "[ -d #{sandbox_dir} ] || printf 'not_found'"
-    stdout = shell.assert(docker_exec(cmd))
-    stdout != 'not_found'
+    cmd = "[ -d #{sandbox_dir} ]"
+    _stdout,_stderr,status = shell.exec(docker_exec(cmd))
+    status == shell.success
   end
 
   def assert_valid_avatar_name
@@ -543,16 +543,16 @@ end
 # - - - - - - - - - - - - - - - - - - - - - - - -
 # The implementation of run_timeout_cyber_dojo_sh is
 #   o) create copies of all files off /tmp
-#   o) one tar-pipe copying /tmp files into the container
+#   o) run one tar-pipe copying /tmp files into the container
 #   o) run cyber-dojo.sh inside the container
 #
 # An alternative implementation is
 #   o) don't create copies of files off /tmp
-#   o) N tar-pipes for N files, each copying directly into the container
+#   o) run N tar-pipes, each copying one file directly into the container
 #   o) run cyber-dojo.sh inside the container
 #
 # If only one file has changed you might image this is quicker
-# but testing shows its actually a bit slower.
+# but timing shows its actually a bit slower.
 #
 # For interests sake here's how you tar pipe without the
 # intermediate /tmp files. I don't know how this would
