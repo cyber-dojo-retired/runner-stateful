@@ -429,7 +429,7 @@ class ApiTest < TestBase
 
     assert_equal   0, ulimit(:core_size)
     assert_equal 128, ulimit(:file_locks)
-    assert_equal 128, ulimit(:no_files)
+    assert_equal 256, ulimit(:no_files)
     assert_equal 128, ulimit(:processes)
 
     expected_max_data_size  =  4 * GB / KB
