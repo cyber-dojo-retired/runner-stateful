@@ -1,1 +1,1 @@
-make --always-make
+pytest *test*.py

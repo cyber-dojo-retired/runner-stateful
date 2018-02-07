@@ -10,7 +10,7 @@
 
   "image_name": "cyberdojofoundation/perl_test_simple",
 
-  "runner_choice": "stateless",
+  "runner_choice": "stateful",
 
   "filename_extension" : ".pl",
 
