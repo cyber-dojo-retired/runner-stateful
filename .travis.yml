@@ -14,5 +14,5 @@ script:
     - docker pull cyberdojofoundation/perl_test_simple
     - docker pull cyberdojofoundation/python_pytest
     #
-    - travis_wait ./pipe_build_up_test.sh \
+    - ./pipe_build_up_test.sh \
         && ./push_and_trigger.sh cyber-dojo/web
