@@ -28,13 +28,12 @@ class RunCyberDojoShTest < TestBase
       run_cyber_dojo_sh
     }
     refute_timed_out
-    assert_status 2
     assert_colour 'red'
   end
 
   # - - - - - - - - - - - - - - - - -
 
-  test 'B2B', %w( [Alpine]
+  test 'B2B', %w( [C,assert]
   when run_cyber_dojo_sh does not complete within max_seconds
   and does not produce output
   then stdout is empty,
@@ -54,7 +53,7 @@ class RunCyberDojoShTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  test '4D8', %w( [Alpine]
+  test '4D8', %w( [C,assert]
   when run_cyber_dojo_sh does not complete in max_seconds
   and produces output
   then stdout is not empty,

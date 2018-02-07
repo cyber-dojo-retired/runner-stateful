@@ -18,7 +18,7 @@ class PullTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test '9C3',
-  'false when image_name is valid but not in [docker images]' do
+  '[C,assert] false when image_name is valid but not in [docker images]' do
     mock_docker_images_prints "#{cdf}/gcc_assert"
     set_image_name "#{cdf}/ruby_mini_test:1.9.3"
     refute image_pulled?
@@ -27,7 +27,7 @@ class PullTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   test 'A44',
-  'true when image_name is valid and in [docker images]' do
+  '[C,assert] true when image_name is valid and in [docker images]' do
     mock_docker_images_prints "#{cdf}/gcc_assert"
     assert image_pulled?
   end

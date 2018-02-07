@@ -1,1 +1,1 @@
-make --always-make
+perl -I . *.t

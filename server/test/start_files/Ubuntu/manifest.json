@@ -1,18 +1,18 @@
 
 {
-  "display_name": "C++ (clang++), assert",
+  "display_name": "Perl, Test::Simple",
 
   "visible_filenames": [
-    "hiker.tests.cpp",
-    "hiker.cpp",
-    "hiker.hpp",
-    "makefile",
+    "hiker.t",
+    "hiker.perl",
     "cyber-dojo.sh"
   ],
 
-  "image_name": "cyberdojofoundation/clangpp_assert",
+  "image_name": "cyberdojofoundation/perl_test_simple",
 
-  "runner_choice": "stateful",
+  "runner_choice": "stateless",
 
-  "filename_extension" : ".cpp"
+  "filename_extension" : ".pl",
+
+  "tab_size": 4
 }
