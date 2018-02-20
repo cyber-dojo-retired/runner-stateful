@@ -1,11 +1,3 @@
-
-* [Take me to cyber-dojo's home github repo](https://github.com/cyber-dojo/cyber-dojo).
-* [Take me to the http://cyber-dojo.org site](http://cyber-dojo.org).
-
-![cyber-dojo.org home page](https://github.com/cyber-dojo/cyber-dojo/blob/master/shared/home_page_snaphot.png)
-
-- - - -
-
 [![Build Status](https://travis-ci.org/cyber-dojo/runner_stateful.svg?branch=master)](https://travis-ci.org/cyber-dojo/runner_stateful)
 
 <img src="https://raw.githubusercontent.com/cyber-dojo/nginx/master/images/home_page_logo.png"
@@ -205,3 +197,10 @@ the output.
 # demo screenshot
 
 ![red amber green demo](red_amber_green_demo.png?raw=true "red amber green demo")
+
+- - - -
+
+* [Take me to cyber-dojo's home github repo](https://github.com/cyber-dojo/cyber-dojo).
+* [Take me to the http://cyber-dojo.org site](http://cyber-dojo.org).
+
+![cyber-dojo.org home page](https://github.com/cyber-dojo/cyber-dojo/blob/master/shared/home_page_snaphot.png)
