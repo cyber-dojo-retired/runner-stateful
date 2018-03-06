@@ -203,4 +203,4 @@ the output.
 * [Take me to cyber-dojo's home github repo](https://github.com/cyber-dojo/cyber-dojo).
 * [Take me to the http://cyber-dojo.org site](http://cyber-dojo.org).
 
-![cyber-dojo.org home page](https://github.com/cyber-dojo/cyber-dojo/blob/master/shared/home_page_snaphot.png)
+![cyber-dojo.org home page](https://github.com/cyber-dojo/cyber-dojo/blob/master/shared/home_page_snapshot.png)
