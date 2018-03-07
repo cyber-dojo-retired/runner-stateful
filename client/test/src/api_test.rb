@@ -8,7 +8,7 @@ class ApiTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  multi_os_test '8A2',
+  multi_os_test '8A1',
   'os-image correspondence' do
     in_kata_as(salmon) {
       etc_issue = assert_cyber_dojo_sh('cat /etc/issue')
@@ -221,6 +221,7 @@ class ApiTest < TestBase
   'container environment properties' do
     in_kata_as(salmon) {
       assert_pid_1_is_running_init_process
+      assert_shell_is_bash
       assert_time_stamp_microseconds_granularity
       assert_env_vars_exist
       assert_avatar_users_exist
@@ -337,6 +338,17 @@ class ApiTest < TestBase
     # odd, but there _is_ an embedded nul-character
     expected = '/dev/init' + 0.chr + '--'
     assert proc1.start_with?(expected), proc1
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def assert_shell_is_bash
+    assert_equal '/bin/bash', shell
+  end
+
+  def shell
+    cmd = 'echo ${SHELL}'
+    assert_cyber_dojo_sh(cmd)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
