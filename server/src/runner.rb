@@ -141,7 +141,7 @@ class Runner # stateful
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
-  def tar_pipe_cmd(tmp_dir, cmd = 'sh ./cyber-dojo.sh')
+  def tar_pipe_cmd(tmp_dir, cmd = 'bash ./cyber-dojo.sh')
     # [1] is for file-stamp date-time granularity
     # This relates to the modification-date (stat %y).
     # The tar --touch option is not available in a
@@ -259,7 +259,7 @@ class Runner # stateful
           "--user=#{uid}:#{gid}",
           '--interactive',
           container_name,
-          "sh -c 'cd #{sandbox_dir} && sh ./cyber-dojo.sh'"
+          "sh -c 'cd #{sandbox_dir} && bash ./cyber-dojo.sh'"
         ].join(space)
       else
         save_to(files, tmp_dir)
