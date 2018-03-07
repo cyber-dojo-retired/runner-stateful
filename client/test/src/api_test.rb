@@ -221,7 +221,7 @@ class ApiTest < TestBase
   'container environment properties' do
     in_kata_as(salmon) {
       assert_pid_1_is_running_init_process
-      assert_shell_is_bash
+      assert_cyber_dojo_runs_in_bash
       assert_time_stamp_microseconds_granularity
       assert_env_vars_exist
       assert_avatar_users_exist
@@ -342,11 +342,11 @@ class ApiTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_shell_is_bash
-    assert_equal '/bin/bash', shell
+  def assert_cyber_dojo_runs_in_bash
+    assert_equal '/bin/bash', cyber_dojo_sh_shell
   end
 
-  def shell
+  def cyber_dojo_sh_shell
     cmd = 'echo ${SHELL}'
     assert_cyber_dojo_sh(cmd)
   end
