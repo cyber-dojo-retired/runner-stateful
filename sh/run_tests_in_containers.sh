@@ -53,9 +53,19 @@ fi
 
 server_status=0
 client_status=0
+
 . ${ROOT_DIR}/.env
-run_server_tests ${*}
-run_client_tests ${*}
+
+if [ "$1" = "server" ]; then
+  shift
+  run_server_tests "$@"
+elif [ "$1" = "client" ]; then
+  shift
+  run_client_tests "$@"
+else
+  run_server_tests "$@"
+  run_client_tests "$@"
+fi
 
 if [[ ( ${server_status} == 0 && ${client_status} == 0 ) ]];  then
   echo '------------------------------------------------------'
