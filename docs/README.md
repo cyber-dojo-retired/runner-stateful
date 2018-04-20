@@ -69,7 +69,7 @@ in the kata with the given kata_id.
 - - - -
 
 # POST run_cyber_dojo_sh
-Saves the unchanged files, saves the changed_files, saves the new files,
+Saves the unchanged files, the changed_files, and the new files,
 deletes the deleted_files, and runs
 cyber-dojo.sh as the avatar with the given avatar_name.
 - parameters, eg
