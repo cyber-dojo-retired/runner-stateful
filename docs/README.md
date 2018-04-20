@@ -17,36 +17,6 @@ API:
 
 - - - -
 
-# GET image_pulled?
-Asks whether the image with the given image_name has been pulled.
-- parameters, eg
-```
-  { "image_name": "cyberdojofoundation/gcc_assert",
-       "kata_id": "15B9AD6C42"
-  }
-```
-- returns true if it has, false if it hasn't.
-```
-  { "image_pulled?": true  }
-  { "image_pulled?": false }
-```
-
-# POST image_pull
-Pull the image with the given image_name.
-- parameters, eg
-```
-  { "image_name": "cyberdojofoundation/gcc_assert",
-       "kata_id": "15B9AD6C42"
-  }
-```
-- returns true if the pull succeeded, false if it failed.
-```
-  { "image_pull": true  }
-  { "image_pull": false }
-```
-
-- - - -
-
 # POST kata_new
 Sets up the kata with the given kata_id.
 Must be called once before any call to avatar_new with the same kata_id.

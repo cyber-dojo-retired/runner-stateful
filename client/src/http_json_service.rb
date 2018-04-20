@@ -3,14 +3,6 @@ require 'net/http'
 
 module HttpJsonService # mix-in
 
-  def get(method, *args)
-    name = method.to_s
-    json = http(name, jsoned_args(name, *args)) { |uri|
-      Net::HTTP::Get.new(uri)
-    }
-    result(json, name)
-  end
-
   def post(method, *args)
     name = method.to_s
     json = http(name, jsoned_args(name, *args)) { |uri|

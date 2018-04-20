@@ -31,30 +31,6 @@ class Runner # stateful
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # image
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def image_pulled?
-    cmd = 'docker images --format "{{.Repository}}"'
-    shell.assert(cmd).split("\n").include?(image_name)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def image_pull
-    # [1] The contents of stderr vary depending on Docker version
-    docker_pull = "docker pull #{image_name}"
-    _stdout,stderr,status = shell.exec(docker_pull)
-    if status == shell.success
-      return true
-    elsif stderr.include?('not found') || stderr.include?('not exist')
-      return false # [1]
-    else
-      argument_error('image_name', 'invalid')
-    end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # kata
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

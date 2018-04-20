@@ -23,16 +23,6 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def image_pulled?
-    runner.image_pulled?
-  end
-
-  def image_pull
-    runner.image_pull
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   def kata_new
     runner.kata_new
   end
@@ -142,11 +132,6 @@ class TestBase < HexMiniTest
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  #TODO?: change to image_name=
-  def set_image_name(image_name)
-    @image_name = image_name
-  end
 
   def image_name
     @image_name ||= manifest['image_name']

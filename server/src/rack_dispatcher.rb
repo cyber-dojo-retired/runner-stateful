@@ -9,10 +9,6 @@ class RackDispatcher
     @name = request.path_info[1..-1] # lose leading /
     @json_args = json_args(request)
     @args = case @name
-      when /^image_pulled$/
-        @name += '?'
-        []
-      when /^image_pull$/   then []
       when /^kata_new$/     then []
       when /^kata_old$/     then []
       when /^avatar_new$/   then [avatar_name, starting_files]
