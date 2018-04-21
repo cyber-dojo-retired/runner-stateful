@@ -14,7 +14,7 @@ class RunCyberDojoShTest < TestBase
       error = assert_raises(ArgumentError) {
         run_cyber_dojo_sh({ avatar_name: 'waterbottle' })
       }
-      assert_equal 'avatar_name:invalid', error.message
+      assert_equal 'avatar_name:!exists', error.message
     }
   end
 

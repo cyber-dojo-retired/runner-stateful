@@ -3,11 +3,11 @@
 # http://stackoverflow.com/questions/37861791/
 # https://github.com/docker/distribution/blob/master/reference/reference.go
 
-module ValidImageName # mix-in
+module WellFormedImageName # mix-in
 
   module_function
 
-  def valid_image_name?(s)
+  def well_formed_image_name?(s)
     return false if s.nil?
     hostname,remote_name = split_image_name(s)
     valid_hostname?(hostname) && valid_remote_name?(remote_name)
@@ -34,8 +34,9 @@ module ValidImageName # mix-in
 
   def valid_hostname?(hostname)
     return true if hostname == ''
+    ch = '[a-zA-Z0-9]'
+    component = "(#{ch}|#{ch}[a-zA-Z0-9-]*#{ch})"
     port = '[\d]+'
-    component = "([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])"
     hostname =~ /^(#{component}(\.#{component})*)(:(#{port}))?$/
   end
 

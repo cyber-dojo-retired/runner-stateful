@@ -1,8 +1,6 @@
 require_relative 'all_avatars_names'
-require_relative 'base58'
 require_relative 'string_cleaner'
 require_relative 'string_truncater'
-require_relative 'valid_image_name'
 require 'timeout'
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -33,9 +31,6 @@ class Runner # stateful
   def kata_new(image_name, kata_id)
     @image_name = image_name
     @kata_id = kata_id
-    assert_valid_image_name
-    assert_valid_kata_id
-
     refute_kata_exists
     create_kata_volume
     nil
@@ -44,9 +39,6 @@ class Runner # stateful
   def kata_old(image_name, kata_id)
     @image_name = image_name
     @kata_id = kata_id
-    assert_valid_image_name
-    assert_valid_kata_id
-
     assert_kata_exists
     remove_kata_volume
     nil
@@ -60,10 +52,6 @@ class Runner # stateful
     @image_name = image_name
     @kata_id = kata_id
     @avatar_name = avatar_name
-
-    assert_valid_image_name
-    assert_valid_kata_id
-
     assert_kata_exists
     in_container(3) { # max_seconds
       refute_avatar_exists
@@ -80,10 +68,6 @@ class Runner # stateful
     @image_name = image_name
     @kata_id = kata_id
     @avatar_name = avatar_name
-
-    assert_valid_image_name
-    assert_valid_kata_id
-
     assert_kata_exists
     in_container(3) { # max_seconds
       assert_avatar_exists
@@ -105,8 +89,6 @@ class Runner # stateful
     @kata_id = kata_id
     @avatar_name = avatar_name
 
-    assert_valid_image_name
-    assert_valid_kata_id
     assert_kata_exists
 
     unchanged_files = nil # we're stateful!
@@ -274,16 +256,6 @@ class Runner # stateful
   # image/container
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_valid_image_name
-    unless valid_image_name?(image_name)
-      argument_error('image_name', 'invalid')
-    end
-  end
-
-  include ValidImageName
-
-  # - - - - - - - - - - - - - - - - - - - - - - - -
-
   def in_container(max_seconds)
     create_container(max_seconds)
     begin
@@ -391,18 +363,6 @@ class Runner # stateful
   # kata
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_valid_kata_id
-    unless valid_kata_id?
-      argument_error('kata_id', 'invalid')
-    end
-  end
-
-  def valid_kata_id?
-    Base58.string?(kata_id) && kata_id.size == 10
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - -
-
   def assert_kata_exists
     unless kata_exists?
       argument_error('kata_id', '!exists')
@@ -443,14 +403,12 @@ class Runner # stateful
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_avatar_exists
-    assert_valid_avatar_name
     unless avatar_exists?
       argument_error('avatar_name', '!exists')
     end
   end
 
   def refute_avatar_exists
-    assert_valid_avatar_name
     if avatar_exists?
       argument_error('avatar_name', 'exists')
     end
@@ -465,18 +423,6 @@ class Runner # stateful
     status == shell.success
   end
 
-  def assert_valid_avatar_name
-    unless valid_avatar_name?
-      argument_error('avatar_name', 'invalid')
-    end
-  end
-
-  def valid_avatar_name?
-    all_avatars_names.include?(avatar_name)
-  end
-
-  include AllAvatarsNames
-
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def group
@@ -490,6 +436,8 @@ class Runner # stateful
   def uid
     40000 + all_avatars_names.index(avatar_name)
   end
+
+  include AllAvatarsNames
 
   def sandbox_dir
     "#{sandboxes_root_dir}/#{avatar_name}"

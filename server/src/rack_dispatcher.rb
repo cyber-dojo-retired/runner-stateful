@@ -1,19 +1,28 @@
-require_relative 'runner'
-require 'json'
+require_relative 'well_formed_args'
 require 'rack'
 
-class RackDispatcher
+class RackDispatcher # stateful
 
   def initialize(runner)
     @runner = runner
   end
 
   def call(env, request = Rack::Request.new(env))
-    @name = request.path_info[1..-1] # lose leading /
-    @json_args = json_args(request)
-    @args = case @name
-      when /^kata_new$/     then [image_name, kata_id]
-      when /^kata_old$/     then [image_name, kata_id]
+    name, args = name_args(request)
+    triple({ name => @runner.public_send(name, *args) })
+  rescue => error
+    #puts error.backtrace
+    triple({ 'exception' => error.message })
+  end
+
+  private # = = = = = = = = = = = =
+
+  def name_args(request)
+    name = request.path_info[1..-1] # lose leading /
+    @well_formed_args = WellFormedArgs.new(request.body.read)
+    args = case name
+      when /^kata_new$/,
+           /^kata_old$/     then [image_name, kata_id]
       when /^avatar_new$/   then [image_name, kata_id, avatar_name, starting_files]
       when /^avatar_old$/   then [image_name, kata_id, avatar_name]
       when /^run_cyber_dojo_sh$/
@@ -21,71 +30,32 @@ class RackDispatcher
          new_files, deleted_files, unchanged_files, changed_files,
          max_seconds]
       else
-        @name = nil
-        []
-      end
-    [ 200, { 'Content-Type' => 'application/json' }, [ invoke.to_json ] ]
-  end
-
-  private # = = = = = = = = = = = =
-
-  def invoke
-    { @name => @runner.public_send(@name, *@args) }
-  rescue Exception => error
-    #log << "EXCEPTION: #{e.class.name}.#{@name} #{e.message}"
-    { 'exception' => error.message }
-  end
-
-  # - - - - - - - - - - - - - - - -
-
-  def json_args(request)
-    args = JSON.parse(request.body.read)
-    if args.class.name != 'Hash'
-      #TODO: log << ...
-      args = {}
+        raise ArgumentError, 'json:malformed'
     end
-    args
-  rescue StandardError => error
-    #log << "EXCEPTION: #{e.class.name}.#{@name} #{e.message}"
-    {}
+    [name, args]
   end
 
   # - - - - - - - - - - - - - - - -
 
-  def image_name
-    @json_args[__method__.to_s]
+  def triple(body)
+    [ 200, { 'Content-Type' => 'application/json' }, [ body.to_json ] ]
   end
 
-  def kata_id
-    @json_args[__method__.to_s]
+  # - - - - - - - - - - - - - - - -
+
+  def self.well_formed_args(*names)
+      names.each do |name|
+        define_method name, &lambda { @well_formed_args.send(name) }
+      end
   end
 
-  def avatar_name
-    @json_args[__method__.to_s]
-  end
-
-  def starting_files
-    @json_args[__method__.to_s]
-  end
-
-  def new_files
-    @json_args[__method__.to_s]
-  end
-
-  def deleted_files
-    @json_args[__method__.to_s]
-  end
-
-  def unchanged_files
-    @json_args[__method__.to_s]
-  end
-
-  def changed_files
-    @json_args[__method__.to_s]
-  end
-
-  def max_seconds
-    @json_args[__method__.to_s]
-  end
-
+  well_formed_args :image_name,
+                   :kata_id,
+                   :avatar_name,
+                   :starting_files,
+                   :new_files,
+                   :deleted_files,
+                   :unchanged_files,
+                   :changed_files,
+                   :max_seconds
 end
