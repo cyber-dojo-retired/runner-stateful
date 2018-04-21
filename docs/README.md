@@ -92,7 +92,7 @@ cyber-dojo.sh, and colour.
 If the run did not complete in max_seconds, colour will be "timed_out".
 eg
 ```
-    { "run": {
+    { "run_cyber_dojo_sh": {
         "stdout": "...",
         "stderr": "...",
         "status": 137,
@@ -103,7 +103,7 @@ eg
 If the run completed in max_seconds, colour will be "red", "amber", or "green".
 eg
 ```
-    { "run": {
+    { "run_cyber_dojo_sh": {
         "stdout": "makefile:17: recipe for target 'test' failed\n",
         "stderr": "invalid suffix sss on integer constant",
         "status": 2,
@@ -159,10 +159,10 @@ Calls the runner-server's micro-service methods and displays their json
 results and how long they took. If the runner-client's IP address is
 192.168.99.100 then put 192.168.99.100:4558 into your browser to see
 the output.
+- grey: tests did not complete (in 3 seconds)
 - red: tests ran but failed
 - amber: tests did not run (syntax error)
 - green: tests test and passed
-- grey: tests did not complete (in 3 seconds)
 
 # demo screenshot
 
