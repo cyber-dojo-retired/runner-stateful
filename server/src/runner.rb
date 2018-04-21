@@ -99,9 +99,21 @@ class Runner # stateful
         shell.assert(docker_exec("rm #{sandbox_dir}/#{pathed_filename}"))
       end
       run_timeout_cyber_dojo_sh(all_files, max_seconds)
-      @colour = @timed_out ? 'timed_out' : red_amber_green
+      if @timed_out
+        @colour = 'timed_out'
+        @files = {}
+      else
+        @colour = red_amber_green
+        @files = {} # ready for tar-pipe out
+      end
     }
-    { stdout:@stdout, stderr:@stderr, status:@status, colour:@colour }
+    {
+      files:@files,
+      stdout:@stdout,
+      stderr:@stderr,
+      status:@status,
+      colour:@colour
+    }
   end
 
   private # = = = = = = = = = = = = = = = = = = = = = = = =
@@ -229,10 +241,9 @@ class Runner # stateful
   def rag_lambda
     # In a crippled container (eg fork-bomb)
     # the [docker exec] will mostly likely raise.
-    cmd = 'cat /usr/local/bin/red_amber_green.rb'
-    docker_cmd = "docker exec #{container_name} bash -c '#{cmd}'"
-    rag_lambda = shell.assert(docker_cmd)
-    eval(rag_lambda)
+    cat_cmd = 'cat /usr/local/bin/red_amber_green.rb'
+    src = shell.assert(docker_exec(cat_cmd))
+    eval(src)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
@@ -427,6 +438,8 @@ class Runner # stateful
     status == shell.success
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+  # avatar
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def group
