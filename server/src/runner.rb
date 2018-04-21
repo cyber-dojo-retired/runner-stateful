@@ -21,6 +21,7 @@ class Runner # stateful
 
   def initialize(external)
     @external = external
+    @rags = {}
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -206,23 +207,32 @@ class Runner # stateful
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
+  # red-amber-green colour of stdout,stderr,status
+  # - - - - - - - - - - - - - - - - - - - - - -
 
   def red_amber_green
     # @stdout and @stderr have been truncated and cleaned.
-    begin
-      # In a crippled container (eg fork-bomb)
-      # the [docker exec] will mostly likely raise.
-      cat_cmd = 'cat /usr/local/bin/red_amber_green.rb'
-      rag_lambda = shell.assert(docker_exec(cat_cmd))
-      rag = eval(rag_lambda)
-      colour = rag.call(@stdout, @stderr, @status).to_s
-      unless ['red','amber','green'].include? colour
-        colour = 'amber'
-      end
-      colour
-    rescue
-      'amber'
+    # Caching the rag-lambdas typically saves
+    # about 0.15 seconds per [test] event.
+    @rags[image_name] ||= rag_lambda
+    colour = @rags[image_name].call(@stdout, @stderr, @status)
+    unless [:red,:amber,:green].include?(colour)
+      colour = :amber
     end
+    colour.to_s
+  rescue
+    'amber'
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - -
+
+  def rag_lambda
+    # In a crippled container (eg fork-bomb)
+    # the [docker exec] will mostly likely raise.
+    cmd = 'cat /usr/local/bin/red_amber_green.rb'
+    docker_cmd = "docker exec #{container_name} bash -c '#{cmd}'"
+    rag_lambda = shell.assert(docker_cmd)
+    eval(rag_lambda)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
