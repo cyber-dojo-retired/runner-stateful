@@ -1,12 +1,28 @@
 require_relative 'hex_mini_test'
 require_relative '../../src/all_avatars_names'
-require_relative '../../src/externals'
+require_relative '../../src/external'
 require_relative '../../src/runner'
 require 'json'
 
 class TestBase < HexMiniTest
 
-  include Externals
+  def external
+    @external ||= External.new
+  end
+
+  def shell
+    external.shell
+  end
+
+  def log
+    external.log
+  end
+
+  def runner
+    Runner.new(external)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def self.multi_os_test(hex_suffix, *lines, &block)
     alpine_lines = ['[Alpine]'] + lines
@@ -17,28 +33,22 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def runner
-    Runner.new(self, image_name, kata_id)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   def kata_new
-    runner.kata_new
+    runner.kata_new(image_name, kata_id)
   end
 
   def kata_old
-    runner.kata_old
+    runner.kata_old(image_name, kata_id)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def avatar_new(name = 'salmon')
-    runner.avatar_new(@avatar_name = name, @previous_files = starting_files)
+    runner.avatar_new(image_name, kata_id, @avatar_name = name, @previous_files = starting_files)
   end
 
   def avatar_old(name = avatar_name)
-    runner.avatar_old(name)
+    runner.avatar_old(image_name, kata_id, name)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -68,6 +78,7 @@ class TestBase < HexMiniTest
     end
 
     @quad = runner.run_cyber_dojo_sh(
+      image_name, kata_id,
       defaulted_arg(named_args, :avatar_name, avatar_name),
       new_files, deleted_files, unchanged_files, changed_files,
       defaulted_arg(named_args, :max_seconds, 10)
@@ -207,12 +218,6 @@ class TestBase < HexMiniTest
     yield
   ensure
     avatar_old(name)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def cdf
-    'cyberdojofoundation'
   end
 
   private

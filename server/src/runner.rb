@@ -21,26 +21,32 @@ require 'timeout'
 
 class Runner # stateful
 
-  def initialize(external, image_name, kata_id)
+  def initialize(external)
     @disk = external.disk
     @shell = external.shell
-    @image_name = image_name
-    @kata_id = kata_id
-    assert_valid_image_name
-    assert_valid_kata_id
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # kata
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def kata_new
+  def kata_new(image_name, kata_id)
+    @image_name = image_name
+    @kata_id = kata_id
+    assert_valid_image_name
+    assert_valid_kata_id
+
     refute_kata_exists
     create_kata_volume
     nil
   end
 
-  def kata_old
+  def kata_old(image_name, kata_id)
+    @image_name = image_name
+    @kata_id = kata_id
+    assert_valid_image_name
+    assert_valid_kata_id
+
     assert_kata_exists
     remove_kata_volume
     nil
@@ -50,8 +56,14 @@ class Runner # stateful
   # avatar
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def avatar_new(avatar_name, starting_files)
+  def avatar_new(image_name, kata_id, avatar_name, starting_files)
+    @image_name = image_name
+    @kata_id = kata_id
     @avatar_name = avatar_name
+
+    assert_valid_image_name
+    assert_valid_kata_id
+
     assert_kata_exists
     in_container(3) { # max_seconds
       refute_avatar_exists
@@ -64,8 +76,14 @@ class Runner # stateful
     nil
   end
 
-  def avatar_old(avatar_name)
+  def avatar_old(image_name, kata_id, avatar_name)
+    @image_name = image_name
+    @kata_id = kata_id
     @avatar_name = avatar_name
+
+    assert_valid_image_name
+    assert_valid_kata_id
+
     assert_kata_exists
     in_container(3) { # max_seconds
       assert_avatar_exists
@@ -79,12 +97,18 @@ class Runner # stateful
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run_cyber_dojo_sh(
-    avatar_name,
+    image_name, kata_id, avatar_name,
     new_files, deleted_files, unchanged_files, changed_files,
     max_seconds
   )
+    @image_name = image_name
+    @kata_id = kata_id
     @avatar_name = avatar_name
+
+    assert_valid_image_name
+    assert_valid_kata_id
     assert_kata_exists
+
     unchanged_files = nil # we're stateful!
     all_files = [*changed_files, *new_files].to_h
     in_container(max_seconds) {

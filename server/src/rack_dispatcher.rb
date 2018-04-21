@@ -1,20 +1,23 @@
-require_relative 'externals'
 require_relative 'runner'
 require 'json'
 require 'rack'
 
 class RackDispatcher
 
+  def initialize(runner)
+    @runner = runner
+  end
+
   def call(env, request = Rack::Request.new(env))
     @name = request.path_info[1..-1] # lose leading /
     @json_args = json_args(request)
     @args = case @name
-      when /^kata_new$/     then []
-      when /^kata_old$/     then []
-      when /^avatar_new$/   then [avatar_name, starting_files]
-      when /^avatar_old$/   then [avatar_name]
+      when /^kata_new$/     then [image_name, kata_id]
+      when /^kata_old$/     then [image_name, kata_id]
+      when /^avatar_new$/   then [image_name, kata_id, avatar_name, starting_files]
+      when /^avatar_old$/   then [image_name, kata_id, avatar_name]
       when /^run_cyber_dojo_sh$/
-        [avatar_name,
+        [image_name, kata_id, avatar_name,
          new_files, deleted_files, unchanged_files, changed_files,
          max_seconds]
       else
@@ -27,11 +30,10 @@ class RackDispatcher
   private # = = = = = = = = = = = =
 
   def invoke
-    runner = Runner.new(self, image_name, kata_id)
-    { @name => runner.public_send(@name, *@args) }
-  rescue Exception => e
-    log << "EXCEPTION: #{e.class.name}.#{@name} #{e.message}"
-    { 'exception' => e.message }
+    { @name => @runner.public_send(@name, *@args) }
+  rescue Exception => error
+    #log << "EXCEPTION: #{e.class.name}.#{@name} #{e.message}"
+    { 'exception' => error.message }
   end
 
   # - - - - - - - - - - - - - - - -
@@ -43,14 +45,12 @@ class RackDispatcher
       args = {}
     end
     args
-  rescue StandardError => e
-    log << "EXCEPTION: #{e.class.name}.#{@name} #{e.message}"
+  rescue StandardError => error
+    #log << "EXCEPTION: #{e.class.name}.#{@name} #{e.message}"
     {}
   end
 
   # - - - - - - - - - - - - - - - -
-
-  include Externals
 
   def image_name
     @json_args[__method__.to_s]

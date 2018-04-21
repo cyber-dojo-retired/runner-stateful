@@ -2,10 +2,13 @@ require_relative 'disk'
 require_relative 'shell_basher'
 require_relative 'logger_stdout'
 
-module Externals # mix-in
+class External
 
   def shell
     @shell ||= ShellBasher.new(self)
+  end
+  def shell=(doppel)
+    @shell = doppel
   end
 
   def disk
