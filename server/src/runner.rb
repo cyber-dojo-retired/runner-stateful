@@ -20,8 +20,7 @@ require 'timeout'
 class Runner # stateful
 
   def initialize(external)
-    @disk = external.disk
-    @shell = external.shell
+    @external = external
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -107,8 +106,6 @@ class Runner # stateful
   private # = = = = = = = = = = = = = = = = = = = = = = = =
 
   attr_reader :image_name, :kata_id, :avatar_name
-
-  attr_reader :disk, :shell
 
   def save_to(files, tmp_dir)
     files.each do |pathed_filename, content|
@@ -201,15 +198,12 @@ class Runner # stateful
     ensure
       w_stdout.close unless w_stdout.closed?
       w_stderr.close unless w_stderr.closed?
-      @stdout = truncated(cleaned(r_stdout.read))
-      @stderr = truncated(cleaned(r_stderr.read))
+      @stdout = sanitized(r_stdout.read)
+      @stderr = sanitized(r_stderr.read)
       r_stdout.close
       r_stderr.close
     end
   end
-
-  include StringCleaner
-  include StringTruncater
 
   # - - - - - - - - - - - - - - - - - - - - - -
 
@@ -478,9 +472,30 @@ class Runner # stateful
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - -
+  # helpers
+  # - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  include StringCleaner
+  include StringTruncater
+
+  def sanitized(string)
+    truncated(cleaned(string))
+  end
 
   def space
     ' '
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - -
+  # externals
+  # - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def disk
+    @external.disk
+  end
+
+  def shell
+    @external.shell
   end
 
 end
