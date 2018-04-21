@@ -223,7 +223,7 @@ class Runner # stateful
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def red_amber_green
-    # @stdout and @stderr have been truncated and cleaned.
+    # @stdout and @stderr have been sanitized.
     # Caching the rag-lambdas typically saves
     # about 0.15 seconds per [test] event.
     @rags[image_name] ||= rag_lambda
@@ -442,6 +442,8 @@ class Runner # stateful
   # avatar
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
+  include AllAvatarsNames
+
   def group
     'cyber-dojo'
   end
@@ -453,8 +455,6 @@ class Runner # stateful
   def uid
     40000 + all_avatars_names.index(avatar_name)
   end
-
-  include AllAvatarsNames
 
   def sandbox_dir
     "#{sandboxes_root_dir}/#{avatar_name}"
