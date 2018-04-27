@@ -3,21 +3,21 @@ version: '2.2'
 
 services:
 
-  runner_stateful_client:
+  runner-stateful-client:
     build:
       context: client
       args:
         - CYBER_DOJO_HOME=${CYBER_DOJO_HOME}
         - PORT=${CYBER_DOJO_RUNNER_CLIENT_PORT}
     user: nobody
-    image: cyberdojo/runner_stateful_client
+    image: cyberdojo/runner-stateful-client
     init: true
-    container_name: test_runner_stateful_client
+    container_name: test-runner-stateful-client
     read_only: true
     tmpfs: /tmp
     restart: 'no'
     depends_on:
-      - runner_stateful
+      - runner-stateful
     environment:
       - CYBER_DOJO_RUNNER_SERVICE_NAME
       - CYBER_DOJO_RUNNER_SERVICE_PORT
@@ -27,16 +27,16 @@ services:
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  runner_stateful:
+  runner-stateful:
     build:
       context: server
       args:
         - CYBER_DOJO_HOME=${CYBER_DOJO_HOME}
         - PORT=${CYBER_DOJO_RUNNER_SERVICE_PORT}
     user: root
-    image: cyberdojo/runner_stateful
+    image: cyberdojo/runner-stateful
     init: true
-    container_name: test_runner_stateful_server
+    container_name: test-runner-stateful-server
     read_only: true
     tmpfs: /tmp
     restart: 'no'
