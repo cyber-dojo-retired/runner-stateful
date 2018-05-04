@@ -55,11 +55,7 @@ class Runner # stateful
     assert_kata_exists
     in_container(3) { # max_seconds
       refute_avatar_exists
-      make_and_chown_dirs
-      Dir.mktmpdir { |tmp_dir|
-        save_to(starting_files, tmp_dir)
-        shell.assert(tar_pipe_cmd(tmp_dir, 'true'))
-      }
+      in_container_avatar_new(starting_files)
     }
     nil
   end
@@ -89,12 +85,10 @@ class Runner # stateful
     @kata_id = kata_id
     @avatar_name = avatar_name
 
-    assert_kata_exists
-
-    unchanged_files = nil # we're stateful!
+    ensure_kata_exists
     all_files = [*changed_files, *new_files].to_h
     in_container(max_seconds) {
-      assert_avatar_exists
+      ensure_avatar_exists(unchanged_files)
       deleted_files.each_key do |pathed_filename|
         shell.assert(docker_exec("rm #{sandbox_dir}/#{pathed_filename}"))
       end
@@ -373,6 +367,31 @@ class Runner # stateful
   KB = 1024
   MB = 1024 * KB
   GB = 1024 * MB
+
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+  # resurrection
+  # assume revisiting a kata the collector has collected.
+  # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def ensure_kata_exists
+    unless kata_exists?
+      kata_new(@image_name, @kata_id)
+    end
+  end
+
+  def ensure_avatar_exists(files)
+    unless avatar_exists?
+      in_container_avatar_new(files)
+    end
+  end
+
+  def in_container_avatar_new(starting_files)
+    make_and_chown_dirs
+    Dir.mktmpdir { |tmp_dir|
+      save_to(starting_files, tmp_dir)
+      shell.assert(tar_pipe_cmd(tmp_dir, 'true'))
+    }
+  end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
   # kata

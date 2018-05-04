@@ -8,18 +8,6 @@ class RunCyberDojoShTest < TestBase
 
   # - - - - - - - - - - - - - - - - -
 
-  multi_os_test '4CC',
-  %w( invalid avatar_name raises ) do
-    in_kata_as('salmon') {
-      error = assert_raises(ArgumentError) {
-        run_cyber_dojo_sh({ avatar_name: 'waterbottle' })
-      }
-      assert_equal 'avatar_name:!exists', error.message
-    }
-  end
-
-  # - - - - - - - - - - - - - - - - -
-
   multi_os_test '8A5',
   %w( when run_cyber_dojo_sh completes within max_seconds
       then the colour is 'red'/'amber'/'green'
