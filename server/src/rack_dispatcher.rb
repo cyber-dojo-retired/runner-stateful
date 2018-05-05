@@ -1,15 +1,19 @@
+require_relative 'external'
+require_relative 'runner'
 require_relative 'well_formed_args'
 require 'rack'
 
 class RackDispatcher # stateful
 
-  def initialize(runner)
-    @runner = runner
+  def initialize(cache)
+    @cache = cache
   end
 
   def call(env, request = Rack::Request.new(env))
+    external = External.new
     name, args = name_args(request)
-    triple({ name => @runner.public_send(name, *args) })
+    runner = Runner.new(external, @cache)
+    triple({ name => runner.public_send(name, *args) })
   rescue => error
     #puts error.backtrace
     triple({ 'exception' => error.message })

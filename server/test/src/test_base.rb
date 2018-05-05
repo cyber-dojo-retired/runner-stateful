@@ -10,16 +10,22 @@ class TestBase < HexMiniTest
     @external ||= External.new
   end
 
+  def cache
+    @cache ||= RagLambdaCache.new
+  end
+
+  def runner
+    Runner.new(external, cache)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   def shell
     external.shell
   end
 
   def log
     external.log
-  end
-
-  def runner
-    Runner.new(external)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
