@@ -95,18 +95,17 @@ class Runner # stateful
       run_timeout_cyber_dojo_sh(all_files, max_seconds)
       if @timed_out
         @colour = 'timed_out'
-        @files = {}
       else
         @colour = red_amber_green
-        @files = {} # ready for tar-pipe out
       end
     }
     {
-      files:@files,
       stdout:@stdout,
       stderr:@stderr,
       status:@status,
-      colour:@colour
+      colour:@colour,
+      new_files:{},     # ready for tar-pipe-out
+      deleted_files:{}  # ready for tar-pipe-out
     }
   end
 
