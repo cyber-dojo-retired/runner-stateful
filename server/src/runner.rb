@@ -104,8 +104,9 @@ class Runner # stateful
       stderr:@stderr,
       status:@status,
       colour:@colour,
-      new_files:{},     # ready for tar-pipe-out
-      deleted_files:{}  # ready for tar-pipe-out
+      new_files:{},      # ready for tar-pipe-out
+      deleted_files:{},  # ready for tar-pipe-out
+      changed_files:{}   # ready for tar-pipe-out
     }
   end
 
