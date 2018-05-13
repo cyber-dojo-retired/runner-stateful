@@ -82,7 +82,7 @@ class TestBase < HexMiniTest
     args << changed_files
     args << defaulted_arg(named_args, :max_seconds, 10)
 
-    @quad = runner.run_cyber_dojo_sh *args
+    @result = runner.run_cyber_dojo_sh *args
 
     @all_files = [ *unchanged_files, *changed_files, *new_files ].to_h
     nil
@@ -90,12 +90,30 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  attr_reader :result
+
   def stdout
-    quad['stdout']
+    result['stdout']
   end
 
   def stderr
-    quad['stderr']
+    result['stderr']
+  end
+
+  def colour
+    result['colour']
+  end
+
+  def new_files
+    result['new_files']
+  end
+
+  def deleted_files
+    result['deleted_files']
+  end
+
+  def changed_files
+    result['changed_files']
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -122,7 +140,7 @@ class TestBase < HexMiniTest
     run_cyber_dojo_sh({
       changed_files: { 'cyber-dojo.sh' => sh_script }
     })
-    refute timed_out?, quad
+    refute timed_out?, result
     assert_equal '', stderr
     stdout.strip
   end
@@ -241,18 +259,6 @@ class TestBase < HexMiniTest
 
   def defaulted_arg(named_args, arg_name, arg_default)
     named_args.key?(arg_name) ? named_args[arg_name] : arg_default
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def quad
-    @quad
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def colour
-    quad['colour']
   end
 
 end
