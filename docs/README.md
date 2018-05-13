@@ -87,30 +87,40 @@ cyber-dojo.sh as the avatar with the given avatar_name.
           "max_seconds": 10
   }
 ```
-- returns stdout, stderr, status, as the results of calling
-cyber-dojo.sh, and colour.
-If the run did not complete in max_seconds, colour will be "timed_out".
-eg
-```
-    { "run_cyber_dojo_sh": {
-        "stdout": "...",
-        "stderr": "...",
-        "status": 137,
-        "colour:"timed_out"
-      }
-    }
-```
-If the run completed in max_seconds, colour will be "red", "amber", or "green".
+- returns [stdout, stderr, status, colour] as the results of
+executing cyber-dojo.sh
+- returns [new_files, deleted_files, changed_files] which are text files
+altered by executing cyber-dojo.sh
+- if the execution completed in max_seconds, colour will be "red", "amber", or "green".
+- if the execution did not complete in max_seconds, colour will be "timed_out".
+
 eg
 ```
     { "run_cyber_dojo_sh": {
         "stdout": "makefile:17: recipe for target 'test' failed\n",
         "stderr": "invalid suffix sss on integer constant",
         "status": 2,
-        "colour": "amber"
+        "colour": "amber",
+        "new_files":{ ... },
+        "deleted_files":{},
+        "changed_files":{ ... }
       }
     }
 ```
+eg
+```
+    { "run_cyber_dojo_sh": {
+        "stdout": "...",
+        "stderr": "...",
+        "status": 137,
+        "colour:"timed_out",
+        "new_files":{},
+        "deleted_files":{},
+        "changed_files":{}
+      }
+    }
+```
+
 The [traffic-light colour](http://blog.cyber-dojo.org/2014/10/cyber-dojo-traffic-lights.html)
 is determined by passing stdout, stderr, and status to a Ruby lambda, read from the
 named image, at /usr/local/bin/red_amber_green.rb.
@@ -162,7 +172,7 @@ the output.
 - grey: tests did not complete (in 3 seconds)
 - red: tests ran but failed
 - amber: tests did not run (syntax error)
-- green: tests test and passed
+- green: tests ran and passed
 
 # demo screenshot
 
