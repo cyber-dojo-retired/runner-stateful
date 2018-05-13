@@ -128,13 +128,13 @@ class RoundTripTest < TestBase
   private # = = = = = = = = = = = = =
 
   def all_OSes
-    [ :Alpine ] #, :Ubuntu, :Debian ]
+    [ :Alpine, :Ubuntu ] #, :Debian ]
   end
 
   def src_file(os)
     case os
     when :Alpine then 'Hiker.cs'
-    #when :Ubuntu then 'hiker.pl'
+    when :Ubuntu then 'hiker.pl'
     #when :Debian then 'hiker.py'
     end
   end

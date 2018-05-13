@@ -193,7 +193,7 @@ class TestBase < HexMiniTest
   end
 
   def manifest
-    @manifest ||= JSON.parse(IO.read("#{starting_files_dir}/manifest.json"))
+    JSON.parse(IO.read("#{starting_files_dir}/manifest.json"))
   end
 
   def starting_files_dir
