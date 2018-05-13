@@ -14,16 +14,6 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def in_kata_as(name)
-    in_kata {
-      as(name) {
-        yield
-      }
-    }
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   def runner
     RunnerService.new
   end
@@ -31,11 +21,13 @@ class TestBase < HexMiniTest
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def kata_new(named_args = {})
-    runner.kata_new *common_args(named_args)
+    runner.kata_new(*common_args(named_args))
+    nil
   end
 
   def kata_old(named_args={})
-    runner.kata_old *common_args(named_args)
+    runner.kata_old(*common_args(named_args))
+    nil
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -44,15 +36,17 @@ class TestBase < HexMiniTest
     args = common_args(named_args)
     args << defaulted_arg(named_args, :avatar_name,    avatar_name)
     args << defaulted_arg(named_args, :starting_files, starting_files)
-    runner.avatar_new *args
+    runner.avatar_new(*args)
     @avatar_name = args[-2]
     @all_files = args[-1]
+    nil
   end
 
   def avatar_old(named_args = {})
     args = common_args(named_args)
     args << defaulted_arg(named_args, :avatar_name, avatar_name)
-    runner.avatar_old *args
+    runner.avatar_old(*args)
+    nil
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -82,7 +76,7 @@ class TestBase < HexMiniTest
     args << changed_files
     args << defaulted_arg(named_args, :max_seconds, 10)
 
-    @result = runner.run_cyber_dojo_sh *args
+    @json = runner.run_cyber_dojo_sh(*args)
 
     @all_files = [ *unchanged_files, *changed_files, *new_files ].to_h
     nil
@@ -90,30 +84,36 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  attr_reader :result
+  def json
+    # If I change this to result/@result
+    # then it clashes with result from http_json_service
+    # which I do not understand as it does not look like
+    # it is in scope?
+    @json
+  end
 
   def stdout
-    result['stdout']
+    json['stdout']
   end
 
   def stderr
-    result['stderr']
+    json['stderr']
   end
 
   def colour
-    result['colour']
+    json['colour']
   end
 
   def new_files
-    result['new_files']
+    json['new_files']
   end
 
   def deleted_files
-    result['deleted_files']
+    json['deleted_files']
   end
 
   def changed_files
-    result['changed_files']
+    json['changed_files']
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -140,7 +140,7 @@ class TestBase < HexMiniTest
     run_cyber_dojo_sh({
       changed_files: { 'cyber-dojo.sh' => sh_script }
     })
-    refute timed_out?, result
+    refute timed_out?, json
     assert_equal '', stderr
     stdout.strip
   end
@@ -224,13 +224,29 @@ class TestBase < HexMiniTest
     end
   end
 
-  private
+  private # = = = = = = = = = = = =
 
   def common_args(named_args)
     args = []
     args << defaulted_arg(named_args, :image_name, image_name)
     args << defaulted_arg(named_args, :kata_id,    kata_id)
     args
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def defaulted_arg(named_args, arg_name, arg_default)
+    named_args.key?(arg_name) ? named_args[arg_name] : arg_default
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def in_kata_as(name)
+    in_kata {
+      as(name) {
+        yield
+      }
+    }
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -253,12 +269,6 @@ class TestBase < HexMiniTest
     ensure
       avatar_old({ avatar_name: name })
     end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def defaulted_arg(named_args, arg_name, arg_default)
-    named_args.key?(arg_name) ? named_args[arg_name] : arg_default
   end
 
 end

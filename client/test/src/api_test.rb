@@ -299,7 +299,7 @@ class ApiTest < TestBase
       })
       assert timed_out? ||
         printed?('All tests passed') ||
-          printed?('fork()'), quad
+          printed?('fork()'), json
     }
   end
 
@@ -314,7 +314,7 @@ class ApiTest < TestBase
       cant_fork = (os == :Alpine ? "can't fork" : 'Cannot fork')
       assert timed_out? ||
         printed?(cant_fork) ||
-          printed?('bomb'), quad
+          printed?('bomb'), json
     }
   end
 
@@ -326,9 +326,9 @@ class ApiTest < TestBase
       run_cyber_dojo_sh({
         changed_files: { 'hiker.c' => exhaust_file_handles }
       })
-      assert printed?('All tests passed'), quad
-      assert printed?('fopen() != NULL'),  quad
-      assert printed?('fopen() == NULL'),  quad
+      assert printed?('All tests passed'), json
+      assert printed?('fopen() != NULL'),  json
+      assert printed?('fopen() == NULL'),  json
     }
   end
 
@@ -422,7 +422,7 @@ class ApiTest < TestBase
     run_cyber_dojo_sh({
       changed_files: { 'cyber-dojo.sh' => stat_cmd }
     })
-    assert amber?, quad # doing an stat
+    assert amber?, json # doing a stat
     assert_equal '', stderr
     assert_equal starting_files.keys.sort, stdout_stats.keys.sort
     starting_files.each do |filename,content|
