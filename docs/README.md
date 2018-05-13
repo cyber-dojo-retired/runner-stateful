@@ -17,6 +17,19 @@ API:
 
 - - - -
 
+## GET sha
+Returns the git commit sha used to create the docker image.
+- parameters, none
+```
+  {}
+```
+- returns the sha, eg
+```
+  { "sha": "b28b3e13c0778fe409a50d23628f631f87920ce5" }
+```
+
+- - - -
+
 # POST kata_new
 Sets up the kata with the given kata_id.
 Must be called once before any call to avatar_new with the same kata_id.

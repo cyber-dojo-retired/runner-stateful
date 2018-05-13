@@ -25,6 +25,7 @@ class RackDispatcher # stateful
     name = request.path_info[1..-1] # lose leading /
     @well_formed_args = WellFormedArgs.new(request.body.read)
     args = case name
+      when /^sha$/          then []
       when /^kata_new$/,
            /^kata_old$/     then [image_name, kata_id]
       when /^avatar_new$/   then [image_name, kata_id, avatar_name, starting_files]

@@ -39,6 +39,12 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  def sha
+    runner.sha
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
   def kata_new
     runner.kata_new(image_name, kata_id)
   end

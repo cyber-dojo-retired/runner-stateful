@@ -27,6 +27,12 @@ class Runner # stateful
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def sha
+    IO.read('/app/sha.txt').strip
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # kata
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
