@@ -50,7 +50,9 @@ class TestBase < HexMiniTest
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def avatar_new(name = 'salmon')
-    runner.avatar_new(image_name, kata_id, @avatar_name = name, @previous_files = starting_files)
+    @avatar_name = name
+    @previous_files = starting_files
+    runner.avatar_new(image_name, kata_id, @avatar_name, @previous_files)
   end
 
   def avatar_old(name = avatar_name)
