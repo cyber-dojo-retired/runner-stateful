@@ -1,6 +1,8 @@
 require_relative 'all_avatars_names'
+require_relative 'file_delta'
 require_relative 'string_cleaner'
 require_relative 'string_truncater'
+require 'find'
 require 'timeout'
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -93,20 +95,17 @@ class Runner # stateful
         shell.assert(docker_exec("rm #{sandbox_dir}/#{pathed_filename}"))
       end
       run_timeout_cyber_dojo_sh(all_files, max_seconds)
-      if @timed_out
-        @colour = 'timed_out'
-      else
-        @colour = red_amber_green
-      end
+      set_colour
+      set_file_delta(all_files.merge(unchanged_files))
     }
     {
       stdout:@stdout,
       stderr:@stderr,
       status:@status,
       colour:@colour,
-      new_files:{},      # ready for tar-pipe-out
-      deleted_files:{},  # ready for tar-pipe-out
-      changed_files:{}   # ready for tar-pipe-out
+      new_files:@new_files,
+      deleted_files:@deleted_files,
+      changed_files:@changed_files
     }
   end
 
@@ -126,6 +125,64 @@ class Runner # stateful
     end
   end
 
+  # - - - - - - - - - - - - - - - - - - - - - -
+
+  def read_from(tmp_dir)
+    # eg tmp_dir = /tmp/.../sandboxes/bee
+    files = {}
+    Find.find(tmp_dir) do |pathed_filename|
+      # eg pathed_filename =
+      # '/tmp/.../sandboxes/bee/features/shouty.feature
+      unless File.directory?(pathed_filename)
+        content = File.read(pathed_filename)
+        filename = pathed_filename[tmp_dir.size+1..-1]
+        # eg filename = features/shouty.feature
+        files[filename] = sanitized(content)
+      end
+    end
+    files
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - -
+
+  def run_timeout(cmd, max_seconds)
+    # The [docker exec] running on the _host_ is
+    # killed by Process.kill. This does _not_ kill
+    # the cyber-dojo.sh running _inside_ the docker
+    # container. The container is killed in the ensure
+    # block of in_container()
+    # See https://github.com/docker/docker/issues/9098
+    # 137=128+9 means Fatal error signal "n"
+    r_stdout, w_stdout = IO.pipe
+    r_stderr, w_stderr = IO.pipe
+    pid = Process.spawn(cmd, {
+      pgroup:true,  # become process leader
+      out:w_stdout, # redirection
+      err:w_stderr  # redirection
+    })
+    begin
+      Timeout::timeout(max_seconds) do
+        _, ps = Process.waitpid2(pid)
+        @status = ps.exitstatus
+        @timed_out = (@status == 137)
+      end
+    rescue Timeout::Error
+      Process.kill(-9, pid) # -ve means kill process-group
+      Process.detach(pid)   # prevent zombie-child
+      @status = 137         # don't wait for status from detach
+      @timed_out = true
+    ensure
+      w_stdout.close unless w_stdout.closed?
+      w_stderr.close unless w_stderr.closed?
+      @stdout = sanitized(r_stdout.read)
+      @stderr = sanitized(r_stderr.read)
+      r_stdout.close
+      r_stderr.close
+    end
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - - -
+  # tar-piping text files into the container
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def tar_pipe_cmd(tmp_dir, cmd = 'bash ./cyber-dojo.sh')
@@ -175,45 +232,66 @@ class Runner # stateful
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
+  # tar-piping text files out of the container
+  # - - - - - - - - - - - - - - - - - - - - - -
 
-  def run_timeout(cmd, max_seconds)
-    # The [docker exec] running on the _host_ is
-    # killed by Process.kill. This does _not_ kill
-    # the cyber-dojo.sh running _inside_ the docker
-    # container. The container is killed in the ensure
-    # block of in_container()
-    # See https://github.com/docker/docker/issues/9098
-    # 137=128+9 means Fatal error signal "n"
-    r_stdout, w_stdout = IO.pipe
-    r_stderr, w_stderr = IO.pipe
-    pid = Process.spawn(cmd, {
-      pgroup:true,  # become process leader
-      out:w_stdout, # redirection
-      err:w_stderr  # redirection
-    })
-    begin
-      Timeout::timeout(max_seconds) do
-        _, ps = Process.waitpid2(pid)
-        @status = ps.exitstatus
-        @timed_out = (@status == 137)
+  include FileDelta
+
+  def set_file_delta(was_files)
+    now_files = tar_pipe_out
+    if now_files == {} || @timed_out
+      @new_files = {}
+      @deleted_files = {}
+      @changed_files = {}
+    else
+      file_delta(was_files, now_files)
+    end
+  end
+
+  def tar_pipe_out
+    # The create_text_file_tar_list.sh file is injected
+    # into the test-framework image by image_builder.
+    # Passes the tar-list filename as an environment
+    # variable because using bash -c means you
+    # cannot pass it as an argument.
+    Dir.mktmpdir do |tmp_dir|
+      tar_list = '/tmp/tar.list'
+      docker_tar_pipe = <<~SHELL.strip
+        docker exec --user=root                           \
+          --env TAR_LIST=#{tar_list}                      \
+          #{container_name}                               \
+          bash -c                                         \
+            '                                             \
+            /usr/local/bin/create_text_file_tar_list.sh   \
+            &&                                            \
+            tar -zcf - -T #{tar_list}                     \
+            '                                             \
+              | tar -zxf - -C #{tmp_dir}
+      SHELL
+      # A crippled container (eg fork-bomb) will
+      # likely not be running causing the [docker exec]
+      # to fail so you cannot use shell.assert() here.
+      _stdout,_stderr,status = shell.exec(docker_tar_pipe)
+      if status == 0
+        read_from(tmp_dir + sandbox_dir)
+      else
+        {}
       end
-    rescue Timeout::Error
-      Process.kill(-9, pid) # -ve means kill process-group
-      Process.detach(pid)   # prevent zombie-child
-      @status = 137         # don't wait for status from detach
-      @timed_out = true
-    ensure
-      w_stdout.close unless w_stdout.closed?
-      w_stderr.close unless w_stderr.closed?
-      @stdout = sanitized(r_stdout.read)
-      @stderr = sanitized(r_stderr.read)
-      r_stdout.close
-      r_stderr.close
     end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
   # red-amber-green colour of stdout,stderr,status
+  # - - - - - - - - - - - - - - - - - - - - - -
+
+  def set_colour
+    if @timed_out
+      @colour = 'timed_out'
+    else
+      @colour = red_amber_green
+    end
+  end
+
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def red_amber_green

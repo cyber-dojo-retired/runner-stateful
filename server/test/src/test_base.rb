@@ -83,7 +83,7 @@ class TestBase < HexMiniTest
       unchanged_files.delete(filename)
     end
 
-    @quad = runner.run_cyber_dojo_sh(
+    @result = runner.run_cyber_dojo_sh(
       image_name, kata_id,
       defaulted_arg(named_args, :avatar_name, avatar_name),
       new_files, deleted_files, unchanged_files, changed_files,
@@ -96,29 +96,43 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+  attr_reader :result
+
   def stdout
-    quad[:stdout]
+    result[:stdout]
   end
 
   def stderr
-    quad[:stderr]
+    result[:stderr]
   end
 
   def colour
-    quad[:colour]
+    result[:colour]
+  end
+
+  def new_files
+    result[:new_files]
+  end
+
+  def deleted_files
+    result[:deleted_files]
+  end
+
+  def changed_files
+    result[:changed_files]
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_stdout(expected)
-    assert_equal expected, stdout, quad
+    assert_equal expected, stdout, result
   end
   def refute_stdout(unexpected)
-    refute_equal unexpected, stdout, quad
+    refute_equal unexpected, stdout, result
   end
 
   def assert_stderr(expected)
-    assert_equal expected, stderr, quad
+    assert_equal expected, stderr, result
   end
 
   def timed_out?
@@ -126,15 +140,15 @@ class TestBase < HexMiniTest
   end
 
   def assert_timed_out
-    assert timed_out?, quad
+    assert timed_out?, result
   end
 
   def refute_timed_out
-    refute timed_out?, quad
+    refute timed_out?, result
   end
 
   def assert_colour(expected)
-    assert_equal expected, colour, quad
+    assert_equal expected, colour, result
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -144,7 +158,7 @@ class TestBase < HexMiniTest
       :changed_files => { 'cyber-dojo.sh' => script }
     }
     run_cyber_dojo_sh(named_args)
-    refute timed_out?, quad
+    refute timed_out?, result
     stdout.strip
   end
 
@@ -187,6 +201,7 @@ class TestBase < HexMiniTest
   end
 
   def os
+    return @os unless @os.nil?
     if hex_test_name.start_with? '[C,assert]'
       :C_assert
     elsif hex_test_name.start_with? '[Ubuntu]'
@@ -232,12 +247,6 @@ class TestBase < HexMiniTest
 
   def defaulted_arg(named_args, arg_name, arg_default)
     named_args.key?(arg_name) ? named_args[arg_name] : arg_default
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def quad
-    @quad
   end
 
 end
