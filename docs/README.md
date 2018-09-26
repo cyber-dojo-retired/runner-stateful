@@ -6,7 +6,7 @@ alt="cyber-dojo yin/yang logo" width="50px" height="50px"/>
 # cyberdojo/runner-stateful docker image
 
 - A docker-containerized stateful micro-service for [cyber-dojo](http://cyber-dojo.org).
-- Runs an avatar's tests.
+- Runs cyber-dojo.sh inside a docker container within a given amount of time.
 - A docker-volume holds the state of each practice session.
 
 API:
@@ -33,11 +33,14 @@ Returns the git commit sha used to create the docker image.
 
 # POST kata_new
 Sets up the kata with the given kata_id.
-Must be called once before any call to avatar_new with the same kata_id.
 - parameters, eg
 ```
-  { "image_name": "cyberdojofoundation/gcc_assert",
-       "kata_id": "15B9AD6C42"
+  {     "image_name": "cyberdojofoundation/gcc_assert",
+           "kata_id": "15B9AD6C42",
+    "starting_files": { "hiker.h" => "#ifndef HIKER_INCLUDED...",
+                        "hiker.c" => "#include...",
+                        ...
+                      }
   }
 ```
 
@@ -52,45 +55,13 @@ Tears down the kata with the given kata_id.
 
 - - - -
 
-# POST avatar_new
-Sets up the avatar with the given avatar_name, in the
-kata with the given kata_id, with the given starting files.
-Must be called once before any call to run_cyber_dojo_sh with the
-same kata_id and avatar_name.
-- parameters, eg
-```
-  {     "image_name": "cyberdojofoundation/gcc_assert",
-           "kata_id": "15B9AD6C42",
-       "avatar_name": "salmon",
-    "starting_files": { "hiker.h": "#ifndef HIKER_INCLUDED...",
-                        "hiker.c": "#include...",
-                        ...
-                      }
-  }
-```
-
-# POST avatar_old
-Tears down the avatar with the given avatar_name,
-in the kata with the given kata_id.
-- parameters, eg
-```
-  {  "image_name": "cyberdojofoundation/gcc_assert",
-        "kata_id": "15B9AD6C42",
-    "avatar_name": "salmon"
-  }
-```
-
-- - - -
-
 # POST run_cyber_dojo_sh
 Saves the unchanged files, the changed_files, and the new files,
-deletes the deleted_files, and runs
-cyber-dojo.sh as the avatar with the given avatar_name.
+deletes the deleted_files, and runs cyber-dojo.sh.
 - parameters, eg
 ```
   {        "image_name": "cyberdojofoundation/gcc_assert",
               "kata_id": "15B9AD6C42",
-          "avatar_name": "salmon",
             "new_files": { ... },
         "deleted_files": { ... },
       "unchanged_files": { "cyber-dojo.sh" => "make" },

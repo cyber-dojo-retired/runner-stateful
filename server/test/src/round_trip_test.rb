@@ -21,7 +21,7 @@ class RoundTripTest < TestBase
 
     all_OSes.each do |os|
       @os = os
-      in_kata_as('salmon') {
+      in_kata {
         assert_cyber_dojo_sh(script)
       }
 
@@ -47,7 +47,7 @@ class RoundTripTest < TestBase
 
     all_OSes.each do |os|
       @os = os
-      in_kata_as('salmon') {
+      in_kata {
         assert_cyber_dojo_sh(script)
       }
 
@@ -62,7 +62,7 @@ class RoundTripTest < TestBase
   test '530', %w( deleted files are detected ) do
     all_OSes.each do |os|
       @os = os
-      in_kata_as('salmon') {
+      in_kata {
         script = "rm #{src_file(os)}"
         assert_cyber_dojo_sh(script)
 
@@ -78,7 +78,7 @@ class RoundTripTest < TestBase
   test '531', %w( changed files are detected ) do
     all_OSes.each do |os|
       @os = os
-      in_kata_as('salmon') {
+      in_kata {
         script = "echo 'XXX' >> #{src_file(os)}"
         assert_cyber_dojo_sh(script)
 
@@ -96,7 +96,7 @@ class RoundTripTest < TestBase
     script = 'yes "123456789" | head -n 1042 > large_file.txt'
     all_OSes.each do |os|
       @os = os
-      in_kata_as('salmon') {
+      in_kata {
         assert_cyber_dojo_sh(script)
       }
 
@@ -118,7 +118,7 @@ class RoundTripTest < TestBase
       @os = os
       stub = BashStubTarPipeOut.new('fail')
       @external = External.new({ 'bash' => stub })
-      in_kata_as('salmon') {
+      in_kata {
         with_captured_log {
           run_cyber_dojo_sh
         }

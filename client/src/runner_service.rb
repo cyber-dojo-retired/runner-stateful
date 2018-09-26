@@ -7,8 +7,8 @@ class RunnerService
     @port = ENV['RUNNER_STATEFUL_SERVICE_PORT'].to_i
   end
 
-  def kata_new(image_name, kata_id)
-    post(__method__, image_name, kata_id)
+  def kata_new(image_name, kata_id, starting_files)
+    post(__method__, image_name, kata_id, starting_files)
   end
 
   def kata_old(image_name, kata_id)
@@ -17,22 +17,12 @@ class RunnerService
 
   # - - - - - - - - - - - - - - - - - - -
 
-  def avatar_new(image_name, kata_id, avatar_name, starting_files)
-    post(__method__, image_name, kata_id, avatar_name, starting_files)
-  end
-
-  def avatar_old(image_name, kata_id, avatar_name)
-    post(__method__, image_name, kata_id, avatar_name)
-  end
-
-  # - - - - - - - - - - - - - - - - - - -
-
   def run_cyber_dojo_sh(
-        image_name, kata_id, avatar_name,
+        image_name, kata_id,
         new_files, deleted_files, unchanged_files, changed_files,
         max_seconds
     )
-    args  = [image_name, kata_id, avatar_name]
+    args  = [image_name, kata_id]
     args += [new_files, deleted_files, unchanged_files, changed_files ]
     args += [max_seconds]
     post(__method__, *args)

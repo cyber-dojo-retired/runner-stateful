@@ -17,7 +17,7 @@ class RunColourRegexTest < TestBase
   test '5A2',
   %w( (cat'ing lambda from file) exception becomes amber ) do
     external.shell = ShellRaiser.new(shell)
-    in_kata_as('salmon') {
+    in_kata {
       run_cyber_dojo_sh
       assert_colour 'amber'
       # would like to check log but there is shell-log over-coupling
@@ -85,7 +85,7 @@ class RunColourRegexTest < TestBase
   %w( [C,assert] red/amber/green progression test ) do
     filename = 'hiker.c'
     src = starting_files[filename]
-    in_kata_as('salmon') {
+    in_kata {
       run_cyber_dojo_sh
       assert_colour 'red'
       run_cyber_dojo_sh( {
@@ -156,7 +156,7 @@ class RunColourRegexTest < TestBase
 
   def assert_rag(lambda)
     external.shell = ShellCatRagFileStub.new(shell, lambda)
-    in_kata_as('salmon') {
+    in_kata {
       run_cyber_dojo_sh
       assert_colour 'amber'
     }

@@ -1,4 +1,3 @@
-require_relative 'all_avatars_names'
 require_relative 'file_delta'
 require_relative 'string_cleaner'
 require_relative 'string_truncater'
@@ -10,13 +9,8 @@ require 'timeout'
 # Uses a long-lived docker volume per kata.
 #
 # Positives:
-#   o) avatars can share disk-state
-#      (eg sqlite database in /sandboxes/shared)
+#   o) persistent disk-state between test-runs can improve speed.
 #   o) short-lived container per run() is pretty secure.
-#
-# Negatives:
-#   o) avatars cannot share processes.
-#   o) bit slower than runner_processful.
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 class Runner # stateful
@@ -36,11 +30,18 @@ class Runner # stateful
   # kata
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def kata_new(image_name, kata_id)
+  def kata_new(image_name, kata_id, starting_files)
     @image_name = image_name
     @kata_id = kata_id
     refute_kata_exists
     create_kata_volume
+    in_container(3) { # max_seconds
+      make_and_chown_dirs
+      Dir.mktmpdir { |tmp_dir|
+        save_to(starting_files, tmp_dir)
+        shell.assert(tar_pipe_cmd(tmp_dir, 'true'))
+      }
+    }
     nil
   end
 
@@ -53,50 +54,20 @@ class Runner # stateful
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # avatar
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def avatar_new(image_name, kata_id, avatar_name, starting_files)
-    @image_name = image_name
-    @kata_id = kata_id
-    @avatar_name = avatar_name
-    assert_kata_exists
-    in_container(3) { # max_seconds
-      refute_avatar_exists
-      in_container_avatar_new(starting_files)
-    }
-    nil
-  end
-
-  def avatar_old(image_name, kata_id, avatar_name)
-    @image_name = image_name
-    @kata_id = kata_id
-    @avatar_name = avatar_name
-    assert_kata_exists
-    in_container(3) { # max_seconds
-      assert_avatar_exists
-      remove_sandbox_dir
-    }
-    nil
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # run
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run_cyber_dojo_sh(
-    image_name, kata_id, avatar_name,
+    image_name, kata_id,
     new_files, deleted_files, unchanged_files, changed_files,
     max_seconds
   )
     @image_name = image_name
     @kata_id = kata_id
-    @avatar_name = avatar_name
 
-    ensure_kata_exists
+    ensure_kata_exists(unchanged_files)
     all_files = [*changed_files, *new_files].to_h
     in_container(max_seconds) {
-      ensure_avatar_exists(unchanged_files)
       deleted_files.each_key do |pathed_filename|
         shell.assert(docker_exec("rm #{sandbox_dir}/#{pathed_filename}"))
       end
@@ -117,7 +88,7 @@ class Runner # stateful
 
   private # = = = = = = = = = = = = = = = = = = = = = = = =
 
-  attr_reader :image_name, :kata_id, :avatar_name
+  attr_reader :image_name, :kata_id
 
   def save_to(files, tmp_dir)
     files.each do |pathed_filename, content|
@@ -396,7 +367,7 @@ class Runner # stateful
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def container_name
-    [ name_prefix, kata_id, avatar_name ].join('_')
+    [ name_prefix, kata_id ].join('_')
   end
 
   def name_prefix
@@ -407,7 +378,6 @@ class Runner # stateful
 
   def env_vars
     [
-      env_var('AVATAR_NAME', avatar_name),
       env_var('IMAGE_NAME',  image_name),
       env_var('KATA_ID',     kata_id),
       env_var('RUNNER',      'stateful'),
@@ -453,33 +423,16 @@ class Runner # stateful
   GB = 1024 * MB
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
-  # resurrection
-  # assume revisiting a kata the collector has collected.
-  # - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def ensure_kata_exists
-    unless kata_exists?
-      kata_new(@image_name, @kata_id)
-    end
-  end
-
-  def ensure_avatar_exists(files)
-    unless avatar_exists?
-      in_container_avatar_new(files)
-    end
-  end
-
-  def in_container_avatar_new(starting_files)
-    make_and_chown_dirs
-    Dir.mktmpdir { |tmp_dir|
-      save_to(starting_files, tmp_dir)
-      shell.assert(tar_pipe_cmd(tmp_dir, 'true'))
-    }
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - -
   # kata
   # - - - - - - - - - - - - - - - - - - - - - - - -
+
+  def ensure_kata_exists(starting_files)
+    # resurrection. Assume we are revisiting
+    # a kata the collector has collected.
+    unless kata_exists?
+      kata_new(image_name, kata_id, starting_files)
+    end
+  end
 
   def assert_kata_exists
     unless kata_exists?
@@ -517,50 +470,23 @@ class Runner # stateful
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
-  # avatar
+  # user
   # - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def assert_avatar_exists
-    unless avatar_exists?
-      argument_error('avatar_name', '!exists')
-    end
-  end
-
-  def refute_avatar_exists
-    if avatar_exists?
-      argument_error('avatar_name', 'exists')
-    end
-  end
-
-  def avatar_exists?
-    # check is for avatar's sandboxes/ subdir and
-    # not its /home/ subdir which is pre-created
-    # in the docker image.
-    cmd = "[ -d #{sandbox_dir} ]"
-    _stdout,_stderr,status = shell.exec(docker_exec(cmd))
-    status == shell.success
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - -
-  # avatar
-  # - - - - - - - - - - - - - - - - - - - - - - - -
-
-  include AllAvatarsNames
 
   def group
-    'cyber-dojo'
+    'sandbox'
   end
 
   def gid
-    5000
+    51966 # sandbox group
   end
 
   def uid
-    40000 + all_avatars_names.index(avatar_name)
+    41966 # sandbox user
   end
 
   def sandbox_dir
-    "#{sandboxes_root_dir}/#{avatar_name}"
+    "#{sandboxes_root_dir}/#{kata_id}"
   end
 
   def sandboxes_root_dir

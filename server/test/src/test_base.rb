@@ -1,5 +1,4 @@
 require_relative 'hex_mini_test'
-require_relative '../../src/all_avatars_names'
 require_relative '../../src/external'
 require_relative '../../src/runner'
 require 'json'
@@ -46,23 +45,12 @@ class TestBase < HexMiniTest
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def kata_new
-    runner.kata_new(image_name, kata_id)
+    runner.kata_new(image_name, kata_id, starting_files)
+    @previous_files = starting_files
   end
 
   def kata_old
     runner.kata_old(image_name, kata_id)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def avatar_new(name = 'salmon')
-    @avatar_name = name
-    @previous_files = starting_files
-    runner.avatar_new(image_name, kata_id, @avatar_name, @previous_files)
-  end
-
-  def avatar_old(name = avatar_name)
-    runner.avatar_old(image_name, kata_id, name)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -93,7 +81,6 @@ class TestBase < HexMiniTest
 
     @result = runner.run_cyber_dojo_sh(
       image_name, kata_id,
-      defaulted_arg(named_args, :avatar_name, avatar_name),
       new_files, deleted_files, unchanged_files, changed_files,
       defaulted_arg(named_args, :max_seconds, 10)
     )
@@ -180,16 +167,12 @@ class TestBase < HexMiniTest
     hex_test_id + '0' * (10-hex_test_id.length)
   end
 
-  def avatar_name
-    @avatar_name
-  end
-
   def uid
-    40000 + all_avatars_names.index(avatar_name)
+    41966
   end
 
   def group
-    'cyber-dojo'
+    'sandbox'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -221,16 +204,6 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def in_kata_as(name)
-    in_kata {
-      as(name) {
-        yield
-      }
-    }
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   def in_kata
     kata_new
     begin
@@ -240,18 +213,7 @@ class TestBase < HexMiniTest
     end
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def as(name)
-    avatar_new(name)
-    yield
-  ensure
-    avatar_old(name)
-  end
-
   private
-
-  include AllAvatarsNames
 
   def defaulted_arg(named_args, arg_name, arg_default)
     named_args.key?(arg_name) ? named_args[arg_name] : arg_default

@@ -11,7 +11,7 @@ class RessurectionTest < TestBase
   test 'F5E', %w(
   when collector collects kata's volume
   then runner ressurects it and the avatar ) do
-    in_kata_as('salmon') {
+    in_kata {
       remove_kata_volume
       run_cyber_dojo_sh
       assert_colour 'red'

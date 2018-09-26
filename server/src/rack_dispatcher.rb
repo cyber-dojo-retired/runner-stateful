@@ -26,12 +26,10 @@ class RackDispatcher # stateful
     @well_formed_args = WellFormedArgs.new(request.body.read)
     args = case name
       when /^sha$/          then []
-      when /^kata_new$/,
-           /^kata_old$/     then [image_name, kata_id]
-      when /^avatar_new$/   then [image_name, kata_id, avatar_name, starting_files]
-      when /^avatar_old$/   then [image_name, kata_id, avatar_name]
+      when /^kata_new$/     then [image_name, kata_id, starting_files]
+      when /^kata_old$/     then [image_name, kata_id]
       when /^run_cyber_dojo_sh$/
-        [image_name, kata_id, avatar_name,
+        [image_name, kata_id,
          new_files, deleted_files, unchanged_files, changed_files,
          max_seconds]
       else
@@ -56,7 +54,6 @@ class RackDispatcher # stateful
 
   well_formed_args :image_name,
                    :kata_id,
-                   :avatar_name,
                    :starting_files,
                    :new_files,
                    :deleted_files,

@@ -11,12 +11,10 @@ class Demo
   def inner_call(_env)
     @html = ''
     in_kata {
-      as('salmon') {
-        timed_out
-        red
-        amber
-        green
-      }
+      red
+      amber
+      green
+      timed_out
     }
     [ 200, { 'Content-Type' => 'text/html' }, [ @html ] ]
   end
@@ -65,15 +63,9 @@ class Demo
     end
   end
 
-  attr_reader :avatar_name
   attr_reader :new_files, :deleted_files, :unchanged_files, :changed_files
 
   # - - - - - - - - - - - - - - - - - - - - -
-
-  def timed_out
-    change('hiker.c', hiker_c.sub('return', "for(;;);\n return"))
-    run_cyber_dojo_sh('LightGray', 3)
-  end
 
   def red
     change('hiker.c', hiker_c.sub('6 * 9', '6 * 9'))
@@ -90,6 +82,13 @@ class Demo
     run_cyber_dojo_sh('Green')
   end
 
+  def timed_out
+    change('hiker.c', hiker_c.sub('return', "for(;;);\n return"))
+    run_cyber_dojo_sh('LightGray', 3)
+  end
+
+  # - - - - - - - - - - - - - - - - - - - - -
+
   def change(filename, content)
     changed_files[filename] = content
     unchanged_files.delete(filename)
@@ -97,7 +96,7 @@ class Demo
 
   def run_cyber_dojo_sh(colour, max_seconds = 10)
     result = nil
-    args  = [ image_name, kata_id, avatar_name ]
+    args  = [ image_name, kata_id ]
     args += [ new_files, deleted_files, unchanged_files, changed_files ]
     args << max_seconds
     duration = timed {
