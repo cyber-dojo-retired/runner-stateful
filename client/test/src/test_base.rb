@@ -1,4 +1,3 @@
-require_relative 'all_avatars_names'
 require_relative 'hex_mini_test'
 require_relative '../../src/runner_service'
 require 'json'
@@ -21,31 +20,15 @@ class TestBase < HexMiniTest
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def kata_new(named_args = {})
-    runner.kata_new(*common_args(named_args))
+    args = common_args(named_args)
+    args << defaulted_arg(named_args, :starting_files, starting_files)
+    @all_files = args[-1]
+    runner.kata_new(*args)
     nil
   end
 
   def kata_old(named_args={})
     runner.kata_old(*common_args(named_args))
-    nil
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def avatar_new(named_args = {})
-    args = common_args(named_args)
-    args << defaulted_arg(named_args, :avatar_name,    avatar_name)
-    args << defaulted_arg(named_args, :starting_files, starting_files)
-    runner.avatar_new(*args)
-    @avatar_name = args[-2]
-    @all_files = args[-1]
-    nil
-  end
-
-  def avatar_old(named_args = {})
-    args = common_args(named_args)
-    args << defaulted_arg(named_args, :avatar_name, avatar_name)
-    runner.avatar_old(*args)
     nil
   end
 
@@ -69,7 +52,6 @@ class TestBase < HexMiniTest
     end
 
     args = common_args(named_args)
-    args << defaulted_arg(named_args, :avatar_name, avatar_name)
     args << new_files
     args << defaulted_arg(named_args, :deleted_files, {})
     args << unchanged_files
@@ -164,38 +146,24 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  include AllAvatarsNames
-
-  def avatar_name
-    @avatar_name || salmon
-  end
-
-  def salmon
-    'salmon'
-  end
-
-  INVALID_AVATAR_NAME = 'sunglasses'
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   def user_id
-    40000 + all_avatars_names.index(avatar_name)
+    41966
   end
 
   def group_id
-    5000
+    51966
   end
 
   def group
-    'cyber-dojo'
+    'sandbox'
   end
 
   def home_dir
-    "/home/#{avatar_name}"
+    '/home/sandbox'
   end
 
   def sandbox_dir
-    "/sandboxes/#{avatar_name}"
+    "/sandboxes/#{kata_id}"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -241,33 +209,12 @@ class TestBase < HexMiniTest
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def in_kata_as(name)
-    in_kata {
-      as(name) {
-        yield
-      }
-    }
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
   def in_kata
     kata_new
     begin
       yield
     ensure
       kata_old
-    end
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def as(name, files = starting_files)
-    avatar_new({ avatar_name: name, starting_files: files })
-    begin
-      yield
-    ensure
-      avatar_old({ avatar_name: name })
     end
   end
 

@@ -3,8 +3,8 @@ require_relative 'http_json_service'
 class RunnerService
 
   def initialize
-    @hostname = ENV['RUNNER_STATEFUL_SERVICE_NAME']
-    @port = ENV['RUNNER_STATEFUL_SERVICE_PORT'].to_i
+    @hostname = 'runner-stateful'
+    @port = 4557
   end
 
   def kata_new(image_name, kata_id, starting_files)

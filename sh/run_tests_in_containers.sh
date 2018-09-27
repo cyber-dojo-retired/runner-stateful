@@ -3,21 +3,29 @@
 readonly ROOT_DIR="$( cd "$( dirname "${0}" )" && cd .. && pwd )"
 readonly MY_NAME="${ROOT_DIR##*/}"
 
-readonly SERVER_CID=`docker ps --all --quiet --filter "name=${MY_NAME}-server"`
-readonly CLIENT_CID=`docker ps --all --quiet --filter "name=${MY_NAME}-client"`
+readonly SERVER_CID=$(docker ps --all --quiet --filter "name=${MY_NAME}-server")
+readonly CLIENT_CID=$(docker ps --all --quiet --filter "name=${MY_NAME}-client")
+
+readonly COVERAGE_ROOT=/tmp/coverage
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 run_server_tests()
 {
-  docker exec "${SERVER_CID}" sh -c "cd /app/test && ./run.sh ${*}"
+  echo
+  echo 'Running server tests...'
+
+  docker exec \
+    --env COVERAGE_ROOT=${COVERAGE_ROOT} \
+    "${SERVER_CID}" \
+      sh -c "cd /app/test && ./run.sh ${*}"
   server_status=$?
 
   # You can't [docker cp] from a tmpfs, you have to tar-pipe out.
   docker exec "${SERVER_CID}" \
     tar Ccf \
-      "$(dirname "${RUNNER_STATEFUL_COVERAGE_ROOT}")" \
-      - "$(basename "${RUNNER_STATEFUL_COVERAGE_ROOT}")" \
+      "$(dirname "${COVERAGE_ROOT}")" \
+      - "$(basename "${COVERAGE_ROOT}")" \
         | tar Cxf "${ROOT_DIR}/server/" -
 
   echo "Coverage report copied to ${MY_NAME}/server/coverage/"
@@ -28,14 +36,20 @@ run_server_tests()
 
 run_client_tests()
 {
-  docker exec "${CLIENT_CID}" sh -c "cd /app/test && ./run.sh ${*}"
+  echo
+  echo 'Running client tests...'
+
+  docker exec \
+    --env COVERAGE_ROOT=${COVERAGE_ROOT} \
+    "${CLIENT_CID}" \
+      sh -c "cd /app/test && ./run.sh ${*}"
   client_status=$?
 
   # You can't [docker cp] from a tmpfs, you have to tar-pipe out.
   docker exec "${CLIENT_CID}" \
     tar Ccf \
-      "$(dirname "${RUNNER_STATEFUL_COVERAGE_ROOT}")" \
-      - "$(basename "${RUNNER_STATEFUL_COVERAGE_ROOT}")" \
+      "$(dirname "${COVERAGE_ROOT}")" \
+      - "$(basename "${COVERAGE_ROOT}")" \
         | tar Cxf "${ROOT_DIR}/client/" -
 
   echo "Coverage report copied to ${MY_NAME}/client/coverage/"
@@ -43,6 +57,7 @@ run_client_tests()
 }
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - -
+
 if [ ! -z "${TRAVIS}" ]; then
   # on Travis - pull images used by tests
   docker pull cyberdojofoundation/gcc_assert
@@ -53,9 +68,6 @@ fi
 
 server_status=0
 client_status=0
-
-# shellcheck disable=SC1090
-. "${ROOT_DIR}/.env"
 
 if [ "$1" = "server" ]; then
   shift

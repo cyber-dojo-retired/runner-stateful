@@ -378,10 +378,10 @@ class Runner # stateful
 
   def env_vars
     [
-      env_var('IMAGE_NAME',  image_name),
-      env_var('KATA_ID',     kata_id),
-      env_var('RUNNER',      'stateful'),
-      env_var('SANDBOX',     sandbox_dir),
+      env_var('IMAGE_NAME', image_name),
+      env_var('KATA_ID',    kata_id),
+      env_var('RUNNER',     'stateful'),
+      env_var('SANDBOX',    sandbox_dir),
     ].join(space)
   end
 
@@ -470,7 +470,7 @@ class Runner # stateful
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
-  # user
+  # sandbox user/group
   # - - - - - - - - - - - - - - - - - - - - - - - -
 
   def group
@@ -493,14 +493,7 @@ class Runner # stateful
     '/sandboxes'
   end
 
-  # - - - - - - - - - - - - - - - - - - - - - - - -
-
   def make_and_chown_dirs
-    # first avatar makes the shared dir
-    shared_dir = "#{sandboxes_root_dir}/shared"
-    shell.assert(docker_exec("mkdir -p -m 775 #{shared_dir}"))
-    shell.assert(docker_exec("chown root:#{group} #{shared_dir}"))
-
     shell.assert(docker_exec("mkdir -m 755 #{sandbox_dir}"))
     shell.assert(docker_exec("chown #{uid}:#{gid} #{sandbox_dir}"))
   end

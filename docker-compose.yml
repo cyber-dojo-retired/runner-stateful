@@ -6,25 +6,17 @@ services:
   runner-stateful-client:
     build:
       context: client
-      args:
-        - RUNNER_STATEFUL_HOME
     user: nobody
     image: cyberdojo/runner-stateful-client
     init: true
     container_name: test-runner-stateful-client
-    expose: [ "${RUNNER_STATEFUL_CLIENT_PORT}" ]
     read_only: true
     tmpfs: /tmp
     restart: 'no'
     depends_on:
       - runner-stateful
-    environment:
-      - RUNNER_STATEFUL_CLIENT_PORT
-      - RUNNER_STATEFUL_SERVICE_NAME=runner-stateful
-      - RUNNER_STATEFUL_SERVICE_PORT
-      - RUNNER_STATEFUL_COVERAGE_ROOT
     ports:
-      - ${RUNNER_STATEFUL_CLIENT_PORT}:${RUNNER_STATEFUL_CLIENT_PORT}
+      - 4558:4558
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -32,20 +24,16 @@ services:
     build:
       context: server
       args:
-        - RUNNER_STATEFUL_HOME
         - SHA
     user: root
     image: cyberdojo/runner-stateful
     init: true
     container_name: test-runner-stateful-server
-    expose: [ "${RUNNER_STATEFUL_SERVICE_PORT}" ]
     read_only: true
     tmpfs: /tmp
     restart: 'no'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
-      - RUNNER_STATEFUL_SERVICE_PORT
-      - RUNNER_STATEFUL_COVERAGE_ROOT
       - TRAVIS
 

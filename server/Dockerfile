@@ -1,18 +1,11 @@
 FROM  cyberdojo/docker-base
 LABEL maintainer=jon@jaggersoft.com
 
-# - - - - - - - - - - - - - - - -
-# setup server
-# - - - - - - - - - - - - - - - -
-
-ARG RUNNER_STATEFUL_HOME
-COPY . ${RUNNER_STATEFUL_HOME}
-
-# - - - - - - - - - - - - - - - - -
-# git commit sha image is built from
-# - - - - - - - - - - - - - - - - -
+ARG HOME=/app
+COPY . ${HOME}
 
 ARG SHA
-RUN echo ${SHA} > ${RUNNER_STATEFUL_HOME}/sha.txt
+RUN echo ${SHA} > ${HOME}/sha.txt
 
+EXPOSE 4557
 CMD [ "./up.sh" ]
