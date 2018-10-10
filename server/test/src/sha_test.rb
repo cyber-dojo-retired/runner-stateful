@@ -3,7 +3,7 @@ require_relative 'test_base'
 class ShaTest < TestBase
 
   def self.hex_prefix
-    'FB359'
+    'FB3'
   end
 
   # - - - - - - - - - - - - - - - - -

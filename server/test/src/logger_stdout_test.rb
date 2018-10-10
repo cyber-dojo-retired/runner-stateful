@@ -3,7 +3,7 @@ require_relative 'test_base'
 class LoggerStdoutTest < TestBase
 
   def self.hex_prefix
-    '1B67B'
+    '1B6'
   end
 
   test '962',

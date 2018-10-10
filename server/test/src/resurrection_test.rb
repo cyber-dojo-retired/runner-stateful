@@ -3,7 +3,7 @@ require_relative 'test_base'
 class RessurectionTest < TestBase
 
   def self.hex_prefix
-    '7B48B'
+    '7B4'
   end
 
   # - - - - - - - - - - - - - - - - -
@@ -25,11 +25,15 @@ class RessurectionTest < TestBase
   end
 
   def kata_volume_name
-    [ name_prefix, kata_id ].join('_')
+    [ name_prefix, id_sha ].join('_')
   end
 
   def name_prefix
     'test_run__runner_stateful_'
+  end
+
+  def id_sha
+    Digest::SHA1.hexdigest(id)[0..11]
   end
 
 end

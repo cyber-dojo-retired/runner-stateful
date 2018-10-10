@@ -3,7 +3,7 @@ require_relative 'test_base'
 class RunColourRegexTest < TestBase
 
   def self.hex_prefix
-    'F6D43'
+    'F6D'
   end
 
   def hex_teardown

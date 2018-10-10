@@ -45,12 +45,12 @@ class TestBase < HexMiniTest
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def kata_new
-    runner.kata_new(image_name, kata_id, starting_files)
+    runner.kata_new(image_name, id, starting_files)
     @previous_files = starting_files
   end
 
   def kata_old
-    runner.kata_old(image_name, kata_id)
+    runner.kata_old(image_name, id)
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -80,7 +80,7 @@ class TestBase < HexMiniTest
     end
 
     @result = runner.run_cyber_dojo_sh(
-      image_name, kata_id,
+      image_name, id,
       new_files, deleted_files, unchanged_files, changed_files,
       defaulted_arg(named_args, :max_seconds, 10)
     )
@@ -163,8 +163,11 @@ class TestBase < HexMiniTest
     @image_name ||= manifest['image_name']
   end
 
-  def kata_id
-    hex_test_id + '0' * (10-hex_test_id.length)
+  def id
+    if hex_test_id.length < 6
+      fail RuntimeError, "#{hex_test_id}.length < 6"
+    end
+    hex_test_id[0..5]
   end
 
   def uid

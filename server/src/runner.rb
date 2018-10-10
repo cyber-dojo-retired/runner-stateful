@@ -1,6 +1,7 @@
 require_relative 'file_delta'
 require_relative 'string_cleaner'
 require_relative 'string_truncater'
+require 'digest/sha1'
 require 'find'
 require 'timeout'
 
@@ -30,9 +31,9 @@ class Runner # stateful
   # kata
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def kata_new(image_name, kata_id, starting_files)
+  def kata_new(image_name, id, starting_files)
     @image_name = image_name
-    @kata_id = kata_id
+    @id = id
     refute_kata_exists
     create_kata_volume
     in_container(3) { # max_seconds
@@ -45,9 +46,9 @@ class Runner # stateful
     nil
   end
 
-  def kata_old(image_name, kata_id)
+  def kata_old(image_name, id)
     @image_name = image_name
-    @kata_id = kata_id
+    @id = id
     assert_kata_exists
     remove_kata_volume
     nil
@@ -58,12 +59,12 @@ class Runner # stateful
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def run_cyber_dojo_sh(
-    image_name, kata_id,
+    image_name, id,
     new_files, deleted_files, unchanged_files, changed_files,
     max_seconds
   )
     @image_name = image_name
-    @kata_id = kata_id
+    @id = id
 
     ensure_kata_exists(unchanged_files)
     all_files = [*changed_files, *new_files].to_h
@@ -88,7 +89,7 @@ class Runner # stateful
 
   private # = = = = = = = = = = = = = = = = = = = = = = = =
 
-  attr_reader :image_name, :kata_id
+  attr_reader :image_name, :id
 
   def save_to(files, tmp_dir)
     files.each do |pathed_filename, content|
@@ -367,11 +368,23 @@ class Runner # stateful
   # - - - - - - - - - - - - - - - - - - - - - -
 
   def container_name
-    [ name_prefix, kata_id ].join('_')
+    [ name_prefix, id_sha ].join('_')
   end
 
   def name_prefix
     'test_run__runner_stateful_'
+  end
+
+  def id_sha
+    # the docker container name alphabet is
+    # [a-zA-Z0-9][a-zA-Z0-9_.-]
+    # in practice [docker ps -a] reveals generated
+    # container names use only [0-9a-f] and are
+    # 64 chars long (docker ps only shows 12).
+    # Forming a sha like this means there is
+    # no need to require the id alphabet is a subset
+    # of the container-name alphabet.
+    Digest::SHA1.hexdigest(id)[0..11]
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
@@ -379,7 +392,7 @@ class Runner # stateful
   def env_vars
     [
       env_var('IMAGE_NAME', image_name),
-      env_var('KATA_ID',    kata_id),
+      env_var('ID',         id),
       env_var('RUNNER',     'stateful'),
       env_var('SANDBOX',    sandbox_dir),
     ].join(space)
@@ -430,19 +443,19 @@ class Runner # stateful
     # resurrection. Assume we are revisiting
     # a kata the collector has collected.
     unless kata_exists?
-      kata_new(image_name, kata_id, starting_files)
+      kata_new(image_name, id, starting_files)
     end
   end
 
   def assert_kata_exists
     unless kata_exists?
-      argument_error('kata_id', '!exists')
+      argument_error('id', '!exists')
     end
   end
 
   def refute_kata_exists
     if kata_exists?
-      argument_error('kata_id', 'exists')
+      argument_error('id', 'exists')
     end
   end
 
@@ -466,7 +479,7 @@ class Runner # stateful
   end
 
   def kata_volume_name
-    [ name_prefix, kata_id ].join('_')
+    [ name_prefix, id_sha ].join('_')
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - -
@@ -486,7 +499,7 @@ class Runner # stateful
   end
 
   def sandbox_dir
-    "#{sandboxes_root_dir}/#{kata_id}"
+    "#{sandboxes_root_dir}/#{id}"
   end
 
   def sandboxes_root_dir
