@@ -3,14 +3,14 @@ require_relative 'test_base'
 class ApiTest < TestBase
 
   def self.hex_prefix
-    '3759D'
+    '375'
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   multi_os_test '8A1',
   'os-image correspondence' do
-    in_kata_as(salmon) {
+    in_kata {
       etc_issue = assert_cyber_dojo_sh('cat /etc/issue')
       diagnostic = [
         "image_name=:#{image_name}:",
@@ -38,17 +38,17 @@ class ApiTest < TestBase
   multi_os_test '2F2',
   'call to existing method with missing argument becomes exception' do
     in_kata {
-      args = { image_name:image_name, kata_id:kata_id }
-      assert_exception('avatar_new', args.to_json)
+      args = { image_name:image_name }
+      assert_exception('kata_new', args.to_json)
     }
   end
 
   multi_os_test '2F3',
   'call to existing method with bad argument type becomes exception' do
-    in_kata_as(salmon) {
+    in_kata {
       args = {
         image_name:image_name,
-        kata_id:kata_id,
+        id:id,
         avatar_name:avatar_name,
         new_files:2, # <=====
         deleted_files:{},
@@ -82,12 +82,11 @@ class ApiTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   METHOD_NAMES = [ :kata_new, :kata_old,
-                   :avatar_new, :avatar_old,
                    :run_cyber_dojo_sh ]
 
   multi_os_test 'D21',
   'all api methods raise when image_name is malformed' do
-    in_kata_as(salmon) {
+    in_kata {
       METHOD_NAMES.each { |method_name|
         error = assert_raises(StandardError, method_name.to_s) {
           self.send method_name, { image_name:INVALID_IMAGE_NAME }
@@ -99,26 +98,13 @@ class ApiTest < TestBase
   end
 
   multi_os_test '656',
-  'all api methods raise when kata_id is malformed' do
-    in_kata_as(salmon) {
+  'all api methods raise when id is malformed' do
+    in_kata {
       METHOD_NAMES.each { |method_name|
         error = assert_raises(StandardError, method_name.to_s) {
-          self.send method_name, { kata_id:INVALID_KATA_ID }
+          self.send method_name, { id:INVALID_ID }
         }
-        expected = "RunnerService:#{method_name}:kata_id:malformed"
-        assert_equal expected, error.message
-      }
-    }
-  end
-
-  multi_os_test 'C3A',
-  'api methods raise when avatar_name is malformed' do
-    in_kata_as(salmon) {
-      [ :avatar_new, :avatar_old, :run_cyber_dojo_sh ].each { |method_name|
-        error = assert_raises(StandardError, method_name.to_s) {
-          self.send method_name, { avatar_name:INVALID_AVATAR_NAME }
-        }
-        expected = "RunnerService:#{method_name}:avatar_name:malformed"
+        expected = "RunnerService:#{method_name}:id:malformed"
         assert_equal expected, error.message
       }
     }
@@ -130,7 +116,7 @@ class ApiTest < TestBase
 
   test '3DF',
   '[C,assert] run with initial 6*9 == 42 is red' do
-    in_kata_as(salmon) {
+    in_kata {
       run_cyber_dojo_sh
       assert red?
     }
@@ -138,7 +124,7 @@ class ApiTest < TestBase
 
   test '3DE',
   '[C,assert] run with syntax error is amber' do
-    in_kata_as(salmon) {
+    in_kata {
       filename = 'hiker.c'
       content = starting_files[filename]
       run_cyber_dojo_sh({
@@ -150,7 +136,7 @@ class ApiTest < TestBase
 
   test '3DD',
   '[C,assert] run with 6*7 == 42 is green' do
-    in_kata_as(salmon) {
+    in_kata {
       filename = 'hiker.c'
       content = starting_files[filename]
       run_cyber_dojo_sh({
@@ -166,7 +152,7 @@ class ApiTest < TestBase
 
   test '3DC',
   '[C,assert] run with infinite loop times out' do
-    in_kata_as(salmon) {
+    in_kata {
       filename = 'hiker.c'
       content = starting_files[filename]
       from = 'return 6 * 9'
@@ -187,7 +173,7 @@ class ApiTest < TestBase
 
   multi_os_test '3DB',
   'run with very large file is red' do
-    in_kata_as(salmon) {
+    in_kata {
       run_cyber_dojo_sh({
         new_files: { 'big_file' => 'X'*1023*500 }
       })
@@ -207,7 +193,7 @@ class ApiTest < TestBase
       "fold -w #{five_K_plus_1}",
       'head -n 1'
     ].join('|')
-    in_kata_as(salmon) {
+    in_kata {
       run_cyber_dojo_sh({
         changed_files: {
           'cyber-dojo.sh' => "seq 2 | xargs -I{} sh -c '#{command}'"
@@ -223,15 +209,14 @@ class ApiTest < TestBase
 
   multi_os_test '9FA',
   'container environment properties' do
-    in_kata_as(salmon) {
+    in_kata {
       assert_pid_1_is_running_init_process
       assert_cyber_dojo_runs_in_bash
       assert_time_stamp_microseconds_granularity
       assert_env_vars_exist
-      assert_avatar_users_exist
       assert_cyber_dojo_group_exists
-      assert_avatar_has_home
-      assert_avatar_sandbox_properties
+      assert_user_home
+      assert_user_properties
       assert_starting_files_properties
       assert_ulimits
     }
@@ -259,7 +244,7 @@ class ApiTest < TestBase
 
   multi_os_test '8A4',
   'files can be created in sandbox sub-dirs' do
-    in_kata_as(salmon) {
+    in_kata {
       assert_files_can_be_in_sub_dirs_of_sandbox
       assert_files_can_be_in_sub_sub_dirs_of_sandbox
     }
@@ -269,7 +254,7 @@ class ApiTest < TestBase
 
   multi_os_test '8A6',
   'baseline speed' do
-    in_kata_as(salmon) {
+    in_kata {
       assert_baseline_speed
     }
   end
@@ -280,7 +265,7 @@ class ApiTest < TestBase
 
   test 'CD4',
   '[C,assert] print-bomb does not run indefinitely and some output is returned' do
-    in_kata_as(salmon) {
+    in_kata {
       run_cyber_dojo_sh({
         changed_files: { 'hiker.c' => print_bomb }
       })
@@ -293,7 +278,7 @@ class ApiTest < TestBase
 
   test 'CD5',
   '[C,assert] fork-bomb does not run indefinitely' do
-    in_kata_as(salmon) {
+    in_kata {
       run_cyber_dojo_sh({
         changed_files: { 'hiker.c' => fork_bomb }
       })
@@ -307,7 +292,7 @@ class ApiTest < TestBase
 
   multi_os_test 'CD6',
   'shell fork-bomb does not run indefinitely' do
-    in_kata_as(salmon) {
+    in_kata {
       run_cyber_dojo_sh({
         changed_files: { 'cyber-dojo.sh' => shell_fork_bomb }
       })
@@ -322,7 +307,7 @@ class ApiTest < TestBase
 
   test 'DB3',
   '[C,assert] file-handles quickly become exhausted' do
-    in_kata_as(salmon) {
+    in_kata {
       run_cyber_dojo_sh({
         changed_files: { 'hiker.c' => exhaust_file_handles }
       })
@@ -358,9 +343,8 @@ class ApiTest < TestBase
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
   def assert_env_vars_exist
-    assert_equal avatar_name, env_var('AVATAR_NAME')
     assert_equal image_name,  env_var('IMAGE_NAME')
-    assert_equal kata_id,     env_var('KATA_ID')
+    assert_equal id,          env_var('ID')
     assert_equal 'stateful',  env_var('RUNNER')
     assert_equal sandbox_dir, env_var('SANDBOX')
   end
@@ -368,16 +352,6 @@ class ApiTest < TestBase
   def env_var(name)
     cmd = "printenv CYBER_DOJO_#{name}"
     assert_cyber_dojo_sh(cmd)
-  end
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-  def assert_avatar_users_exist
-    etc_passwd = assert_cyber_dojo_sh 'cat /etc/passwd'
-    all_avatars_names.each do |name|
-      assert etc_passwd.include?(user_id.to_s),
-        "#{name}:#{user_id}:#{etc_passwd}:#{image_name}"
-    end
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -391,7 +365,7 @@ class ApiTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_avatar_has_home
+  def assert_user_home
     home = assert_cyber_dojo_sh('printenv HOME')
     assert_equal home_dir, home
 
@@ -401,18 +375,18 @@ class ApiTest < TestBase
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def assert_avatar_sandbox_properties
+  def assert_user_properties
     assert_cyber_dojo_sh "[ -d #{sandbox_dir} ]" # sandbox exists
 
     ls = assert_cyber_dojo_sh "ls -A #{sandbox_dir}"
     refute_equal '', ls # sandbox is not empty
 
-    assert_equal user_id.to_s,  stat_sandbox_dir('u'), 'stat <uid>  sandbox_dir'
-    assert_equal group_id.to_s, stat_sandbox_dir('g'), 'stat <gid>  sandbox_dir'
-    assert_equal 'drwxr-xr-x',  stat_sandbox_dir('A'), 'stat <perm> sandbox_dir'
+    assert_equal user_id.to_s,  stat_user_dir('u'), 'stat <uid>  sandbox_dir'
+    assert_equal group_id.to_s, stat_user_dir('g'), 'stat <gid>  sandbox_dir'
+    assert_equal 'drwxr-xr-x',  stat_user_dir('A'), 'stat <perm> sandbox_dir'
   end
 
-  def stat_sandbox_dir(ch)
+  def stat_user_dir(ch)
     assert_cyber_dojo_sh("stat -c '%#{ch}' #{sandbox_dir}")
   end
 

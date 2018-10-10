@@ -36,7 +36,7 @@ Sets up the kata with the given kata_id.
 - parameters, eg
 ```
   {     "image_name": "cyberdojofoundation/gcc_assert",
-           "kata_id": "15B9AD6C42",
+                "id": "15B9AD",
     "starting_files": { "hiker.h" => "#ifndef HIKER_INCLUDED...",
                         "hiker.c" => "#include...",
                         ...
@@ -49,7 +49,7 @@ Tears down the kata with the given kata_id.
 - parameters, eg
 ```
   { "image_name": "cyberdojofoundation/gcc_assert",
-       "kata_id": "15B9AD6C42"
+            "id": "15B9AD"
   }
 ```
 
@@ -61,7 +61,7 @@ deletes the deleted_files, and runs cyber-dojo.sh.
 - parameters, eg
 ```
   {        "image_name": "cyberdojofoundation/gcc_assert",
-              "kata_id": "15B9AD6C42",
+                   "id": "15B9AD",
             "new_files": { ... },
         "deleted_files": { ... },
       "unchanged_files": { "cyber-dojo.sh" => "make" },

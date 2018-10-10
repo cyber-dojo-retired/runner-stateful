@@ -23,22 +23,22 @@ class Demo
 
   def in_kata
     @image_name = 'cyberdojofoundation/gcc_assert'
-    @kata_id = '729B652756'
+    @id = '729B65'
     duration = timed {
-      runner.kata_new(image_name, kata_id)
+      runner.kata_new(image_name, id)
     }
     @html += pre('kata_new', duration)
     begin
       yield
     ensure
       duration = timed {
-        runner.kata_old(image_name, kata_id)
+        runner.kata_old(image_name, id)
       }
       @html += pre('kata_old', duration)
     end
   end
 
-  attr_reader :image_name, :kata_id
+  attr_reader :image_name, :id
 
   # - - - - - - - - - - - - - - - - - - - - -
 

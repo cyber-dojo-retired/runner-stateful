@@ -28,10 +28,10 @@ class WellFormedArgs
 
   # - - - - - - - - - - - - - - - -
 
-  def kata_id
+  def id
     name = __method__.to_s
     arg = @args[name]
-    unless well_formed_kata_id?(arg)
+    unless well_formed_id?(arg)
       malformed(name)
     end
     arg
@@ -74,8 +74,8 @@ class WellFormedArgs
 
   include WellFormedImageName
 
-  def well_formed_kata_id?(arg)
-    Base58.string?(arg) && arg.size == 10
+  def well_formed_id?(arg)
+    Base58.string?(arg) && arg.size == 6
   end
 
   def well_formed_files(name)

@@ -138,11 +138,11 @@ class TestBase < HexMiniTest
 
     # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-  def kata_id
-    hex_test_id + '0' * (10 - hex_test_id.length)
+  def id
+    hex_test_id[0..5]
   end
 
-  INVALID_KATA_ID = '675'
+  INVALID_ID = '675'
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -163,7 +163,7 @@ class TestBase < HexMiniTest
   end
 
   def sandbox_dir
-    "/sandboxes/#{kata_id}"
+    "/sandboxes/#{id}"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -197,7 +197,7 @@ class TestBase < HexMiniTest
   def common_args(named_args)
     args = []
     args << defaulted_arg(named_args, :image_name, image_name)
-    args << defaulted_arg(named_args, :kata_id,    kata_id)
+    args << defaulted_arg(named_args, :id,         id)
     args
   end
 
