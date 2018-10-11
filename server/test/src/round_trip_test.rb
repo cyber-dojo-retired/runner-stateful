@@ -25,6 +25,9 @@ class RoundTripTest < TestBase
         assert_cyber_dojo_sh(script)
       }
 
+      #puts "image_name:#{image_name}:" #cyberdojofoundation/csharp_nunit
+      puts "stdout:#{stdout}:"
+
       assert stdout.include?('binary.dat: binary') # file --mime-encoding
 
       assert_hash_equal({
