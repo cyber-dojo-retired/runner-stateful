@@ -398,7 +398,7 @@ class Runner # stateful
   end
 
   def env_var(name, value)
-    "--env CYBER_DOJO_#{name}=#{value}"
+    "--env CYBER_DOJO_#{name}='#{value}'"
   end
 
   # - - - - - - - - - - - - - - - - - - - - - -
