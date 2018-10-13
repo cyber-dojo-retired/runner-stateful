@@ -1,3 +1,4 @@
+require_relative 'base62'
 require_relative 'well_formed_image_name'
 require 'json'
 
@@ -74,7 +75,7 @@ class WellFormedArgs
   include WellFormedImageName
 
   def well_formed_id?(arg)
-    arg.is_a?(String) && arg.size == 6
+    Base62.string?(arg) && arg.size == 6
   end
 
   def well_formed_files(name)
