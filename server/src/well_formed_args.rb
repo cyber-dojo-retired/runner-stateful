@@ -2,7 +2,7 @@ require_relative 'base62'
 require_relative 'well_formed_image_name'
 require 'json'
 
-# Checks for arguments synactic correctness
+# Checks for arguments syntactic correctness
 
 class WellFormedArgs
 
